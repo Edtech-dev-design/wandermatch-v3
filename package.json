@@ -1,0 +1,22 @@
+{
+  "name": "wandermatch-v3",
+  "version": "3.0.0",
+  "description": "WANDERMATCH (BẢN ĐỒ MÙ) — PHIÊN BẢN 3.0: Corporate VietQR, Conditional Refund, Hard-Commit SLA & AI Smart Arrival Concierge",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "wandermatch",
+    "blind-trip",
+    "vietqr",
+    "napas247",
+    "ai-concierge",
+    "post-arrival",
+    "refund-engine",
+    "travel-startup"
+  ],
+  "author": "Principal Full-Stack Architect & Senior UI/UX Designer",
+  "license": "MIT"
+}
