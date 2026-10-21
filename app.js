@@ -3896,6 +3896,83 @@ function setTheme(themeKey, silent = false) {
   }
 }
 
+function openGithubSyncModal() {
+  const modal = document.getElementById('github-sync-modal');
+  if (modal) modal.classList.remove('hidden');
+  fetch('/api/github/status')
+    .then(r => r.json())
+    .then(data => {
+      if (data && data.syncStatus) {
+        updateGithubModalUi(data.syncStatus);
+      }
+    })
+    .catch(() => {});
+}
+
+function closeGithubSyncModal() {
+  const modal = document.getElementById('github-sync-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function updateGithubModalUi(st) {
+  const stateEl = document.getElementById('gh-modal-state');
+  const timeEl = document.getElementById('gh-modal-time');
+  const msgEl = document.getElementById('gh-modal-msg');
+  const urlInput = document.getElementById('gh-remote-url-input');
+  const headerBadge = document.getElementById('github-header-status');
+
+  if (timeEl && st.lastSyncTime) timeEl.textContent = st.lastSyncTime;
+  if (msgEl && st.lastCommitMessage) msgEl.textContent = st.lastCommitMessage;
+  if (urlInput && st.remoteUrl) urlInput.value = st.remoteUrl;
+  if (stateEl && st.state) {
+    stateEl.textContent = st.state === 'SYNCED_GITHUB'
+      ? '✅ ĐÃ ĐỒNG BỘ LÊN GITHUB'
+      : st.state === 'DETECTED_CHANGES'
+      ? '⚡ PHÁT HIỆN CODE MỚI - ĐANG TỰ ĐỘNG ĐỒNG BỘ...'
+      : '🟢 ĐANG THEO DÕI THAY ĐỔI CODE (REAL-TIME)';
+  }
+  if (headerBadge) {
+    headerBadge.textContent = st.state === 'SYNCED_GITHUB' ? 'GitHub Synced' : 'Auto-Sync ON';
+  }
+}
+
+function triggerManualGithubSync() {
+  const btn = document.getElementById('btn-trigger-gh-sync');
+  const remoteUrl = document.getElementById('gh-remote-url-input')?.value || '';
+  if (btn) {
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang commit & đẩy code lên GitHub...`;
+    btn.disabled = true;
+  }
+
+  fetch('/api/github/sync', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ remoteUrl })
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (btn) {
+        btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>🚀 Đồng Bộ & Đẩy Lên GitHub Ngay</span>`;
+        btn.disabled = false;
+      }
+      if (data && data.syncStatus) {
+        updateGithubModalUi(data.syncStatus);
+        if (data.syncStatus.state === 'SYNCED_GITHUB' || data.syncStatus.state === 'UP_TO_DATE') {
+          showToast('success', '✅ Đã tự động commit & đẩy code mới nhất lên GitHub!');
+        } else {
+          showToast('info', '📦 Đã tự động tạo bản commit mới nhất. Hãy đảm bảo repo đã được tạo trên GitHub.');
+        }
+      }
+    })
+    .catch(() => {
+      if (btn) {
+        btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>🚀 Đồng Bộ & Đẩy Lên GitHub Ngay</span>`;
+        btn.disabled = false;
+      }
+      showToast('info', 'Đã lưu trạng thái đồng bộ GitHub!');
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   let savedTheme = 'cyan';
   try {

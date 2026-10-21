@@ -9,6 +9,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
+const { exec } = require('child_process');
+const autoSync = require('./auto-sync-github');
 
 const PORT = process.env.PORT || 3000;
 const ROOT_DIR = __dirname;
@@ -282,6 +284,29 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
+  // 9. GitHub Auto-Sync Status & Manual Trigger
+  if (pathname === '/api/github/status' && req.method === 'GET') {
+    return sendJson(res, 200, {
+      success: true,
+      syncStatus: autoSync.getSyncStatus()
+    });
+  }
+
+  if (pathname === '/api/github/sync' && req.method === 'POST') {
+    const body = await parseBody(req);
+    if (body.remoteUrl && body.remoteUrl.startsWith('https://github.com/')) {
+      await new Promise((resolve) => {
+        exec(`git remote set-url origin "${body.remoteUrl.trim()}"`, { cwd: ROOT_DIR }, () => resolve());
+      });
+      autoSync.getSyncStatus().remoteUrl = body.remoteUrl.trim();
+    }
+    const result = await autoSync.performGitSync('Web-UI-Trigger');
+    return sendJson(res, 200, {
+      success: true,
+      syncStatus: result
+    });
+  }
+
   // ==========================================================================
   // STATIC FILE SERVING
   // ==========================================================================
@@ -304,7 +329,9 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`====================================================================`);
-  console.log(`🚀 WANDERMATCH 3.0 SERVER RUNNING AT: http://localhost:${PORT}`);
+  console.log(`🚀 WANDERMATCH 3.1 SERVER RUNNING AT: http://localhost:${PORT}`);
   console.log(`📌 Trip Planner: Input Destination & Custom Budget Enabled`);
+  console.log(`🔄 GitHub Auto-Sync Watcher: ACTIVE (Auto commit & push on save)`);
   console.log(`====================================================================`);
+  autoSync.startFileWatcher();
 });
