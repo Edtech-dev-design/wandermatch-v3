@@ -436,5 +436,88 @@ VALUES (
 ) ON CONFLICT (code_slug) DO NOTHING;
 
 -- ============================================================================
--- KẾT THÚC DDL SCHEMA V3
+-- PHẦN BỔ SUNG: 5 TRỤ CỘT THỰC DỤNG TIÊU DÙNG & TỐI ƯU LOSS AVERSION (V3.1)
+-- ============================================================================
+
+-- BẢNG 13: group_booking_sessions (Phiên đặt chuyến theo nhóm & chia bill VietQR)
+CREATE TABLE IF NOT EXISTS group_booking_sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    group_code VARCHAR(10) UNIQUE NOT NULL, -- Vd: G8892
+    creator_user_id UUID REFERENCES users(id),
+    total_amount NUMERIC(15, 2) NOT NULL CHECK (total_amount > 0),
+    amount_per_member NUMERIC(15, 2) NOT NULL CHECK (amount_per_member > 0),
+    total_members INT NOT NULL CHECK (total_members >= 2 AND total_members <= 10),
+    paid_members_count INT DEFAULT 0,
+    session_expires_at TIMESTAMPTZ NOT NULL, -- Giữ chỗ trong 30 phút
+    status VARCHAR(30) DEFAULT 'WAITING_MEMBERS' CHECK (status IN ('WAITING_MEMBERS', 'FULLY_PAID', 'EXPIRED_REFUNDED', 'CANCELLED')),
+    corporate_account_no VARCHAR(50) DEFAULT '990812348888',
+    corporate_bank_code VARCHAR(20) DEFAULT 'MB',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- BẢNG 14: group_booking_members (Từng thành viên trong nhóm chia tiền)
+CREATE TABLE IF NOT EXISTS group_booking_members (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id UUID REFERENCES group_booking_sessions(id) ON DELETE CASCADE,
+    member_index INT NOT NULL CHECK (member_index >= 1),
+    member_name VARCHAR(120) NOT NULL,
+    member_phone VARCHAR(20),
+    napas_bank_code VARCHAR(20) NOT NULL,
+    napas_account_no VARCHAR(50) NOT NULL,
+    napas_account_holder VARCHAR(120) NOT NULL,
+    amount_due NUMERIC(15, 2) NOT NULL,
+    vietqr_memo VARCHAR(50) NOT NULL UNIQUE, -- Vd: WM G8892 M1
+    qr_raw_payload TEXT,
+    is_paid BOOLEAN DEFAULT FALSE,
+    paid_at TIMESTAMPTZ,
+    payout_refund_status VARCHAR(30) DEFAULT 'NONE' CHECK (payout_refund_status IN ('NONE', 'PENDING_REFUND', 'REFUNDED_100_PERCENT')),
+    payout_refund_tx_id VARCHAR(100),
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- BẢNG 15: b2b_sla_escrow_claims (Xử lý khiếu nại phòng & kích hoạt SOS Quỹ Ký Quỹ Đổi Phòng 15 Phút)
+CREATE TABLE IF NOT EXISTS b2b_sla_escrow_claims (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    trip_id UUID REFERENCES blind_trips(id) ON DELETE CASCADE,
+    hotel_id UUID REFERENCES b2b_partner_profiles(id),
+    traveler_id UUID REFERENCES users(id),
+    complaint_reason VARCHAR(100) NOT NULL, -- 'OVERBOOKED_DENIED', 'WRONG_STAR_RATING', 'UNHYGIENIC_FACILITY'
+    evidence_image_url TEXT,
+    penalty_deduction_amount NUMERIC(15, 2) NOT NULL, -- Trích từ EscrowSecurityDeposit
+    backup_hotel_voucher_code VARCHAR(50),
+    backup_hotel_name VARCHAR(200),
+    resolution_time_minutes INT DEFAULT 15,
+    status VARCHAR(30) DEFAULT 'SLA_PENALIZED_AND_REPLACED' CHECK (status IN ('PENDING_REVIEW', 'SLA_PENALIZED_AND_REPLACED', 'RESOLVED_SATISFIED', 'REJECTED')),
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- BẢNG 16: anti_tourist_trap_guides (Bản đồ ẩm thực bản địa & cảnh báo chặt chém)
+CREATE TABLE IF NOT EXISTS anti_tourist_trap_guides (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    destination_id UUID REFERENCES destinations(id) ON DELETE CASCADE,
+    spot_name VARCHAR(200) NOT NULL,
+    category VARCHAR(50) NOT NULL, -- 'STREET_FOOD', 'SEAFOOD', 'SPECIALTY_DISH'
+    price_range_min NUMERIC(12, 2) NOT NULL,
+    price_range_max NUMERIC(12, 2) NOT NULL,
+    distance_km_from_hotel NUMERIC(4, 1) DEFAULT 1.5,
+    local_authentic_reason TEXT NOT NULL,
+    scam_warning_alert TEXT, -- Vd: 'Cảnh báo: Không mua hải sản từ người bán rong ven đường, hỏi giá trước khi chọn con sống'
+    voucher_discount_amount NUMERIC(12, 2) DEFAULT 200000.00,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Bổ sung trường Thực dụng vào bảng blind_trips
+ALTER TABLE blind_trips 
+    ADD COLUMN IF NOT EXISTS retail_value_floor NUMERIC(15, 2) DEFAULT 0.00,
+    ADD COLUMN IF NOT EXISTS retail_price_actual NUMERIC(15, 2) DEFAULT 0.00,
+    ADD COLUMN IF NOT EXISTS savings_amount NUMERIC(15, 2) DEFAULT 0.00,
+    ADD COLUMN IF NOT EXISTS savings_pct NUMERIC(5, 2) DEFAULT 0.00,
+    ADD COLUMN IF NOT EXISTS comfort_locks JSONB DEFAULT '{"no_red_eye": true, "bed_type": "TWIN", "luggage_kg": 20, "need_work_desk": false}'::jsonb,
+    ADD COLUMN IF NOT EXISTS exact_departure_window VARCHAR(200),
+    ADD COLUMN IF NOT EXISTS offline_wallet_data JSONB,
+    ADD COLUMN IF NOT EXISTS destination_cost_index NUMERIC(3, 2) DEFAULT 1.0;
+
+-- ============================================================================
+-- KẾT THÚC DDL SCHEMA V3.1 (5 TRỤ CỘT THỰC DỤNG TIÊU DÙNG & TỐI ƯU LOSS AVERSION)
 -- ============================================================================

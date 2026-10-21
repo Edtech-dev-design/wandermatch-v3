@@ -3,3 +3,7 @@ node_modules/
 Thumbs.db
 *.log
 .env
+bin/
+obj/
+__pycache__/
+*.pyc

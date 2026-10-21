@@ -292,18 +292,176 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
-  if (pathname === '/api/github/sync' && req.method === 'POST') {
+  // ==========================================================================
+  // PRAGMATIC PILLARS API ROUTES (V3.1)
+  // ==========================================================================
+
+  // 10. Smart Package & Value Guarantee Calculator (Retail Value Floor >= 120%)
+  if (pathname === '/api/pragmatic/guarantee-calculate' && req.method === 'POST') {
     const body = await parseBody(req);
-    if (body.remoteUrl && body.remoteUrl.startsWith('https://github.com/')) {
-      await new Promise((resolve) => {
-        exec(`git remote set-url origin "${body.remoteUrl.trim()}"`, { cwd: ROOT_DIR }, () => resolve());
-      });
-      autoSync.getSyncStatus().remoteUrl = body.remoteUrl.trim();
-    }
-    const result = await autoSync.performGitSync('Web-UI-Trigger');
+    const budget = Math.max(1000000, Number(body.budget) || 5000000);
+    const retailFloor = Math.round(budget * 1.20);
+    const estimatedSavings = Math.round(budget * 0.25);
+    const wholesaleNetCost = Math.round(budget * 0.75);
+
     return sendJson(res, 200, {
       success: true,
-      syncStatus: result
+      budgetSelected: budget,
+      retailValueFloorMin: retailFloor,
+      retailValueFloorRatio: "120%",
+      accommodationStandard: "Khách sạn/Resort 4-5 sao (Review >= 8.2/10)",
+      refund200PctGuaranteeBadge: "Cam kết hoàn tiền 200% phần chênh lệch vào STK đã liên kết nếu tổng giá trị thực tế thấp hơn gói ngân sách",
+      estimatedSavingsVnd: estimatedSavings,
+      wholesaleNetCostB2b: wholesaleNetCost,
+      voucherFoodVnd: 200000
+    });
+  }
+
+  // 11. Group Split-Bill VietQR Session Generator
+  if (pathname === '/api/group-booking/create' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const totalBudget = Math.max(2000000, Number(body.totalBudget) || 16000000);
+    const membersCount = Math.min(10, Math.max(2, Number(body.membersCount) || 4));
+    const groupCode = `G${Math.floor(1000 + Math.random() * 9000)}`;
+    const perMember = Math.round(totalBudget / membersCount);
+
+    const members = [];
+    for (let i = 1; i <= membersCount; i++) {
+      const memo = `WM ${groupCode} M${i}`;
+      members.push({
+        memberIndex: i,
+        name: body.members && body.members[i-1] ? body.members[i-1].name : `Thành viên ${i}`,
+        amountDue: perMember,
+        memo: memo,
+        vietQrPayload: `00020101021238580010A0000007270126000697042201129908123488880208QRIBFTTA5303704540${perMember}5802VN62140810${memo}6304`,
+        isPaid: i === 1, // Trưởng nhóm đã quét cọc
+        paidAt: i === 1 ? new Date().toISOString() : null,
+        payoutStatus: "NONE"
+      });
+    }
+
+    return sendJson(res, 200, {
+      success: true,
+      groupCode: groupCode,
+      totalBudget: totalBudget,
+      amountPerMember: perMember,
+      membersCount: membersCount,
+      corporateAccountNo: "990812348888 (MBBank)",
+      corporateEntity: "CONG TY CP CONG NGHE DU LICH WANDERMATCH",
+      expiresInMinutes: 30,
+      expiresAt: new Date(Date.now() + 30 * 60000).toISOString(),
+      members: members
+    });
+  }
+
+  // 12. Simulate Member Payment in Group Split-Bill
+  if (pathname === '/api/group-booking/pay-member' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const { groupCode, memberIndex, amount } = body;
+
+    const ledger = {
+      txId: `TX-GRP-${Date.now().toString().slice(-5)}`,
+      tripCode: `WM-${groupCode}-M${memberIndex}`,
+      type: "VIETQR_ESCROW_INFLOW",
+      direction: "IN",
+      amount: `${Number(amount || 4000000).toLocaleString('vi-VN')}đ`,
+      sender: `Thành viên ${memberIndex} (Napas 247)`,
+      receiver: "CONG TY CP CONG NGHE DU LICH WANDERMATCH",
+      status: "HELD_IN_ESCROW",
+      time: new Date().toISOString()
+    };
+    DB.escrowLedgers.unshift(ledger);
+
+    return sendJson(res, 200, {
+      success: true,
+      groupCode: groupCode,
+      memberIndex: memberIndex,
+      paidAt: new Date().toISOString(),
+      transactionId: ledger.txId,
+      message: `Thành viên M${memberIndex} đã chuyển khoản thành công vào tài khoản doanh nghiệp WanderMatch.`
+    });
+  }
+
+  // 13. One-Click Out-of-Office / Xin nghỉ phép Generator
+  if (pathname === '/api/pragmatic/leave-letter' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const fullName = body.fullName || "Nguyễn Văn An";
+    const department = body.department || "Phòng Kỹ thuật & Công nghệ";
+    const startDate = body.startDate || "Thứ Sáu, ngày 24/10";
+    const endDate = body.endDate || "Chủ Nhật, ngày 26/10";
+    const urgentContact = body.urgentContact || "0908.123.488";
+
+    const letterContent = `Kính gửi: Ban Giám đốc & Trưởng Bộ phận ${department},
+
+Tôi tên là: ${fullName}
+Hiện đang công tác tại vị trí: Thành viên phụ trách dự án
+
+Nay tôi viết đơn này kính xin phép Ban Giám đốc và Quản lý trực tiếp cho phép tôi được nghỉ phép trong thời gian:
+- Từ: ${startDate}
+- Đến hết: ${endDate}
+- Lý do: Tái tạo năng lượng cá nhân qua chuyến du lịch trải nghiệm cuối tuần.
+
+Trong thời gian nghỉ phép:
+- Tôi đã bàn giao các đầu việc khẩn cấp cho đồng nghiệp trong nhóm.
+- Trường hợp có sự cố phát sinh cần hỗ trợ gấp, vui lòng liên hệ qua số điện thoại: ${urgentContact}.
+- Email sẽ được phản hồi ngay khi tôi quay trở lại văn phòng vào sáng Thứ Hai.
+
+Kính mong Ban Giám đốc xem xét và phê duyệt.
+Tôi xin chân thành cảm ơn!
+
+Người làm đơn,
+${fullName}`;
+
+    return sendJson(res, 200, {
+      success: true,
+      subject: `[ĐƠN XIN NGHỈ PHÉP] - ${fullName} (${startDate} - ${endDate})`,
+      content: letterContent
+    });
+  }
+
+  // 14. SOS Room Exchange SLA Claim
+  if (pathname === '/api/pragmatic/sos-sla' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const penaltyAmount = 5000000;
+    DB.slaDepositBalance = Math.max(0, DB.slaDepositBalance - penaltyAmount);
+
+    const ledger = {
+      txId: `TX-SOS-SLA-${Date.now().toString().slice(-5)}`,
+      tripCode: body.tripCode || "WM99081234",
+      type: "SLA_PENALTY_DEDUCTION",
+      direction: "OUT",
+      amount: "5.000.000đ",
+      sender: "B2B_PARTNER_ESCROW_SECURITY_DEPOSIT",
+      receiver: "5_STAR_BACKUP_HOTEL_REPLACEMENT",
+      status: "DISBURSED_TO_PARTNER",
+      time: new Date().toISOString()
+    };
+    DB.escrowLedgers.unshift(ledger);
+
+    return sendJson(res, 200, {
+      success: true,
+      slaClaimId: `SLA-CLAIM-${Date.now().toString().slice(-4)}`,
+      resolutionMinutes: 15,
+      backupHotelAssigned: "Sheraton / Grand Mercure 5-Sao Dự Phòng Ngay Liền Kề",
+      voucherCode: `UPGRADE-5STAR-${Math.floor(10000 + Math.random() * 90000)}`,
+      privateTransferDispatched: "Xe Mercedes đón quý khách sang khách sạn dự phòng trong vòng 10 phút.",
+      penaltyDeductedFromPartner: penaltyAmount,
+      remainingSlaFund: DB.slaDepositBalance,
+      message: "Hệ thống đã tự động trích quỹ ký quỹ đối tác để nâng cấp phòng 5 sao miễn phí cho quý khách."
+    });
+  }
+
+  // 15. Unit Economics Calculator
+  if (pathname === '/api/pragmatic/unit-economics' && req.method === 'GET') {
+    return sendJson(res, 200, {
+      success: true,
+      unitEconomics: [
+        { metric: "1. Giá trị Bán lẻ ngoài thị trường (Retail Price)", amount: "6.200.000đ", percentage: "124%", explanation: "Giá nếu khách tự lên OTA đặt vé khứ hồi (3,2tr) + KS 4 sao (3,0tr)." },
+        { metric: "2. Giá trọn gói Khách trả qua QR WanderMatch", amount: "5.000.000đ", percentage: "100%", explanation: "Khách hàng lãi ngay 1.200.000đ so với tự đi đặt lẻ, lại không tốn công lên lịch." },
+        { metric: "3. Giá vốn Sỉ trả cho Công ty Du lịch (NetPrice)", amount: "3.750.000đ", percentage: "75%", explanation: "Công ty du lịch xả được phòng/vé trống phút chót, thu tiền tươi qua STK liên kết." },
+        { metric: "4. Quỹ Voucher Ẩm thực/Bảo hiểm SLA tặng khách", amount: "250.000đ", percentage: "5%", explanation: "Tặng khách mã giảm giá ăn uống bản địa & quỹ dự phòng nâng hạng phòng." },
+        { metric: "5. Lợi nhuận gộp của WanderMatch (Gross Margin)", amount: "1.000.000đ", percentage: "20%", explanation: "Biên lợi nhuận thực thu trên mỗi giao dịch (chưa tính doanh thu phụ từ Upsell Blacklist)." }
+      ]
     });
   }
 

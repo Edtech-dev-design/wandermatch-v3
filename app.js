@@ -515,6 +515,29 @@ const state = {
   partnerSigned: true,
   isOverbookPenalized: false,
   activeDayTab: 1,
+
+  // Pragmatic Consumer Pillars (v3.1)
+  comfortLocks: {
+    noRedEye: true,
+    bedType: 'TWIN',
+    luggageShuttle: true,
+    workcation: false
+  },
+  paymentMode: 'INDIVIDUAL', // 'INDIVIDUAL' | 'GROUP'
+  groupBooking: {
+    groupCode: 'G8892',
+    membersCount: 4,
+    totalBudget: 16000000,
+    amountPerMember: 4000000,
+    paidCount: 1,
+    members: []
+  },
+  offlineWallet: {
+    pnr: 'VN-9920-WM',
+    hotelCode: 'HTL-CONF-8892',
+    departTime: '07:30 Sáng (Ga Quốc Nội)'
+  },
+  sosClaimed: false
 };
 
 // DỮ LIỆU ĐIỂM ĐẾN CHI TIẾT (TP. HỒ CHÍ MINH, ĐÀ LẠT, ĐÀ NẴNG)
@@ -1647,6 +1670,32 @@ function renderTripSummaryCard() {
         </div>
       </div>
 
+      <!-- Khóa Tiêu Chuẩn Thực Dụng Đã Áp Dụng (Pragmatic Comfort Locks) -->
+      <div class="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-slate-300 flex items-center gap-1.5 text-[11px]">
+            <i class="fa-solid fa-lock text-cyan-400"></i> Tiêu Chuẩn Thực Dụng Đã Khóa Cho Chuyến Đi:
+          </span>
+          <span class="text-cyan-400 font-mono text-[10px] font-bold">RETAIL FLOOR: &ge; ${(budget * 1.2).toLocaleString('vi-VN')}đ</span>
+        </div>
+        <div class="flex flex-wrap gap-1.5 text-[10px]">
+          <span class="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 flex items-center gap-1 font-semibold">
+            <i class="fa-solid fa-plane-departure text-cyan-400"></i> ${state.comfortLocks.noRedEye ? 'Khung giờ bay 07:00 - 20:00' : 'Giờ bay linh hoạt'}
+          </span>
+          <span class="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 flex items-center gap-1 font-semibold">
+            <i class="fa-solid fa-bed text-amber-400"></i> Cấu hình: ${state.comfortLocks.bedType === 'TWIN' ? '2 Giường Đơn (Twin)' : '1 Giường Đôi Lớn (King)'}
+          </span>
+          <span class="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 flex items-center gap-1 font-semibold">
+            <i class="fa-solid fa-suitcase-rolling text-emerald-400"></i> ${state.comfortLocks.luggageShuttle ? 'Kèm 20kg ký gửi & Xe đón sân bay' : 'Hành lý xách tay 7kg'}
+          </span>
+          ${state.comfortLocks.workcation ? `
+            <span class="px-2.5 py-1 rounded-lg bg-slate-950 border border-violet-500/40 text-violet-300 flex items-center gap-1 font-semibold">
+              <i class="fa-solid fa-laptop-code text-violet-400"></i> Workcation: Bàn riêng & Wifi &ge; 50Mbps
+            </span>
+          ` : ''}
+        </div>
+      </div>
+
       <!-- Cam kết bảo hiểm SLA -->
       <div class="bg-cyan-950/30 p-3.5 rounded-2xl border border-cyan-800/50 flex flex-wrap items-center justify-between gap-3 text-xs">
         <div class="flex items-center gap-2.5 text-cyan-200">
@@ -1654,8 +1703,8 @@ function renderTripSummaryCard() {
             <i class="fa-solid fa-shield-halved"></i>
           </div>
           <div>
-            <span class="font-bold text-white">Bảo Hiểm SLA Phòng Cứng 20 Triệu Đồng</span>
-            <span class="text-slate-300 text-[11px] block">Đối tác B2B ký số cam kết 100% không bùng phòng • Đền bù gấp đôi nếu overbooking</span>
+            <span class="font-bold text-white">Bảo Hiểm SLA Phòng Cứng 20 Triệu Đồng & Hoàn 200% Chênh Lệch</span>
+            <span class="text-slate-300 text-[11px] block">Đối tác B2B ký số cam kết 100% không bùng phòng • Hoàn 200% chênh lệch nếu giá trị thực tế < ngân sách</span>
           </div>
         </div>
         <span class="px-3 py-1 rounded-full text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-700/60">
@@ -2818,6 +2867,12 @@ function handleLiveBudgetInput(val) {
   renderTripSummaryCard();
   renderDetailedDayItinerary();
   renderBudgetAllocation();
+  renderValueGuaranteeCalculator();
+  renderTransparentValueReceipt();
+  renderPackingChecklist();
+  if (state.paymentMode === 'GROUP') {
+    initGroupBooking();
+  }
   updateVietQrDisplay();
   renderRefundCalculator();
 }
@@ -3550,6 +3605,9 @@ function initScratchCard() {
     const btn = document.getElementById('revealed-action-btn');
     if (btn) btn.classList.remove('hidden');
 
+    renderTransparentValueReceipt();
+    renderAntiTrapSpots();
+
     showToast('success', `🎉 CHÚC MỪNG! BẠN ĐÃ MỞ KHÓA ĐIỂM ĐẾN: ${getCurrentDestData().name.vi.toUpperCase()}!`);
   }
 
@@ -3830,6 +3888,577 @@ function switchView(viewName) {
 }
 
 // ============================================================================
+// 12. PRAGMATIC CONSUMER ENGINE (5 TRỤ CỘT THỰC DỤNG & LOSS AVERSION V3.1)
+// ============================================================================
+
+// 1. SMART PACKAGE & VALUE GUARANTEE CALCULATOR (Retail Value Floor >= 120%)
+function renderValueGuaranteeCalculator() {
+  const budget = state.selectedBudget || 5000000;
+  const retailFloor = Math.round(budget * 1.20);
+  const floorEl = document.getElementById('retail-floor-val');
+  if (floorEl) {
+    floorEl.textContent = `≥ ${retailFloor.toLocaleString('vi-VN')} VNĐ`;
+  }
+}
+
+// 2. PRAGMATIC COMFORT LOCKS
+function handleComfortLockChange() {
+  const noRedEye = document.getElementById('lock-no-red-eye')?.checked ?? true;
+  const luggageShuttle = document.getElementById('lock-luggage-shuttle')?.checked ?? true;
+  const workcation = document.getElementById('lock-workcation')?.checked ?? false;
+
+  state.comfortLocks.noRedEye = noRedEye;
+  state.comfortLocks.luggageShuttle = luggageShuttle;
+  state.comfortLocks.workcation = workcation;
+
+  const depEl = document.getElementById('departure-window-text');
+  if (depEl) {
+    if (noRedEye) {
+      depEl.innerHTML = `Bạn cần có mặt tại <strong>Ga Quốc nội - Sân bay (Sảnh A) lúc 07:30 sáng Thứ Sáu, ngày 24/10</strong>. Chuyến đi kéo dài đến <strong>19:00 Chủ Nhật, ngày 26/10</strong> (Cam kết không bay giờ xấu Red-Eye).`;
+    } else {
+      depEl.innerHTML = `Chuyến bay linh hoạt theo giá rẻ nhất. Có thể khởi hành vào khung giờ đêm 22:30.`;
+    }
+  }
+
+  renderTripSummaryCard();
+  renderDetailedDayItinerary();
+  showToast('info', '✅ Đã cập nhật bộ khóa tiêu chuẩn thực dụng');
+}
+
+function setBedType(type) {
+  state.comfortLocks.bedType = type;
+  const btnTwin = document.getElementById('bed-btn-twin');
+  const btnKing = document.getElementById('bed-btn-king');
+  if (type === 'TWIN') {
+    if (btnTwin) btnTwin.className = 'py-1.5 px-2 rounded-lg text-[10px] font-bold transition border border-cyan-500/50 bg-cyan-500/20 text-cyan-300';
+    if (btnKing) btnKing.className = 'py-1.5 px-2 rounded-lg text-[10px] font-medium transition border border-slate-800 bg-slate-900 text-slate-400 hover:text-white';
+    showToast('info', '🛏️ Đã chọn cấu hình: 2 Giường Đơn (Twin Beds - Bạn bè)');
+  } else {
+    if (btnKing) btnKing.className = 'py-1.5 px-2 rounded-lg text-[10px] font-bold transition border border-amber-500/50 bg-amber-500/20 text-amber-300';
+    if (btnTwin) btnTwin.className = 'py-1.5 px-2 rounded-lg text-[10px] font-medium transition border border-slate-800 bg-slate-900 text-slate-400 hover:text-white';
+    showToast('info', '🛏️ Đã chọn cấu hình: 1 Giường Đôi Lớn (King Bed - Cặp đôi)');
+  }
+  renderTripSummaryCard();
+}
+
+// 3. INTERACTIVE PACKING CHECKLIST (BLIND LOGISTICS KIT)
+const PACKING_DATA = {
+  dalat: [
+    { item: "Áo khoác ấm & áo giữ nhiệt", reason: "Nhiệt độ ban đêm giảm sâu 14-16°C" },
+    { item: "Ô gấp gọn / Áo mưa mỏng", reason: "Thường có mưa phùn và sương mù bất chợt" },
+    { item: "Giày thể thao chống trơn", reason: "Địa hình dốc đồi thông và bậc thang thác đá" },
+    { item: "Kem dưỡng ẩm & Son dưỡng", reason: "Không khí khô lạnh dễ nứt nẻ da" },
+    { item: "CCCD / Hộ chiếu bản gốc", reason: "Check-in lễ tân khách sạn & nhận xe máy" },
+    { item: "Sạc dự phòng 20.000mAh", reason: "Chụp ảnh săn mây liên tục ngoài trời" },
+    { item: "Thuốc chống say xe đèo dốc", reason: "Đoạn đường đèo Prenn / Mimosa nhiều cua gắt" },
+    { item: "Bình giữ nhiệt mini", reason: "Đựng trà atisô nóng giữ ấm cơ thể" }
+  ],
+  hochiminh: [
+    { item: "Trang phục năng động, thoáng mát", reason: "Nắng ấm nhiệt đới đặc trưng Sài Gòn" },
+    { item: "Ô gấp gọn chống mưa rào", reason: "Mưa chợt đến rồi chợt đi vào buổi chiều" },
+    { item: "Giày êm đi bộ dạo phố", reason: "Khám phá phố đi bộ Nguyễn Huệ & chợ Bến Thành" },
+    { item: "Túi đeo chéo an toàn trước ngực", reason: "Bảo vệ tư trang nơi đông người" },
+    { item: "CCCD bản gốc", reason: "Thủ tục nhận phòng khách sạn The Myst" },
+    { item: "Kính râm & Khẩu trang chống bụi", reason: "Di chuyển ngắm cảnh bằng xe bus 2 tầng" },
+    { item: "Sạc dự phòng & Dây cáp sạc", reason: "Cả ngày check-in các quán cafe rooftop" },
+    { item: "Bình nước cá nhân", reason: "Giữ đủ nước khi đi bộ trải nghiệm ẩm thực" }
+  ],
+  danang: [
+    { item: "Đồ bơi & Kính râm chống UV", reason: "Bãi biển Mỹ Khê nắng vàng rực rỡ" },
+    { item: "Kem chống nắng SPF 50+ PA++++", reason: "Chỉ số UV miền Trung ban ngày rất cao" },
+    { item: "Dép sandal / Dép xốp đi biển", reason: "Thuận tiện dạo bãi cát và lội nước" },
+    { item: "Trang phục lịch sự kín đáo", reason: "Tham quan Chùa Linh Ứng & Phố Cổ Hội An" },
+    { item: "Túi chống nước điện thoại", reason: "Bảo vệ máy khi tắm biển hoặc đi thuyền thúng" },
+    { item: "CCCD bản gốc", reason: "Xác nhận nhận phòng resort & vé bay" },
+    { item: "Mũ rộng vành / Nón cói", reason: "Che nắng khi dạo bộ cầu Rồng / phố đi bộ" },
+    { item: "Bình xịt khoáng làm dịu da", reason: "Cấp ẩm sau khi tắm nắng và gió biển" }
+  ]
+};
+
+function renderPackingChecklist() {
+  const container = document.getElementById('packing-checklist-grid');
+  if (!container) return;
+
+  const destKey = state.selectedDestination === 'blind' ? 'dalat' : state.selectedDestination;
+  const items = PACKING_DATA[destKey] || PACKING_DATA['dalat'];
+
+  let savedChecked = [];
+  try {
+    const raw = localStorage.getItem('wandermatch_packing_' + destKey);
+    if (raw) savedChecked = JSON.parse(raw);
+  } catch (e) {}
+
+  container.innerHTML = items.map((it, idx) => {
+    const isChecked = savedChecked.includes(idx);
+    return `
+      <div onclick="togglePackingItem(${idx})" class="checklist-item p-3 rounded-xl bg-slate-950 border ${isChecked ? 'border-emerald-500/40 bg-emerald-950/20 checked' : 'border-slate-800'} hover:border-cyan-500/40 cursor-pointer flex items-start gap-2.5 transition">
+        <input type="checkbox" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation(); togglePackingItem(${idx})" class="mt-0.5 rounded border-slate-700 text-cyan-500 focus:ring-0 cursor-pointer">
+        <div class="min-w-0 flex-1">
+          <span class="font-bold text-white block text-[11px] leading-tight">${it.item}</span>
+          <span class="text-[9px] text-slate-400 block mt-0.5">${it.reason}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  updatePackingProgress(items.length, savedChecked.length);
+}
+
+function togglePackingItem(idx) {
+  const destKey = state.selectedDestination === 'blind' ? 'dalat' : state.selectedDestination;
+  let savedChecked = [];
+  try {
+    const raw = localStorage.getItem('wandermatch_packing_' + destKey);
+    if (raw) savedChecked = JSON.parse(raw);
+  } catch (e) {}
+
+  if (savedChecked.includes(idx)) {
+    savedChecked = savedChecked.filter(i => i !== idx);
+  } else {
+    savedChecked.push(idx);
+  }
+
+  try {
+    localStorage.setItem('wandermatch_packing_' + destKey, JSON.stringify(savedChecked));
+  } catch (e) {}
+
+  renderPackingChecklist();
+}
+
+function updatePackingProgress(total, checkedCount) {
+  const percent = Math.round((checkedCount / total) * 100);
+  const textEl = document.getElementById('checklist-progress-text');
+  const barEl = document.getElementById('checklist-progress-bar');
+  const badgeEl = document.getElementById('checklist-ready-badge');
+
+  if (textEl) textEl.textContent = `${checkedCount}/${total} Món (${percent}%)`;
+  if (barEl) barEl.style.width = `${percent}%`;
+  if (badgeEl) {
+    if (percent === 100) {
+      badgeEl.classList.remove('hidden');
+    } else {
+      badgeEl.classList.add('hidden');
+    }
+  }
+}
+
+// 4. OUT-OF-OFFICE / ĐƠN XIN NGHỈ PHÉP 1-CHẠM
+function openLeaveLetterModal() {
+  const modal = document.getElementById('leave-letter-modal');
+  if (modal) modal.classList.remove('hidden');
+
+  const fullName = "Nguyễn Văn An";
+  const dept = "Phòng Kỹ thuật & Công nghệ";
+  const startDate = "Thứ Sáu, ngày 24/10/2026";
+  const endDate = "Chủ Nhật, ngày 26/10/2026";
+  const urgentContact = "0908.123.488";
+
+  const letterText = `Kính gửi: Ban Giám đốc & Trưởng Bộ phận ${dept},
+
+Tôi tên là: ${fullName}
+Hiện đang công tác tại vị trí: Kỹ sư Phần mềm / Quản lý Dự án
+
+Nay tôi viết đơn này kính xin phép Ban Giám đốc và Quản lý trực tiếp cho phép tôi được nghỉ phép trong thời gian:
+- Từ ngày: ${startDate}
+- Đến hết ngày: ${endDate}
+- Lý do: Tái tạo năng lượng cá nhân qua chuyến du lịch tự túc trải nghiệm cuối tuần cùng WanderMatch.
+
+Trong thời gian nghỉ phép:
+- Tôi đã hoàn tất và bàn giao các đầu việc khẩn cấp cho đồng nghiệp trong nhóm phụ trách.
+- Trường hợp có sự cố phát sinh khẩn cấp cần hỗ trợ, vui lòng liên hệ qua số điện thoại cá nhân: ${urgentContact}.
+- Hòm thư email sẽ được kiểm tra và phản hồi ngay khi tôi quay trở lại văn phòng vào sáng Thứ Hai.
+
+Kính mong Ban Giám đốc xem xét và phê duyệt.
+Tôi xin chân thành cảm ơn!
+
+Người làm đơn,
+${fullName}`;
+
+  const ta = document.getElementById('leave-content-textarea');
+  if (ta) ta.value = letterText;
+}
+
+function closeLeaveLetterModal() {
+  const modal = document.getElementById('leave-letter-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function copyLeaveLetter() {
+  const ta = document.getElementById('leave-content-textarea');
+  if (ta) {
+    copyToClipboard(ta.value, 'nội dung đơn xin nghỉ phép');
+  }
+}
+
+function downloadLeaveLetter() {
+  const ta = document.getElementById('leave-content-textarea');
+  if (!ta) return;
+  const blob = new Blob([ta.value], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Don_Xin_Nghi_Phep_WanderMatch.txt';
+  a.click();
+  showToast('success', 'Đã tải xuống file Don_Xin_Nghi_Phep_WanderMatch.txt thành công!');
+}
+
+// 5. GROUP SPLIT-BILL VIETQR PAYMENT (PROMPT 3)
+function setPaymentMode(mode) {
+  state.paymentMode = mode;
+  const btnInd = document.getElementById('btn-mode-individual-qr');
+  const btnGrp = document.getElementById('btn-mode-group-qr');
+  const boxInd = document.getElementById('container-individual-qr');
+  const boxGrp = document.getElementById('container-group-qr');
+
+  if (mode === 'GROUP') {
+    if (btnGrp) {
+      btnGrp.className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-lg flex items-center gap-2';
+    }
+    if (btnInd) {
+      btnInd.className = 'px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-900 border border-slate-800 transition flex items-center gap-2';
+    }
+    if (boxInd) boxInd.classList.add('hidden');
+    if (boxGrp) {
+      boxGrp.classList.remove('hidden');
+      initGroupBooking();
+    }
+    showToast('info', '👥 Chuyển sang chế độ Đi Nhóm & Chia Tiền Tự Động (Group Split-Bill)');
+  } else {
+    if (btnInd) {
+      btnInd.className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-cyan-500 text-slate-950 shadow-lg flex items-center gap-2';
+    }
+    if (btnGrp) {
+      btnGrp.className = 'px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-900 border border-slate-800 transition flex items-center gap-2';
+    }
+    if (boxGrp) boxGrp.classList.add('hidden');
+    if (boxInd) boxInd.classList.remove('hidden');
+    showToast('info', '💳 Chuyển sang chế độ Thanh Toán Đơn / Trưởng Nhóm');
+  }
+}
+
+let groupTimerInterval = null;
+let groupTimerSeconds = 1799;
+
+function initGroupBooking() {
+  const total = Math.max(8000000, state.selectedBudget * (state.selectedPax >= 4 ? 1 : 2));
+  const membersCount = 4;
+  const perMember = Math.round(total / membersCount);
+
+  state.groupBooking.totalBudget = total;
+  state.groupBooking.membersCount = membersCount;
+  state.groupBooking.amountPerMember = perMember;
+
+  const totalEl = document.getElementById('group-total-budget-display');
+  const perEl = document.getElementById('group-per-member-display');
+  if (totalEl) totalEl.textContent = `${total.toLocaleString('vi-VN')} VNĐ`;
+  if (perEl) perEl.textContent = `${perMember.toLocaleString('vi-VN')} VNĐ`;
+
+  const memberNames = [
+    "Nguyễn Văn An (Trưởng nhóm)",
+    "Trần Hoàng Nam",
+    "Lê Phương Thảo",
+    "Phạm Minh Khôi"
+  ];
+
+  if (!state.groupBooking.members || state.groupBooking.members.length === 0) {
+    state.groupBooking.members = memberNames.map((name, i) => ({
+      index: i + 1,
+      name: name,
+      amount: perMember,
+      memo: `WM G8892 M${i + 1}`,
+      qrUrl: `https://img.vietqr.io/image/MB-990812348888-compact2.png?amount=${perMember}&addInfo=WM%20G8892%20M${i + 1}&accountName=CONG%20TY%20CP%20CONG%20NGHE%20DU%20LICH%20WANDERMATCH`,
+      isPaid: i === 0,
+      paidTime: i === 0 ? "Vừa xong" : null
+    }));
+  }
+
+  renderGroupMembersGrid();
+
+  if (!groupTimerInterval) {
+    groupTimerInterval = setInterval(() => {
+      if (groupTimerSeconds <= 0) {
+        clearInterval(groupTimerInterval);
+        const timerEl = document.getElementById('group-countdown-timer');
+        if (timerEl) timerEl.textContent = "00:00 (Hết hạn)";
+        return;
+      }
+      groupTimerSeconds--;
+      const m = Math.floor(groupTimerSeconds / 60);
+      const s = groupTimerSeconds % 60;
+      const el = document.getElementById('group-countdown-timer');
+      if (el) el.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }, 1000);
+  }
+}
+
+function renderGroupMembersGrid() {
+  const container = document.getElementById('group-members-qr-grid');
+  if (!container) return;
+
+  const members = state.groupBooking.members;
+  const paidCount = members.filter(m => m.isPaid).length;
+  state.groupBooking.paidCount = paidCount;
+
+  const progressEl = document.getElementById('group-progress-stat');
+  if (progressEl) {
+    const pct = Math.round((paidCount / members.length) * 100);
+    progressEl.textContent = `${paidCount} / ${members.length} Người (${pct}%)`;
+    if (paidCount === members.length) {
+      progressEl.className = "text-base font-black text-emerald-400 font-mono";
+    }
+  }
+
+  container.innerHTML = members.map(m => `
+    <div class="p-4 rounded-2xl bg-slate-950 border ${m.isPaid ? 'border-emerald-500/50 bg-emerald-950/20' : 'border-slate-800'} space-y-3 relative overflow-hidden transition">
+      ${m.isPaid ? `
+        <div class="absolute top-2 right-2 px-2 py-0.5 rounded text-[9px] font-black bg-emerald-500 text-slate-950 uppercase tracking-wider flex items-center gap-1 shadow">
+          <i class="fa-solid fa-check"></i> ĐÃ THANH TOÁN
+        </div>
+      ` : `
+        <div class="absolute top-2 right-2 px-2 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase tracking-wider">
+          CHỜ QUÉT QR
+        </div>
+      `}
+
+      <div>
+        <span class="text-[10px] font-mono text-cyan-400 font-bold block">THÀNH VIÊN #${m.index}</span>
+        <h5 class="text-xs font-bold text-white truncate">${m.name}</h5>
+        <span class="text-sm font-black text-emerald-400 font-mono block mt-1">${m.amount.toLocaleString('vi-VN')} VNĐ</span>
+      </div>
+
+      <!-- QR Code Image -->
+      <div class="p-2 bg-white rounded-xl flex items-center justify-center">
+        <img src="${m.qrUrl}" alt="${m.memo}" class="w-36 h-auto rounded">
+      </div>
+
+      <!-- Memo -->
+      <div class="bg-slate-900 p-2 rounded-lg border border-slate-800 text-[10px] flex items-center justify-between">
+        <span class="text-slate-400">Nội dung:</span>
+        <span class="font-mono font-bold text-amber-400">${m.memo}</span>
+        <button onclick="copyToClipboard('${m.memo}', 'Nội dung chuyển khoản')" class="text-cyan-400 hover:text-cyan-300">
+          <i class="fa-regular fa-copy"></i>
+        </button>
+      </div>
+
+      ${!m.isPaid ? `
+        <button onclick="simulatePayMember(${m.index})" class="w-full py-2 rounded-xl btn-glow-cyan text-slate-950 font-bold text-[10px] shadow transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-mobile-screen"></i>
+          <span>Mô Phỏng Quét Trả (${m.index})</span>
+        </button>
+      ` : `
+        <div class="text-[10px] text-emerald-300 text-center font-semibold py-1">
+          ✅ Đã nhận tiền vào STK MBBank Công Ty
+        </div>
+      `}
+    </div>
+  `).join('');
+}
+
+function simulatePayMember(idx) {
+  const member = state.groupBooking.members.find(m => m.index === idx);
+  if (!member || member.isPaid) return;
+
+  member.isPaid = true;
+  member.paidTime = new Date().toLocaleTimeString();
+
+  ESCROW_LEDGER.unshift({
+    txId: `TX-GRP-${Date.now().toString().slice(-5)}`,
+    tripCode: `WM-${state.groupBooking.groupCode}-M${idx}`,
+    type: "VIETQR_ESCROW_INFLOW",
+    direction: "IN",
+    amount: `${member.amount.toLocaleString('vi-VN')}đ`,
+    sender: `${member.name} (Napas 247)`,
+    receiver: "CONG TY CP CONG NGHE DU LICH WANDERMATCH",
+    status: "HELD_IN_ESCROW",
+    time: new Date().toLocaleString()
+  });
+
+  renderGroupMembersGrid();
+  renderEscrowLedger();
+
+  const paidCount = state.groupBooking.members.filter(m => m.isPaid).length;
+  if (paidCount === state.groupBooking.members.length) {
+    showToast('success', `🎉 TẤT CẢ 4/4 THÀNH VIÊN ĐÃ ĐÓNG ĐỦ! Hệ thống tự động kích hoạt AutoBookingSagaService khóa cứng vé và phòng!`);
+  } else {
+    showToast('success', `✅ Thành viên #${idx} (${member.name}) đã đóng ${member.amount.toLocaleString('vi-VN')}đ thành công!`);
+  }
+}
+
+function simulateAllMembersPay() {
+  state.groupBooking.members.forEach(m => {
+    if (!m.isPaid) {
+      m.isPaid = true;
+      m.paidTime = new Date().toLocaleTimeString();
+      ESCROW_LEDGER.unshift({
+        txId: `TX-GRP-${Date.now().toString().slice(-5)}`,
+        tripCode: `WM-${state.groupBooking.groupCode}-M${m.index}`,
+        type: "VIETQR_ESCROW_INFLOW",
+        direction: "IN",
+        amount: `${m.amount.toLocaleString('vi-VN')}đ`,
+        sender: `${m.name} (Napas 247)`,
+        receiver: "CONG TY CP CONG NGHE DU LICH WANDERMATCH",
+        status: "HELD_IN_ESCROW",
+        time: new Date().toLocaleString()
+      });
+    }
+  });
+
+  renderGroupMembersGrid();
+  renderEscrowLedger();
+  showToast('success', '🎉 Toàn bộ nhóm 4 người đã đóng đủ 16.000.000đ! Chuyến đi đã được khóa cứng bảo lãnh 100%.');
+}
+
+function simulateGroupCancelRefund() {
+  const paidMembers = state.groupBooking.members.filter(m => m.isPaid);
+  if (paidMembers.length === 0) {
+    showToast('info', 'Chưa có thành viên nào đóng tiền để hoàn.');
+    return;
+  }
+
+  paidMembers.forEach(m => {
+    ESCROW_LEDGER.unshift({
+      txId: `TX-REFUND-${Date.now().toString().slice(-5)}`,
+      tripCode: `WM-${state.groupBooking.groupCode}-M${m.index}`,
+      type: "REFUND_FORCE_MAJEURE",
+      direction: "OUT",
+      amount: `${m.amount.toLocaleString('vi-VN')}đ`,
+      sender: "CONG TY CP CONG NGHE DU LICH WANDERMATCH",
+      receiver: `${m.name} (STK Napas 247)`,
+      status: "REFUNDED_TO_USER",
+      time: new Date().toLocaleString()
+    });
+  });
+
+  state.groupBooking.members.forEach(m => m.isPaid = false);
+  renderGroupMembersGrid();
+  renderEscrowLedger();
+
+  showToast('success', `⚡ Đã kích hoạt hoàn trả 100% tiền (${paidMembers.length} thành viên) về đúng STK Napas 247 không mất phí!`);
+}
+
+// 6. TRANSPARENT VALUE RECEIPT & ANTI-TOURIST TRAP (PROMPT 1 & 4)
+function renderTransparentValueReceipt() {
+  const budget = state.selectedBudget || 5000000;
+  const retailFlight = Math.round(budget * 0.64);
+  const retailHotel = Math.round(budget * 0.69);
+  const totalMarket = retailFlight + retailHotel;
+  const savings = totalMarket - budget;
+  const savingsPct = ((savings / totalMarket) * 100).toFixed(1);
+
+  const fPrice = document.getElementById('receipt-flight-price');
+  const hPrice = document.getElementById('receipt-hotel-price');
+  const tPrice = document.getElementById('receipt-total-market-price');
+  const uPrice = document.getElementById('receipt-user-paid-price');
+  const sHighlight = document.getElementById('receipt-savings-highlight');
+
+  if (fPrice) fPrice.textContent = `${retailFlight.toLocaleString('vi-VN')} VNĐ`;
+  if (hPrice) hPrice.textContent = `${retailHotel.toLocaleString('vi-VN')} VNĐ`;
+  if (tPrice) tPrice.textContent = `${totalMarket.toLocaleString('vi-VN')} VNĐ`;
+  if (uPrice) uPrice.textContent = `${budget.toLocaleString('vi-VN')} VNĐ`;
+  if (sHighlight) {
+    sHighlight.innerHTML = `
+      <i class="fa-solid fa-arrow-trend-down"></i>
+      <span>Chuyến đi Mù này đã giúp bạn tiết kiệm thực tế ${savings.toLocaleString('vi-VN')}đ (${savingsPct}%)!</span>
+    `;
+  }
+}
+
+function claimFoodVoucher() {
+  showToast('success', '🎁 Đã lưu E-Voucher ẩm thực bản địa 200.000 VNĐ vào ví! Mã: WM-FOOD-200K (Áp dụng tại mọi quán trong cẩm nang Anti-Tourist Trap).');
+}
+
+// 7. ANTI-TOURIST TRAP GUIDE SPOTS
+const ANTI_TRAP_DATA = {
+  dalat: [
+    { name: "Quán Bánh Căn Lệ Yersin", price: "35.000đ - 55.000đ / dĩa", reason: "Bánh căn giòn rụm, xíu mại thơm béo, người dân Đà Lạt ăn đông nhất." },
+    { name: "Lẩu Gà Lá É Tao Ngộ (Đường 3/4)", price: "200.000đ - 300.000đ / nồi 3-4 người", reason: "Nước dùng the nồng lá é ngọt thanh, thịt gà ta chắc thịt chuẩn gốc." },
+    { name: "Bánh Tráng Nướng Dì Đinh", price: "20.000đ - 35.000đ / cái", reason: "Pizza Đà Lạt nướng than hoa ngập phô mai bơ trứng, không bị chặt chém." },
+    { name: "Quán Kem Bơ Thanh Thảo (Nguyễn Văn Trỗi)", price: "25.000đ - 30.000đ / ly", reason: "Bơ sáp dẻo quánh xay mịn kèm viên kem dừa thơm ngậy danh tiếng." },
+    { name: "Chợ Đêm Ẩm Thực Góc Phố Không Cò Mồi", price: "15.000đ - 40.000đ / món", reason: "Sữa đậu nành nóng & bánh ngọt sưởi ấm đêm lạnh giá niêm yết chuẩn." }
+  ],
+  hochiminh: [
+    { name: "Cơm Tấm Ba Ghiền (Đặng Văn Ngữ)", price: "85.000đ - 110.000đ / dĩa", reason: "Miếng sườn khổng lồ nướng than hoa đạt Michelin Bib Gourmand." },
+    { name: "Ốc Đào (Hẻm 212B Nguyễn Trãi)", price: "120.000đ - 180.000đ / người", reason: "Ốc hương sốt bơ tỏi bánh mì nức tiếng Sài Gòn, hải sản tươi sống." },
+    { name: "Phở Hòa Pasteur", price: "90.000đ - 110.000đ / tô", reason: "Nước dùng thanh trong gia truyền hơn 50 năm, thịt bò tươi mềm." },
+    { name: "Bánh Mì Huỳnh Hoa", price: "68.000đ / ổ ngập nhân", reason: "Ổ bánh mì nặng nửa ký với 5 loại chả lụa pate bơ béo ngậy." },
+    { name: "Hủ Tiếu Nam Vang Nhân Quán", price: "85.000đ - 100.000đ / tô", reason: "Hủ tiếu khô sốt tỏi ớt đặc trưng, tôm tươi giòn sần sật." }
+  ],
+  danang: [
+    { name: "Bánh Tráng Cuốn Thịt Heo Bà Mua", price: "60.000đ - 85.000đ / phần", reason: "Thịt heo hai đầu da luộc mềm, mắm nêm cá cơm nguyên chất đậm đà." },
+    { name: "Mì Quảng Bà Vị (Lê Đình Dương)", price: "40.000đ - 55.000đ / tô", reason: "Sợi mì tươi dẻo vàng nghệ, tôm thịt rim đậm đà và bánh tráng mè nướng." },
+    { name: "Hải Sản Bé Mặn (Đường Võ Nguyên Giáp)", price: "180.000đ - 280.000đ / người", reason: "Cân tại bể công khai trước mặt khách, niêm yết rõ ràng không sợ chém." },
+    { name: "Bánh Xèo Tôm Nhảy Năm Hiền", price: "45.000đ - 65.000đ / dĩa", reason: "Tôm đất tươi nhảy tanh tách đổ bánh giòn tan chấm sốt tương đậu phụng." },
+    { name: "Chè Liên Đà Nẵng (Đường Hoàng Diệu)", price: "25.000đ - 35.000đ / chén", reason: "Chè sầu riêng nước cốt dừa nguyên chất béo ngậy làm xiêu lòng thực khách." }
+  ]
+};
+
+function renderAntiTrapSpots() {
+  const container = document.getElementById('anti-trap-spots-list');
+  if (!container) return;
+
+  const destKey = state.selectedDestination === 'blind' ? 'dalat' : state.selectedDestination;
+  const spots = ANTI_TRAP_DATA[destKey] || ANTI_TRAP_DATA['dalat'];
+
+  container.innerHTML = spots.map(s => `
+    <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+      <div class="flex items-center justify-between">
+        <h5 class="font-bold text-white text-xs">${s.name}</h5>
+        <span class="font-mono text-[10px] font-bold text-emerald-400 bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-800">${s.price}</span>
+      </div>
+      <p class="text-[11px] text-slate-300 leading-tight">${s.reason}</p>
+    </div>
+  `).join('');
+}
+
+// 8. SOS SLA 15-MINUTE GUARANTEE (PROMPT 4)
+function openSosModal() {
+  const modal = document.getElementById('sos-sla-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeSosModal() {
+  const modal = document.getElementById('sos-sla-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function executeSosClaim() {
+  const btn = document.getElementById('btn-trigger-sos-claim');
+  const resBox = document.getElementById('sos-result-box');
+
+  if (btn) {
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang kích hoạt giao thức trích phạt đối tác...`;
+    btn.disabled = true;
+  }
+
+  setTimeout(() => {
+    state.sosClaimed = true;
+    state.slaDepositBalance = Math.max(0, state.slaDepositBalance - 5000000);
+    const balanceEl = document.getElementById('b2b-sla-balance');
+    if (balanceEl) balanceEl.textContent = `${state.slaDepositBalance.toLocaleString('vi-VN')} VNĐ`;
+
+    ESCROW_LEDGER.unshift({
+      txId: `TX-SOS-SLA-${Date.now().toString().slice(-5)}`,
+      tripCode: state.orderCode,
+      type: "SLA_PENALTY_DEDUCTION",
+      direction: "OUT",
+      amount: "5.000.000đ",
+      sender: "B2B_PARTNER_ESCROW_SECURITY_DEPOSIT",
+      receiver: "5_STAR_BACKUP_HOTEL_REPLACEMENT",
+      status: "DISBURSED_TO_PARTNER",
+      time: new Date().toLocaleString()
+    });
+    renderEscrowLedger();
+
+    if (resBox) resBox.classList.remove('hidden');
+    if (btn) {
+      btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> ĐÃ BỒI THƯỜNG KHÁCH SẠN 5 SAO!`;
+      btn.className = "flex-1 py-3 rounded-xl bg-emerald-600 text-white font-black text-xs shadow-xl";
+    }
+
+    showToast('success', '🚨 Giao thức SLA thành công: Đã tự động nâng cấp khách sạn 5 sao liền kề và điều xe đón trong 15 phút!');
+  }, 1200);
+}
+
+// ============================================================================
 // 13. TOAST NOTIFICATION UTILITY
 // ============================================================================
 
@@ -3991,8 +4620,14 @@ document.addEventListener('DOMContentLoaded', () => {
   renderEscrowLedger();
   updateVietQrDisplay();
   startPaymentCountdown();
-  updateQuickBudgetButtons(state.selectedBudget);
   setTimeout(initScratchCard, 200);
+
+  // Consumer Pragmatism v3.1 Inits
+  if (typeof renderValueGuaranteeCalculator === 'function') renderValueGuaranteeCalculator();
+  if (typeof renderPackingChecklist === 'function') renderPackingChecklist();
+  if (typeof renderTransparentValueReceipt === 'function') renderTransparentValueReceipt();
+  if (typeof renderAntiTrapSpots === 'function') renderAntiTrapSpots();
+  if (typeof initGroupBooking === 'function') initGroupBooking();
 
   document.querySelectorAll('.modal-star').forEach(star => {
     star.addEventListener('click', () => {
