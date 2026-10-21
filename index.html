@@ -1040,20 +1040,32 @@
 
         <div class="mt-6 flex flex-col items-center justify-center">
           <div class="scratch-container border-2 border-cyan-500/50">
-            <div class="scratch-background bg-slate-950 p-6 flex flex-col items-center justify-center text-white relative">
-              <img src="https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=800&q=80" alt="Secret Dest" class="absolute inset-0 w-full h-full object-cover opacity-35">
-              <div class="relative z-10 text-center space-y-2">
-                <span class="px-3 py-0.5 rounded-full text-[11px] font-black bg-cyan-500 text-slate-950 uppercase tracking-widest">
-                  ĐIỂM ĐẾN & KHÁCH SẠN ĐÃ MỞ KHÓA
+            <div class="scratch-background bg-slate-950 p-6 flex flex-col items-center justify-center text-white relative specular-card">
+              <img id="scratch-secret-img" src="https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=800&q=80" alt="Secret Dest" class="absolute inset-0 w-full h-full object-cover opacity-40">
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/30"></div>
+              
+              <!-- Postage Stamp & Wax Seal Visuals -->
+              <div class="absolute top-3 right-3 px-3 py-1 rounded-xl luxury-badge-gold text-[10px] font-black uppercase font-mono tracking-wider flex items-center gap-1 shadow-lg">
+                <i class="fa-solid fa-stamp text-amber-400"></i> BƯU CHÍNH VIỆT NAM
+              </div>
+              <div class="absolute top-3 left-3 px-3 py-1 rounded-xl bg-slate-950/80 border border-cyan-500/50 text-[10px] font-bold text-cyan-300 font-mono flex items-center gap-1">
+                <span class="radar-beacon"></span> CONFIRMED
+              </div>
+
+              <div class="relative z-10 text-center space-y-2 mt-4">
+                <span class="px-3.5 py-1 rounded-full text-[11px] font-black bg-gradient-to-r from-cyan-500 to-emerald-400 text-slate-950 uppercase tracking-widest shadow-lg">
+                  ✨ ĐIỂM ĐẾN & KHÁCH SẠN ĐÃ MỞ KHÓA ✨
                 </span>
-                <h4 id="scratch-revealed-city" class="text-2xl lg:text-3xl font-black text-white glow-cyan">
-                  THÀNH PHỐ ĐÃ CHỌN
+                <h4 id="scratch-revealed-city" class="text-3xl lg:text-4xl font-black text-white glow-cyan font-heading tracking-tight mt-1">
+                  ĐÀ LẠT (XỨ SỞ SƯƠNG MÙ)
                 </h4>
-                <p id="scratch-revealed-hotel" class="text-xs text-cyan-200">Kèm mã đặt chỗ máy bay & voucher dịch vụ độc quyền</p>
-                <div class="flex items-center justify-center gap-3 text-xs text-slate-300 font-mono mt-2">
-                  <span>Mã PNR: <strong>VN-9920-WM</strong></span>
+                <p id="scratch-revealed-hotel" class="text-xs text-cyan-200 font-medium">Resort Ana Mandara Villas Dalat • Kèm phòng Suite & bữa sáng</p>
+                <div class="flex flex-wrap items-center justify-center gap-3 text-xs text-slate-200 font-mono mt-3 bg-slate-950/80 px-4 py-2 rounded-xl border border-slate-800">
+                  <span>PNR: <strong class="text-amber-400">VN-9920-WM</strong></span>
                   <span>•</span>
-                  <span>Chuyến bay: <strong>VN-AIRWAYS</strong></span>
+                  <span>KHUNG BAY: <strong class="text-emerald-400">07:30 - 19:00</strong></span>
+                  <span>•</span>
+                  <span>BẢO HIỂM: <strong class="text-cyan-300">20.000.000đ</strong></span>
                 </div>
               </div>
             </div>
