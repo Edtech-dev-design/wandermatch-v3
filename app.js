@@ -3227,40 +3227,47 @@ function renderPois() {
     `).join('');
 
     return `
-      <div class="glass-card rounded-2xl overflow-hidden border border-slate-800 flex flex-col justify-between group">
+      <div class="glass-card specular-card rounded-2xl overflow-hidden border border-slate-800/80 hover:border-cyan-500/50 flex flex-col justify-between group transition-all duration-300 shadow-xl">
         <div>
-          <div class="relative h-52 overflow-hidden">
-            <img src="${poi.img}" alt="${nameText}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
-            <div class="absolute top-3 left-3">
+          <div class="poi-card-image-wrap relative h-56 overflow-hidden">
+            <img src="${poi.img}" alt="${nameText}" class="w-full h-full object-cover group-hover:scale-108 transition duration-700">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
+            
+            <div class="absolute top-3 left-3 z-10">
               ${verdictHtml}
             </div>
-            <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-              <span class="px-2.5 py-1 rounded-md bg-slate-900/90 backdrop-blur border border-slate-700 text-xs font-black text-amber-400 flex items-center gap-1 shadow-lg">
-                <i class="fa-solid fa-star"></i> ${poi.rating.toFixed(2)} (${poi.reviewsCount})
+            <div class="absolute top-3 right-3 z-10">
+              <span class="luxury-badge-gold px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-lg">
+                <i class="fa-solid fa-award text-amber-400"></i> VERIFIED
               </span>
-              <span class="px-2.5 py-1 rounded-md bg-emerald-950/90 backdrop-blur border border-emerald-700 text-xs font-bold text-emerald-300">
-                <i class="fa-solid fa-receipt"></i> ${costText}
+            </div>
+
+            <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between z-10">
+              <span class="px-3 py-1 rounded-lg bg-slate-950/90 backdrop-blur border border-amber-500/40 text-xs font-black text-amber-400 flex items-center gap-1.5 shadow-xl">
+                <i class="fa-solid fa-star text-amber-400"></i> ${poi.rating.toFixed(2)} <span class="text-[10px] text-slate-400 font-normal">(${poi.reviewsCount})</span>
+              </span>
+              <span class="px-3 py-1 rounded-lg bg-emerald-950/90 backdrop-blur border border-emerald-500/50 text-xs font-black text-emerald-300 font-mono shadow-xl">
+                <i class="fa-solid fa-receipt text-[10px]"></i> ${costText}
               </span>
             </div>
           </div>
 
           <div class="p-5">
-            <h4 class="text-base font-bold text-white mb-1">${nameText}</h4>
-            <div class="space-y-1 text-xs text-slate-400 mb-3">
-              <p class="flex items-start gap-1.5">
+            <h4 class="text-base font-extrabold text-white mb-1.5 group-hover:text-cyan-300 transition tracking-tight">${nameText}</h4>
+            <div class="space-y-1.5 text-xs text-slate-400 mb-3.5">
+              <p class="flex items-start gap-1.5 leading-snug">
                 <i class="fa-solid fa-location-dot text-rose-400 mt-0.5 shrink-0"></i>
-                <span>${poi.address}</span>
+                <span class="text-slate-300">${poi.address}</span>
               </p>
               <p class="flex items-center gap-1.5">
                 <i class="fa-solid fa-clock text-cyan-400 shrink-0"></i>
-                <span>${poi.hours}</span>
+                <span class="font-mono text-[11px]">${poi.hours}</span>
               </p>
             </div>
             <p class="text-xs text-slate-300 mb-4 line-clamp-3 leading-relaxed">${descText}</p>
 
             <div class="border-t border-slate-800/80 pt-3">
-              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 mb-1">
+              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
                 <i class="fa-solid fa-comments text-cyan-400"></i> ${t('reviews_heading')} (${poi.reviews.length})
               </span>
               ${reviewsSnippet}
@@ -3269,7 +3276,7 @@ function renderPois() {
         </div>
 
         <div class="p-5 pt-0">
-          <button onclick="openReviewModal('${poi.id}')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-cyan-950/80 hover:border-cyan-500/50 border border-slate-700 text-cyan-300 font-bold text-xs transition flex items-center justify-center gap-2 shadow-md">
+          <button onclick="openReviewModal('${poi.id}')" class="w-full py-2.5 rounded-xl bg-slate-800/90 hover:bg-cyan-950 hover:border-cyan-500/60 border border-slate-700/80 text-cyan-300 font-bold text-xs transition flex items-center justify-center gap-2 shadow-md">
             <i class="fa-regular fa-comment-dots"></i> ${t('btn_view_write_review')}
           </button>
         </div>
