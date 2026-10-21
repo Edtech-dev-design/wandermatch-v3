@@ -755,14 +755,25 @@
         <div id="container-individual-qr" class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start max-w-5xl mx-auto">
           
           <!-- Thẻ VietQR Doanh Nghiệp -->
-          <div class="bg-gradient-to-b from-slate-900 to-slate-950 p-6 rounded-3xl border border-cyan-500/40 shadow-2xl relative">
+          <div class="bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 p-6 lg:p-7 rounded-3xl border-2 border-cyan-500/40 shadow-2xl relative specular-card">
+            
+            <!-- Metallic Card Top Header with EMV Chip & NFC -->
             <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-              <div class="flex items-center gap-2">
-                <span class="text-xs font-black text-cyan-400 tracking-wider">VIETQR PRO CORPORATE</span>
+              <div class="flex items-center gap-3">
+                <div class="emv-chip"></div>
+                <div class="nfc-indicator text-cyan-400 text-lg">
+                  <i class="fa-solid fa-wifi transform rotate-90"></i>
+                </div>
+                <div>
+                  <span class="text-xs font-black text-white tracking-wider block font-mono">CORPORATE VIETQR</span>
+                  <span class="text-[10px] text-cyan-300 font-mono">NAPAS 247 DIRECT SWITCH</span>
+                </div>
               </div>
-              <span class="text-[11px] font-bold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-800 flex items-center gap-1">
-                <i class="fa-solid fa-lock"></i> ESCROW PROTECTED
-              </span>
+              <div class="flex items-center gap-2">
+                <span class="luxury-badge-cyan px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1.5 shadow">
+                  <span class="radar-beacon"></span> ESCROW PROTECTED
+                </span>
+              </div>
             </div>
 
             <!-- Real-time Dynamic VietQR Image -->
