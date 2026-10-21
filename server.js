@@ -292,6 +292,14 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
+  if (pathname === '/api/github/sync' && req.method === 'POST') {
+    const syncRes = await autoSync.performGitSync('Manual-Modal-Trigger');
+    return sendJson(res, 200, {
+      success: true,
+      syncStatus: syncRes
+    });
+  }
+
   // ==========================================================================
   // PRAGMATIC PILLARS API ROUTES (V3.1)
   // ==========================================================================

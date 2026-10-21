@@ -2958,6 +2958,12 @@ function handleGeneratePlan() {
   renderPois();
   renderRefundCalculator();
 
+  if (typeof renderValueGuaranteeCalculator === 'function') renderValueGuaranteeCalculator();
+  if (typeof renderPackingChecklist === 'function') renderPackingChecklist();
+  if (typeof renderTransparentValueReceipt === 'function') renderTransparentValueReceipt();
+  if (typeof renderAntiTrapSpots === 'function') renderAntiTrapSpots();
+  if (typeof initGroupBooking === 'function') initGroupBooking();
+
   showToast('success', `🎉 AI đã tối ưu chuyến đi ${getCurrentDestData().name.vi} với ngân sách ${state.selectedBudget.toLocaleString('vi-VN')}đ!`);
 }
 
