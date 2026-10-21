@@ -115,6 +115,19 @@ function startFileWatcher() {
   } catch (e) {
     console.error('⚠️ Không thể khởi tạo fs.watch:', e.message);
   }
+
+  // Tự động kiểm tra và đẩy các commit chưa push lên GitHub mỗi 15 giây
+  setInterval(async () => {
+    if (lastSyncStatus.state !== 'SYNCED_GITHUB' && !isSyncing) {
+      const pushRes = await runGitCommand('git push -u origin main');
+      if (pushRes.ok) {
+        lastSyncStatus.state = 'SYNCED_GITHUB';
+        lastSyncStatus.lastSyncTime = new Date().toLocaleString('vi-VN');
+        lastSyncStatus.lastCommitMessage = 'Đã tự động đẩy toàn bộ mã nguồn lên GitHub thành công!';
+        console.log('🎉 [GitHub Auto-Sync] Đã kết nối và đẩy toàn bộ code lên GitHub thành công!');
+      }
+    }
+  }, 15000);
 }
 
 if (require.main === module) {
