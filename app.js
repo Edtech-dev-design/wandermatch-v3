@@ -1564,11 +1564,19 @@ function renderTripSummaryCard() {
   const destName = data.name[state.currentLang] || data.name.vi;
   const hotelName = data.hotel[state.currentLang] || data.hotel.vi;
 
+  const destKey = state.selectedDestination === 'blind' ? 'dalat' : state.selectedDestination;
+  let flightRoute = { origin: "SGN", originCity: "TP. Hồ Chí Minh", dest: "DLI", destCity: "Đà Lạt (Liên Khương)", flightNo: "VN-9920", terminal: "T1 - Sảnh A" };
+  if (destKey === 'hochiminh') {
+    flightRoute = { origin: "HAN", originCity: "Hà Nội (Nội Bài)", dest: "SGN", destCity: "TP. Hồ Chí Minh (Tân Sơn Nhất)", flightNo: "VN-8842", terminal: "T2 - Cổng 04" };
+  } else if (destKey === 'danang') {
+    flightRoute = { origin: "SGN", originCity: "TP. Hồ Chí Minh (SGN)", dest: "DAD", destCity: "Đà Nẵng (Quốc tế)", flightNo: "VN-7718", terminal: "T1 - Cổng 08" };
+  }
+
   let hotelTierDesc = "";
   if (budget < 3500000) {
-    hotelTierDesc = "Khách sạn Tiêu Chuẩn 3 Sao (Phòng Superior City View)";
+    hotelTierDesc = "Khách sạn Tiêu Chuẩn 3-4 Sao (Phòng Superior City View)";
   } else if (budget <= 8000000) {
-    hotelTierDesc = "Khách sạn Cao Cấp 4 Sao (Phòng Deluxe River/Forest View + Buffet Sáng)";
+    hotelTierDesc = "Khách sạn Cao Cấp 4-5 Sao (Phòng Deluxe River/Forest View + Buffet Sáng)";
   } else {
     hotelTierDesc = "Resort / Khách Sạn Thượng Lưu 5 Sao (Phòng Suite + Spa & Đưa Đón Sân Bay)";
   }
@@ -1582,43 +1590,90 @@ function renderTripSummaryCard() {
   const sampleSlots = topItin ? topItin.slots.slice(0, 3) : [];
 
   const slotsPreviewHtml = sampleSlots.map(s => `
-    <div class="flex items-center gap-3 bg-slate-950/70 p-2.5 rounded-xl border border-slate-800">
-      <img src="${s.img}" alt="${s.poi_name.vi}" class="w-12 h-12 rounded-lg object-cover border border-slate-700 shrink-0">
+    <div class="flex items-center gap-3 bg-slate-950/80 p-3 rounded-2xl border border-slate-800 hover:border-cyan-500/40 transition group">
+      <div class="poi-card-image-wrap w-14 h-14 rounded-xl shrink-0 border border-slate-700/80 shadow-md">
+        <img src="${s.img}" alt="${s.poi_name.vi}" class="w-full h-full object-cover">
+      </div>
       <div class="min-w-0 flex-1">
         <div class="flex items-center justify-between text-[11px]">
           <span class="text-cyan-400 font-mono font-bold">${s.time}</span>
-          <span class="text-emerald-400 font-bold">${s.cost_est}</span>
+          <span class="text-emerald-400 font-bold font-mono">${s.cost_est}</span>
         </div>
-        <p class="text-xs font-bold text-white truncate mt-0.5">${s.poi_name[state.currentLang] || s.poi_name.vi}</p>
+        <p class="text-xs font-bold text-white truncate mt-0.5 group-hover:text-cyan-300 transition">${s.poi_name[state.currentLang] || s.poi_name.vi}</p>
       </div>
     </div>
   `).join('');
 
-  container.innerHTML = `
-    <div class="bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 rounded-3xl p-6 lg:p-7 border-2 border-emerald-500/50 shadow-2xl space-y-5 animate-fadeIn relative overflow-hidden">
-      <div class="absolute top-0 right-0 px-4 py-1.5 bg-gradient-to-l from-emerald-500 to-teal-600 text-slate-950 font-black text-xs rounded-bl-2xl uppercase tracking-wider flex items-center gap-1.5 shadow">
-        <i class="fa-solid fa-circle-check"></i> KẾ HOẠCH ĐÃ ĐƯỢC TẠO
-      </div>
+  // Barcode lines generator
+  const barcodeBars = Array.from({ length: 38 }, (_, i) => {
+    const widths = [1, 2, 3, 4, 2, 1, 3, 2, 4, 1];
+    const w = widths[i % widths.length];
+    return `<div class="barcode-bar" style="width: ${w}px;"></div>`;
+  }).join('');
 
-      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
-        <div>
-          <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-compass"></i> CHUYẾN ĐI TỰ TẠO THEO NGÂN SÁCH CỦA BẠN
-          </span>
-          <h3 class="text-xl lg:text-2xl font-black text-white mt-1 flex items-center gap-2">
-            <span>Chuyến Du Lịch: ${destName}</span>
-          </h3>
-          <p class="text-xs text-slate-300 mt-0.5">
-            Mã đơn hàng: <strong class="text-amber-400 font-mono">WM99081234</strong> • ${pax} khách • ${state.selectedDuration === '2d1n' ? '2 Ngày 1 Đêm' : state.selectedDuration === '4d3n' ? '4 Ngày 3 Đêm' : '3 Ngày 2 Đêm'}
-          </p>
+  container.innerHTML = `
+    <div class="boarding-pass-card specular-card rounded-3xl p-6 lg:p-8 border-2 border-emerald-500/50 shadow-2xl space-y-6 animate-fadeIn relative">
+      <div class="ticket-notch-left"></div>
+      <div class="ticket-notch-right"></div>
+
+      <!-- Top Airline / Escrow Header Badge -->
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-emerald-500 flex items-center justify-center text-slate-950 font-black shadow-lg">
+            <i class="fa-solid fa-plane-departure text-base"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-black text-cyan-400 tracking-wider font-mono">WANDERMATCH AIRWAYS & ESCROW STAY</span>
+              <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-cyan-950 text-cyan-300 border border-cyan-700">VIP PASS</span>
+            </div>
+            <h4 class="text-xs text-slate-400 font-medium">Vé Trọn Gói Bản Đồ Mù • Bảo Lãnh PMS Cứng 20.000.000đ</h4>
+          </div>
         </div>
 
-        <div class="text-right">
-          <span class="text-xs text-slate-400">Tổng Ngân Sách Trọn Gói:</span>
-          <div class="text-2xl lg:text-3xl font-black text-emerald-400 font-mono">
-            ${budget.toLocaleString('vi-VN')} VNĐ
+        <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 bg-slate-950/80 px-3 py-1.5 rounded-full border border-emerald-500/40 text-emerald-300 font-bold text-xs font-mono shadow-inner">
+            <span class="radar-beacon"></span>
+            <span>HARD-COMMITTED • ON SCHEDULE</span>
           </div>
-          <span class="text-[11px] text-cyan-300 font-medium">Bình quân: ~${perPax.toLocaleString('vi-VN')}đ / khách</span>
+        </div>
+      </div>
+
+      <!-- Main Flight & Hotel Routing Banner -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        <!-- Flight Route Info -->
+        <div class="md:col-span-8 flex flex-wrap items-center justify-between gap-4 bg-slate-950/60 p-5 rounded-2xl border border-slate-800">
+          <div>
+            <span class="text-[10px] text-slate-400 font-mono font-bold block uppercase">KHỞI HÀNH</span>
+            <div class="text-2xl lg:text-3xl font-black text-white font-mono tracking-tight">${flightRoute.origin}</div>
+            <div class="text-[11px] text-slate-300 mt-0.5">${flightRoute.originCity}</div>
+          </div>
+
+          <div class="flex flex-col items-center px-4">
+            <span class="text-[10px] text-cyan-400 font-mono font-bold mb-1">${flightRoute.flightNo} • 1H15M</span>
+            <div class="flex items-center gap-2 text-cyan-400">
+              <div class="w-12 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
+              <i class="fa-solid fa-plane text-xs transform rotate-45"></i>
+              <div class="w-12 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
+            </div>
+            <span class="text-[9px] text-slate-400 font-sans mt-1">Bay khung giờ đẹp (Không Red-Eye)</span>
+          </div>
+
+          <div class="text-right">
+            <span class="text-[10px] text-slate-400 font-mono font-bold block uppercase">ĐIỂM ĐẾN</span>
+            <div class="text-2xl lg:text-3xl font-black text-emerald-400 font-mono tracking-tight">${flightRoute.dest}</div>
+            <div class="text-[11px] text-slate-300 mt-0.5">${destName}</div>
+          </div>
+        </div>
+
+        <!-- Budget & PNR Overview -->
+        <div class="md:col-span-4 bg-gradient-to-b from-slate-950 to-slate-900/90 p-5 rounded-2xl border border-emerald-500/30 text-right space-y-1">
+          <span class="text-[11px] text-slate-400 font-semibold block">Tổng Ngân Sách Trọn Gói:</span>
+          <div class="text-2xl lg:text-3xl font-black text-emerald-400 font-mono">${budget.toLocaleString('vi-VN')}đ</div>
+          <div class="text-[11px] text-cyan-300 font-medium">Bình quân ~${perPax.toLocaleString('vi-VN')}đ / khách (${pax} người)</div>
+          <div class="pt-2 text-[10px] font-mono text-amber-400 font-bold border-t border-slate-800">
+            PNR: WM99081234 • CLASS: BUSINESS BLIND
+          </div>
         </div>
       </div>
 
@@ -1628,7 +1683,7 @@ function renderTripSummaryCard() {
           <div class="text-cyan-400 font-bold flex items-center gap-1.5">
             <i class="fa-solid fa-hotel"></i> 🏨 Lưu Trú (40%)
           </div>
-          <div class="text-base font-black text-white">${hotelAlloc.toLocaleString('vi-VN')}đ</div>
+          <div class="text-base font-black text-white font-mono">${hotelAlloc.toLocaleString('vi-VN')}đ</div>
           <div class="text-[11px] text-slate-300 leading-tight">${hotelName} — ${hotelTierDesc}</div>
         </div>
 
@@ -1636,7 +1691,7 @@ function renderTripSummaryCard() {
           <div class="text-amber-400 font-bold flex items-center gap-1.5">
             <i class="fa-solid fa-utensils"></i> 🍜 Ẩm Thực (30%)
           </div>
-          <div class="text-base font-black text-white">${foodAlloc.toLocaleString('vi-VN')}đ</div>
+          <div class="text-base font-black text-white font-mono">${foodAlloc.toLocaleString('vi-VN')}đ</div>
           <div class="text-[11px] text-slate-300 leading-tight">Thưởng thức món đặc sản Michelin Bib Gourmand & phố ẩm thực</div>
         </div>
 
@@ -1644,7 +1699,7 @@ function renderTripSummaryCard() {
           <div class="text-emerald-400 font-bold flex items-center gap-1.5">
             <i class="fa-solid fa-ticket"></i> 🎡 Vé Vui Chơi (20%)
           </div>
-          <div class="text-base font-black text-white">${ticketAlloc.toLocaleString('vi-VN')}đ</div>
+          <div class="text-base font-black text-white font-mono">${ticketAlloc.toLocaleString('vi-VN')}đ</div>
           <div class="text-[11px] text-slate-300 leading-tight">Bao gồm trọn gói vé đài quan sát, cáp treo, di tích và tour</div>
         </div>
 
@@ -1652,7 +1707,7 @@ function renderTripSummaryCard() {
           <div class="text-violet-400 font-bold flex items-center gap-1.5">
             <i class="fa-solid fa-taxi"></i> 🚕 Di Chuyển (10%)
           </div>
-          <div class="text-base font-black text-white">${transitAlloc.toLocaleString('vi-VN')}đ</div>
+          <div class="text-base font-black text-white font-mono">${transitAlloc.toLocaleString('vi-VN')}đ</div>
           <div class="text-[11px] text-slate-300 leading-tight">Di chuyển Grab/Taxi nội thành, cafe chill và quỹ dự phòng</div>
         </div>
       </div>
@@ -1670,46 +1725,30 @@ function renderTripSummaryCard() {
         </div>
       </div>
 
-      <!-- Khóa Tiêu Chuẩn Thực Dụng Đã Áp Dụng (Pragmatic Comfort Locks) -->
-      <div class="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="font-bold text-slate-300 flex items-center gap-1.5 text-[11px]">
-            <i class="fa-solid fa-lock text-cyan-400"></i> Tiêu Chuẩn Thực Dụng Đã Khóa Cho Chuyến Đi:
-          </span>
-          <span class="text-cyan-400 font-mono text-[10px] font-bold">RETAIL FLOOR: &ge; ${(budget * 1.2).toLocaleString('vi-VN')}đ</span>
-        </div>
-        <div class="flex flex-wrap gap-1.5 text-[10px]">
-          <span class="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 flex items-center gap-1 font-semibold">
-            <i class="fa-solid fa-plane-departure text-cyan-400"></i> ${state.comfortLocks.noRedEye ? 'Khung giờ bay 07:00 - 20:00' : 'Giờ bay linh hoạt'}
-          </span>
-          <span class="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 flex items-center gap-1 font-semibold">
-            <i class="fa-solid fa-bed text-amber-400"></i> Cấu hình: ${state.comfortLocks.bedType === 'TWIN' ? '2 Giường Đơn (Twin)' : '1 Giường Đôi Lớn (King)'}
-          </span>
-          <span class="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 flex items-center gap-1 font-semibold">
-            <i class="fa-solid fa-suitcase-rolling text-emerald-400"></i> ${state.comfortLocks.luggageShuttle ? 'Kèm 20kg ký gửi & Xe đón sân bay' : 'Hành lý xách tay 7kg'}
-          </span>
-          ${state.comfortLocks.workcation ? `
-            <span class="px-2.5 py-1 rounded-lg bg-slate-950 border border-violet-500/40 text-violet-300 flex items-center gap-1 font-semibold">
-              <i class="fa-solid fa-laptop-code text-violet-400"></i> Workcation: Bàn riêng & Wifi &ge; 50Mbps
-            </span>
-          ` : ''}
-        </div>
-      </div>
+      <!-- Perforated Ticket Divider Line -->
+      <div class="ticket-perforation"></div>
 
-      <!-- Cam kết bảo hiểm SLA -->
-      <div class="bg-cyan-950/30 p-3.5 rounded-2xl border border-cyan-800/50 flex flex-wrap items-center justify-between gap-3 text-xs">
-        <div class="flex items-center gap-2.5 text-cyan-200">
-          <div class="w-7 h-7 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold shrink-0">
-            <i class="fa-solid fa-shield-halved"></i>
+      <!-- Ticket Bottom Pass Stub with Barcode & Escrow Guarantee -->
+      <div class="flex flex-wrap items-center justify-between gap-4 pt-1">
+        <div class="flex items-center gap-4">
+          <!-- Barcode Graphic -->
+          <div class="barcode-visual p-2 bg-slate-950 rounded-lg border border-slate-800">
+            ${barcodeBars}
           </div>
           <div>
-            <span class="font-bold text-white">Bảo Hiểm SLA Phòng Cứng 20 Triệu Đồng & Hoàn 200% Chênh Lệch</span>
-            <span class="text-slate-300 text-[11px] block">Đối tác B2B ký số cam kết 100% không bùng phòng • Hoàn 200% chênh lệch nếu giá trị thực tế < ngân sách</span>
+            <span class="text-[10px] font-mono text-slate-400 block">E-TICKET SERIAL NO.</span>
+            <span class="font-mono text-xs font-bold text-slate-200">WM-ETK-2026-8892</span>
           </div>
         </div>
-        <span class="px-3 py-1 rounded-full text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-700/60">
-          HARD_COMMIT_ESCROW
-        </span>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="luxury-badge-gold px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-shield-halved text-amber-400"></i> BẢO LÃNH PMS 20.000.000 VNĐ
+          </span>
+          <span class="luxury-badge-cyan px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-scale-balanced text-cyan-300"></i> CAM KẾT HOÀN 200% CHÊNH LỆCH
+          </span>
+        </div>
       </div>
 
       <!-- Nút Chốt Chuyến Đi & Thanh Toán VietQR Ngay -->
