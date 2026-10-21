@@ -3587,23 +3587,50 @@ function initScratchCard() {
   canvas.width = container.offsetWidth || 540;
   canvas.height = container.offsetHeight || 300;
 
-  ctx.fillStyle = '#64748b';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // Cập nhật thông tin điểm đến bên dưới lớp cào
+  const data = getCurrentDestData();
+  const secretImg = document.getElementById('scratch-secret-img');
+  const revealedCity = document.getElementById('scratch-revealed-city');
+  const revealedHotel = document.getElementById('scratch-revealed-hotel');
+  if (secretImg) secretImg.src = data.heroImg;
+  if (revealedCity) revealedCity.textContent = (data.name[state.currentLang] || data.name.vi).toUpperCase();
+  if (revealedHotel) revealedHotel.textContent = `${data.hotel[state.currentLang] || data.hotel.vi} • Cam kết 100% giữ phòng cứng`;
 
+  // Vẽ nền tráng kim loại bóng bẩy cao cấp
   const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  grad.addColorStop(0, 'rgba(203, 213, 225, 0.95)');
-  grad.addColorStop(0.5, 'rgba(148, 163, 184, 0.98)');
-  grad.addColorStop(1, 'rgba(100, 116, 139, 0.95)');
+  grad.addColorStop(0, '#94a3b8');
+  grad.addColorStop(0.2, '#f8fafc');
+  grad.addColorStop(0.4, '#cbd5e1');
+  grad.addColorStop(0.6, '#f1f5f9');
+  grad.addColorStop(0.8, '#94a3b8');
+  grad.addColorStop(1, '#64748b');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = '#1e293b';
-  ctx.font = 'bold 16px Outfit, sans-serif';
+  // Viền hoa văn vàng kim loại
+  ctx.strokeStyle = 'rgba(245, 158, 11, 0.7)';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(15, 15, canvas.width - 30, canvas.height - 30);
+
+  // Ngôi sao lấp lánh góc thẻ
+  ctx.fillStyle = '#f59e0b';
+  ctx.font = '16px Outfit, sans-serif';
+  ctx.fillText('✦', 28, 38);
+  ctx.fillText('✦', canvas.width - 38, 38);
+  ctx.fillText('✦', 28, canvas.height - 24);
+  ctx.fillText('✦', canvas.width - 38, canvas.height - 24);
+
+  // Chữ dập nổi sắc nét
+  ctx.fillStyle = '#0f172a';
+  ctx.font = '900 17px Outfit, sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('✨ CÀO TẠI ĐÂY ĐỂ MỞ KHÓA ĐIỂM ĐẾN ✨', canvas.width / 2, canvas.height / 2 - 10);
-  ctx.font = '12px Inter, sans-serif';
+  ctx.fillText('✨ CÀO TẠI ĐÂY ĐỂ MỞ KHÓA ĐIỂM ĐẾN ✨', canvas.width / 2, canvas.height / 2 - 12);
   ctx.fillStyle = '#334155';
-  ctx.fillText('WanderMatch 3.0 • Bảo hiểm 200% phòng cứng', canvas.width / 2, canvas.height / 2 + 18);
+  ctx.font = '700 11px Inter, sans-serif';
+  ctx.fillText('WANDERMATCH 3.1 • BẢO HIỂM 200% PHÒNG CỨNG • HARD-COMMIT ESCROW', canvas.width / 2, canvas.height / 2 + 16);
 
   let isDrawing = false;
 
