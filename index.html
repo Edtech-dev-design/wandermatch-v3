@@ -1772,6 +1772,47 @@
         </div>
       </div>
 
+      <!-- CLOUD WORKER LIVE ADMIN & B2B SUMMARY TABLE (/api/admin-summary) -->
+      <div class="glass-panel rounded-3xl p-6 lg:p-8 border border-cyan-500/40 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h4 class="text-base font-black text-white flex items-center gap-2">
+              <i class="fa-solid fa-server text-cyan-400"></i> Bảng Quản Trị Đơn Đặt Mù AI & Đối Soát B2B (`/api/admin-summary`)
+            </h4>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Hiển thị trực tiếp các đơn `blind_bookings`, nhật ký suy luận AI (`ai_reasoning_log`), giá vốn `net_cost_vnd`, lợi nhuận `gross_margin_vnd` và đánh giá của khách hàng.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="cw-supabase-status-badge" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-700">
+              🟢 CLOUD WORKER READY
+            </span>
+            <button onclick="refreshCloudAdminSummary()" class="px-3.5 py-1.5 rounded-xl btn-glow-cyan text-slate-950 font-black text-xs shadow transition flex items-center gap-1.5">
+              <i class="fa-solid fa-rotate"></i>
+              <span>Làm Mới (`/api/admin-summary`)</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-2xl border border-slate-800">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-900/90 text-slate-400 text-[11px] uppercase tracking-wider border-b border-slate-800">
+                <th class="py-3 px-4">Mã Đơn</th>
+                <th class="py-3 px-4">Khách Hàng & STK (Masked)</th>
+                <th class="py-3 px-4">Điểm Đến & Mã SLA</th>
+                <th class="py-3 px-4">Thu / Giá Net / Lãi Gộp</th>
+                <th class="py-3 px-4">Nhật Ký Suy Luận AI (Cosine & Gemini)</th>
+                <th class="py-3 px-4">Đánh Giá Sau Chuyến Đi</th>
+              </tr>
+            </thead>
+            <tbody id="cw-admin-table-body" class="divide-y divide-slate-800/80">
+              <!-- Rendered dynamically by Cloud Worker JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </section>
 
   </main>
