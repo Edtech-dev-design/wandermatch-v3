@@ -3623,17 +3623,18 @@ function initScratchCard() {
   const ctx = canvas.getContext('2d');
   const container = canvas.parentElement;
 
+  canvas.style.display = 'block';
+  canvas.style.opacity = '1';
   canvas.width = container.offsetWidth || 540;
   canvas.height = container.offsetHeight || 300;
 
-  // Cập nhật thông tin điểm đến bên dưới lớp cào
-  const data = getCurrentDestData();
-  const secretImg = document.getElementById('scratch-secret-img');
+  // ANTI-F12 LEAK PROTECTION: Giữ niêm phong trên DOM cho tới khi cào đạt >= 40%
   const revealedCity = document.getElementById('scratch-revealed-city');
   const revealedHotel = document.getElementById('scratch-revealed-hotel');
-  if (secretImg) secretImg.src = data.heroImg;
-  if (revealedCity) revealedCity.textContent = (data.name[state.currentLang] || data.name.vi).toUpperCase();
-  if (revealedHotel) revealedHotel.textContent = `${data.hotel[state.currentLang] || data.hotel.vi} • Cam kết 100% giữ phòng cứng`;
+  if (!state.isScratchedRevealed) {
+    if (revealedCity) revealedCity.textContent = "🔒 ĐANG NIÊM PHONG BỞI AI ESCROW";
+    if (revealedHotel) revealedHotel.textContent = "Cào trên 40% diện tích thẻ bạc để giải mã Điểm Đến, Vé Bay & Mã Phòng Cứng SLA";
+  }
 
   // Vẽ nền tráng kim loại bóng bẩy cao cấp
   const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
@@ -3643,6 +3644,7 @@ function initScratchCard() {
   grad.addColorStop(0.6, '#f1f5f9');
   grad.addColorStop(0.8, '#94a3b8');
   grad.addColorStop(1, '#64748b');
+  ctx.globalCompositeOperation = 'source-over';
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -3669,19 +3671,23 @@ function initScratchCard() {
   ctx.fillText('✨ CÀO TẠI ĐÂY ĐỂ MỞ KHÓA ĐIỂM ĐẾN ✨', canvas.width / 2, canvas.height / 2 - 12);
   ctx.fillStyle = '#334155';
   ctx.font = '700 11px Inter, sans-serif';
-  ctx.fillText('WANDERMATCH 3.1 • BẢO HIỂM 200% PHÒNG CỨNG • HARD-COMMIT ESCROW', canvas.width / 2, canvas.height / 2 + 16);
+  ctx.fillText('WANDERMATCH 3.0 • BẢO HIỂM 200% PHÒNG CỨNG • HARD-COMMIT ESCROW', canvas.width / 2, canvas.height / 2 + 16);
 
   let isDrawing = false;
 
   function scratch(e) {
     if (!isDrawing) return;
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
-    const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
+    const scaleX = canvas.width / (rect.width || 1);
+    const scaleY = canvas.height / (rect.height || 1);
+    const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+    const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
 
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
-    ctx.arc(x, y, 28, 0, Math.PI * 2);
+    ctx.arc(x, y, 30, 0, Math.PI * 2);
     ctx.fill();
 
     calculateProgress();
@@ -3700,38 +3706,44 @@ function initScratchCard() {
     if (progressEl) progressEl.textContent = `${percent}%`;
     if (barEl) barEl.style.width = `${percent}%`;
 
-    if (percent > 45 && !state.isScratchedRevealed) {
+    if (percent >= 40 && !state.isScratchedRevealed) {
       state.isScratchedRevealed = true;
       revealCardFull();
     }
   }
 
   function revealCardFull() {
-    canvas.style.transition = 'opacity 0.6s ease';
+    canvas.style.transition = 'opacity 0.65s ease';
     canvas.style.opacity = '0';
     setTimeout(() => {
       canvas.style.display = 'none';
-    }, 600);
+    }, 650);
 
     const btn = document.getElementById('revealed-action-btn');
     if (btn) btn.classList.remove('hidden');
 
-    renderTransparentValueReceipt();
-    renderAntiTrapSpots();
-
-    showToast('success', `🎉 CHÚC MỪNG! BẠN ĐÃ MỞ KHÓA ĐIỂM ĐẾN: ${getCurrentDestData().name.vi.toUpperCase()}!`);
+    if (typeof window.triggerCloudReveal === 'function') {
+      window.triggerCloudReveal();
+    } else {
+      const data = getCurrentDestData();
+      if (revealedCity) revealedCity.textContent = (data.name[state.currentLang] || data.name.vi).toUpperCase();
+      if (revealedHotel) revealedHotel.textContent = `${data.hotel[state.currentLang] || data.hotel.vi} • Cam kết 100% giữ phòng cứng`;
+      renderTransparentValueReceipt();
+      renderAntiTrapSpots();
+      showToast('success', `🎉 CHÚC MỪNG! BẠN ĐÃ MỞ KHÓA ĐIỂM ĐẾN: ${data.name.vi.toUpperCase()}!`);
+    }
   }
 
-  canvas.addEventListener('mousedown', () => isDrawing = true);
-  window.addEventListener('mouseup', () => isDrawing = false);
-  canvas.addEventListener('mousemove', scratch);
+  canvas.onmousedown = () => { isDrawing = true; };
+  window.addEventListener('mouseup', () => { isDrawing = false; });
+  canvas.onmousemove = scratch;
 
-  canvas.addEventListener('touchstart', (e) => {
+  canvas.ontouchstart = (e) => {
     isDrawing = true;
     scratch(e);
-  }, { passive: true });
-  window.addEventListener('touchend', () => isDrawing = false);
-  canvas.addEventListener('touchmove', scratch, { passive: true });
+  };
+  window.addEventListener('touchend', () => { isDrawing = false; });
+  canvas.ontouchmove = scratch;
 }
 
 // ============================================================================
