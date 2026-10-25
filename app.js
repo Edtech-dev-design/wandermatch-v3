@@ -540,6 +540,28 @@ const state = {
   sosClaimed: false
 };
 
+// ============================================================================
+// REVERSE PROXY API BRIDGE (/api/*)
+// Triệt tiêu lỗi CORS và bảo mật tuyệt đối Cloudflare Worker Address
+// ============================================================================
+async function callBackendApi(endpoint, data = null, method = 'POST') {
+  try {
+    const opts = {
+      method: method,
+      headers: { 'Content-Type': 'application/json' }
+    };
+    if (data && method !== 'GET') {
+      opts.body = JSON.stringify(data);
+    }
+    const res = await fetch(`/api${endpoint}`, opts);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (e) {
+    // Seamless fallback to client-side state
+    return null;
+  }
+}
+
 // DỮ LIỆU ĐIỂM ĐẾN CHI TIẾT (TP. HỒ CHÍ MINH, ĐÀ LẠT, ĐÀ NẴNG)
 const DESTINATION_DATA = {
   hochiminh: {
