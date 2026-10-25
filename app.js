@@ -3767,6 +3767,7 @@ function simulateNapasVerification() {
         <span>Đang gọi Napas 247 Switch API để tra cứu tên chủ tài khoản...</span>
       </div>
     `;
+  }
   // Gọi qua Reverse Proxy /api/napas/lookup
   callBackendApi('/napas/lookup', { bankCode: bankSelect, accountNumber: accNo }).then(res => {
     if (res && res.success) {
