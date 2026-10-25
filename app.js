@@ -2954,16 +2954,18 @@ function updateVietQrDisplay() {
   const receiptDest = document.getElementById('receipt-dest-name');
   if (receiptDest) receiptDest.textContent = getCurrentDestData().name.vi;
 
-  const scratchCity = document.getElementById('scratch-revealed-city');
-  if (scratchCity) scratchCity.textContent = getCurrentDestData().name.vi.toUpperCase();
+  if (state.isScratchedRevealed || window.cwState?.isCurrentBookingUnlocked) {
+    const scratchCity = document.getElementById('scratch-revealed-city');
+    if (scratchCity) scratchCity.textContent = getCurrentDestData().name.vi.toUpperCase();
 
-  const scratchHotel = document.getElementById('scratch-revealed-hotel');
-  if (scratchHotel) scratchHotel.textContent = getCurrentDestData().hotel.vi;
+    const scratchHotel = document.getElementById('scratch-revealed-hotel');
+    if (scratchHotel) scratchHotel.textContent = getCurrentDestData().hotel.vi;
+  }
 
   // Cập nhật URL ảnh mã QR VietQR chuẩn xác theo đúng số tiền người dùng nhập
   const qrImg = document.getElementById('vietqr-image-element');
   if (qrImg) {
-    qrImg.src = `https://img.vietqr.io/image/MB-990812348888-compact2.png?amount=${amt}&addInfo=${order}&accountName=CONG%20TY%20CP%20CONG%20NGHE%20DU%20LICH%20WANDERMATCH`;
+    qrImg.src = `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${amt}&addInfo=${order}&accountName=CONG%20TY%20TNHH%20WANDERMATCH%20VN`;
   }
 
   // Nếu người dùng đã thanh toán trước đó nhưng vừa đổi số tiền, reset lại trạng thái để người dùng thanh toán tiếp số mới
