@@ -476,7 +476,11 @@ ${fullName}`;
   // ==========================================================================
   // STATIC FILE SERVING
   // ==========================================================================
-  let filePath = path.join(ROOT_DIR, pathname === '/' ? 'index.html' : pathname);
+  let reqRelPath = pathname === '/' ? 'index.html' : pathname.replace(/^\//, '');
+  let filePath = path.join(ROOT_DIR, 'frontend', reqRelPath);
+  if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+    filePath = path.join(ROOT_DIR, reqRelPath);
+  }
 
   fs.stat(filePath, (err, stats) => {
     if (err || !stats.isFile()) {
