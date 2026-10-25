@@ -3,8 +3,6 @@
   "version": "3.0.0",
   "private": true,
   "scripts": {
-    "start": "node server.js",
-    "sync": "node auto-sync-github.js",
     "dev:worker": "wrangler dev worker.js --port 8787",
     "deploy:worker": "wrangler deploy worker.js",
     "deploy": "wrangler deploy worker.js"
