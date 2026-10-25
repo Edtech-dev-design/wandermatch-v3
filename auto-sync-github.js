@@ -36,12 +36,39 @@ function runGitCommand(cmd) {
   });
 }
 
+function syncFrontendMirror() {
+  const files = ['index.html', 'app.js', 'styles.css'];
+  const frontendDir = path.join(ROOT_DIR, 'frontend');
+  if (!fs.existsSync(frontendDir)) return;
+
+  for (const f of files) {
+    const rootFile = path.join(ROOT_DIR, f);
+    const feFile = path.join(frontendDir, f);
+    try {
+      if (fs.existsSync(rootFile) && fs.existsSync(feFile)) {
+        const rootStat = fs.statSync(rootFile);
+        const feStat = fs.statSync(feFile);
+        if (Math.abs(rootStat.mtimeMs - feStat.mtimeMs) > 1000) {
+          if (rootStat.mtimeMs > feStat.mtimeMs) {
+            fs.copyFileSync(rootFile, feFile);
+          } else {
+            fs.copyFileSync(feFile, rootFile);
+          }
+        }
+      } else if (fs.existsSync(rootFile) && !fs.existsSync(feFile)) {
+        fs.copyFileSync(rootFile, feFile);
+      }
+    } catch (e) {}
+  }
+}
+
 async function performGitSync(triggerReason = 'Auto-watch') {
   if (isSyncing) return lastSyncStatus;
   isSyncing = true;
   lastSyncStatus.state = 'SYNCING';
 
   try {
+    syncFrontendMirror();
     const statusRes = await runGitCommand('git status --porcelain');
     if (!statusRes.stdout) {
       lastSyncStatus.state = 'UP_TO_DATE';
