@@ -1345,7 +1345,13 @@
         </span>
       </div>
 
-      <div class="glass-panel rounded-3xl p-6 lg:p-10 border border-slate-800 text-center">
+      <div id="b2c-subview-step4-scratch" class="glass-panel rounded-3xl p-6 lg:p-10 border border-slate-800 text-center">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-800/80 text-left">
+          <span class="px-3 py-1 rounded-full text-xs font-black bg-cyan-500 text-slate-950 uppercase">BƯỚC 4: CÀO THẺ GIỜ G &amp; NHẬN VÉ BOARDING PASS</span>
+          <button type="button" onclick="switchB2CStep(3)" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold transition flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-left"></i> <span>Quay lại Bước 3 (Phòng Chờ &amp; Hoàn Tiền)</span>
+          </button>
+        </div>
         <h3 class="text-2xl font-extrabold text-white" data-i18n="scratch_title">
           Phòng Chờ & Thẻ Cào Mở Khóa Điểm Đến
         </h3>
@@ -1585,18 +1591,28 @@
 
       </div>
 
-      <!-- Time-Tiered Cancellation Engine -->
-      <div class="glass-panel rounded-3xl p-6 lg:p-10 border border-slate-800 space-y-6">
-        <div>
-          <span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">
-            CONDITIONAL REFUND ENGINE
-          </span>
-          <h3 class="text-xl lg:text-2xl font-extrabold text-white mt-2" data-i18n="refund_calc_title">
-            Bộ Máy Tính Phí Hoàn Tiền Tự Động Theo Khung Giờ
-          </h3>
-          <p class="text-xs text-slate-400 mt-1">
-            Bấm chọn 3 khung giờ để xem công thức trừ phí tự động và tỷ lệ hoàn về STK Napas 247 tương ứng với ngân sách bạn đã nhập.
-          </p>
+      <!-- Time-Tiered Cancellation Engine (BƯỚC 3: PHÒNG CHỜ & HOÀN TIỀN) -->
+      <div id="b2c-subview-step3-lounge" class="glass-panel rounded-3xl p-6 lg:p-10 border border-slate-800 space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+          <div>
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">
+              BƯỚC 3: PHÒNG CHỜ MYSTERY HINT &amp; BẢO HIỂM HOÀN TIỀN 3 KHUNG GIỜ
+            </span>
+            <h3 class="text-xl lg:text-2xl font-extrabold text-white mt-2" data-i18n="refund_calc_title">
+              Bộ Máy Tính Phí Hoàn Tiền Tự Động Theo Khung Giờ &amp; Bất Khả Kháng
+            </h3>
+            <p class="text-xs text-slate-400 mt-1">
+              Bấm chọn 3 khung giờ để xem công thức trừ phí tự động và tỷ lệ hoàn về STK Napas 247 tương ứng với ngân sách bạn đã nhập.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="switchB2CStep(2)" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold transition flex items-center gap-1.5">
+              <i class="fa-solid fa-arrow-left"></i> <span>Bước 2 (VietQR)</span>
+            </button>
+            <button type="button" onclick="switchB2CStep(4)" class="px-4 py-2 rounded-xl btn-glow-cyan text-slate-950 text-xs font-black shadow transition flex items-center gap-1.5">
+              <span>Tiếp tục Bước 4: Cào Thẻ Giờ G</span> <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
