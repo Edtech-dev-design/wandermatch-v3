@@ -751,6 +751,134 @@
           </div>
 
         </div>
+
+        <!-- ======================================================================
+             CLOUDFLARE WORKER V3.0 LIVE AI BLIND BOOKING & eKYC ENGINE (/api/create-booking)
+             ====================================================================== -->
+        <div class="mt-8 pt-8 border-t border-slate-800 space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <span class="px-3 py-1 rounded-full text-[11px] font-black bg-cyan-500 text-slate-950 uppercase tracking-wider shadow">
+                CLOUD WORKER V3.0 • AES-GCM 256-BIT • VECTOR COSINE 5D
+              </span>
+              <h3 class="text-xl font-extrabold text-white mt-2">
+                🚀 Đặt Chuyến Đi Mù AI & Định Danh eKYC Trực Tiếp Qua Cloud Worker (`/api/create-booking`)
+              </h3>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Kiểm tra trùng khớp 100% Họ Tên CCCD với Chủ TK Ngân Hàng (`normalizeVNName`), mã hóa AES-GCM 256-bit, lọc thành phố Blacklist và sinh VietQR chia tiền tự động.
+              </p>
+            </div>
+            <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-2 rounded-xl border border-slate-800 text-xs">
+              <span class="text-slate-400">Worker API URL:</span>
+              <input id="cloud-worker-url-input" type="text" value="" placeholder="Mặc định: Cùng tên miền (/api/...)" class="glass-input rounded-lg px-2.5 py-1 text-xs font-mono text-cyan-300 w-56">
+            </div>
+          </div>
+
+          <form id="cloud-booking-form" onsubmit="createCloudBlindBooking(event)" class="bg-slate-900/75 p-6 rounded-2xl border border-cyan-500/30 space-y-5 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-slate-300 font-bold mb-1">Email nhận vé & lịch sử AI:</label>
+                <input id="cw-email" type="email" required value="nguyenvanan@wandermatch.vn" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs font-medium">
+              </div>
+              <div>
+                <label class="block text-slate-300 font-bold mb-1">Họ và tên trên CCCD (Có dấu hoặc không dấu):</label>
+                <input id="cw-fullname" type="text" required value="Nguyễn Văn An" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs font-bold text-white">
+              </div>
+              <div>
+                <label class="block text-slate-300 font-bold mb-1">Số CCCD 12 số (Mã hóa AES-GCM 256-bit):</label>
+                <input id="cw-cccd" type="text" required value="079095012345" class="w-full glass-input rounded-xl px-3 py-2.5 font-mono text-xs text-cyan-300">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-slate-300 font-bold mb-1">Ngân hàng nhận hoàn tiền:</label>
+                <select id="cw-bank-code" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs font-semibold">
+                  <option value="MB">MBBank (Quân Đội)</option>
+                  <option value="VCB">Vietcombank</option>
+                  <option value="TCB">Techcombank</option>
+                  <option value="ACB">ACB</option>
+                  <option value="BIDV">BIDV</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-slate-300 font-bold mb-1">Số Tài Khoản Cá Nhân:</label>
+                <input id="cw-bank-account" type="text" required value="0388998899" class="w-full glass-input rounded-xl px-3 py-2.5 font-mono text-xs">
+              </div>
+              <div>
+                <label class="block text-slate-300 font-bold mb-1">Tên Chủ TK (Phải khớp CCCD):</label>
+                <input id="cw-bank-holder" type="text" required value="NGUYEN VAN AN" class="w-full glass-input rounded-xl px-3 py-2.5 font-mono font-bold text-emerald-300 uppercase">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-slate-300 font-bold mb-1">Ngân sách/người:</label>
+                  <input id="cw-budget-vnd" type="number" step="500000" min="2000000" value="5000000" class="w-full glass-input rounded-xl px-2.5 py-2.5 font-mono font-bold text-cyan-300">
+                </div>
+                <div>
+                  <label class="block text-slate-300 font-bold mb-1">Số người:</label>
+                  <input id="cw-group-size" type="number" min="1" max="8" value="2" class="w-full glass-input rounded-xl px-2.5 py-2.5 font-mono font-bold text-amber-300">
+                </div>
+              </div>
+            </div>
+
+            <!-- 5D Persona Vector & Blacklist Cities -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-2 border-t border-slate-800">
+              <div class="space-y-2.5">
+                <span class="font-bold text-cyan-300 block">📊 5 Chiều Vector Tâm Lý (Cosine Similarity Matching):</span>
+                <div class="grid grid-cols-5 gap-2 text-center">
+                  <div class="bg-slate-950 p-2 rounded-xl border border-slate-800">
+                    <span class="text-[10px] text-slate-400 block">Chữa lành</span>
+                    <input id="cw-vec-healing" type="number" min="10" max="100" value="95" class="w-full bg-transparent text-center font-black text-cyan-300 text-sm focus:outline-none">
+                  </div>
+                  <div class="bg-slate-950 p-2 rounded-xl border border-slate-800">
+                    <span class="text-[10px] text-slate-400 block">Thiên nhiên</span>
+                    <input id="cw-vec-nature" type="number" min="10" max="100" value="90" class="w-full bg-transparent text-center font-black text-emerald-300 text-sm focus:outline-none">
+                  </div>
+                  <div class="bg-slate-950 p-2 rounded-xl border border-slate-800">
+                    <span class="text-[10px] text-slate-400 block">Tĩnh lặng</span>
+                    <input id="cw-vec-solitude" type="number" min="10" max="100" value="85" class="w-full bg-transparent text-center font-black text-indigo-300 text-sm focus:outline-none">
+                  </div>
+                  <div class="bg-slate-950 p-2 rounded-xl border border-slate-800">
+                    <span class="text-[10px] text-slate-400 block">Tiện nghi</span>
+                    <input id="cw-vec-comfort" type="number" min="10" max="100" value="90" class="w-full bg-transparent text-center font-black text-amber-300 text-sm focus:outline-none">
+                  </div>
+                  <div class="bg-slate-950 p-2 rounded-xl border border-slate-800">
+                    <span class="text-[10px] text-slate-400 block">Văn hóa</span>
+                    <input id="cw-vec-culture" type="number" min="10" max="100" value="75" class="w-full bg-transparent text-center font-black text-rose-300 text-sm focus:outline-none">
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-2.5">
+                <span class="font-bold text-rose-300 block">🚫 Danh Sách Loại Trừ Điểm Đến (Blacklisted Cities - Không trùng nơi đã đi):</span>
+                <div class="flex flex-wrap gap-2 pt-1">
+                  <label class="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
+                    <input type="checkbox" name="cw-blacklist" value="Đà Lạt" class="rounded text-rose-500"> <span>Đà Lạt</span>
+                  </label>
+                  <label class="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
+                    <input type="checkbox" name="cw-blacklist" value="Quy Nhơn" class="rounded text-rose-500"> <span>Quy Nhơn</span>
+                  </label>
+                  <label class="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
+                    <input type="checkbox" name="cw-blacklist" value="Măng Đen" class="rounded text-rose-500"> <span>Măng Đen</span>
+                  </label>
+                  <label class="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
+                    <input type="checkbox" name="cw-blacklist" value="Huế" class="rounded text-rose-500"> <span>Huế</span>
+                  </label>
+                  <label class="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
+                    <input type="checkbox" name="cw-blacklist" value="Phú Quốc" class="rounded text-rose-500"> <span>Phú Quốc</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div id="cw-create-booking-result" class="hidden p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/50 space-y-2 text-xs"></div>
+
+            <button id="btn-cw-submit-booking" type="submit" class="w-full py-3.5 rounded-2xl btn-glow-cyan text-slate-950 font-black text-sm shadow-xl transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span>🚀 Khóa Đơn Mù AI, Mã Hóa CCCD AES-256 & Sinh Mã VietQR (`/api/create-booking`)</span>
+            </button>
+          </form>
+        </div>
       </div>
     </section>
 
