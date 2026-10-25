@@ -1947,7 +1947,7 @@
       </div>
 
       <!-- CLOUD WORKER LIVE ADMIN & B2B SUMMARY TABLE (/api/admin-summary) -->
-      <div class="glass-panel rounded-3xl p-6 lg:p-8 border border-cyan-500/40 space-y-4">
+      <div class="glass-panel rounded-3xl p-6 lg:p-8 border border-cyan-500/40 space-y-5">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h4 class="text-base font-black text-white flex items-center gap-2">
@@ -1965,6 +1965,45 @@
               <i class="fa-solid fa-rotate"></i>
               <span>Làm Mới (`/api/admin-summary`)</span>
             </button>
+          </div>
+        </div>
+
+        <!-- 4 THẺ CHỈ SỐ TỔNG QUAN (4 KPI SUMMARY CARDS) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-slate-950/90 p-4 rounded-2xl border border-cyan-500/40 space-y-1">
+            <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <span>Tổng tiền Tạm giữ Escrow</span>
+              <i class="fa-solid fa-vault text-cyan-400"></i>
+            </div>
+            <div id="kpi-escrow-total" class="text-lg font-black text-cyan-300 font-mono">15.000.000 VNĐ</div>
+            <span class="block text-[10px] text-slate-400">Đang bảo lãnh qua TK Công ty MBBank</span>
+          </div>
+
+          <div class="bg-slate-950/90 p-4 rounded-2xl border border-amber-500/40 space-y-1">
+            <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <span>Tổng thanh toán B2B</span>
+              <i class="fa-solid fa-hotel text-amber-400"></i>
+            </div>
+            <div id="kpi-b2b-payout" class="text-lg font-black text-amber-300 font-mono">10.700.000 VNĐ</div>
+            <span class="block text-[10px] text-slate-400">Giá vốn sỉ NetPrice trả đối tác KS/Bay</span>
+          </div>
+
+          <div class="bg-slate-950/90 p-4 rounded-2xl border border-emerald-500/40 space-y-1">
+            <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <span>Tổng Lợi nhuận Arbitrage</span>
+              <i class="fa-solid fa-sack-dollar text-emerald-400"></i>
+            </div>
+            <div id="kpi-arbitrage-margin" class="text-lg font-black text-emerald-400 font-mono">+4.300.000 VNĐ</div>
+            <span class="block text-[10px] text-emerald-300/80 font-semibold">Biên lợi nhuận gộp đạt &ge; 28.6%</span>
+          </div>
+
+          <div class="bg-slate-950/90 p-4 rounded-2xl border border-indigo-500/40 space-y-1">
+            <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <span>Điểm hài lòng TB</span>
+              <i class="fa-solid fa-star text-amber-400"></i>
+            </div>
+            <div id="kpi-avg-rating" class="text-lg font-black text-white font-mono">5.0 / 5.0 ★</div>
+            <span class="block text-[10px] text-indigo-300 font-semibold">100% khách hàng tiết kiệm &ge; 15%</span>
           </div>
         </div>
 
