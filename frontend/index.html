@@ -1601,31 +1601,74 @@
           <!-- Rendered by app.js -->
         </div>
 
-        <div class="border-t border-slate-800 pt-5 space-y-3">
-          <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2" data-i18n="force_majeure_title">
-            <i class="fa-solid fa-cloud-bolt text-amber-400"></i> Cơ Chế Bất Khả Kháng (Force Majeure Override)
-          </h4>
+        <div class="border-t border-slate-800 pt-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2" data-i18n="force_majeure_title">
+              <i class="fa-solid fa-cloud-bolt text-amber-400"></i> Cơ Chế Hoàn Tiền 3 Khung Giờ & Bảo Vệ Bất Khả Kháng (Force Majeure Override)
+            </h4>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-700">
+              BẢO VỆ HOÀN 90% KHI CÓ MINH CHỨNG
+            </span>
+          </div>
+
+          <!-- Form nhập lý do & tải minh chứng Bất khả kháng -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-3 bg-slate-900/80 p-4 rounded-2xl border border-slate-800 text-xs">
+            <div class="md:col-span-7">
+              <label class="block text-slate-400 mb-1 font-semibold">Lý do Bất khả kháng / Sự cố đột xuất (Bảo vệ hoàn 90%):</label>
+              <input id="cw-force-majeure-reason" type="text" value="Cảnh báo bão lũ hoãn chuyến bay / Có giấy xác nhận y tế đột xuất" placeholder="Nhập lý do bất khả kháng để kích hoạt bảo vệ hoàn 90%..." class="w-full glass-input rounded-xl px-3 py-2 text-xs text-white">
+            </div>
+            <div class="md:col-span-5">
+              <label class="block text-slate-400 mb-1 font-semibold">Tải lên minh chứng (Giấy viện / Thông báo hãng bay):</label>
+              <label class="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-slate-950 border border-dashed border-cyan-500/50 hover:border-cyan-400 cursor-pointer transition text-[11px] text-cyan-300 font-semibold">
+                <span id="cw-force-majeure-file-label" class="truncate"><i class="fa-solid fa-file-shield mr-1.5"></i> Minh_chung_bat_kha_khang.pdf (Đã đính kèm)</span>
+                <input id="cw-force-majeure-proof" type="file" accept="image/*,.pdf" class="hidden" onchange="const lbl=document.getElementById('cw-force-majeure-file-label'); if(lbl && this.files[0]) lbl.innerHTML='<i class=\'fa-solid fa-circle-check text-emerald-400 mr-1\'></i> ' + this.files[0].name;">
+                <span class="px-2 py-0.5 rounded bg-cyan-950 text-[10px] text-cyan-200 border border-cyan-800 ml-2 shrink-0">Chọn Tệp</span>
+              </label>
+            </div>
+          </div>
 
           <div class="flex flex-wrap gap-3">
-            <button onclick="simulateForceMajeure('LEVEL_A'); simulateCloudRefundScenario('FORCE_MAJEURE');" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-amber-500/50 text-amber-300 font-bold text-xs transition flex items-center gap-2">
+            <button type="button" onclick="simulateCloudRefundScenario('EARLY_72H')" class="px-4 py-2.5 rounded-xl bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 font-bold text-xs transition flex items-center gap-1.5">
+              <i class="fa-solid fa-clock-rotate-left"></i>
+              <span>Khung 1 (> 72h): Phí 10% • Hoàn 90%</span>
+            </button>
+            <button type="button" onclick="simulateCloudRefundScenario('LATE_24_72H')" class="px-4 py-2.5 rounded-xl bg-amber-950/70 hover:bg-amber-900 border border-amber-500/50 text-amber-300 font-bold text-xs transition flex items-center gap-1.5">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span>Khung 2 (24h - 72h): Phí 35% (10% Sàn + 25% B2B) • Hoàn 65%</span>
+            </button>
+            <button type="button" onclick="simulateForceMajeure('LEVEL_A'); simulateCloudRefundScenario('FORCE_MAJEURE');" class="px-4 py-2.5 rounded-xl bg-cyan-950/70 hover:bg-cyan-900 border border-cyan-500/50 text-cyan-300 font-bold text-xs transition flex items-center gap-1.5">
               <i class="fa-solid fa-tornado"></i>
-              <span data-i18n="force_a_btn">🚨 Giả Lập Cấp Độ A: Bão Lũ/Thiên Tai (Hoàn 100% + Voucher 300K)</span>
+              <span data-i18n="force_a_btn">🚨 Bất Khả Kháng (Force Majeure): Bảo Vệ Hoàn 90%</span>
             </button>
-            <button onclick="simulateForceMajeure('LEVEL_B'); simulateCloudRefundScenario('FORCE_MAJEURE');" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-rose-500/50 text-rose-300 font-bold text-xs transition flex items-center gap-2">
-              <i class="fa-solid fa-hospital"></i>
-              <span data-i18n="force_b_btn">🏥 Giả Lập Cấp Độ B: Cấp Cứu Y Tế (Hoàn 85% hoặc 100% Ví)</span>
-            </button>
-            <button onclick="simulateCloudRefundScenario('EARLY_72H')" class="px-4 py-2.5 rounded-xl bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 font-bold text-xs transition">
-              ⚡ Cloud API: EARLY_72H (Hoàn 90%)
-            </button>
-            <button onclick="simulateCloudRefundScenario('LATE_24_72H')" class="px-4 py-2.5 rounded-xl bg-amber-950/60 hover:bg-amber-900 border border-amber-500/40 text-amber-300 font-bold text-xs transition">
-              ⚡ Cloud API: LATE_24_72H (Hoàn 65%)
-            </button>
-            <button onclick="simulateCloudRefundScenario('UNDER_24H')" class="px-4 py-2.5 rounded-xl bg-rose-950/60 hover:bg-rose-900 border border-rose-500/40 text-rose-300 font-bold text-xs transition">
-              ⚡ Cloud API: UNDER_24H (Khóa 100%)
+            <button type="button" onclick="simulateCloudRefundScenario('UNDER_24H')" class="px-4 py-2.5 rounded-xl bg-rose-950/60 hover:bg-rose-900 border border-rose-500/40 text-rose-300 font-bold text-xs transition flex items-center gap-1.5">
+              <i class="fa-solid fa-lock"></i>
+              <span>Khung 3 (< 24h / Đã mở khóa): Khóa 100%</span>
             </button>
           </div>
-          <div id="cw-refund-api-output" class="hidden p-4 rounded-2xl bg-slate-950 border border-cyan-500/40 text-xs space-y-1.5 mt-3"></div>
+
+          <div id="cw-refund-api-output" class="p-4 rounded-2xl bg-slate-950 border border-cyan-500/40 text-xs space-y-2 mt-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
+              <span class="font-bold text-cyan-300">Sẵn sàng kiểm toán hoàn tiền tự động (Escrow Smart Refund)</span>
+              <span class="font-mono font-black text-emerald-400">STK Nhận Hoàn: MB - 0388998899 (NGUYEN VAN AN)</span>
+            </div>
+            <p class="text-slate-400 text-[11px]">Hãy chọn 1 trong 3 khung giờ phía trên hoặc bấm nút thực hiện lệnh hoàn tiền tự động bên dưới để kiểm tra giải ngân Napas 247.</p>
+          </div>
+
+          <!-- Nút Thực hiện Lệnh Hoàn Tiền Tự Động có đếm ngược giải ngân -->
+          <div class="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-emerald-950/20 p-4 rounded-2xl border border-emerald-500/40">
+            <div class="space-y-0.5">
+              <div class="text-xs font-extrabold text-emerald-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-bolt-lightning text-amber-400"></i> Giải Ngân Hoàn Tiền Tự Động Qua Cổng Napas 247
+              </div>
+              <p id="cw-auto-refund-status-text" class="text-[11px] text-slate-300">
+                Tiền hoàn sẽ chuyển trực tiếp từ Quỹ Escrow Công ty về đúng STK ngân hàng đã định danh CCCD.
+              </p>
+            </div>
+            <button id="btn-auto-refund-disburse" type="button" onclick="executeAutomatedRefundCountdown()" class="px-5 py-3 rounded-xl btn-glow-emerald text-white font-black text-xs shadow-xl transition flex items-center justify-center gap-2 shrink-0">
+              <i class="fa-solid fa-money-bill-transfer"></i>
+              <span id="btn-auto-refund-label">Thực hiện Lệnh Hoàn Tiền Tự Động</span>
+            </button>
+          </div>
         </div>
 
         <!-- POST-TRIP FEEDBACK LOOP TO SUPABASE & GEMINI (/api/feedback) -->
