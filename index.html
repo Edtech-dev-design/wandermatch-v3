@@ -67,6 +67,36 @@
     .scratch-canvas:active {
       cursor: grabbing;
     }
+    #toast-container {
+      position: fixed !important;
+      top: 24px !important;
+      bottom: auto !important;
+      right: 24px !important;
+      z-index: 99999 !important;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      pointer-events: none;
+    }
+    .boarding-pass-ticket {
+      position: relative;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.96) 0%, rgba(9, 13, 22, 0.98) 100%);
+      border: 2px solid rgba(6, 182, 212, 0.5);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65), 0 0 35px rgba(6, 182, 212, 0.18);
+    }
+    .boarding-pass-divider {
+      position: relative;
+      border-top: 2px dashed rgba(148, 163, 184, 0.35);
+      margin: 1.25rem 0;
+    }
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 99998;
+    }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-slate-950">
