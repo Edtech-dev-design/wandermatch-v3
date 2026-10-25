@@ -751,8 +751,54 @@ export default {
       });
     }
 
+    // 8. HEALTH CHECK JSON (/api/health)
+    if (url.pathname === "/api/health") {
+      return new Response(JSON.stringify({
+        service: "WanderMatch v3.0 Fullstack Cloud Worker (Frontend + API Unified)",
+        aiEngine: "Gemini 2.5 Flash + Weighted Euclidean & Cosine Active",
+        supabaseConnected: hasSupabase,
+        geminiConfigured: Boolean(env.GEMINI_API_KEY && !env.GEMINI_API_KEY.includes("DAN_"))
+      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // 9. PHỤC VỤ TRỰC TIẾP GIAO DIỆN WEB TRÊN CLOUDFLARE (KHÔNG CẦN NETLIFY)
+    // Ưu tiên 1: Cloudflare Workers Static Assets (binding = "ASSETS" từ thư mục ./frontend)
+    if (env && env.ASSETS && typeof env.ASSETS.fetch === "function") {
+      try {
+        const assetResp = await env.ASSETS.fetch(request);
+        if (assetResp && assetResp.status !== 404) {
+          return assetResp;
+        }
+      } catch (e) {}
+    }
+
+    // Ưu tiên 2: Tự động tải file tĩnh từ nhánh main GitHub của dự án nếu Worker chạy độc lập
+    const cleanPath = url.pathname === "/" ? "/index.html" : url.pathname;
+    if (cleanPath === "/index.html" || cleanPath === "/app.js" || cleanPath === "/styles.css") {
+      const contentTypeMap = {
+        "/index.html": "text/html; charset=utf-8",
+        "/app.js": "application/javascript; charset=utf-8",
+        "/styles.css": "text/css; charset=utf-8"
+      };
+      try {
+        const ghRawUrl = `https://raw.githubusercontent.com/Edtech-dev-design/wandermatch-v3/main${cleanPath}`;
+        const ghResp = await fetch(ghRawUrl, { cf: { cacheTtl: 60, cacheEverything: true } });
+        if (ghResp.ok) {
+          const bodyText = await ghResp.text();
+          return new Response(bodyText, {
+            status: 200,
+            headers: {
+              ...corsHeaders,
+              "Content-Type": contentTypeMap[cleanPath] || "text/plain; charset=utf-8",
+              "Cache-Control": "public, max-age=60"
+            }
+          });
+        }
+      } catch (e) {}
+    }
+
     return new Response(JSON.stringify({
-      service: "WanderMatch v3.0 Cloud Worker",
+      service: "WanderMatch v3.0 Fullstack Cloud Worker",
       aiEngine: "Gemini 2.5 Flash + Weighted Euclidean & Cosine Active",
       supabaseConnected: hasSupabase,
       geminiConfigured: Boolean(env.GEMINI_API_KEY && !env.GEMINI_API_KEY.includes("DAN_"))
