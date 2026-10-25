@@ -4368,7 +4368,7 @@ function renderGroupMembersGrid() {
 
       <!-- QR Code Image -->
       <div class="p-2 bg-white rounded-xl flex items-center justify-center">
-        <img src="${m.qrUrl}" alt="${m.memo}" class="w-36 h-auto rounded">
+        <img src="${m.qrUrl}" alt="${m.memo}" onerror="if(window.handleQrImageFallback) window.handleQrImageFallback(this, '${m.memo}', ${m.amount})" class="w-36 h-auto rounded">
       </div>
 
       <!-- Memo -->
