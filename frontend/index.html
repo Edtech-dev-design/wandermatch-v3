@@ -1336,14 +1336,14 @@
 
               <div class="relative z-10 text-center space-y-2 mt-4">
                 <span class="px-3.5 py-1 rounded-full text-[11px] font-black bg-gradient-to-r from-cyan-500 to-emerald-400 text-slate-950 uppercase tracking-widest shadow-lg">
-                  ✨ ĐIỂM ĐẾN & KHÁCH SẠN ĐÃ MỞ KHÓA ✨
+                  ✨ ĐIỂM ĐẾN & KHÁCH SẠN BÍ ẨN ✨
                 </span>
-                <h4 id="scratch-revealed-city" class="text-3xl lg:text-4xl font-black text-white glow-cyan font-heading tracking-tight mt-1">
-                  ĐÀ LẠT (XỨ SỞ SƯƠNG MÙ)
+                <h4 id="scratch-revealed-city" class="text-2xl lg:text-3xl font-black text-white glow-cyan font-heading tracking-tight mt-1">
+                  🔒 ĐANG NIÊM PHONG BỞI AI ESCROW
                 </h4>
-                <p id="scratch-revealed-hotel" class="text-xs text-cyan-200 font-medium">Resort Ana Mandara Villas Dalat • Kèm phòng Suite & bữa sáng</p>
+                <p id="scratch-revealed-hotel" class="text-xs text-cyan-200 font-medium">Cào sạch trên 40% diện tích thẻ bạc để giải mã Điểm Đến, Vé Bay & Mã Phòng Cứng SLA</p>
                 <div class="flex flex-wrap items-center justify-center gap-3 text-xs text-slate-200 font-mono mt-3 bg-slate-950/80 px-4 py-2 rounded-xl border border-slate-800">
-                  <span>PNR: <strong class="text-amber-400">VN-9920-WM</strong></span>
+                  <span>PNR: <strong id="scratch-pnr-badge" class="text-amber-400">SEALED-PNR</strong></span>
                   <span>•</span>
                   <span>KHUNG BAY: <strong class="text-emerald-400">07:30 - 19:00</strong></span>
                   <span>•</span>
@@ -1357,7 +1357,7 @@
 
           <div class="mt-4 w-full max-w-md space-y-2">
             <div class="flex justify-between text-xs text-slate-400 font-semibold">
-              <span data-i18n="scratch_progress">Tiến độ cào:</span>
+              <span data-i18n="scratch_progress">Tiến độ cào (Tự mở khóa & bắn pháo giấy khi > 40%):</span>
               <span id="scratch-percent-label" class="text-cyan-400 font-bold">0%</span>
             </div>
             <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
@@ -1386,76 +1386,102 @@
               <span class="font-black text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
                 <i class="fa-solid fa-envelope-open-text"></i> Lời Nhắn Gợi Ý Thời Tiết & Tâm Thế Từ AI (Mystery Hint)
               </span>
-              <span id="cw-active-booking-badge" class="font-mono font-bold text-amber-400">Mã đơn: #WM99081234</span>
+              <span id="cw-active-booking-badge" class="font-mono font-bold text-amber-400">Mã đơn: #WM88219</span>
             </div>
             <p id="cw-mystery-hint-text" class="text-slate-200 italic leading-relaxed">
               "Nơi bạn sắp đến được bao phủ bởi sương sớm và hương thông trầm mặc. Hãy chuẩn bị áo khoác ấm và giày đi bộ êm chân."
             </p>
           </div>
 
-          <!-- COMPONENT 3: TRANSPARENT VALUE RECEIPT (HÓA ĐƠN ĐỐI CHIẾU GIÁ TRỊ MINH BẠCH) -->
-          <div id="transparent-value-receipt-container" class="mt-8 text-left w-full max-w-3xl mx-auto p-6 rounded-3xl bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-aurora-teal box-glow-aurora space-y-5 animate-fadeIn">
-            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
-              <div class="flex items-center gap-2.5">
-                <span class="w-9 h-9 rounded-xl bg-cyan-500/20 text-aurora-teal flex items-center justify-center font-bold text-base border border-aurora-teal">
-                  <i class="fa-solid fa-receipt"></i>
-                </span>
+          <!-- COMPONENT 3: BUSINESS CLASS BOARDING PASS & TRANSPARENT VALUE RECEIPT -->
+          <div id="transparent-value-receipt-container" class="mt-8 text-left w-full max-w-3xl mx-auto rounded-3xl boarding-pass-ticket overflow-hidden animate-fadeIn">
+            <!-- Top Airline Boarding Pass Header Bar -->
+            <div class="bg-gradient-to-r from-cyan-500 via-teal-400 to-emerald-400 px-6 py-3 flex flex-wrap items-center justify-between gap-2 text-slate-950">
+              <div class="flex items-center gap-2 font-black text-xs tracking-wider uppercase">
+                <i class="fa-solid fa-plane-departure text-sm"></i>
+                <span>WANDERMATCH EXECUTIVE BOARDING PASS & VALUE RECEIPT</span>
+              </div>
+              <div class="flex items-center gap-2 font-mono text-[11px] font-black">
+                <span class="px-2 py-0.5 rounded bg-slate-950 text-cyan-300">CLASS: FIRST / 5-STAR SLA</span>
+                <span id="boarding-pass-sla-badge" class="px-2 py-0.5 rounded bg-slate-950 text-amber-300">SLA-DL-88219</span>
+              </div>
+            </div>
+
+            <div class="p-6 space-y-5">
+              <!-- Flight & Hotel Ticket Columns -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-950/90 p-4 rounded-2xl border border-slate-800 text-xs">
                 <div>
-                  <h4 class="text-base font-black text-white flex items-center gap-2">
-                    <span>HÓA ĐƠN ĐỐI CHIẾU GIÁ TRỊ MINH BẠCH</span>
-                    <span class="px-2 py-0.5 rounded text-[10px] font-black bg-cyan-950 text-aurora-teal border border-aurora-teal">VERIFIED VALUE</span>
-                  </h4>
-                  <p class="text-[11px] text-slate-400">Minh bạch giá trị bán lẻ ngoài thị trường so với số tiền bạn trả qua WanderMatch</p>
+                  <span class="text-[10px] text-slate-400 uppercase block">Hành khách / Định danh Napas</span>
+                  <strong id="bp-passenger-name" class="text-white text-sm font-black block mt-0.5">NGUYEN VAN AN</strong>
+                  <span class="text-[10px] text-emerald-400 font-mono">eKYC AES-256 VERIFIED</span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-400 uppercase block">Điểm đến & Chuyến bay</span>
+                  <strong id="bp-destination-title" class="text-cyan-300 text-sm font-black block mt-0.5">ĐÀ LẠT (3N2Đ RỪNG THÔNG)</strong>
+                  <span id="bp-transport-desc" class="text-[10px] text-slate-300 block">Vietnam Airlines (08:30) + Xe đón riêng</span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-400 uppercase block">Resort 5 Sao & Mã Nhận Phòng</span>
+                  <strong id="bp-hotel-title" class="text-amber-300 text-xs font-bold block mt-0.5">Ana Mandara Villas Dalat Resort & Spa</strong>
+                  <span class="text-[10px] font-mono text-emerald-300">Cam kết không Overbooking 200%</span>
                 </div>
               </div>
-              <span class="text-xs font-mono text-emerald-400 font-bold bg-emerald-950/80 px-2.5 py-1 rounded-full border border-emerald-700">
-                SỐ TIẾT KIỆM THỰC TẾ
-              </span>
-            </div>
 
-            <!-- Receipt Breakdown Lines -->
-            <div class="space-y-2.5 text-xs">
-              <div class="flex justify-between items-center py-1 border-b border-slate-800/60">
-                <span class="text-slate-300 flex items-center gap-2">
-                  <i class="fa-solid fa-plane text-cyan-400"></i> Giá vé bay khứ hồi công khai ngoài thị trường:
-                </span>
-                <span id="receipt-flight-price" class="font-mono font-bold text-slate-200">3.200.000 VNĐ</span>
-              </div>
+              <div class="boarding-pass-divider"></div>
 
-              <div class="flex justify-between items-center py-1 border-b border-slate-800/60">
-                <span class="text-slate-300 flex items-center gap-2">
-                  <i class="fa-solid fa-hotel text-amber-400"></i> Giá phòng khách sạn 3 đêm công khai ngoài thị trường:
-                </span>
-                <span id="receipt-hotel-price" class="font-mono font-bold text-slate-200">3.450.000 VNĐ</span>
-              </div>
-
-              <div class="flex justify-between items-center py-1.5 border-b border-slate-800 bg-slate-900/60 px-3 rounded-lg">
-                <span class="text-slate-200 font-bold">Tổng giá trị thị trường bạn nhận được:</span>
-                <span id="receipt-total-market-price" class="font-mono font-black text-base text-white">6.650.000 VNĐ</span>
-              </div>
-
-              <div class="flex justify-between items-center py-1.5 px-3">
-                <span class="text-slate-400">Số tiền bạn đã thanh toán qua WanderMatch:</span>
-                <span id="receipt-user-paid-price" class="font-mono font-bold text-sm text-cyan-300">5.000.000 VNĐ</span>
-              </div>
-            </div>
-
-            <!-- Aurora Teal Highlight Banner -->
-            <div class="p-4 rounded-2xl bg-cyan-950/40 border border-aurora-teal flex flex-wrap items-center justify-between gap-4">
-              <div class="space-y-1">
-                <div id="receipt-savings-highlight" class="text-base lg:text-lg font-black text-aurora-teal glow-aurora flex items-center gap-2">
-                  <i class="fa-solid fa-arrow-trend-down"></i>
-                  <span>Chuyến đi Mù này đã giúp bạn tiết kiệm thực tế 1.650.000đ (24.8%)!</span>
+              <!-- Receipt Breakdown Lines -->
+              <div class="space-y-2.5 text-xs">
+                <div class="flex justify-between items-center py-1 border-b border-slate-800/60">
+                  <span class="text-slate-300 flex items-center gap-2">
+                    <i class="fa-solid fa-plane text-cyan-400"></i> Giá vé bay khứ hồi công khai ngoài thị trường (OTA):
+                  </span>
+                  <span id="receipt-flight-price" class="font-mono font-bold text-slate-200">3.200.000 VNĐ</span>
                 </div>
-                <p class="text-[11px] text-slate-300">
-                  Món hời kinh tế thật, cam kết dịch vụ chuẩn 4-5 sao, bảo hiểm phòng cứng 100%.
-                </p>
+
+                <div class="flex justify-between items-center py-1 border-b border-slate-800/60">
+                  <span class="text-slate-300 flex items-center gap-2">
+                    <i class="fa-solid fa-hotel text-amber-400"></i> Giá phòng Resort 4-5 sao công khai ngoài thị trường:
+                  </span>
+                  <span id="receipt-hotel-price" class="font-mono font-bold text-slate-200">3.300.000 VNĐ</span>
+                </div>
+
+                <div class="flex justify-between items-center py-1.5 border-b border-slate-800 bg-slate-900/60 px-3 rounded-lg">
+                  <span class="text-slate-200 font-bold">Tổng giá trị thị trường bạn nhận được (Retail Value):</span>
+                  <span id="receipt-total-market-price" class="font-mono font-black text-base text-white">6.500.000 VNĐ</span>
+                </div>
+
+                <div class="flex justify-between items-center py-1.5 px-3">
+                  <span class="text-slate-400">Số tiền bạn đã thanh toán qua WanderMatch:</span>
+                  <span id="receipt-user-paid-price" class="font-mono font-bold text-sm text-cyan-300">5.000.000 VNĐ</span>
+                </div>
               </div>
 
-              <button onclick="claimFoodVoucher()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-teal-400 to-emerald-400 text-slate-950 font-black text-xs shadow-lg hover:brightness-110 transition flex items-center gap-1.5 shrink-0">
-                <i class="fa-solid fa-gift"></i>
-                <span>Tải E-Voucher Ẩm Thực 200.000đ</span>
-              </button>
+              <!-- Highlighted Savings Banner & Download Ticket Button -->
+              <div class="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-cyan-950/60 to-slate-900 border-2 border-emerald-400/60 flex flex-wrap items-center justify-between gap-4">
+                <div class="space-y-1">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-emerald-300 block">
+                    💎 SỐ TIỀN BẠN ĐÃ TIẾT KIỆM ĐƯỢC SO VỚI GIÁ THỊ TRƯỜNG
+                  </span>
+                  <div id="receipt-savings-highlight" class="text-base lg:text-lg font-black text-emerald-300 flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-trend-down text-emerald-400"></i>
+                    <span>Tiết kiệm thực tế 1.500.000 VNĐ (23.1%) so với tự đặt lẻ!</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300">
+                    Đạt chuẩn kiểm định kép: Giá trị lẻ &ge; 115% Ngân sách & Bảo hiểm phòng cứng SLA 20.000.000đ.
+                  </p>
+                </div>
+
+                <div class="flex flex-wrap gap-2 shrink-0">
+                  <button onclick="downloadBoardingPassTicket()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-emerald-400 text-slate-950 font-black text-xs shadow-lg hover:brightness-110 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-file-arrow-down"></i>
+                    <span>📥 Tải Vé & Mã Nhận Phòng (Offline PDF/Image)</span>
+                  </button>
+                  <button onclick="claimFoodVoucher()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/40 font-bold text-xs transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-gift"></i>
+                    <span>E-Voucher 200K</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
