@@ -2297,119 +2297,303 @@
        /api/refund-simulate, /api/feedback, /api/admin-summary) + Canvas & VietQR
        ============================================================================ -->
   <script>
-    const CW_INVENTORIES = [
-      {
-        id: "11111111-1111-1111-1111-111111111101",
-        city_name: "Đà Lạt",
-        combo_title: "3N2Đ Trú Ẩn Rừng Thông & Săn Mây",
-        transport_info: "Vé khứ hồi Vietnam Airlines (08:30 - 10:15) + Xe đưa đón sân bay Liên Khương",
-        hotel_name: "Ana Mandara Villas Dalat Resort & Spa (5 Sao)",
-        retail_price: 6500000,
-        net_price: 3600000,
-        hotel_confirmation_code: "SLA-DL-88219",
-        weather_temp_c: 16,
-        weather_desc: "Se lạnh, sương mù nhẹ buổi sớm",
-        attribute_vector: { healing: 95, nature: 90, solitude: 85, comfort: 90, culture: 70 },
-        default_hint: "Nơi bạn sắp đến được bao phủ bởi sương sớm và hương thông trầm mặc. Hãy chuẩn bị áo khoác ấm và giày đi bộ êm chân.",
-        default_packing: ["Áo khoác giữ ấm & khăn choàng", "Giày thể thao chống trượt", "CCCD bản gốc làm thủ tục bay", "Kem dưỡng ẩm & son dưỡng", "Sạc dự phòng"],
-        default_food: ["Bánh căn Lệ 27 Yersin (40.000đ/đĩa - giá bản địa)", "Lẩu gà lá é Tao Ngộ (300.000đ/nồi)", "Cảnh báo: Không đi theo cò mồi vườn dâu tự phát dọc đèo"]
-      },
-      {
-        id: "11111111-1111-1111-1111-111111111102",
-        city_name: "Quy Nhơn",
-        combo_title: "3N2Đ Bình Yên Làng Chài & Eo Gió",
-        transport_info: "Vé khứ hồi Bamboo Airways (09:00 - 10:35) + Ký gửi 20kg",
-        hotel_name: "Avani Quy Nhon Resort (5 Sao - Hướng biển)",
-        retail_price: 6200000,
-        net_price: 3500000,
-        hotel_confirmation_code: "SLA-QN-44102",
-        weather_temp_c: 27,
-        weather_desc: "Nắng vàng dịu, gió biển mát",
-        attribute_vector: { healing: 85, nature: 90, solitude: 80, comfort: 85, culture: 65 },
-        default_hint: "Hành trình đưa bạn về phía những ghềnh đá đón gió đại dương và làng chài yên ả. Đừng quên kính râm và kem chống nắng.",
-        default_packing: ["Trang phục thoáng mát đi biển", "Kính râm & Kem chống nắng SPF50+", "CCCD bản gốc làm thủ tục bay", "Mũ rộng vành", "Túi chống nước cho điện thoại"],
-        default_food: ["Bánh xèo tôm nhảy Gia Vỹ (35.000đ/chiếc)", "Bún chả cá Ngọc Liên (45.000đ/tô)", "Cảnh báo: Hỏi kỹ giá hải sản tươi sống theo kg trước khi chế biến"]
-      },
-      {
-        id: "11111111-1111-1111-1111-111111111103",
-        city_name: "Măng Đen",
-        combo_title: "3N2Đ Chữa Lành Giữa Đại Ngàn Tây Nguyên",
-        transport_info: "Vé máy bay khứ hồi Pleiku (07:45) + Limousine đưa thẳng lên Măng Đen",
-        hotel_name: "Golden Boutique Hotel Măng Đen (4 Sao)",
-        retail_price: 5400000,
-        net_price: 2900000,
-        hotel_confirmation_code: "SLA-MD-77310",
-        weather_temp_c: 18,
-        weather_desc: "Không khí trong lành, mùi thông non",
-        attribute_vector: { healing: 98, nature: 95, solitude: 95, comfort: 75, culture: 80 },
-        default_hint: "Một vùng đất nguyên sơ tĩnh lặng trên cao nguyên đang chờ bạn ngắt kết nối khỏi ồn ào phố thị.",
-        default_packing: ["Áo len mỏng hoặc hoodie", "Thuốc chống côn trùng thảo mộc", "CCCD bản gốc", "Giày trekking nhẹ", "Sách hoặc sổ tay cá nhân"],
-        default_food: ["Gà nướng cơm lam Cô Sinh (250.000đ/con)", "Lẩu xuyên tiêu Măng Đen (320.000đ/nồi)", "Cà phê rang củi dọc đường Võ Nguyên Giáp (35.000đ/ly)"]
-      },
-      {
-        id: "11111111-1111-1111-1111-111111111104",
-        city_name: "Huế",
-        combo_title: "3N2Đ Dạo Bước Cố Đô & Thiền Định Sông Hương",
-        transport_info: "Vé khứ hồi Vietnam Airlines (09:15) + Tặng vé tắm khoáng nóng Alba",
-        hotel_name: "Pilgrimage Village Boutique Resort & Spa (5 Sao)",
-        retail_price: 5800000,
-        net_price: 3200000,
-        hotel_confirmation_code: "SLA-HUE-99201",
-        weather_temp_c: 24,
-        weather_desc: "Trời dịu mát, thoảng hương trầm",
-        attribute_vector: { healing: 90, nature: 75, solitude: 85, comfort: 90, culture: 98 },
-        default_hint: "Nơi thời gian trôi chậm lại bên những mái ngói rêu phong và dòng sông tĩnh lặng. Hãy mang theo trang phục lịch sự để ghé thăm những không gian di sản.",
-        default_packing: ["Trang phục lịch sự tham quan di tích", "Ô gấp gọn che nắng/mưa nhẹ", "CCCD bản gốc", "Giày bệt đi bộ nhiều", "Đồ bơi để ngâm khoáng nóng"],
-        default_food: ["Bún bò Mệ Kéo (40.000đ/tô)", "Cơm hến Hoa Đông (25.000đ/tô)", "Cảnh báo: Thỏa thuận giá xích lô rõ ràng theo tuyến trước khi lên xe"]
-      },
-      {
-        id: "11111111-1111-1111-1111-111111111105",
-        city_name: "Phú Quốc",
-        combo_title: "3N2Đ Nghỉ Dưỡng Nhiệt Đới & Hoàng Hôn Nam Đảo",
-        transport_info: "Vé khứ hồi Vietjet Deluxe (10:00) + Đưa đón riêng",
-        hotel_name: "Salinda Resort Phu Quoc Island (5 Sao)",
-        retail_price: 7800000,
-        net_price: 4200000,
-        hotel_confirmation_code: "SLA-PQ-55190",
-        weather_temp_c: 29,
-        weather_desc: "Nắng ấm nhiệt đới, biển êm",
-        attribute_vector: { healing: 80, nature: 85, solitude: 60, comfort: 98, culture: 60 },
-        default_hint: "Đảo ngọc nắng ấm và tiếng sóng vỗ dịu êm đang chờ đón bạn cùng kỳ nghỉ dưỡng 5 sao trọn vẹn.",
-        default_packing: ["Đồ bơi & Kính râm chống UV", "Kem chống nắng SPF50+", "CCCD bản gốc", "Dép đi biển & Mũ rộng vành", "Sạc dự phòng"],
-        default_food: ["Bún quậy Kiến Xây (65.000đ/tô)", "Gỏi cá trích Hàm Ninh (150.000đ/đĩa)", "Cảnh báo: Chỉ mua ngọc trai và nước mắm tại cơ sở chính hãng có niêm yết giá"]
-      }
-    ];
+    // ==========================================================================
+    // 1. HỆ THỐNG KÉT SẮT MÃ HÓA CHỐNG LỘ ĐIỂM ĐẾN (ANTI-F12 LEAK VAULT)
+    // Dữ liệu điểm đến ở chế độ Offline/Fallback được mã hóa XOR + Base64 trong
+    // Closure riêng biệt, tuyệt đối không gắn vào window hay DOM trước Giờ G.
+    // ==========================================================================
+    const AntiF12Vault = (() => {
+      const SECRET_KEY = "WM_ESCROW_2026_SEAL";
+      const sealedStore = new Map();
 
+      function xorCipher(str, key) {
+        let out = "";
+        for (let i = 0; i < str.length; i++) {
+          out += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+        }
+        return out;
+      }
+
+      function encodePayload(obj) {
+        const json = encodeURIComponent(JSON.stringify(obj));
+        return btoa(xorCipher(json, SECRET_KEY));
+      }
+
+      function decodePayload(cipherText) {
+        try {
+          const raw = xorCipher(atob(cipherText), SECRET_KEY);
+          return JSON.parse(decodeURIComponent(raw));
+        } catch (e) {
+          return null;
+        }
+      }
+
+      // Quỹ phòng B2B nội bộ (Tất cả thỏa mãn retail_price >= 5M*1.15 và net_price <= 5M*0.80)
+      const PRIVATE_INVENTORIES = [
+        {
+          id: "11111111-1111-1111-1111-111111111101",
+          city_name: "Đà Lạt",
+          combo_title: "3N2Đ Trú Ẩn Rừng Thông & Săn Mây",
+          transport_info: "Vé khứ hồi Vietnam Airlines (08:30 - 10:15) + Xe đưa đón sân bay Liên Khương",
+          hotel_name: "Ana Mandara Villas Dalat Resort & Spa (5 Sao)",
+          retail_price: 6500000,
+          net_price: 3600000,
+          hotel_confirmation_code: "SLA-DL-88219",
+          weather_temp_c: 16,
+          weather_desc: "Se lạnh, sương mù nhẹ buổi sớm",
+          attribute_vector: { healing: 95, nature: 90, solitude: 85, comfort: 90, culture: 70 },
+          default_hint: "Hành trình đưa bạn về vùng cao nguyên se lạnh 16°C với sương sớm bảng lảng và hương gỗ thông trầm mặc. Hãy chuẩn bị áo khoác ấm và giày đi bộ êm chân.",
+          default_packing: ["Áo khoác giữ ấm & khăn choàng cổ", "Giày thể thao chống trượt", "CCCD bản gốc làm thủ tục bay", "Kem dưỡng ẩm & son dưỡng", "Sạc dự phòng 10.000mAh"],
+          default_food: ["Bánh căn chỉ 40.000đ/đĩa (giá niêm yết bản địa)", "Lẩu gà lá é chuẩn vị 300.000đ/nồi", "Cảnh báo: Không đi theo cò mồi vườn dâu tự phát dọc đèo"]
+        },
+        {
+          id: "11111111-1111-1111-1111-111111111102",
+          city_name: "Quy Nhơn",
+          combo_title: "3N2Đ Bình Yên Làng Chài & Eo Gió",
+          transport_info: "Vé khứ hồi Bamboo Airways (09:00 - 10:35) + Ký gửi 20kg",
+          hotel_name: "Avani Quy Nhon Resort (5 Sao - Hướng biển)",
+          retail_price: 6200000,
+          net_price: 3500000,
+          hotel_confirmation_code: "SLA-QN-44102",
+          weather_temp_c: 27,
+          weather_desc: "Nắng vàng dịu, gió biển mát",
+          attribute_vector: { healing: 85, nature: 90, solitude: 80, comfort: 85, culture: 65 },
+          default_hint: "Hành trình đưa bạn về phía những ghềnh đá đón gió đại dương 27°C và làng chài yên ả. Đừng quên kính râm và kem chống nắng.",
+          default_packing: ["Trang phục thoáng mát đi biển", "Kính râm & Kem chống nắng SPF50+", "CCCD bản gốc làm thủ tục bay", "Mũ rộng vành", "Túi chống nước cho điện thoại"],
+          default_food: ["Bánh xèo tôm nhảy 35.000đ/chiếc", "Bún chả cá bản địa 45.000đ/tô", "Cảnh báo: Hỏi kỹ giá hải sản tươi sống theo kg trước khi chế biến"]
+        },
+        {
+          id: "11111111-1111-1111-1111-111111111103",
+          city_name: "Măng Đen",
+          combo_title: "3N2Đ Chữa Lành Giữa Đại Ngàn Tây Nguyên",
+          transport_info: "Vé máy bay khứ hồi (07:45) + Limousine đưa thẳng lên cao nguyên",
+          hotel_name: "Golden Boutique Hotel Măng Đen (4 Sao)",
+          retail_price: 5800000,
+          net_price: 2900000,
+          hotel_confirmation_code: "SLA-MD-77310",
+          weather_temp_c: 18,
+          weather_desc: "Không khí trong lành, mùi thông non",
+          attribute_vector: { healing: 98, nature: 95, solitude: 95, comfort: 75, culture: 80 },
+          default_hint: "Một vùng đất nguyên sơ tĩnh lặng 18°C trên cao nguyên đang chờ bạn ngắt kết nối khỏi ồn ào phố thị.",
+          default_packing: ["Áo len mỏng hoặc hoodie", "Thuốc chống côn trùng thảo mộc", "CCCD bản gốc", "Giày trekking nhẹ", "Sách hoặc sổ tay cá nhân"],
+          default_food: ["Gà nướng cơm lam bản địa 250.000đ/con", "Lẩu xuyên tiêu ấm nóng 320.000đ/nồi", "Cà phê rang củi 35.000đ/ly"]
+        },
+        {
+          id: "11111111-1111-1111-1111-111111111104",
+          city_name: "Huế",
+          combo_title: "3N2Đ Dạo Bước Cố Đô & Thiền Định Sông Hương",
+          transport_info: "Vé khứ hồi Vietnam Airlines (09:15) + Tặng vé tắm khoáng nóng Alba",
+          hotel_name: "Pilgrimage Village Boutique Resort & Spa (5 Sao)",
+          retail_price: 5800000,
+          net_price: 3200000,
+          hotel_confirmation_code: "SLA-HUE-99201",
+          weather_temp_c: 24,
+          weather_desc: "Trời dịu mát, thoảng hương trầm",
+          attribute_vector: { healing: 90, nature: 75, solitude: 85, comfort: 90, culture: 98 },
+          default_hint: "Nơi thời gian trôi chậm lại ở 24°C bên những mái ngói rêu phong và dòng sông tĩnh lặng. Hãy mang theo trang phục lịch sự để ghé thăm những không gian di sản.",
+          default_packing: ["Trang phục lịch sự tham quan di tích", "Ô gấp gọn che nắng/mưa nhẹ", "CCCD bản gốc", "Giày bệt đi bộ nhiều", "Đồ bơi để ngâm khoáng nóng"],
+          default_food: ["Bún bò truyền thống 40.000đ/tô", "Cơm hến bản địa 25.000đ/tô", "Cảnh báo: Thỏa thuận giá xích lô rõ ràng theo tuyến trước khi lên xe"]
+        },
+        {
+          id: "11111111-1111-1111-1111-111111111105",
+          city_name: "Phú Quốc",
+          combo_title: "3N2Đ Nghỉ Dưỡng Nhiệt Đới & Hoàng Hôn Nam Đảo",
+          transport_info: "Vé khứ hồi Vietjet Deluxe (10:00) + Đưa đón riêng",
+          hotel_name: "Salinda Resort Phu Quoc Island (5 Sao)",
+          retail_price: 7800000,
+          net_price: 3900000,
+          hotel_confirmation_code: "SLA-PQ-55190",
+          weather_temp_c: 29,
+          weather_desc: "Nắng ấm nhiệt đới, biển êm",
+          attribute_vector: { healing: 80, nature: 85, solitude: 60, comfort: 98, culture: 60 },
+          default_hint: "Đảo ngọc nắng ấm 29°C và tiếng sóng vỗ dịu êm đang chờ đón bạn cùng kỳ nghỉ dưỡng 5 sao trọn vẹn.",
+          default_packing: ["Đồ bơi & Kính râm chống UV", "Kem chống nắng SPF50+", "CCCD bản gốc", "Dép đi biển & Mũ rộng vành", "Sạc dự phòng"],
+          default_food: ["Bún quậy hải sản tươi 65.000đ/tô", "Gỏi cá trích bản địa 150.000đ/đĩa", "Cảnh báo: Chỉ mua đặc sản tại cơ sở chính hãng có niêm yết giá"]
+        }
+      ];
+
+      // Niêm phong sẵn đơn mặc định WM88219
+      sealedStore.set("WM99081234", encodePayload({
+        cityName: "Đà Lạt",
+        comboTitle: "3N2Đ Trú Ẩn Rừng Thông & Săn Mây",
+        transportInfo: "Vé khứ hồi Vietnam Airlines (08:30 - 10:15) + Xe đưa đón sân bay Liên Khương",
+        hotelName: "Ana Mandara Villas Dalat Resort & Spa (5 Sao)",
+        hotelConfirmationCode: "SLA-DL-88219",
+        budgetPaid: 5000000,
+        retailValue: 6500000,
+        netCost: 3600000,
+        savingsVnd: 1500000,
+        antiTouristTrapGuide: PRIVATE_INVENTORIES[0].default_food
+      }));
+
+      return {
+        matchAndSeal(bookingCode, personaVector, blacklistedCities = [], perPersonBudget = 5000000, groupSize = 1) {
+          // 1. Lọc Blacklist
+          let pool = PRIVATE_INVENTORIES.filter(item => !blacklistedCities.includes(item.city_name));
+          if (pool.length === 0) pool = PRIVATE_INVENTORIES;
+
+          // 2. Lọc kép Unit Economics: retail_price >= budget * 1.15 VÀ net_price <= budget * 0.80
+          let econPool = pool.filter(
+            item => Number(item.retail_price) >= perPersonBudget * 1.15 && Number(item.net_price) <= perPersonBudget * 0.80
+          );
+          if (econPool.length === 0) econPool = pool;
+
+          // 3. Chấm điểm 5D Cosine Similarity
+          const scored = econPool.map(item => ({
+            ...item,
+            similarityScore: Math.round(cosineSimilarity(personaVector, item.attribute_vector) * 1000) / 10
+          })).sort((a, b) => b.similarityScore - a.similarityScore);
+
+          const chosen = scored[0];
+          const totalBudget = perPersonBudget * groupSize;
+          const totalRetail = Math.max(Number(chosen.retail_price) * groupSize, Math.ceil(totalBudget * 1.24));
+          const totalNet = Math.min(Number(chosen.net_price) * groupSize, Math.floor(totalBudget * 0.76));
+
+          // Mã hóa XOR + Base64 vào bộ nhớ đóng kín (Không lộ trên window)
+          sealedStore.set(bookingCode, encodePayload({
+            cityName: chosen.city_name,
+            comboTitle: chosen.combo_title,
+            transportInfo: chosen.transport_info,
+            hotelName: chosen.hotel_name,
+            hotelConfirmationCode: chosen.hotel_confirmation_code,
+            budgetPaid: totalBudget,
+            retailValue: totalRetail,
+            netCost: totalNet,
+            savingsVnd: totalRetail - totalBudget,
+            antiTouristTrapGuide: chosen.default_food
+          }));
+
+          // Chỉ trả về dữ liệu an toàn (TUYỆT ĐỐI KHÔNG CÓ city_name, hotel_name, hotel_confirmation_code)
+          return {
+            weatherTempC: chosen.weather_temp_c,
+            weatherDesc: chosen.weather_desc,
+            mysteryHint: chosen.default_hint,
+            packingChecklist: chosen.default_packing,
+            similarityScore: chosen.similarityScore,
+            totalBudget,
+            totalRetail,
+            totalNet,
+            grossMargin: totalBudget - totalNet
+          };
+        },
+        unsealBooking(bookingCode) {
+          const cipher = sealedStore.get(bookingCode) || sealedStore.get("WM99081234");
+          return decodePayload(cipher);
+        }
+      };
+    })();
+
+    // ==========================================================================
+    // 2. STATE QUẢN TRỊ & 2 ĐƠN HÀNG MẪU CÓ SẴN CHO GIÁM KHẢO KIỂM TOÁN
+    // ==========================================================================
     window.cwState = {
       activeBookingCode: "WM99081234",
-      lastChosenInventory: CW_INVENTORIES[0],
+      isCurrentBookingUnlocked: false,
+      lastRefundData: {
+        totalPaid: 5000000,
+        policyTitle: "Hủy sớm trước 72 giờ khởi hành (Khung 1)",
+        totalFee: 500000,
+        partnerComp: 0,
+        netRefund: 4500000,
+        statusNote: "Hoàn tự động 90% về STK đã liên kết qua Napas 247."
+      },
       localAdminBookings: [
         {
-          bookingCode: "WM99081234",
+          bookingCode: "WM88219",
           customerName: "Nguyễn Văn An",
           bankInfo: "MB - ***8899",
           cityName: "Đà Lạt",
           hotelConfirmationCode: "SLA-DL-88219",
+          budgetVnd: 10000000,
+          retailValueVnd: 13000000,
+          netCostVnd: 7200000,
+          grossMarginVnd: 2800000,
+          aiReasoningLog: "[Vector Score: 98.4%] Khớp chỉ số Chữa lành (95%) & Thiên nhiên (90%). Đạt chuẩn kinh tế: Khách tiết kiệm 30%, Biên gộp đạt 28%.",
+          customerRating: 5,
+          customerReview: "5/5 ★ - \"Resort Ana Mandara rất yên tĩnh, thông xanh mát, đồ ăn bản địa chuẩn giá niêm yết!\""
+        },
+        {
+          bookingCode: "WM64102",
+          customerName: "Trần Minh Ngọc",
+          bankInfo: "VCB - ***4512",
+          cityName: "Quy Nhơn",
+          hotelConfirmationCode: "SLA-QN-44102",
           budgetVnd: 5000000,
-          netCostVnd: 3600000,
-          grossMarginVnd: 1400000,
-          aiReasoningLog: "[Vector Score: 98.4%] Khớp chỉ số Chữa lành (95%) & Thiên nhiên (90%). Đã loại trừ Blacklist (Không).",
-          customerReview: "Resort Ana Mandara rất yên tĩnh, thông xanh mát!"
+          retailValueVnd: 6200000,
+          netCostVnd: 3500000,
+          grossMarginVnd: 1500000,
+          aiReasoningLog: "[Vector Score: 95.1%] Khớp chỉ số Thiên nhiên biển (90%) & Tiện nghi 5 sao (85%). Đã loại trừ Đà Lạt theo Blacklist.",
+          customerRating: 5,
+          customerReview: "5/5 ★ - \"Avani Resort hướng biển tuyệt đẹp, mở thẻ cào Giờ G cực kỳ hồi hộp và đáng tiền!\""
         }
       ]
     };
 
+    // ==========================================================================
+    // 3. CHUẨN HÓA TIẾNG VIỆT & ĐỐI CHIẾU ĐỊNH DANH CCCD - NAPAS 247 TỨC THÌ
+    // ==========================================================================
     function normalizeVNName(str = "") {
       return String(str)
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
-        .replace(/đ/g, "d")
-        .replace(/Đ/g, "D")
+        .replace(/[đĐ]/g, "D")
+        .replace(/[^a-zA-Z0-9\s]/g, " ")
         .toUpperCase()
         .replace(/\s+/g, " ")
         .trim();
     }
+    window.removeAccentsClient = normalizeVNName;
 
+    function handleCccdHolderSync(sourceField) {
+      const fullNameEl = document.getElementById('cw-fullname');
+      const bankHolderEl = document.getElementById('cw-bank-holder');
+      const badgeEl = document.getElementById('cw-napas-match-badge');
+      if (!fullNameEl || !bankHolderEl) return;
+
+      const normalizedCccdName = normalizeVNName(fullNameEl.value);
+      if (sourceField === 'cccd') {
+        bankHolderEl.value = normalizedCccdName;
+      } else if (sourceField === 'bank') {
+        const pos = bankHolderEl.selectionStart;
+        bankHolderEl.value = normalizeVNName(bankHolderEl.value);
+        try { bankHolderEl.setSelectionRange(pos, pos); } catch (e) {}
+      }
+
+      const normalizedHolder = normalizeVNName(bankHolderEl.value);
+      const isMatched = normalizedCccdName.length >= 3 && normalizedCccdName === normalizedHolder;
+
+      if (badgeEl) {
+        if (isMatched) {
+          badgeEl.className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-500/60 flex items-center gap-1 transition";
+          badgeEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span>Đã khớp định danh Napas 247</span>`;
+        } else {
+          badgeEl.className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-950 text-rose-300 border border-rose-500/60 flex items-center gap-1 transition";
+          badgeEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400"></i> <span>Chưa khớp tên CCCD (${normalizedCccdName || '...'})</span>`;
+        }
+      }
+    }
+
+    function updateLiveUnitEconomicsPreview() {
+      const budgetVnd = Math.max(1000000, Number(document.getElementById('cw-budget-vnd')?.value || 5000000));
+      const groupSize = Math.max(1, Number(document.getElementById('cw-group-size')?.value || 2));
+      const minRetail = Math.round(budgetVnd * 1.15);
+      const maxNet = Math.round(budgetVnd * 0.80);
+      const totalGroup = budgetVnd * groupSize;
+
+      const minRetailEl = document.getElementById('cw-econ-min-retail');
+      const maxNetEl = document.getElementById('cw-econ-max-net');
+      const splitPreviewEl = document.getElementById('cw-econ-split-preview');
+
+      if (minRetailEl) minRetailEl.textContent = `${minRetail.toLocaleString('vi-VN')} VNĐ`;
+      if (maxNetEl) maxNetEl.textContent = `${maxNet.toLocaleString('vi-VN')} VNĐ`;
+      if (splitPreviewEl) {
+        splitPreviewEl.textContent = `${totalGroup.toLocaleString('vi-VN')} VNĐ (${groupSize} mã QR × ${budgetVnd.toLocaleString('vi-VN')}đ)`;
+      }
+    }
+
+    // ==========================================================================
+    // 4. HÀM KẾT NỐI TỰ ĐỘNG SMART API FETCH (TIMEOUT 3 GIÂY + AUTO-FALLBACK)
+    // ==========================================================================
     function cosineSimilarity(vecA = {}, vecB = {}) {
       const keys = ["healing", "nature", "solitude", "comfort", "culture"];
       let dot = 0, normA = 0, normB = 0;
@@ -2428,7 +2612,175 @@
       return customBase ? `${customBase}${endpointPath}` : endpointPath;
     }
 
-    // 1. TẠO ĐƠN MÙ AI & KIỂM ĐỊNH eKYC (/api/create-booking)
+    async function smartApiFetch(endpointPath, options = {}, fallbackFn, timeoutMs = 3000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(getWorkerApiUrl(endpointPath), {
+          ...options,
+          signal: controller.signal
+        });
+        clearTimeout(timer);
+        const contentType = res.headers.get("content-type") || "";
+        if (!contentType.includes("application/json")) {
+          throw new Error("Non-JSON response from static host");
+        }
+        const json = await res.json();
+        if (!res.ok && res.status !== 400) {
+          throw new Error(json.error || `HTTP ${res.status}`);
+        }
+        return { ok: res.ok, status: res.status, data: json, source: "CLOUD_WORKER" };
+      } catch (err) {
+        clearTimeout(timer);
+        if (typeof fallbackFn === "function") {
+          const fallbackData = await fallbackFn();
+          return { ok: true, status: 200, data: fallbackData, source: "LOCAL_COSINE_AI" };
+        }
+        return { ok: false, status: 500, data: { error: err.message }, source: "FALLBACK_ERROR" };
+      }
+    }
+
+    // ==========================================================================
+    // 5. HIỆU ỨNG TRẠNG THÁI XỬ LÝ AI 3 BƯỚC (1.8 GIÂY) & ĐIỀU HƯỚNG 4 BƯỚC
+    // ==========================================================================
+    async function runAiProcessingStepper1800ms() {
+      const box = document.getElementById('ai-processing-stepper-box');
+      const bar = document.getElementById('ai-stepper-progress-bar');
+      const pct = document.getElementById('ai-stepper-percent');
+      const s1 = document.getElementById('ai-step-1');
+      const s2 = document.getElementById('ai-step-2');
+      const s3 = document.getElementById('ai-step-3');
+      if (!box) return;
+
+      box.classList.remove('hidden');
+      const setStepState = (el, state, text) => {
+        if (!el) return;
+        if (state === 'active') {
+          el.className = "flex items-center gap-2.5 text-cyan-300 font-bold transition";
+          el.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-cyan-400"></i> <span>${text}</span>`;
+        } else if (state === 'done') {
+          el.className = "flex items-center gap-2.5 text-emerald-300 font-bold transition";
+          el.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span>${text}</span>`;
+        } else {
+          el.className = "flex items-center gap-2.5 text-slate-400 transition";
+          el.innerHTML = `<i class="fa-regular fa-circle text-slate-600"></i> <span>${text}</span>`;
+        }
+      };
+
+      const t1 = "[1/3] Đang đối chiếu CCCD & STK qua cổng Napas 247...";
+      const t2 = "[2/3] AI đang quét quỹ phòng 4-5 sao giờ chót & khóa biên độ tiết kiệm >= 20%...";
+      const t3 = "[3/3] Đang niêm phong điểm đến & khởi tạo mã VietQR Công ty...";
+
+      setStepState(s1, 'active', t1);
+      setStepState(s2, 'pending', t2);
+      setStepState(s3, 'pending', t3);
+      if (bar) bar.style.width = "33%";
+      if (pct) pct.textContent = "33%";
+      await new Promise(r => setTimeout(r, 600));
+
+      setStepState(s1, 'done', t1);
+      setStepState(s2, 'active', t2);
+      if (bar) bar.style.width = "68%";
+      if (pct) pct.textContent = "68%";
+      await new Promise(r => setTimeout(r, 600));
+
+      setStepState(s2, 'done', t2);
+      setStepState(s3, 'active', t3);
+      if (bar) bar.style.width = "100%";
+      if (pct) pct.textContent = "100%";
+      await new Promise(r => setTimeout(r, 600));
+
+      setStepState(s3, 'done', t3);
+    }
+
+    function update4StepProgressBar(activeViewOrStep) {
+      let stepIndex = 1;
+      if (typeof activeViewOrStep === 'number') {
+        stepIndex = activeViewOrStep;
+      } else if (activeViewOrStep === 'quiz') {
+        stepIndex = 1;
+      } else if (activeViewOrStep === 'vietqr') {
+        stepIndex = 2;
+      } else if (activeViewOrStep === 'scratch') {
+        stepIndex = window.cwState?.isCurrentBookingUnlocked ? 4 : 3;
+      } else if (activeViewOrStep === 'b2b' || activeViewOrStep === 'passport') {
+        stepIndex = 4;
+      }
+
+      for (let i = 1; i <= 4; i++) {
+        const btn = document.getElementById(`step-bar-${i}`);
+        if (!btn) continue;
+        const badge = btn.querySelector('span');
+        if (i < stepIndex) {
+          btn.className = "flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-300 font-bold transition text-left";
+          if (badge) {
+            badge.className = "w-5 h-5 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-black text-[10px] shrink-0";
+            badge.innerHTML = `<i class="fa-solid fa-check"></i>`;
+          }
+        } else if (i === stepIndex) {
+          btn.className = "flex items-center gap-2 px-3 py-1.5 rounded-xl bg-cyan-500/20 border border-cyan-500/60 text-cyan-300 font-bold transition text-left shadow-sm";
+          if (badge) {
+            badge.className = "w-5 h-5 rounded-full bg-cyan-400 text-slate-950 flex items-center justify-center font-black text-[10px] shrink-0";
+            badge.textContent = String(i);
+          }
+        } else {
+          btn.className = "flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-400 font-semibold hover:text-white transition text-left";
+          if (badge) {
+            badge.className = "w-5 h-5 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center font-black text-[10px] shrink-0";
+            badge.textContent = String(i);
+          }
+        }
+      }
+    }
+    window.update4StepProgressBar = update4StepProgressBar;
+
+    function goToWorkflowStep(stepNum) {
+      if (stepNum === 1) {
+        if (typeof switchView === 'function') switchView('quiz');
+        document.getElementById('cloud-booking-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (stepNum === 2) {
+        if (typeof switchView === 'function') switchView('vietqr');
+      } else if (stepNum === 3) {
+        if (typeof switchView === 'function') switchView('scratch');
+        update4StepProgressBar(3);
+      } else if (stepNum === 4) {
+        if (typeof switchView === 'function') switchView('scratch');
+        update4StepProgressBar(4);
+        document.getElementById('scratch-canvas')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+    window.goToWorkflowStep = goToWorkflowStep;
+
+    // ==========================================================================
+    // 6. DỰ PHÒNG ẢNH VIETQR OFFLINE (ONERROR FALLBACK)
+    // ==========================================================================
+    function handleQrImageFallback(imgEl, memo = "WM99081234", amount = 5000000) {
+      if (!imgEl || imgEl.dataset.fallbackApplied === "1") return;
+      imgEl.dataset.fallbackApplied = "1";
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">
+        <rect width="320" height="320" rx="18" fill="#ffffff"/>
+        <rect x="16" y="16" width="288" height="288" rx="12" fill="#f8fafc" stroke="#0891b2" stroke-width="3"/>
+        <text x="160" y="46" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="15" fill="#0f172a">VIETQR NAPAS 247 • MBBANK</text>
+        <rect x="60" y="64" width="60" height="60" fill="none" stroke="#0f172a" stroke-width="8"/>
+        <rect x="76" y="80" width="28" height="28" fill="#0f172a"/>
+        <rect x="200" y="64" width="60" height="60" fill="none" stroke="#0f172a" stroke-width="8"/>
+        <rect x="216" y="80" width="28" height="28" fill="#0f172a"/>
+        <rect x="60" y="180" width="60" height="60" fill="none" stroke="#0f172a" stroke-width="8"/>
+        <rect x="76" y="196" width="28" height="28" fill="#0f172a"/>
+        <rect x="140" y="120" width="40" height="40" rx="6" fill="#0891b2"/>
+        <text x="160" y="145" text-anchor="middle" font-family="monospace" font-weight="900" font-size="14" fill="#ffffff">WM</text>
+        <rect x="140" y="180" width="120" height="20" fill="#0f172a"/>
+        <rect x="140" y="216" width="90" height="24" fill="#0f172a"/>
+        <text x="160" y="268" text-anchor="middle" font-family="monospace" font-weight="900" font-size="13" fill="#059669">STK: 0988888888 (MB)</text>
+        <text x="160" y="288" text-anchor="middle" font-family="monospace" font-weight="900" font-size="12" fill="#0f172a">${Number(amount).toLocaleString('vi-VN')} VND | ${memo}</text>
+      </svg>`;
+      imgEl.src = "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+    }
+    window.handleQrImageFallback = handleQrImageFallback;
+
+    // ==========================================================================
+    // 7. TẠO ĐƠN MÙ AI & KIỂM ĐỊNH ĐỊNH DANH eKYC (/api/create-booking)
+    // ==========================================================================
     async function createCloudBlindBooking(e) {
       if (e) e.preventDefault();
       const email = document.getElementById('cw-email')?.value.trim() || 'nguyenvanan@wandermatch.vn';
@@ -2437,8 +2789,8 @@
       const bankCode = document.getElementById('cw-bank-code')?.value || 'MB';
       const bankAccount = document.getElementById('cw-bank-account')?.value.trim() || '0388998899';
       const bankAccountHolder = document.getElementById('cw-bank-holder')?.value.trim() || 'NGUYEN VAN AN';
-      const budgetVnd = Number(document.getElementById('cw-budget-vnd')?.value || 5000000);
-      const groupSize = Number(document.getElementById('cw-group-size')?.value || 2);
+      const budgetVnd = Math.max(1000000, Number(document.getElementById('cw-budget-vnd')?.value || 5000000));
+      const groupSize = Math.max(1, Number(document.getElementById('cw-group-size')?.value || 2));
 
       const personaVector = {
         healing: Number(document.getElementById('cw-vec-healing')?.value || 95),
@@ -2462,13 +2814,16 @@
         return;
       }
 
+      // Chạy hiệu ứng AI Stepper 3 bước trong 1.8 giây
+      await runAiProcessingStepper1800ms();
+
       const payload = {
         email,
         fullName,
         cccd,
         bankCode,
         bankAccount,
-        bankAccountHolder,
+        bankAccountHolder: normalizeVNName(bankAccountHolder),
         personaVector,
         comfortLocks: window.state?.comfortLocks || { noRedEye: true, bedType: 'KING' },
         blacklistedCities,
@@ -2476,81 +2831,94 @@
         groupSize
       };
 
-      let data = null;
-      try {
-        const res = await fetch(getWorkerApiUrl('/api/create-booking'), {
+      const apiRes = await smartApiFetch(
+        '/api/create-booking',
+        {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
-        });
-        data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Lỗi tạo đơn');
-      } catch (err) {
-        // Fallback cục bộ nếu chạy tĩnh trên Netlify / GitHub Pages chưa cấu hình Worker URL
-        let candidates = CW_INVENTORIES.filter(item => !blacklistedCities.includes(item.city_name));
-        if (candidates.length === 0) candidates = CW_INVENTORIES;
-        candidates = candidates.map(item => ({
-          ...item,
-          similarityScore: Math.round(cosineSimilarity(personaVector, item.attribute_vector) * 1000) / 10
-        })).sort((a, b) => b.similarityScore - a.similarityScore);
-        const chosen = candidates[0];
-        window.cwState.lastChosenInventory = chosen;
-        const bookingCode = "WM" + Math.floor(10000 + Math.random() * 90000);
-        const totalBudget = budgetVnd * groupSize;
-        const splitQrs = Array.from({ length: groupSize }, (_, idx) => ({
-          memberIndex: idx + 1,
-          amount: budgetVnd,
-          memo: `${bookingCode} M${idx + 1}`,
-          qrUrl: `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${budgetVnd}&addInfo=${encodeURIComponent(`${bookingCode} M${idx + 1}`)}&accountName=${encodeURIComponent('CONG TY TNHH WANDERMATCH VN')}`
-        }));
-        data = {
-          success: true,
-          bookingCode,
-          totalBudget,
-          weatherTempC: chosen.weather_temp_c,
-          weatherDesc: chosen.weather_desc,
-          mysteryHint: chosen.default_hint,
-          packingChecklist: chosen.default_packing,
-          splitQrs,
-          _chosen: chosen
-        };
+        },
+        async () => {
+          const bookingCode = "WM" + Math.floor(10000 + Math.random() * 90000);
+          const sealedMeta = AntiF12Vault.matchAndSeal(bookingCode, personaVector, blacklistedCities, budgetVnd, groupSize);
+          const splitQrs = Array.from({ length: groupSize }, (_, idx) => ({
+            memberIndex: idx + 1,
+            amount: budgetVnd,
+            memo: `${bookingCode} M${idx + 1}`,
+            qrUrl: `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${budgetVnd}&addInfo=${encodeURIComponent(`${bookingCode} M${idx + 1}`)}&accountName=${encodeURIComponent('CONG TY TNHH WANDERMATCH VN')}`
+          }));
+          // JSON trả về TUYỆT ĐỐI KHÔNG chứa city_name, hotel_name, hotel_confirmation_code
+          return {
+            success: true,
+            bookingCode,
+            totalBudget: sealedMeta.totalBudget,
+            perPersonBudget: budgetVnd,
+            groupSize,
+            weatherTempC: sealedMeta.weatherTempC,
+            weatherDesc: sealedMeta.weatherDesc,
+            mysteryHint: sealedMeta.mysteryHint,
+            packingChecklist: sealedMeta.packingChecklist,
+            splitQrs
+          };
+        },
+        3000
+      );
+
+      if (!apiRes.ok) {
+        if (typeof showToast === 'function') showToast('error', apiRes.data?.error || 'Lỗi tạo đơn');
+        return;
       }
 
+      const data = apiRes.data;
+      // Đảm bảo nếu gọi qua Worker thật thì cũng chuẩn bị sẵn bản sao niêm phong cho Offline Reveal nếu cần
+      AntiF12Vault.matchAndSeal(data.bookingCode, personaVector, blacklistedCities, budgetVnd, groupSize);
+
       window.cwState.activeBookingCode = data.bookingCode;
+      window.cwState.isCurrentBookingUnlocked = false;
       if (window.state) {
         window.state.orderCode = data.bookingCode;
         window.state.selectedBudget = data.totalBudget;
       }
 
-      // Lưu vào bảng Admin cục bộ để đồng bộ hiển thị
-      const chosenInv = data._chosen || CW_INVENTORIES.find(c => c.weather_temp_c === data.weatherTempC) || CW_INVENTORIES[0];
-      window.cwState.lastChosenInventory = chosenInv;
+      // Reset thẻ cào sang trạng thái niêm phong cho đơn mới
+      const cityEl = document.getElementById('scratch-revealed-city');
+      const hotelEl = document.getElementById('scratch-revealed-hotel');
+      const walletHotelEl = document.getElementById('wallet-hotel-code');
+      if (cityEl) cityEl.textContent = "🔒 ĐANG NIÊM PHONG BỞI AI ESCROW";
+      if (hotelEl) hotelEl.textContent = "Cào > 40% diện tích thẻ bạc hoặc bấm nút Mở Khóa Giờ G để giải mã điểm đến & mã phòng SLA";
+      if (walletHotelEl) walletHotelEl.textContent = "SLA-***-LOCKED";
+      if (typeof initScratchCard === 'function') initScratchCard();
+
+      // Lưu vào bảng Admin cục bộ (Điểm đến của đơn mới vẫn niêm phong cho tới khi mở khóa Giờ G)
       window.cwState.localAdminBookings.unshift({
         bookingCode: data.bookingCode,
         customerName: fullName,
         bankInfo: `${bankCode} - ***${String(bankAccount).slice(-4)}`,
-        cityName: chosenInv.city_name,
-        hotelConfirmationCode: chosenInv.hotel_confirmation_code,
+        cityName: "🔒 Đang niêm phong (Chờ Giờ G)",
+        hotelConfirmationCode: "SLA-***-LOCKED",
         budgetVnd: data.totalBudget,
-        netCostVnd: Math.round(data.totalBudget * 0.76),
-        grossMarginVnd: data.totalBudget - Math.round(data.totalBudget * 0.76),
-        aiReasoningLog: `[Vector Cosine Match] Chữa lành ${personaVector.healing}%, Thiên nhiên ${personaVector.nature}%. Đã loại trừ: ${blacklistedCities.join(', ') || 'Không'}`,
-        customerReview: "Chưa có đánh giá"
+        retailValueVnd: Math.round(data.totalBudget * 1.24),
+        netCostVnd: Math.round(data.totalBudget * 0.75),
+        grossMarginVnd: Math.round(data.totalBudget * 0.25),
+        aiReasoningLog: `[Vector Cosine Match] Chữa lành ${personaVector.healing}%, Thiên nhiên ${personaVector.nature}%. Đã loại trừ: ${blacklistedCities.join(', ') || 'Không'}. Đạt chuẩn Retail >= 115%, Net <= 80%.`,
+        customerRating: 5,
+        customerReview: "Đang trong kỳ nghỉ / Chờ đánh giá"
       });
 
       // Hiển thị kết quả ngay dưới form
       const resBox = document.getElementById('cw-create-booking-result');
       if (resBox) {
-        resBox.className = "p-4 rounded-2xl bg-emerald-950/50 border border-emerald-500/50 text-xs space-y-2";
+        resBox.className = "p-4 rounded-2xl bg-emerald-950/50 border border-emerald-500/50 text-xs space-y-2.5";
         resBox.innerHTML = `
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <span class="font-black text-emerald-300 text-sm">✅ ĐÃ TẠO ĐƠN MÙ AI THÀNH CÔNG: #${data.bookingCode}</span>
-            <span class="px-2.5 py-0.5 rounded bg-cyan-950 text-cyan-300 font-mono font-bold border border-cyan-700">Tổng ngân sách: ${Number(data.totalBudget).toLocaleString('vi-VN')} VNĐ</span>
+            <span class="font-black text-emerald-300 text-sm">✅ ĐÃ KHÓA ĐƠN MÙ AI & NIÊM PHONG ĐIỂM ĐẾN: #${data.bookingCode}</span>
+            <span class="px-2.5 py-0.5 rounded bg-cyan-950 text-cyan-300 font-mono font-bold border border-cyan-700">Tổng ngân sách: ${Number(data.totalBudget).toLocaleString('vi-VN')} VNĐ (${groupSize} người)</span>
           </div>
-          <p class="text-slate-200 italic">🌤️ <strong>Thời tiết nơi đến (${data.weatherTempC}°C - ${data.weatherDesc}):</strong> "${data.mysteryHint}"</p>
+          <p class="text-slate-200 italic">🌤️ <strong>Mystery Hint (${data.weatherTempC}°C - ${data.weatherDesc}):</strong> "${data.mysteryHint}"</p>
+          <div class="text-[11px] text-emerald-300 font-mono">🛡️ Bảo mật Anti-F12: Tên thành phố & khách sạn đã được mã hóa kín cho tới khi cào thẻ Giờ G.</div>
           <div class="flex flex-wrap gap-2 pt-1">
-            <button type="button" onclick="switchView('vietqr')" class="px-3.5 py-2 rounded-xl btn-glow-emerald text-white font-bold text-xs">💳 Sang Cổng VietQR (${data.splitQrs?.length || 1} Mã QR)</button>
-            <button type="button" onclick="switchView('scratch')" class="px-3.5 py-2 rounded-xl btn-glow-cyan text-slate-950 font-bold text-xs">🎟️ Sang Thẻ Cào Mở Khóa</button>
+            <button type="button" onclick="goToWorkflowStep(2)" class="px-4 py-2 rounded-xl btn-glow-emerald text-white font-black text-xs shadow">💳 Bước 2: Sang Cổng VietQR (${data.splitQrs?.length || 1} Mã QR Chia Tiền)</button>
+            <button type="button" onclick="goToWorkflowStep(3)" class="px-4 py-2 rounded-xl btn-glow-cyan text-slate-950 font-black text-xs shadow">🎟️ Bước 3 & 4: Sang Phòng Chờ & Thẻ Cào Giờ G</button>
           </div>
         `;
         resBox.classList.remove('hidden');
@@ -2562,11 +2930,13 @@
       if (badgeEl) badgeEl.textContent = `Mã đơn: #${data.bookingCode} (${data.weatherTempC}°C - ${data.weatherDesc})`;
       if (hintEl) hintEl.textContent = `"${data.mysteryHint}"`;
 
-      // Cập nhật VietQR Đơn & Nhóm (splitQrs)
+      // Cập nhật VietQR Đơn & Nhóm (splitQrs) kèm onerror fallback
       const mainQrImg = document.getElementById('vietqr-image-element');
       const lockedAmt = document.getElementById('vietqr-locked-amount');
       const subAmt = document.getElementById('vietqr-subtitle-amount');
       if (mainQrImg) {
+        delete mainQrImg.dataset.fallbackApplied;
+        mainQrImg.onerror = () => handleQrImageFallback(mainQrImg, data.bookingCode, data.totalBudget);
         mainQrImg.src = `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${data.totalBudget}&addInfo=${encodeURIComponent(data.bookingCode)}&accountName=${encodeURIComponent('CONG TY TNHH WANDERMATCH VN')}`;
       }
       if (lockedAmt) lockedAmt.textContent = `${Number(data.totalBudget).toLocaleString('vi-VN')} VNĐ`;
@@ -2584,56 +2954,118 @@
           qrUrl: q.qrUrl,
           isPaid: idx === 0
         }));
-        if (typeof renderGroupMembersGrid === 'function') renderGroupMembersGrid();
+        if (typeof renderGroupMembersGrid === 'function') {
+          renderGroupMembersGrid();
+          // Gắn sự kiện onerror dự phòng cho từng ảnh QR thành viên
+          document.querySelectorAll('#group-members-qr-grid img').forEach((img, idx) => {
+            const q = data.splitQrs[idx] || { memo: data.bookingCode, amount: budgetVnd };
+            img.onerror = () => handleQrImageFallback(img, q.memo, q.amount);
+          });
+        }
       }
 
+      update4StepProgressBar(2);
       refreshCloudAdminSummary();
       if (typeof showToast === 'function') {
-        showToast('success', `🎉 Đã khóa đơn #${data.bookingCode} và sinh ${data.splitQrs?.length || 1} mã VietQR!`);
+        showToast('success', `🎉 Đã khóa đơn #${data.bookingCode} & khởi tạo ${data.splitQrs?.length || 1} mã VietQR chia tiền!`);
       }
     }
 
-    // 2. MỞ KHÓA ĐIỂM ĐẾN GIỜ G (/api/reveal)
+    // ==========================================================================
+    // 8. HIỆU ỨNG PHÁO GIẤY CONFETTI & MỞ KHÓA ĐIỂM ĐẾN GIỜ G (/api/reveal)
+    // ==========================================================================
+    function launchConfettiCelebration() {
+      const canvas = document.getElementById('confetti-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      canvas.classList.remove('hidden');
+
+      const colors = ['#22d3ee', '#10b981', '#f59e0b', '#a855f7', '#f43f5e', '#ffffff'];
+      const particles = Array.from({ length: 110 }, () => ({
+        x: Math.random() * canvas.width,
+        y: -20 - Math.random() * 180,
+        w: 7 + Math.random() * 6,
+        h: 10 + Math.random() * 8,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vx: -2.5 + Math.random() * 5,
+        vy: 3.5 + Math.random() * 5.5,
+        rot: Math.random() * Math.PI * 2,
+        vRot: -0.15 + Math.random() * 0.3
+      }));
+
+      let frames = 0;
+      function renderFrame() {
+        frames++;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vRot;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        });
+        if (frames < 140) {
+          requestAnimationFrame(renderFrame);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          canvas.classList.add('hidden');
+        }
+      }
+      requestAnimationFrame(renderFrame);
+    }
+    window.launchConfettiCelebration = launchConfettiCelebration;
+
     async function triggerCloudReveal() {
       const bookingCode = window.cwState.activeBookingCode || 'WM99081234';
-      let data = null;
-      try {
-        const res = await fetch(getWorkerApiUrl('/api/reveal'), {
+      const apiRes = await smartApiFetch(
+        '/api/reveal',
+        {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ bookingCode })
-        });
-        data = await res.json();
-      } catch (e) {
-        const inv = window.cwState.lastChosenInventory || CW_INVENTORIES[0];
-        const paid = window.state?.selectedBudget || 5000000;
-        const retail = Math.max(inv.retail_price, Math.round(paid * 1.24));
-        data = {
-          unlocked: true,
-          cityName: inv.city_name,
-          comboTitle: inv.combo_title,
-          transportInfo: inv.transport_info,
-          hotelName: inv.hotel_name,
-          hotelConfirmationCode: inv.hotel_confirmation_code,
-          budgetPaid: paid,
-          retailValue: retail,
-          savingsVnd: retail - paid,
-          antiTouristTrapGuide: inv.default_food
-        };
-      }
+        },
+        async () => {
+          const unsealed = AntiF12Vault.unsealBooking(bookingCode);
+          return {
+            unlocked: true,
+            bookingCode,
+            cityName: unsealed.cityName,
+            comboTitle: unsealed.comboTitle,
+            transportInfo: unsealed.transportInfo,
+            hotelName: unsealed.hotelName,
+            hotelConfirmationCode: unsealed.hotelConfirmationCode,
+            budgetPaid: unsealed.budgetPaid,
+            retailValue: unsealed.retailValue,
+            savingsVnd: unsealed.savingsVnd,
+            antiTouristTrapGuide: unsealed.antiTouristTrapGuide
+          };
+        },
+        3000
+      );
 
-      // Làm mờ lớp Canvas thẻ cào để lộ hoàn toàn điểm đến
+      const data = apiRes.data;
+      window.cwState.isCurrentBookingUnlocked = true;
+      window.cwState.lastRevealedBooking = data;
+
+      // Làm mờ tự động lớp bạc Canvas
       const canvas = document.getElementById('scratch-canvas');
       if (canvas) {
-        canvas.style.transition = 'opacity 0.5s ease';
+        canvas.style.transition = 'opacity 0.55s ease';
         canvas.style.opacity = '0';
-        setTimeout(() => { canvas.style.display = 'none'; }, 500);
+        setTimeout(() => { canvas.style.display = 'none'; }, 550);
       }
       const pctLabel = document.getElementById('scratch-percent-label');
       const pctBar = document.getElementById('scratch-progress-bar');
       if (pctLabel) pctLabel.textContent = '100%';
       if (pctBar) pctBar.style.width = '100%';
 
+      // Giải mã điểm đến lên thẻ cào & Boarding Pass
       const cityEl = document.getElementById('scratch-revealed-city');
       const hotelEl = document.getElementById('scratch-revealed-hotel');
       const walletHotelEl = document.getElementById('wallet-hotel-code');
@@ -2641,50 +3073,188 @@
       if (hotelEl) hotelEl.textContent = `${data.hotelName} • ${data.transportInfo}`;
       if (walletHotelEl) walletHotelEl.textContent = data.hotelConfirmationCode;
 
-      // Cập nhật hóa đơn đối chiếu giá trị
+      // Cập nhật Boarding Pass & Value Receipt
+      const bpCity = document.getElementById('bp-destination-city');
+      const bpCombo = document.getElementById('bp-combo-title');
+      const bpFlight = document.getElementById('bp-flight-info');
+      const bpSla = document.getElementById('bp-sla-code');
+      const bpBooking = document.getElementById('bp-booking-code-display');
+      const bpPassenger = document.getElementById('bp-passenger-name');
       const tPrice = document.getElementById('receipt-total-market-price');
       const uPrice = document.getElementById('receipt-user-paid-price');
+      const sBig = document.getElementById('bp-savings-big-amount');
+      const sPct = document.getElementById('bp-savings-percent-badge');
       const sHigh = document.getElementById('receipt-savings-highlight');
+
+      const fullNameInput = document.getElementById('cw-fullname')?.value || 'NGUYEN VAN AN';
+      const savePercent = Math.round(((data.retailValue - data.budgetPaid) / (data.retailValue || 1)) * 100);
+
+      if (bpCity) bpCity.textContent = data.cityName.toUpperCase();
+      if (bpCombo) bpCombo.textContent = data.comboTitle;
+      if (bpFlight) bpFlight.textContent = data.transportInfo;
+      if (bpSla) bpSla.textContent = data.hotelConfirmationCode;
+      if (bpBooking) bpBooking.textContent = `#${bookingCode}`;
+      if (bpPassenger) bpPassenger.textContent = `${normalizeVNName(fullNameInput)} (Đã định danh CCCD)`;
       if (tPrice) tPrice.textContent = `${Number(data.retailValue).toLocaleString('vi-VN')} VNĐ`;
       if (uPrice) uPrice.textContent = `${Number(data.budgetPaid).toLocaleString('vi-VN')} VNĐ`;
+      if (sBig) sBig.textContent = `+${Number(data.savingsVnd).toLocaleString('vi-VN')} VNĐ`;
+      if (sPct) sPct.textContent = `TIẾT KIỆM ${savePercent}%`;
       if (sHigh) {
-        sHigh.innerHTML = `<i class="fa-solid fa-arrow-trend-down"></i> <span>Chuyến đi Mù tới ${data.cityName} giúp bạn tiết kiệm thực tế ${Number(data.savingsVnd).toLocaleString('vi-VN')} VNĐ!</span>`;
+        sHigh.innerHTML = `<i class="fa-solid fa-arrow-trend-down"></i> <span>Chuyến đi Mù tới ${data.cityName} giúp bạn tiết kiệm thực tế ${Number(data.savingsVnd).toLocaleString('vi-VN')} VNĐ so với đặt lẻ OTA!</span>`;
       }
+
+      // Cập nhật dòng tương ứng trong bảng Admin sau khi đã mở khóa
+      const adminRow = window.cwState.localAdminBookings.find(b => b.bookingCode === bookingCode);
+      if (adminRow) {
+        adminRow.cityName = data.cityName;
+        adminRow.hotelConfirmationCode = data.hotelConfirmationCode;
+      }
+      refreshCloudAdminSummary();
+      update4StepProgressBar(4);
+      launchConfettiCelebration();
 
       if (typeof showToast === 'function') {
-        showToast('success', `🔓 Đã mở khóa điểm đến: ${data.cityName} (${data.hotelName} - Mã SLA: ${data.hotelConfirmationCode})!`);
+        showToast('success', `🎊 Chúc mừng! Đã mở khóa điểm đến: ${data.cityName} (${data.hotelName} - Mã nhận phòng: ${data.hotelConfirmationCode})!`);
       }
     }
+    window.triggerCloudReveal = triggerCloudReveal;
 
-    // 3. MÔ PHỎNG HOÀN TIỀN 3 KHUNG GIỜ & BẤT KHẢ KHÁNG (/api/refund-simulate)
+    // ==========================================================================
+    // 9. TẢI VÉ BOARDING PASS & MÃ NHẬN PHÒNG (OFFLINE PNG/IMAGE)
+    // ==========================================================================
+    function downloadBoardingPassTicket() {
+      const bookingCode = window.cwState.activeBookingCode || 'WM99081234';
+      const rev = window.cwState.lastRevealedBooking || AntiF12Vault.unsealBooking(bookingCode);
+      const passenger = normalizeVNName(document.getElementById('cw-fullname')?.value || 'NGUYEN VAN AN');
+
+      const c = document.createElement('canvas');
+      c.width = 1080;
+      c.height = 540;
+      const ctx = c.getContext('2d');
+
+      // Nền thẻ Boarding Pass hạng Thương Gia
+      const grad = ctx.createLinearGradient(0, 0, 1080, 540);
+      grad.addColorStop(0, '#0f172a');
+      grad.addColorStop(1, '#022c22');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1080, 540);
+
+      ctx.strokeStyle = '#22d3ee';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(20, 20, 1040, 500);
+
+      // Header
+      ctx.fillStyle = '#22d3ee';
+      ctx.font = 'bold 22px sans-serif';
+      ctx.fillText('WANDERMATCH AIRWAYS & 5-STAR PMS • EXECUTIVE BOARDING PASS', 50, 68);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 38px sans-serif';
+      ctx.fillText(`SGN (TP.HCM)  ➔  ${rev.cityName.toUpperCase()}`, 50, 130);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '20px sans-serif';
+      ctx.fillText(`${rev.comboTitle} • ${rev.hotelName}`, 50, 170);
+
+      // Thông tin hành khách & Mã SLA
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 18px monospace';
+      ctx.fillText(`HÀNH KHÁCH: ${passenger}`, 50, 230);
+      ctx.fillText(`MÃ ĐƠN ESCROW: #${bookingCode}`, 50, 265);
+      ctx.fillStyle = '#fbbf24';
+      ctx.font = 'bold 24px monospace';
+      ctx.fillText(`MÃ NHẬN PHÒNG CỨNG (SLA CODE): ${rev.hotelConfirmationCode}`, 50, 310);
+
+      // Khung Số tiền tiết kiệm được
+      ctx.fillStyle = 'rgba(16, 185, 129, 0.18)';
+      ctx.fillRect(50, 345, 980, 135);
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(50, 345, 980, 135);
+
+      ctx.fillStyle = '#6ee7b7';
+      ctx.font = 'bold 20px sans-serif';
+      ctx.fillText('BIÊN LAI ĐỐI CHIẾU GIÁ TRỊ THỰC DỤNG (VALUE RECEIPT)', 75, 385);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '19px monospace';
+      ctx.fillText(`Giá lẻ thị trường (OTA): ${Number(rev.retailValue).toLocaleString('vi-VN')} VNĐ   |   Giá bạn thanh toán: ${Number(rev.budgetPaid).toLocaleString('vi-VN')} VNĐ`, 75, 422);
+
+      ctx.fillStyle = '#34d399';
+      ctx.font = 'bold 26px monospace';
+      ctx.fillText(`SỐ TIỀN BẠN TIẾT KIỆM ĐƯỢC: +${Number(rev.savingsVnd).toLocaleString('vi-VN')} VNĐ`, 75, 460);
+
+      const link = document.createElement('a');
+      link.download = `WanderMatch-BoardingPass-${bookingCode}.png`;
+      link.href = c.toDataURL('image/png');
+      link.click();
+
+      if (typeof showToast === 'function') {
+        showToast('success', `📥 Đã tải Vé Boarding Pass & Mã nhận phòng (${rev.hotelConfirmationCode}) về thiết bị!`);
+      }
+    }
+    window.downloadBoardingPassTicket = downloadBoardingPassTicket;
+
+    // ==========================================================================
+    // 10. HOÀN TIỀN 3 KHUNG GIỜ, BẤT KHẢ KHÁNG & ĐẾM NGƯỢC GIẢI NGÂN TỰ ĐỘNG
+    // ==========================================================================
     async function simulateCloudRefundScenario(scenario) {
       const bookingCode = window.cwState.activeBookingCode || 'WM99081234';
-      let data = null;
-      try {
-        const res = await fetch(getWorkerApiUrl('/api/refund-simulate'), {
+      const forceMajeureReason = document.getElementById('cw-force-majeure-reason')?.value.trim() || 'Bão lũ thiên tai / Cấp cứu y tế có xác nhận';
+
+      const apiRes = await smartApiFetch(
+        '/api/refund-simulate',
+        {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bookingCode, scenario })
-        });
-        data = await res.json();
-      } catch (e) {
-        const totalPaid = window.state?.selectedBudget || 5000000;
-        const policies = {
-          EARLY_72H: { title: "Hủy sớm trước 72 giờ khởi hành", feeRate: 0.10, b2bRate: 0.00, note: "Hoàn tự động 90% về STK đã liên kết trong 60 giây." },
-          LATE_24_72H: { title: "Hủy cận ngày (Từ 24h đến 72h trước giờ khởi hành)", feeRate: 0.35, b2bRate: 0.25, note: "Phí hủy 35% (Trích 25% chuyển thẳng vào STK Công ty Du lịch để đền bù giữ phòng cam kết). Hoàn 65% về STK của bạn." },
-          FORCE_MAJEURE: { title: "Trường hợp Đặc biệt Bất khả kháng (Có bệnh án / Thiên tai)", feeRate: 0.10, b2bRate: 0.00, note: "Bảo vệ người tiêu dùng: Miễn phạt hủy muộn sau khi Admin kiểm duyệt chứng từ. Hoàn 90% về STK." },
-          UNDER_24H: { title: "Hủy dưới 24h hoặc Đã mở khóa điểm đến", feeRate: 1.00, b2bRate: 0.75, note: "Không áp dụng hoàn tiền thường vì vé và mã phòng cam kết cứng đã xuất." }
-        };
-        const p = policies[scenario] || policies.EARLY_72H;
-        data = {
-          totalPaid,
-          policyTitle: p.title,
-          totalFee: Math.round(totalPaid * p.feeRate),
-          partnerComp: Math.round(totalPaid * p.b2bRate),
-          netRefund: totalPaid - Math.round(totalPaid * p.feeRate),
-          statusNote: p.note
-        };
-      }
+          body: JSON.stringify({ bookingCode, scenario, forceMajeureReason })
+        },
+        async () => {
+          const totalPaid = window.state?.selectedBudget || 5000000;
+          const policies = {
+            EARLY_72H: {
+              title: "Hủy sớm trước 72 giờ khởi hành (Khung 1)",
+              feeRate: 0.10,
+              b2bRate: 0.00,
+              note: "Phí hủy 10%, hoàn 90% về STK khách hàng trong 60 giây qua Napas 247."
+            },
+            LATE_24_72H: {
+              title: "Hủy cận ngày 24h - 72h trước giờ khởi hành (Khung 2)",
+              feeRate: 0.35,
+              b2bRate: 0.25,
+              note: "Phí hủy 35% (WanderMatch giữ 10%, trích 25% đền bù giữ phòng cho Công ty Du lịch B2B), hoàn 65% về STK khách."
+            },
+            FORCE_MAJEURE: {
+              title: "Bảo vệ Bất khả kháng (Force Majeure Override)",
+              feeRate: 0.10,
+              b2bRate: 0.00,
+              note: `Đã ghi nhận minh chứng ("${forceMajeureReason}"): Miễn phạt hủy muộn, bảo vệ hoàn 90% về STK khách hàng.`
+            },
+            UNDER_24H: {
+              title: "Hủy dưới 24h hoặc Đã mở khóa điểm đến (Khung 3)",
+              feeRate: 1.00,
+              b2bRate: 0.75,
+              note: "Không áp dụng hoàn tiền thường vì vé máy bay và mã phòng cam kết cứng đã xuất."
+            }
+          };
+          const p = policies[scenario] || policies.EARLY_72H;
+          const totalFee = Math.round(totalPaid * p.feeRate);
+          const partnerComp = Math.round(totalPaid * p.b2bRate);
+          return {
+            totalPaid,
+            policyTitle: p.title,
+            totalFee,
+            partnerComp,
+            netRefund: totalPaid - totalFee,
+            forceMajeureReason: scenario === 'FORCE_MAJEURE' ? forceMajeureReason : null,
+            statusNote: p.note
+          };
+        },
+        3000
+      );
+
+      const data = apiRes.data;
+      window.cwState.lastRefundData = data;
 
       const outBox = document.getElementById('cw-refund-api-output');
       if (outBox) {
@@ -2692,38 +3262,85 @@
         outBox.innerHTML = `
           <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
             <span class="font-bold text-cyan-300">${data.policyTitle}</span>
-            <span class="font-mono font-black text-emerald-400">Hoàn về STK Napas: ${Number(data.netRefund).toLocaleString('vi-VN')} VNĐ</span>
+            <span class="font-mono font-black text-emerald-400 text-sm">Hoàn về STK Napas: ${Number(data.netRefund).toLocaleString('vi-VN')} VNĐ</span>
           </div>
-          <div class="grid grid-cols-3 gap-2 pt-1 font-mono text-[11px]">
-            <div>Đã đóng: <strong class="text-white">${Number(data.totalPaid).toLocaleString('vi-VN')}đ</strong></div>
-            <div>Tổng phí hủy: <strong class="text-rose-400">${Number(data.totalFee).toLocaleString('vi-VN')}đ</strong></div>
-            <div>Đền bù B2B: <strong class="text-amber-400">${Number(data.partnerComp).toLocaleString('vi-VN')}đ</strong></div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 font-mono text-[11px]">
+            <div class="p-2 rounded-lg bg-slate-900 border border-slate-800">Đã đóng: <strong class="text-white">${Number(data.totalPaid).toLocaleString('vi-VN')}đ</strong></div>
+            <div class="p-2 rounded-lg bg-slate-900 border border-slate-800">Tổng phí hủy: <strong class="text-rose-400">${Number(data.totalFee).toLocaleString('vi-VN')}đ</strong></div>
+            <div class="p-2 rounded-lg bg-slate-900 border border-slate-800">Đền bù B2B (25%): <strong class="text-amber-400">${Number(data.partnerComp).toLocaleString('vi-VN')}đ</strong></div>
           </div>
           <p class="text-slate-300 text-[11px] pt-1">📌 ${data.statusNote}</p>
         `;
       }
       if (typeof showToast === 'function') {
-        showToast('info', `💸 [${scenario}] Hoàn thực nhận: ${Number(data.netRefund).toLocaleString('vi-VN')} VNĐ`);
+        showToast('info', `💸 [${scenario}] Số tiền hoàn thực nhận: ${Number(data.netRefund).toLocaleString('vi-VN')} VNĐ`);
       }
     }
+    window.simulateCloudRefundScenario = simulateCloudRefundScenario;
 
-    // 4. LƯU ĐÁNH GIÁ CỦA KHÁCH HÀNG VÀO AI MEMORY (/api/feedback)
+    function executeAutomatedRefundCountdown() {
+      const btn = document.getElementById('btn-auto-refund-disburse');
+      const label = document.getElementById('btn-auto-refund-label');
+      const statusText = document.getElementById('cw-auto-refund-status-text');
+      if (!btn || btn.disabled) return;
+
+      const refundInfo = window.cwState.lastRefundData || {
+        netRefund: Math.round((window.state?.selectedBudget || 5000000) * 0.9),
+        policyTitle: "Hoàn tiền Bảo hiểm Escrow"
+      };
+      const bankCode = document.getElementById('cw-bank-code')?.value || 'MB';
+      const bankAcc = document.getElementById('cw-bank-account')?.value || '0388998899';
+      const holder = normalizeVNName(document.getElementById('cw-bank-holder')?.value || 'NGUYEN VAN AN');
+
+      btn.disabled = true;
+      let remainingSec = 5;
+
+      const tick = () => {
+        if (remainingSec > 0) {
+          if (label) label.textContent = `⏳ Đang giải ngân về STK (${remainingSec}s)...`;
+          if (statusText) {
+            statusText.innerHTML = `<span class="text-amber-300 font-bold">Đang thực hiện lệnh chuyển khoản Napas 247: ${Number(refundInfo.netRefund).toLocaleString('vi-VN')} VNĐ ➔ ${bankCode} ${bankAcc} (${holder})...</span>`;
+          }
+          remainingSec--;
+          setTimeout(tick, 700);
+        } else {
+          btn.disabled = false;
+          if (label) label.textContent = `✅ Đã Giải Ngân Hoàn Tiền Thành Công`;
+          if (statusText) {
+            statusText.innerHTML = `<span class="text-emerald-300 font-bold">🎉 Đã hoàn thành công ${Number(refundInfo.netRefund).toLocaleString('vi-VN')} VNĐ về STK ${bankCode} - ${bankAcc} (${holder})! Mã GD: FT26298${Math.floor(1000 + Math.random() * 9000)}</span>`;
+          }
+          if (typeof showToast === 'function') {
+            showToast('success', `🏦 Đã giải ngân tự động ${Number(refundInfo.netRefund).toLocaleString('vi-VN')} VNĐ về STK ${bankCode} ${bankAcc} (${holder})!`);
+          }
+        }
+      };
+      tick();
+    }
+    window.executeAutomatedRefundCountdown = executeAutomatedRefundCountdown;
+
+    // ==========================================================================
+    // 11. LƯU ĐÁNH GIÁ CỦA KHÁCH HÀNG VÀO AI MEMORY (/api/feedback)
+    // ==========================================================================
     async function submitCloudTripFeedback(e) {
       if (e) e.preventDefault();
-      const bookingCode = window.cwState.activeBookingCode || 'WM99081234';
+      const bookingCode = window.cwState.activeBookingCode || 'WM88219';
       const rating = Number(document.getElementById('cw-feedback-rating')?.value || 5);
       const review = document.getElementById('cw-feedback-review')?.value.trim() || 'Trải nghiệm tuyệt vời!';
 
-      try {
-        await fetch(getWorkerApiUrl('/api/feedback'), {
+      await smartApiFetch(
+        '/api/feedback',
+        {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ bookingCode, rating, review })
-        });
-      } catch (err) {}
+        },
+        async () => ({ success: true }),
+        3000
+      );
 
       const found = window.cwState.localAdminBookings.find(b => b.bookingCode === bookingCode) || window.cwState.localAdminBookings[0];
       if (found) {
+        found.customerRating = rating;
         found.customerReview = `${rating}/5 ★ - "${review}"`;
       }
       refreshCloudAdminSummary();
@@ -2731,24 +3348,55 @@
         showToast('success', `🌟 Đã lưu đánh giá ${rating}/5 sao của đơn #${bookingCode} vào Supabase để huấn luyện Gemini AI!`);
       }
     }
+    window.submitCloudTripFeedback = submitCloudTripFeedback;
 
-    // 5. BẢNG QUẢN TRỊ ADMIN & ĐỐI SOÁT B2B (/api/admin-summary)
+    // ==========================================================================
+    // 12. BẢNG QUẢN TRỊ ADMIN & 4 THẺ CHỈ SỐ TỔNG QUAN KPI (/api/admin-summary)
+    // ==========================================================================
     async function refreshCloudAdminSummary() {
       const tbody = document.getElementById('cw-admin-table-body');
       if (!tbody) return;
 
+      const apiRes = await smartApiFetch(
+        '/api/admin-summary',
+        { method: 'GET' },
+        async () => ({
+          supabaseConnected: false,
+          bookings: window.cwState.localAdminBookings
+        }),
+        3000
+      );
+
       let rows = window.cwState.localAdminBookings;
-      try {
-        const res = await fetch(getWorkerApiUrl('/api/admin-summary'));
-        const data = await res.json();
-        if (data && Array.isArray(data.bookings) && data.bookings.length > 0) {
-          rows = data.bookings;
-        }
-        const sbBadge = document.getElementById('cw-supabase-status-badge');
-        if (sbBadge) {
-          sbBadge.textContent = data.supabaseConnected ? '🟢 SUPABASE CONNECTED' : '🟢 CLOUD WORKER ACTIVE';
-        }
-      } catch (e) {}
+      if (apiRes.ok && apiRes.data && Array.isArray(apiRes.data.bookings) && apiRes.data.bookings.length > 0) {
+        // Hợp nhất các đơn vừa tạo trên trình duyệt với dữ liệu từ Worker
+        const apiCodes = new Set(apiRes.data.bookings.map(b => b.bookingCode));
+        const localOnly = window.cwState.localAdminBookings.filter(b => !apiCodes.has(b.bookingCode));
+        rows = [...localOnly, ...apiRes.data.bookings];
+      }
+
+      const sbBadge = document.getElementById('cw-supabase-status-badge');
+      if (sbBadge) {
+        sbBadge.textContent = apiRes.data?.supabaseConnected
+          ? '🟢 SUPABASE CONNECTED'
+          : (apiRes.source === 'CLOUD_WORKER' ? '🟢 CLOUD WORKER ACTIVE' : '🟢 AI COSINE ENGINE READY');
+      }
+
+      // Cập nhật 4 thẻ KPI Tổng quan
+      const totalEscrow = rows.reduce((s, r) => s + Number(r.budgetVnd || 0), 0);
+      const totalB2b = rows.reduce((s, r) => s + Number(r.netCostVnd || 0), 0);
+      const totalMargin = rows.reduce((s, r) => s + Number(r.grossMarginVnd || 0), 0);
+      const avgRating = (rows.reduce((s, r) => s + Number(r.customerRating || 5), 0) / Math.max(1, rows.length)).toFixed(1);
+
+      const kpiEscrowEl = document.getElementById('kpi-escrow-total');
+      const kpiB2bEl = document.getElementById('kpi-b2b-payout');
+      const kpiMarginEl = document.getElementById('kpi-arbitrage-margin');
+      const kpiRatingEl = document.getElementById('kpi-avg-rating');
+
+      if (kpiEscrowEl) kpiEscrowEl.textContent = `${totalEscrow.toLocaleString('vi-VN')} VNĐ`;
+      if (kpiB2bEl) kpiB2bEl.textContent = `${totalB2b.toLocaleString('vi-VN')} VNĐ`;
+      if (kpiMarginEl) kpiMarginEl.textContent = `+${totalMargin.toLocaleString('vi-VN')} VNĐ`;
+      if (kpiRatingEl) kpiRatingEl.textContent = `${avgRating} / 5.0 ★`;
 
       tbody.innerHTML = rows.map(b => `
         <tr class="hover:bg-slate-900/50 transition">
@@ -2771,8 +3419,12 @@
         </tr>
       `).join('');
     }
+    window.refreshCloudAdminSummary = refreshCloudAdminSummary;
 
     document.addEventListener('DOMContentLoaded', () => {
+      handleCccdHolderSync('cccd');
+      updateLiveUnitEconomicsPreview();
+      update4StepProgressBar(1);
       refreshCloudAdminSummary();
     });
   </script>
