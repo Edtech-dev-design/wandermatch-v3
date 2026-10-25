@@ -9,8 +9,8 @@ const path = require('path');
 const { exec } = require('child_process');
 
 const ROOT_DIR = __dirname;
-const WATCH_EXTENSIONS = new Set(['.html', '.css', '.js', '.json', '.sql', '.md', '.yml']);
-const IGNORE_DIRS = new Set(['.git', 'node_modules']);
+const WATCH_EXTENSIONS = new Set(['.html', '.css', '.js', '.json', '.sql', '.md', '.yml', '.toml']);
+const IGNORE_DIRS = new Set(['.git', 'node_modules', '.netlify', '.wrangler']);
 
 let syncTimer = null;
 let isSyncing = false;
