@@ -3627,8 +3627,10 @@ function initScratchCard() {
 
   canvas.style.display = 'block';
   canvas.style.opacity = '1';
-  canvas.width = container.offsetWidth || 540;
-  canvas.height = container.offsetHeight || 300;
+  const measuredW = (container && container.offsetWidth) || canvas.offsetWidth || 640;
+  const measuredH = (container && container.offsetHeight) || canvas.offsetHeight || 280;
+  canvas.width = Math.max(320, measuredW);
+  canvas.height = Math.max(220, measuredH);
 
   // ANTI-F12 LEAK PROTECTION: Giữ niêm phong trên DOM cho tới khi cào đạt >= 40%
   const revealedCity = document.getElementById('scratch-revealed-city');
