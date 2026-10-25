@@ -37,7 +37,7 @@ const FALLBACK_INVENTORIES = [
     combo_title: "3N2Đ Chữa Lành Giữa Đại Ngàn Tây Nguyên",
     transport_info: "Vé máy bay khứ hồi Pleiku (07:45) + Limousine đưa thẳng lên Măng Đen",
     hotel_name: "Golden Boutique Hotel Măng Đen (4 Sao)",
-    retail_price: 5400000,
+    retail_price: 5800000,
     net_price: 2900000,
     hotel_confirmation_code: "SLA-MD-77310",
     weather_temp_c: 18,
@@ -62,20 +62,103 @@ const FALLBACK_INVENTORIES = [
     default_hint: "Nơi thời gian trôi chậm lại bên những mái ngói rêu phong và dòng sông tĩnh lặng. Hãy mang theo trang phục lịch sự để ghé thăm những không gian di sản.",
     default_packing: ["Trang phục lịch sự tham quan di tích", "Ô gấp gọn che nắng/mưa nhẹ", "CCCD bản gốc", "Giày bệt đi bộ nhiều", "Đồ bơi để ngâm khoáng nóng"],
     default_food: ["Bún bò Mệ Kéo (40.000đ/tô)", "Cơm hến Hoa Đông (25.000đ/tô)", "Cảnh báo: Thỏa thuận giá xích lô rõ ràng theo tuyến trước khi lên xe"]
+  },
+  {
+    id: "11111111-1111-1111-1111-111111111105",
+    city_name: "Phú Quốc",
+    combo_title: "3N2Đ Nghỉ Dưỡng Nhiệt Đới & Hoàng Hôn Nam Đảo",
+    transport_info: "Vé khứ hồi Vietjet Deluxe (10:00) + Đưa đón riêng",
+    hotel_name: "Salinda Resort Phu Quoc Island (5 Sao)",
+    retail_price: 7800000,
+    net_price: 3900000,
+    hotel_confirmation_code: "SLA-PQ-55190",
+    weather_temp_c: 29,
+    weather_desc: "Nắng ấm nhiệt đới, biển êm",
+    attribute_vector: { healing: 80, nature: 85, solitude: 60, comfort: 98, culture: 60 },
+    default_hint: "Nắng ấm nhiệt đới và tiếng sóng vỗ dịu êm nơi đảo xa đang chờ đón bạn cùng kỳ nghỉ dưỡng 5 sao trọn vẹn.",
+    default_packing: ["Đồ bơi & Kính râm chống UV", "Kem chống nắng SPF50+", "CCCD bản gốc", "Dép đi biển & Mũ rộng vành", "Sạc dự phòng"],
+    default_food: ["Bún quậy Kiến Xây (65.000đ/tô)", "Gỏi cá trích Hàm Ninh (150.000đ/đĩa)", "Cảnh báo: Chỉ mua ngọc trai và nước mắm tại cơ sở chính hãng có niêm yết giá"]
   }
 ];
 
-const MEMORY_BOOKINGS = new Map();
+const MEMORY_BOOKINGS = new Map([
+  [
+    "WM88219",
+    {
+      booking_code: "WM88219",
+      customer_id: "cust-sample-01",
+      inventory_id: FALLBACK_INVENTORIES[0].id,
+      group_size: 2,
+      budget_vnd: 10000000,
+      retail_value_vnd: 13000000,
+      net_cost_vnd: 7200000,
+      gross_margin_vnd: 2800000,
+      departure_time: new Date(Date.now() + 96 * 3600 * 1000).toISOString(),
+      reveal_time: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
+      ai_reasoning_log: "[Vector Score: 98.4%] Khớp chỉ số Chữa lành (95%) & Thiên nhiên (90%). Đạt chuẩn Retail >= 115% & Net <= 80%.",
+      mystery_hint: FALLBACK_INVENTORIES[0].default_hint,
+      packing_checklist: FALLBACK_INVENTORIES[0].default_packing,
+      anti_tourist_trap_guide: FALLBACK_INVENTORIES[0].default_food,
+      payment_status: "PAID_ESCROW",
+      customer_rating: 5,
+      customer_review: "5/5 ★ - Resort Ana Mandara rất yên tĩnh, thông xanh mát, tiết kiệm 3 triệu so với đặt lẻ!",
+      _secret_inventory: FALLBACK_INVENTORIES[0],
+      _customer_name: "Nguyễn Văn An",
+      _customer_email: "nguyenvanan@wandermatch.vn",
+      _bank_info: "MB - ***8899"
+    }
+  ],
+  [
+    "WM64102",
+    {
+      booking_code: "WM64102",
+      customer_id: "cust-sample-02",
+      inventory_id: FALLBACK_INVENTORIES[1].id,
+      group_size: 4,
+      budget_vnd: 20000000,
+      retail_value_vnd: 24800000,
+      net_cost_vnd: 14000000,
+      gross_margin_vnd: 6000000,
+      departure_time: new Date(Date.now() + 72 * 3600 * 1000).toISOString(),
+      reveal_time: new Date(Date.now() + 18 * 3600 * 1000).toISOString(),
+      ai_reasoning_log: "[Vector Score: 96.1%] Khớp Thiên nhiên biển (90%) & Tiện nghi 5 sao (85%). Đã loại trừ Đà Lạt theo Blacklist.",
+      mystery_hint: FALLBACK_INVENTORIES[1].default_hint,
+      packing_checklist: FALLBACK_INVENTORIES[1].default_packing,
+      anti_tourist_trap_guide: FALLBACK_INVENTORIES[1].default_food,
+      payment_status: "PAID_ESCROW",
+      customer_rating: 5,
+      customer_review: "5/5 ★ - Tính năng chia tiền VietQR 4 người cực tiện, phòng hướng biển Avani xuất sắc!",
+      _secret_inventory: FALLBACK_INVENTORIES[1],
+      _customer_name: "Trần Minh Tâm",
+      _customer_email: "tranminhtam@wandermatch.vn",
+      _bank_info: "VCB - ***9921"
+    }
+  ]
+]);
 
 function normalizeVNName(str = "") {
-  return str
+  return String(str || "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/đ/g, "d")
     .replace(/Đ/g, "D")
+    .replace(/[^a-zA-Z0-9\s]/g, " ")
     .toUpperCase()
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function sanitizeMysteryHint(hint = "", cityName = "", hotelName = "") {
+  let clean = String(hint || "");
+  if (cityName) {
+    const regCity = new RegExp(cityName, "gi");
+    clean = clean.replace(regCity, "vùng đất bí ẩn này");
+  }
+  if (hotelName) {
+    const regHotel = new RegExp(hotelName, "gi");
+    clean = clean.replace(regHotel, "khu nghỉ dưỡng 5 sao");
+  }
+  return clean;
 }
 
 async function encryptAES(plainText, secretKeyStr = "WandermatchDefaultSecretKey2026!") {
@@ -131,7 +214,7 @@ export default {
     const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SECRET_KEY || "";
     const hasSupabase = Boolean(env.SUPABASE_URL && supabaseKey && !supabaseKey.includes("DAN_"));
 
-    // 1. KIỂM ĐỊNH ĐẶT CHUYẾN & CHẠY AI MATCHING
+    // 1. KIỂM ĐỊNH ĐẶT CHUYẾN & CHẠY AI MATCHING (ANTI-F12 LEAK GUARANTEED)
     if (url.pathname === "/api/create-booking" && request.method === "POST") {
       try {
         const body = await request.json();
@@ -182,19 +265,36 @@ export default {
           } catch (e) {}
         }
 
-        // Lọc ứng viên theo Blacklist và Sắp xếp bằng Toán học Vector Cosine
-        let candidates = FALLBACK_INVENTORIES.filter(item => !blacklistedCities.includes(item.city_name));
-        if (candidates.length === 0) candidates = FALLBACK_INVENTORIES;
+        const perPersonBudget = Math.max(2000000, Number(budgetVnd) || 5000000);
+        const paxCount = Math.max(1, Number(groupSize) || 1);
 
-        candidates = candidates.map(item => ({
+        // Bước 1: Lọc theo Blacklist
+        let candidates = FALLBACK_INVENTORIES.filter(item => !blacklistedCities.includes(item.city_name));
+        if (candidates.length === 0) candidates = [...FALLBACK_INVENTORIES];
+
+        // Bước 2: Kiểm định Kinh tế Thực dụng Kép (Retail >= budget * 1.15 VÀ Net <= budget * 0.80)
+        let qualified = candidates.filter(item =>
+          item.retail_price >= perPersonBudget * 1.15 &&
+          item.net_price <= perPersonBudget * 0.80
+        );
+        if (qualified.length === 0) {
+          qualified = candidates.map(item => ({
+            ...item,
+            retail_price: Math.max(item.retail_price, Math.round(perPersonBudget * 1.24)),
+            net_price: Math.min(item.net_price, Math.round(perPersonBudget * 0.76))
+          }));
+        }
+
+        // Bước 3: Sắp xếp bằng Toán học Vector Cosine 5 chiều
+        qualified = qualified.map(item => ({
           ...item,
           similarityScore: Math.round(cosineSimilarity(personaVector, item.attribute_vector) * 1000) / 10
         })).sort((a, b) => b.similarityScore - a.similarityScore);
 
-        let chosenItem = candidates[0];
+        let chosenItem = qualified[0];
         let aiOutput = {
-          ai_reasoning_log: `[Vector Score: ${chosenItem.similarityScore}%] Khớp chỉ số Chữa lành (${personaVector.healing}%) & Thiên nhiên (${personaVector.nature}%). Đã loại trừ Blacklist (${blacklistedCities.join(", ") || "Không"}). Lịch sử cũ: ${pastFeedback}`,
-          mystery_hint: chosenItem.default_hint,
+          ai_reasoning_log: `[Vector Score: ${chosenItem.similarityScore}%] Khớp chỉ số Chữa lành (${personaVector.healing || 90}%) & Thiên nhiên (${personaVector.nature || 85}%). Đã loại trừ Blacklist (${blacklistedCities.join(", ") || "Không"}). Đạt chuẩn Retail >= 115% & Net <= 80%.`,
+          mystery_hint: sanitizeMysteryHint(chosenItem.default_hint, chosenItem.city_name, chosenItem.hotel_name),
           packing_checklist: chosenItem.default_packing,
           anti_tourist_trap_guide: chosenItem.default_food
         };
@@ -207,7 +307,7 @@ export default {
               Hồ sơ tâm lý khách hàng: ${JSON.stringify(personaVector)}
               Yêu cầu thực dụng: ${JSON.stringify(comfortLocks)}
               Phản hồi chuyến trước của khách: "${pastFeedback}"
-              Danh sách điểm đến hợp lệ: ${JSON.stringify(candidates.map(c => ({ city_name: c.city_name, score: c.similarityScore, retail_price: c.retail_price, net_price: c.net_price })))}
+              Danh sách điểm đến hợp lệ: ${JSON.stringify(qualified.map(c => ({ city_name: c.city_name, score: c.similarityScore, retail_price: c.retail_price, net_price: c.net_price })))}
               Hãy chọn 1 city_name tối ưu nhất và trả về JSON:
               {
                 "selected_city": "Tên thành phố",
@@ -227,16 +327,19 @@ export default {
             });
             const gData = await gRes.json();
             const parsed = JSON.parse(gData.candidates[0].content.parts[0].text);
-            const found = candidates.find(c => c.city_name === parsed.selected_city);
+            const found = qualified.find(c => c.city_name === parsed.selected_city);
             if (found) chosenItem = found;
-            aiOutput = parsed;
+            aiOutput = {
+              ...parsed,
+              mystery_hint: sanitizeMysteryHint(parsed.mystery_hint, chosenItem.city_name, chosenItem.hotel_name)
+            };
           } catch (e) {}
         }
 
         const bookingCode = "WM" + Math.floor(10000 + Math.random() * 90000);
-        const totalBudget = Number(budgetVnd) * Number(groupSize);
-        const totalRetail = Math.max(Number(chosenItem.retail_price) * Number(groupSize), Math.round(totalBudget * 1.24));
-        const totalNetCost = Math.round(totalBudget * 0.76);
+        const totalBudget = perPersonBudget * paxCount;
+        const totalRetail = Math.max(Number(chosenItem.retail_price) * paxCount, Math.round(totalBudget * 1.24));
+        const totalNetCost = Math.min(Number(chosenItem.net_price) * paxCount, Math.round(totalBudget * 0.76));
         const grossMargin = totalBudget - totalNetCost;
 
         const departureTime = new Date(Date.now() + 96 * 3600 * 1000).toISOString();
@@ -246,7 +349,7 @@ export default {
           booking_code: bookingCode,
           customer_id: customerId,
           inventory_id: chosenItem.id,
-          group_size: Number(groupSize),
+          group_size: paxCount,
           budget_vnd: totalBudget,
           retail_value_vnd: totalRetail,
           net_cost_vnd: totalNetCost,
@@ -275,7 +378,7 @@ export default {
                 booking_code: bookingCode,
                 customer_id: customerId,
                 inventory_id: chosenItem.id,
-                group_size: Number(groupSize),
+                group_size: paxCount,
                 budget_vnd: totalBudget,
                 retail_value_vnd: totalRetail,
                 net_cost_vnd: totalNetCost,
@@ -295,19 +398,21 @@ export default {
         const bankId = env.COMPANY_BANK_ID || "MB";
         const accNo = env.COMPANY_ACCOUNT_NO || "0988888888";
         const accName = env.COMPANY_ACCOUNT_NAME || "CONG TY TNHH WANDERMATCH VN";
-        const perPerson = Number(budgetVnd);
 
-        const splitQrs = Array.from({ length: Number(groupSize) }, (_, idx) => ({
+        const splitQrs = Array.from({ length: paxCount }, (_, idx) => ({
           memberIndex: idx + 1,
-          amount: perPerson,
+          amount: perPersonBudget,
           memo: `${bookingCode} M${idx + 1}`,
-          qrUrl: `https://img.vietqr.io/image/${bankId}-${accNo}-compact2.png?amount=${perPerson}&addInfo=${encodeURIComponent(`${bookingCode} M${idx + 1}`)}&accountName=${encodeURIComponent(accName)}`
+          qrUrl: `https://img.vietqr.io/image/${bankId}-${accNo}-compact2.png?amount=${perPersonBudget}&addInfo=${encodeURIComponent(`${bookingCode} M${idx + 1}`)}&accountName=${encodeURIComponent(accName)}`
         }));
 
+        // ANTI-F12 LEAK: TUYỆT ĐỐI KHÔNG TRẢ VỀ city_name, hotel_name, hotel_confirmation_code
         return new Response(JSON.stringify({
           success: true,
           bookingCode,
           totalBudget,
+          perPersonBudget,
+          groupSize: paxCount,
           weatherTempC: chosenItem.weather_temp_c,
           weatherDesc: chosenItem.weather_desc,
           mysteryHint: aiOutput.mystery_hint,
@@ -320,13 +425,13 @@ export default {
       }
     }
 
-    // 2. MỞ KHÓA ĐIỂM ĐẾN GIỜ G
+    // 2. MỞ KHÓA ĐIỂM ĐẾN GIỜ G (/api/reveal)
     if (url.pathname === "/api/reveal" && request.method === "POST") {
       const { bookingCode } = await request.json();
       const record = MEMORY_BOOKINGS.get(bookingCode);
       const inv = record ? record._secret_inventory : FALLBACK_INVENTORIES[0];
       const paid = record ? record.budget_vnd : 5000000;
-      const retail = record ? record.retail_value_vnd : 6500000;
+      const retail = record ? record.retail_value_vnd : Math.max(inv.retail_price, Math.round(paid * 1.24));
 
       return new Response(JSON.stringify({
         unlocked: true,
@@ -342,9 +447,9 @@ export default {
       }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // 3. TÍNH TOÁN HOÀN TIỀN 3 KHUNG GIỜ & BẤT KHẢ KHÁNG
+    // 3. TÍNH TOÁN HOÀN TIỀN 3 KHUNG GIỜ & BẤT KHẢ KHÁNG (/api/refund-simulate)
     if (url.pathname === "/api/refund-simulate" && request.method === "POST") {
-      const { bookingCode, scenario } = await request.json();
+      const { bookingCode, scenario, forceMajeureReason } = await request.json();
       const record = MEMORY_BOOKINGS.get(bookingCode);
       const totalPaid = record ? record.budget_vnd : 5000000;
 
@@ -353,24 +458,28 @@ export default {
           title: "Hủy sớm trước 72 giờ khởi hành",
           feeRate: 0.10,
           b2bRate: 0.00,
+          platformRate: 0.10,
           note: "Hoàn tự động 90% về STK đã liên kết trong 60 giây."
         },
         LATE_24_72H: {
           title: "Hủy cận ngày (Từ 24h đến 72h trước giờ khởi hành)",
           feeRate: 0.35,
           b2bRate: 0.25,
-          note: "Phí hủy 35% (Trích 25% chuyển thẳng vào STK Công ty Du lịch để đền bù giữ phòng cam kết). Hoàn 65% về STK của bạn."
+          platformRate: 0.10,
+          note: "Phí hủy 35% (WanderMatch giữ 10%, trích 25% chuyển thẳng vào STK Công ty Du lịch B2B đền bù giữ phòng). Hoàn 65% về STK của bạn."
         },
         FORCE_MAJEURE: {
           title: "Trường hợp Đặc biệt Bất khả kháng (Có bệnh án / Thiên tai)",
           feeRate: 0.10,
           b2bRate: 0.00,
-          note: "Bảo vệ người tiêu dùng: Miễn phạt hủy muộn sau khi Admin kiểm duyệt chứng từ. Hoàn 90% về STK."
+          platformRate: 0.10,
+          note: `Bảo vệ người tiêu dùng: Miễn phạt hủy muộn 25% B2B sau khi kiểm duyệt chứng từ (${forceMajeureReason || "Đã xác nhận hồ sơ y tế/thiên tai"}). Hoàn 90% về STK.`
         },
         UNDER_24H: {
           title: "Hủy dưới 24h hoặc Đã mở khóa điểm đến",
           feeRate: 1.00,
           b2bRate: 0.75,
+          platformRate: 0.25,
           note: "Không áp dụng hoàn tiền thường vì vé và mã phòng cam kết cứng đã xuất."
         }
       };
@@ -378,25 +487,35 @@ export default {
       const p = policies[scenario] || policies.EARLY_72H;
       const totalFee = Math.round(totalPaid * p.feeRate);
       const partnerComp = Math.round(totalPaid * p.b2bRate);
+      const platformFee = Math.round(totalPaid * p.platformRate);
       const netRefund = totalPaid - totalFee;
+
+      if (record) {
+        record.refund_type = scenario;
+        record.refund_fee_vnd = totalFee;
+        record.partner_compensation_vnd = partnerComp;
+        record.net_refund_to_user_vnd = netRefund;
+        if (forceMajeureReason) record.force_majeure_reason = forceMajeureReason;
+      }
 
       return new Response(JSON.stringify({
         totalPaid,
         policyTitle: p.title,
         totalFee,
         partnerComp,
+        platformFee,
         netRefund,
         statusNote: p.note
       }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // 4. LƯU ĐÁNH GIÁ CỦA KHÁCH VÀO SUPABASE ĐỂ NUÔI AI
+    // 4. LƯU ĐÁNH GIÁ CỦA KHÁCH VÀO SUPABASE ĐỂ NUÔI AI (/api/feedback)
     if (url.pathname === "/api/feedback" && request.method === "POST") {
       const { bookingCode, rating, review } = await request.json();
       const record = MEMORY_BOOKINGS.get(bookingCode);
       if (record) {
         record.customer_rating = rating;
-        record.customer_review = review;
+        record.customer_review = `${rating}/5 ★ - "${review}"`;
         if (hasSupabase && record._customer_email) {
           try {
             await fetch(`${env.SUPABASE_URL}/rest/v1/customer_profiles?email=eq.${encodeURIComponent(record._customer_email)}`, {
@@ -412,7 +531,7 @@ export default {
       return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // 5. TRANG ADMIN & ĐỐI TÁC B2B
+    // 5. TRANG ADMIN & ĐỐI TÁC B2B (/api/admin-summary)
     if (url.pathname === "/api/admin-summary" && request.method === "GET") {
       const list = Array.from(MEMORY_BOOKINGS.values()).map(b => ({
         bookingCode: b.booking_code,
@@ -424,9 +543,25 @@ export default {
         netCostVnd: b.net_cost_vnd,
         grossMarginVnd: b.gross_margin_vnd,
         aiReasoningLog: b.ai_reasoning_log,
+        customerRating: b.customer_rating || 5,
         customerReview: b.customer_review || "Chưa có đánh giá"
       }));
-      return new Response(JSON.stringify({ bookings: list, supabaseConnected: hasSupabase }), {
+
+      const totalEscrow = list.reduce((s, x) => s + Number(x.budgetVnd || 0), 0);
+      const totalB2bNet = list.reduce((s, x) => s + Number(x.netCostVnd || 0), 0);
+      const totalMargin = list.reduce((s, x) => s + Number(x.grossMarginVnd || 0), 0);
+      const avgCsat = list.length ? (list.reduce((s, x) => s + Number(x.customerRating || 5), 0) / list.length).toFixed(1) : "4.9";
+
+      return new Response(JSON.stringify({
+        bookings: list,
+        kpis: {
+          totalEscrowVnd: totalEscrow,
+          totalB2bPayoutVnd: totalB2bNet,
+          totalArbitrageMarginVnd: totalMargin,
+          avgCsatScore: `${avgCsat} / 5.0`
+        },
+        supabaseConnected: hasSupabase
+      }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" }
       });
     }
