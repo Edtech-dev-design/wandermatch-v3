@@ -102,13 +102,13 @@
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-slate-950">
 
   <!-- ============================================================================
-       TOP HEADER & MULTI-LANGUAGE BAR
+       TOP HEADER: 3 ROLE TABS (B2C APP | B2B PARTNER PORTAL | ADMIN & AI INSPECTOR)
        ============================================================================ -->
-  <header class="sticky top-0 z-50 glass-panel border-b border-slate-800/80 px-4 lg:px-8 py-3.5">
+  <header class="sticky top-0 z-50 glass-panel border-b border-slate-800/80 px-4 lg:px-8 py-3">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
       
       <!-- Brand Logo -->
-      <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('concierge')">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('b2c')">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-violet-600 flex items-center justify-center text-slate-950 shadow-lg shadow-cyan-500/30">
           <i class="fa-solid fa-compass text-xl text-white"></i>
         </div>
@@ -121,35 +121,25 @@
               v3.0
             </span>
           </div>
-          <p class="text-[10px] text-slate-400 font-medium tracking-wide">NHẬP NGÂN SÁCH & RA CHUYẾN ĐI • CORPORATE VIETQR</p>
+          <p class="text-[10px] text-slate-400 font-medium tracking-wide">AI BLIND TRAVEL • NAPAS 247 ESCROW • B2B ARBITRAGE</p>
         </div>
       </div>
 
-      <!-- Navigation Links -->
-      <nav class="flex items-center gap-1.5 overflow-x-auto py-1 max-w-full">
-        <button id="nav-btn-concierge" onclick="switchView('concierge')" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition border border-cyan-500/40 bg-cyan-500/20 text-cyan-300 flex items-center gap-1.5 shrink-0">
-          <i class="fa-solid fa-route"></i>
-          <span data-i18n="nav_concierge">🧭 Lập Kế Hoạch & Chuyến Đi</span>
+      <!-- 3 MAIN ROLE TABS (TOP NAVBAR) -->
+      <nav class="flex items-center gap-2 overflow-x-auto py-1 max-w-full bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800">
+        <button id="role-tab-b2c" onclick="switchTab('b2c')" class="px-4 py-2 rounded-xl text-xs font-extrabold transition border border-cyan-500/60 bg-cyan-500 text-slate-950 shadow-lg flex items-center gap-2 shrink-0">
+          <i class="fa-solid fa-suitcase-rolling"></i>
+          <span>1. Du Khách (B2C App)</span>
         </button>
 
-        <button id="nav-btn-quiz" onclick="switchView('quiz')" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition border border-transparent flex items-center gap-1.5 shrink-0">
-          <i class="fa-solid fa-bullseye"></i>
-          <span data-i18n="nav_quiz">🎯 Persona & eKYC</span>
+        <button id="role-tab-b2b" onclick="switchTab('b2b')" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/80 transition border border-transparent flex items-center gap-2 shrink-0">
+          <i class="fa-solid fa-hotel text-amber-400"></i>
+          <span>2. Cổng Công Ty Du Lịch (B2B Portal)</span>
         </button>
 
-        <button id="nav-btn-vietqr" onclick="switchView('vietqr')" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition border border-transparent flex items-center gap-1.5 shrink-0">
-          <i class="fa-solid fa-qrcode"></i>
-          <span data-i18n="nav_vietqr">💳 Cổng VietQR Công Ty</span>
-        </button>
-
-        <button id="nav-btn-scratch" onclick="switchView('scratch')" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition border border-transparent flex items-center gap-1.5 shrink-0">
-          <i class="fa-solid fa-ticket"></i>
-          <span data-i18n="nav_scratch_refund">🎟️ Thẻ Cào & Phí Hủy</span>
-        </button>
-
-        <button id="nav-btn-b2b" onclick="switchView('b2b')" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition border border-transparent flex items-center gap-1.5 shrink-0">
-          <i class="fa-solid fa-hotel"></i>
-          <span data-i18n="nav_b2b_admin">🏨 Đối Tác B2B & Sổ Cái</span>
+        <button id="role-tab-admin" onclick="switchTab('admin')" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/80 transition border border-transparent flex items-center gap-2 shrink-0">
+          <i class="fa-solid fa-microchip text-emerald-400"></i>
+          <span>3. Quản Trị & Kiểm Định AI (Admin Inspector)</span>
         </button>
       </nav>
 
@@ -157,13 +147,13 @@
       <div class="flex flex-wrap items-center gap-2">
         <!-- 6-Color Dynamic Theme Switcher -->
         <div class="flex items-center gap-1.5 bg-slate-900/90 px-2.5 py-1.5 rounded-xl border border-slate-800 shadow-inner" title="Đổi màu giao diện (Theme Color Switcher)">
-          <span class="text-[10px] font-bold text-slate-400 mr-0.5"><i class="fa-solid fa-palette text-cyan-400"></i> Màu:</span>
-          <button id="theme-btn-cyan" onclick="setTheme('cyan')" class="theme-swatch-btn active-theme" style="background: linear-gradient(135deg, #06b6d4, #3b82f6);" title="Cyber Cyan (Mặc định)"></button>
-          <button id="theme-btn-emerald" onclick="setTheme('emerald')" class="theme-swatch-btn" style="background: linear-gradient(135deg, #10b981, #059669);" title="Emerald Pine (Rừng Thông)"></button>
-          <button id="theme-btn-sunset" onclick="setTheme('sunset')" class="theme-swatch-btn" style="background: linear-gradient(135deg, #f97316, #eab308);" title="Sunset Amber (Hoàng Hôn)"></button>
-          <button id="theme-btn-sakura" onclick="setTheme('sakura')" class="theme-swatch-btn" style="background: linear-gradient(135deg, #ec4899, #a855f7);" title="Sakura Rose (Hồng Anh Đào)"></button>
-          <button id="theme-btn-royal" onclick="setTheme('royal')" class="theme-swatch-btn" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);" title="Royal Amethyst (Tím Thượng Lưu)"></button>
-          <button id="theme-btn-light" onclick="setTheme('light')" class="theme-swatch-btn" style="background: linear-gradient(135deg, #f8fafc, #38bdf8);" title="Daylight Pearl (Giao diện Sáng)"></button>
+          <span class="text-[10px] font-bold text-slate-400 mr-0.5"><i class="fa-solid fa-palette text-cyan-400"></i></span>
+          <button id="theme-btn-cyan" onclick="setTheme('cyan')" class="theme-swatch-btn active-theme" style="background: linear-gradient(135deg, #06b6d4, #3b82f6);" title="Cyber Cyan"></button>
+          <button id="theme-btn-emerald" onclick="setTheme('emerald')" class="theme-swatch-btn" style="background: linear-gradient(135deg, #10b981, #059669);" title="Emerald Pine"></button>
+          <button id="theme-btn-sunset" onclick="setTheme('sunset')" class="theme-swatch-btn" style="background: linear-gradient(135deg, #f97316, #eab308);" title="Sunset Amber"></button>
+          <button id="theme-btn-sakura" onclick="setTheme('sakura')" class="theme-swatch-btn" style="background: linear-gradient(135deg, #ec4899, #a855f7);" title="Sakura Rose"></button>
+          <button id="theme-btn-royal" onclick="setTheme('royal')" class="theme-swatch-btn" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);" title="Royal Amethyst"></button>
+          <button id="theme-btn-light" onclick="setTheme('light')" class="theme-swatch-btn" style="background: linear-gradient(135deg, #f8fafc, #38bdf8);" title="Daylight Pearl"></button>
         </div>
 
         <!-- GitHub Auto-Sync Button -->
@@ -175,18 +165,10 @@
 
         <!-- Multi-Language Selector -->
         <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 shadow-inner">
-          <button id="lang-btn-vi" onclick="setLanguage('vi')" class="px-2.5 py-1 rounded-lg text-xs font-bold transition bg-cyan-500 text-slate-950 shadow">
-            🇻🇳 VI
-          </button>
-          <button id="lang-btn-en" onclick="setLanguage('en')" class="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800 transition">
-            🇬🇧 EN
-          </button>
-          <button id="lang-btn-ko" onclick="setLanguage('ko')" class="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800 transition">
-            🇰🇷 KO
-          </button>
-          <button id="lang-btn-ja" onclick="setLanguage('ja')" class="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800 transition">
-            🇯🇵 JA
-          </button>
+          <button id="lang-btn-vi" onclick="setLanguage('vi')" class="px-2 py-1 rounded-lg text-[11px] font-bold transition bg-cyan-500 text-slate-950 shadow">🇻🇳 VI</button>
+          <button id="lang-btn-en" onclick="setLanguage('en')" class="px-2 py-1 rounded-lg text-[11px] font-medium text-slate-300 hover:bg-slate-800 transition">🇬🇧 EN</button>
+          <button id="lang-btn-ko" onclick="setLanguage('ko')" class="px-2 py-1 rounded-lg text-[11px] font-medium text-slate-300 hover:bg-slate-800 transition">🇰🇷 KO</button>
+          <button id="lang-btn-ja" onclick="setLanguage('ja')" class="px-2 py-1 rounded-lg text-[11px] font-medium text-slate-300 hover:bg-slate-800 transition">🇯🇵 JA</button>
         </div>
       </div>
 
@@ -194,25 +176,60 @@
   </header>
 
   <!-- ============================================================================
-       STICKY 4-STEP USER JOURNEY PROGRESS STEPPER (MOBILE & DESKTOP OPTIMIZED)
+       AI LIVE DIAGNOSTIC BAR & B2C INTERACTIVE 4-STEP WIZARD
        ============================================================================ -->
-  <div id="top-4step-stepper" class="sticky top-[68px] z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-2.5">
-    <div class="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-2 text-xs">
-      <button id="step-pill-1" onclick="goToWorkflowStep(1)" class="flex items-center gap-2.5 p-2 rounded-xl border border-cyan-500/50 bg-cyan-500/15 text-cyan-300 font-bold transition text-left">
-        <span class="w-6 h-6 rounded-full bg-cyan-500 text-slate-950 font-black flex items-center justify-center shrink-0 text-[11px]">1</span>
-        <span class="truncate">1. Tâm lý & Khóa chất lượng</span>
+  <div id="top-4step-stepper" class="sticky top-[64px] z-40 bg-slate-950/95 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-2.5 space-y-2">
+    <!-- AI Live Diagnostic Bar -->
+    <div id="ai-live-diagnostic-bar" class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 px-3.5 py-2 rounded-xl bg-slate-900/90 border border-emerald-500/40 text-xs">
+      <div class="flex flex-wrap items-center gap-2.5">
+        <span class="px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-950 text-emerald-300 border border-emerald-500/60 flex items-center gap-1.5 shadow">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>AI Engine: Gemini 2.5 Flash + Vector Cosine Active</span>
+        </span>
+        <span id="ai-live-diag-status" class="text-[11px] text-slate-300 font-mono">
+          Độ nhạy AI: <strong class="text-cyan-300">Khoảng cách Euclid + Độ lệch tuyệt đối (100 - &Delta;)</strong> • Quỹ phòng đang quét: <strong id="ai-live-pool-count" class="text-amber-300">5 Điểm đến</strong>
+        </span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span id="ai-feedback-memory-pill" class="px-2.5 py-1 rounded-lg bg-indigo-950/80 text-indigo-300 border border-indigo-700/60 text-[10px] font-mono">
+          🧠 AI Feedback Boost: Sẵn sàng (+15đ)
+        </span>
+        <button type="button" onclick="switchTab('admin'); runAiSensitivity3ScenariosTest();" class="px-3 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/50 font-black text-[11px] transition flex items-center gap-1.5">
+          <i class="fa-solid fa-flask-vial"></i>
+          <span>Chạy Test Độ Nhạy AI (3 Kịch Bản)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Interactive 4-Step Wizard Bar (Shown inside Tab 1: B2C App) -->
+    <div id="b2c-4step-wizard-bar" class="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-2 text-xs">
+      <button id="step-pill-1" type="button" onclick="switchB2CStep(1)" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-cyan-500/60 bg-cyan-500/20 text-cyan-300 font-extrabold transition text-left shadow">
+        <span id="step-badge-1" class="w-6 h-6 rounded-full bg-cyan-400 text-slate-950 font-black flex items-center justify-center shrink-0 text-[11px]">1</span>
+        <div class="truncate">
+          <span class="block text-[11px] font-black">Bước 1: Tâm Lý & Khóa Thực Dụng</span>
+          <span class="block text-[10px] opacity-80">5 Trục Vector • Blacklist • Ngân sách</span>
+        </div>
       </button>
-      <button id="step-pill-2" onclick="goToWorkflowStep(2)" class="flex items-center gap-2.5 p-2 rounded-xl border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-white font-semibold transition text-left">
-        <span class="w-6 h-6 rounded-full bg-slate-800 text-slate-300 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
-        <span class="truncate">2. Định danh & VietQR</span>
+      <button id="step-pill-2" type="button" onclick="switchB2CStep(2)" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-white font-semibold transition text-left">
+        <span id="step-badge-2" class="w-6 h-6 rounded-full bg-slate-800 text-slate-300 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
+        <div class="truncate">
+          <span class="block text-[11px] font-bold">Bước 2: Định Danh STK & VietQR</span>
+          <span class="block text-[10px] opacity-80">Napas 247 • Chia tiền Nhóm QR</span>
+        </div>
       </button>
-      <button id="step-pill-3" onclick="goToWorkflowStep(3)" class="flex items-center gap-2.5 p-2 rounded-xl border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-white font-semibold transition text-left">
-        <span class="w-6 h-6 rounded-full bg-slate-800 text-slate-300 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
-        <span class="truncate">3. Phòng chờ & Bảo hiểm hoàn tiền</span>
+      <button id="step-pill-3" type="button" onclick="switchB2CStep(3)" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-white font-semibold transition text-left">
+        <span id="step-badge-3" class="w-6 h-6 rounded-full bg-slate-800 text-slate-300 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
+        <div class="truncate">
+          <span class="block text-[11px] font-bold">Bước 3: Phòng Chờ & Hoàn Tiền</span>
+          <span class="block text-[10px] opacity-80">Mystery Hint • Hoàn tiền 3 Khung giờ</span>
+        </div>
       </button>
-      <button id="step-pill-4" onclick="goToWorkflowStep(4)" class="flex items-center gap-2.5 p-2 rounded-xl border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-white font-semibold transition text-left">
-        <span class="w-6 h-6 rounded-full bg-slate-800 text-slate-300 font-bold flex items-center justify-center shrink-0 text-[11px]">4</span>
-        <span class="truncate">4. Cào thẻ Giờ G</span>
+      <button id="step-pill-4" type="button" onclick="switchB2CStep(4)" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-white font-semibold transition text-left">
+        <span id="step-badge-4" class="w-6 h-6 rounded-full bg-slate-800 text-slate-300 font-bold flex items-center justify-center shrink-0 text-[11px]">4</span>
+        <div class="truncate">
+          <span class="block text-[11px] font-bold">Bước 4: Cào Thẻ Giờ G</span>
+          <span class="block text-[10px] opacity-80">Thẻ cào Canvas • Vé Boarding Pass</span>
+        </div>
       </button>
     </div>
   </div>
