@@ -3884,6 +3884,11 @@ function signPmsCommitment() {
   const pmsCode = document.getElementById('b2b-pms-code')?.value || 'PMS-DL-8892';
   state.partnerSigned = true;
 
+  // Gọi qua Reverse Proxy /api/b2b/commit-room
+  callBackendApi('/b2b/commit-room', { pmsCode, orderCode: state.orderCode }).then(res => {
+    if (res && res.success) console.log('✍️ [ReverseProxy /api/b2b/commit-room] Room committed:', res);
+  });
+
   const statusBadge = document.getElementById('b2b-sign-status');
   if (statusBadge) {
     statusBadge.innerHTML = `
@@ -3900,6 +3905,11 @@ function simulateOverbookingViolation() {
     showToast('info', 'Khoản phạt vi phạm SLA này đã được xử lý trước đó.');
     return;
   }
+
+  // Gọi qua Reverse Proxy /api/b2b/report-overbooking
+  callBackendApi('/b2b/report-overbooking', { orderCode: state.orderCode }).then(res => {
+    if (res && res.success) console.log('⚠️ [ReverseProxy /api/b2b/report-overbooking] SLA penalty processed:', res);
+  });
 
   state.isOverbookPenalized = true;
   state.slaDepositBalance = 10000000;
