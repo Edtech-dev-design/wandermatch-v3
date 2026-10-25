@@ -1261,6 +1261,10 @@
           </div>
 
           <div id="revealed-action-btn" class="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <button onclick="triggerCloudReveal()" class="px-5 py-3.5 rounded-2xl btn-glow-cyan text-slate-950 font-black text-xs shadow-xl transition flex items-center gap-2">
+              <i class="fa-solid fa-unlock-keyhole"></i>
+              <span>🔓 Mở Khóa Nhanh Giờ G (`/api/reveal`)</span>
+            </button>
             <button onclick="switchView('concierge')" class="px-6 py-3.5 rounded-2xl btn-glow-emerald text-white font-extrabold text-sm shadow-xl transition flex items-center gap-2">
               <i class="fa-solid fa-sparkles"></i>
               <span data-i18n="revealed_btn">🎉 Đã Mở Khóa! Vào Ngay Smart Concierge</span>
@@ -1269,6 +1273,19 @@
               <i class="fa-solid fa-shield-cat"></i>
               <span>🚨 SOS Đổi Phòng 15 Phút (SLA 5 Sao)</span>
             </button>
+          </div>
+
+          <!-- Mystery Hint & Cloud Reveal Box -->
+          <div id="cw-mystery-hint-panel" class="mt-6 text-left w-full max-w-3xl mx-auto p-5 rounded-2xl bg-slate-900/90 border border-cyan-500/30 space-y-2 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="font-black text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-envelope-open-text"></i> Lời Nhắn Gợi Ý Thời Tiết & Tâm Thế Từ AI (Mystery Hint)
+              </span>
+              <span id="cw-active-booking-badge" class="font-mono font-bold text-amber-400">Mã đơn: #WM99081234</span>
+            </div>
+            <p id="cw-mystery-hint-text" class="text-slate-200 italic leading-relaxed">
+              "Nơi bạn sắp đến được bao phủ bởi sương sớm và hương thông trầm mặc. Hãy chuẩn bị áo khoác ấm và giày đi bộ êm chân."
+            </p>
           </div>
 
           <!-- COMPONENT 3: TRANSPARENT VALUE RECEIPT (HÓA ĐƠN ĐỐI CHIẾU GIÁ TRỊ MINH BẠCH) -->
