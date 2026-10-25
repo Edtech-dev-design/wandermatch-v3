@@ -35,6 +35,39 @@
 
   <!-- Custom Stylesheet -->
   <link rel="stylesheet" href="styles.css">
+
+  <!-- Inline Core Styles for Standalone Netlify / Cloudflare Pages Deployment -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+    .scratch-container {
+      position: relative;
+      width: 100%;
+      max-width: 580px;
+      height: 320px;
+      border-radius: 1.25rem;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .scratch-background {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+    .scratch-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      cursor: grab;
+      touch-action: none;
+    }
+    .scratch-canvas:active {
+      cursor: grabbing;
+    }
+  </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-slate-950">
 
