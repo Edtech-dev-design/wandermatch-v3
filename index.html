@@ -1951,12 +1951,103 @@
         </div>
       </div>
 
+      <!-- ĐẨY QUỸ PHÒNG GIỜ CHÓT MỚI TỪ ĐỐI TÁC B2B (ZERO-RELOAD SYNC SANG AI B2C) -->
+      <div class="glass-panel rounded-3xl p-6 lg:p-8 border border-amber-500/40 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+          <div>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-500 text-slate-950 uppercase tracking-wider">
+              LIVE B2B INVENTORY SYNC
+            </span>
+            <h4 class="text-base lg:text-lg font-black text-white mt-1 flex items-center gap-2">
+              <i class="fa-solid fa-plus-circle text-amber-400"></i> Đẩy Quỹ Phòng &amp; Vé Giờ Chót Mới Vào Động Cơ AI (Zero-Reload Sync)
+            </h4>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Khi Công ty Du lịch thêm gói Combo mới tại đây, hệ thống lập tức đồng bộ sang <strong>Tab 1 (B2C)</strong> và <strong>Tab 3 (Admin AI Inspector)</strong> để thuật toán AI quét ngay lập tức.
+            </p>
+          </div>
+          <span id="b2b-inventory-count-badge" class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-slate-900 text-amber-300 border border-amber-500/40">
+            Đang mở bán: 5 Gói Combo
+          </span>
+        </div>
+
+        <form onsubmit="handleAddB2BInventory(event)" class="grid grid-cols-1 md:grid-cols-12 gap-3 text-xs bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
+          <div class="md:col-span-2">
+            <label class="block text-slate-400 mb-1 font-bold">Thành phố / Điểm đến:</label>
+            <input id="b2b-new-city" type="text" required value="Nha Trang" class="w-full glass-input rounded-xl px-3 py-2 text-xs font-bold text-white">
+          </div>
+          <div class="md:col-span-3">
+            <label class="block text-slate-400 mb-1 font-bold">Tên Khách sạn / Resort 4-5 Sao:</label>
+            <input id="b2b-new-hotel" type="text" required value="Amiana Resort Nha Trang (5 Sao)" class="w-full glass-input rounded-xl px-3 py-2 text-xs text-cyan-300 font-semibold">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-slate-400 mb-1 font-bold">Mã giữ phòng SLA:</label>
+            <input id="b2b-new-sla" type="text" required value="SLA-NT-90811" class="w-full glass-input rounded-xl px-3 py-2 font-mono text-xs text-amber-300 font-bold">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-slate-400 mb-1 font-bold">Giá lẻ OTA (VNĐ):</label>
+            <input id="b2b-new-retail" type="number" required value="6800000" step="100000" class="w-full glass-input rounded-xl px-3 py-2 font-mono text-xs text-white">
+          </div>
+          <div class="md:col-span-3">
+            <label class="block text-slate-400 mb-1 font-bold">Giá sỉ Net B2B (&le;80% Ngân sách):</label>
+            <input id="b2b-new-net" type="number" required value="3600000" step="100000" class="w-full glass-input rounded-xl px-3 py-2 font-mono text-xs text-emerald-400 font-bold">
+          </div>
+
+          <div class="md:col-span-9 grid grid-cols-5 gap-2 pt-1">
+            <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 text-center">
+              <span class="text-[10px] text-slate-400 block">Chữa lành</span>
+              <input id="b2b-vec-healing" type="number" min="10" max="100" value="92" class="w-full bg-transparent text-center font-black text-cyan-300 text-xs">
+            </div>
+            <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 text-center">
+              <span class="text-[10px] text-slate-400 block">Thiên nhiên</span>
+              <input id="b2b-vec-nature" type="number" min="10" max="100" value="95" class="w-full bg-transparent text-center font-black text-emerald-300 text-xs">
+            </div>
+            <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 text-center">
+              <span class="text-[10px] text-slate-400 block">Độc hành</span>
+              <input id="b2b-vec-solitude" type="number" min="10" max="100" value="78" class="w-full bg-transparent text-center font-black text-indigo-300 text-xs">
+            </div>
+            <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 text-center">
+              <span class="text-[10px] text-slate-400 block">Nghỉ dưỡng</span>
+              <input id="b2b-vec-comfort" type="number" min="10" max="100" value="96" class="w-full bg-transparent text-center font-black text-amber-300 text-xs">
+            </div>
+            <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 text-center">
+              <span class="text-[10px] text-slate-400 block">Văn hóa</span>
+              <input id="b2b-vec-culture" type="number" min="10" max="100" value="72" class="w-full bg-transparent text-center font-black text-rose-300 text-xs">
+            </div>
+          </div>
+
+          <div class="md:col-span-3 flex items-end pt-1">
+            <button type="submit" class="w-full py-3 rounded-xl btn-glow-emerald text-white font-black text-xs shadow-lg transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>Đẩy Vào Quỹ Phòng AI Ngay</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Bảng Danh Sách Quỹ Phòng B2B Đang Kết Nối AI -->
+        <div class="overflow-x-auto rounded-2xl border border-slate-800">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-900/90 text-slate-400 text-[11px] uppercase tracking-wider border-b border-slate-800">
+                <th class="py-2.5 px-4">Thành Phố</th>
+                <th class="py-2.5 px-4">Khách Sạn / Resort &amp; Gói Combo</th>
+                <th class="py-2.5 px-4">Mã Phòng SLA</th>
+                <th class="py-2.5 px-4">Giá Lẻ OTA / Giá Net B2B</th>
+                <th class="py-2.5 px-4">Vector 5 Trục (H - N - S - Co - Cu)</th>
+              </tr>
+            </thead>
+            <tbody id="b2b-inventories-table-body" class="divide-y divide-slate-800/80">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <div class="glass-panel rounded-3xl p-6 lg:p-8 border border-slate-800 space-y-4">
         <div class="flex items-center justify-between">
           <h4 class="text-base font-bold text-white flex items-center gap-2" data-i18n="ledger_title">
-            <i class="fa-solid fa-book-journal-whills text-cyan-400"></i> Sổ Cái Dòng Tiền VietQR Công Ty (escrow_payment_ledgers)
+            <i class="fa-solid fa-book-journal-whills text-cyan-400"></i> Sổ Cái Dòng Tiền VietQR Công Ty &amp; Đối Soát B2B (70% Check-in / 30% Check-out / 25% Đền bù Hủy muộn)
           </h4>
-          <span class="text-xs font-mono text-slate-400">MBBank Corp: 990812348888</span>
+          <span class="text-xs font-mono text-slate-400">MBBank Corp: 0988888888</span>
         </div>
 
         <div class="overflow-x-auto rounded-2xl border border-slate-800">
@@ -1979,15 +2070,83 @@
         </div>
       </div>
 
+    </section>
+
+    <!-- ==========================================================================
+         TAB 3 (VIEW-ADMIN): QUẢN TRỊ VIÊN & KIỂM ĐỊNH AI (ADMIN & AI INSPECTOR)
+         ========================================================================== -->
+    <section id="view-admin" class="space-y-8 hidden animate-fadeIn">
+
+      <!-- BẢNG KIỂM ĐỊNH ĐỘ NHẠY AI TRỰC TIẾP & MA TRẬN CHẤM ĐIỂM 5 THÀNH PHỐ -->
+      <div class="glass-panel rounded-3xl p-6 lg:p-8 border border-emerald-500/40 space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1 rounded-full text-[11px] font-black bg-emerald-500 text-slate-950 uppercase tracking-wider shadow">
+                AI SENSITIVITY &amp; VECTOR INSPECTOR
+              </span>
+              <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-cyan-950 text-cyan-300 border border-cyan-700">
+                AI Engine: Gemini 2.5 Flash + Vector Cosine Active
+              </span>
+            </div>
+            <h3 class="text-xl lg:text-2xl font-extrabold text-white mt-2">
+              🔬 Trung Tâm Kiểm Định Độ Nhạy AI &amp; Bảng Chấm Điểm 5 Thành Phố
+            </h3>
+            <p class="text-xs text-slate-400 mt-1">
+              Công thức: <code>100 - trung bình độ lệch tuyệt đối (&Delta;)</code> kết hợp Khoảng cách Euclid có trọng số &amp; Cosine Similarity + Loại trừ tuyệt đối Blacklist (0đ) + Cộng <code>+15đ</code> từ Vòng lặp Học Phản hồi (Feedback Loop).
+            </p>
+          </div>
+          <button type="button" onclick="runAiSensitivity3ScenariosTest()" class="px-5 py-3 rounded-2xl btn-glow-emerald text-white font-black text-xs shadow-xl transition flex items-center gap-2 shrink-0">
+            <i class="fa-solid fa-vial-circle-check text-sm"></i>
+            <span>Chạy Test Độ Nhạy AI (3 Kịch Bản)</span>
+          </button>
+        </div>
+
+        <!-- KẾT QUẢ TEST 3 KỊCH BẢN ĐỘ NHẠY AI -->
+        <div id="ai-sensitivity-3scenarios-output" class="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs">
+          <!-- Rendered automatically by runAiSensitivity3ScenariosTest() -->
+        </div>
+
+        <!-- BẢNG MA TRẬN CHẤM ĐIỂM TRỰC TIẾP CỦA CÁC THÀNH PHỐ THEO THANH TRƯỢT HIỆN TẠI -->
+        <div class="space-y-3 pt-2">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h4 class="text-sm font-extrabold text-cyan-300 flex items-center gap-2">
+              <i class="fa-solid fa-ranking-star"></i> Bảng Chấm Điểm Trực Tiếp Của AI Theo Hồ Sơ Khách Hàng Hiện Tại:
+            </h4>
+            <span id="admin-current-vector-label" class="font-mono text-[11px] text-slate-300 bg-slate-900 px-3 py-1 rounded-lg border border-slate-800">
+              Vector hiện tại: H:98 • N:98 • S:95 • Co:65 • Cu:70
+            </span>
+          </div>
+          <div class="overflow-x-auto rounded-2xl border border-slate-800">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-900/90 text-slate-400 text-[11px] uppercase tracking-wider border-b border-slate-800">
+                  <th class="py-3 px-4">Hạng</th>
+                  <th class="py-3 px-4">Thành Phố &amp; Khách Sạn</th>
+                  <th class="py-3 px-4">Vector Đặc Trưng Điểm Đến</th>
+                  <th class="py-3 px-4">Điểm Khoảng Cách (100 - &Delta;)</th>
+                  <th class="py-3 px-4">Feedback Boost</th>
+                  <th class="py-3 px-4">Tổng Điểm AI Match</th>
+                  <th class="py-3 px-4">Kết Luận Của AI</th>
+                </tr>
+              </thead>
+              <tbody id="admin-5city-score-matrix-body" class="divide-y divide-slate-800/80">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- CLOUD WORKER LIVE ADMIN & B2B SUMMARY TABLE (/api/admin-summary) -->
       <div class="glass-panel rounded-3xl p-6 lg:p-8 border border-cyan-500/40 space-y-5">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h4 class="text-base font-black text-white flex items-center gap-2">
-              <i class="fa-solid fa-server text-cyan-400"></i> Bảng Quản Trị Đơn Đặt Mù AI & Đối Soát B2B (`/api/admin-summary`)
+              <i class="fa-solid fa-server text-cyan-400"></i> Bảng Quản Trị Đơn Đặt Mù AI, Biên Lợi Nhuận Arbitrage &amp; Duyệt Hoàn Tiền Bất Khả Kháng (`/api/admin-summary`)
             </h4>
             <p class="text-xs text-slate-400 mt-0.5">
-              Hiển thị trực tiếp các đơn `blind_bookings`, nhật ký suy luận AI (`ai_reasoning_log`), giá vốn `net_cost_vnd`, lợi nhuận `gross_margin_vnd` và đánh giá của khách hàng.
+              Hiển thị trực tiếp các đơn `blind_bookings`, nhật ký suy luận AI (`ai_reasoning_log`), biên lợi nhuận `gross_margin_vnd`, đánh giá khách hàng và nút Duyệt đơn hủy Bất khả kháng.
             </p>
           </div>
           <div class="flex items-center gap-2">
@@ -2045,11 +2204,11 @@
             <thead>
               <tr class="bg-slate-900/90 text-slate-400 text-[11px] uppercase tracking-wider border-b border-slate-800">
                 <th class="py-3 px-4">Mã Đơn</th>
-                <th class="py-3 px-4">Khách Hàng & STK (Masked)</th>
-                <th class="py-3 px-4">Điểm Đến & Mã SLA</th>
+                <th class="py-3 px-4">Khách Hàng &amp; STK (Masked)</th>
+                <th class="py-3 px-4">Điểm Đến &amp; Mã SLA</th>
                 <th class="py-3 px-4">Thu / Giá Net / Lãi Gộp</th>
-                <th class="py-3 px-4">Nhật Ký Suy Luận AI (Cosine & Gemini)</th>
-                <th class="py-3 px-4">Đánh Giá Sau Chuyến Đi</th>
+                <th class="py-3 px-4">Nhật Ký Suy Luận AI (Euclid &amp; Cosine)</th>
+                <th class="py-3 px-4">Đánh Giá &amp; Duyệt Bất Khả Kháng</th>
               </tr>
             </thead>
             <tbody id="cw-admin-table-body" class="divide-y divide-slate-800/80">
