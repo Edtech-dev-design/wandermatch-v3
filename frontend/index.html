@@ -194,6 +194,33 @@
   </header>
 
   <!-- ============================================================================
+       STICKY 4-STEP USER JOURNEY PROGRESS STEPPER (MOBILE & DESKTOP OPTIMIZED)
+       ============================================================================ -->
+  <div id="top-4step-stepper" class="sticky top-[68px] z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-2.5">
+    <div class="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-2 text-xs">
+      <button id="step-pill-1" onclick="goToWorkflowStep(1)" class="flex items-center gap-2.5 p-2 rounded-xl border border-cyan-500/50 bg-cyan-500/15 text-cyan-300 font-bold transition text-left">
+        <span class="w-6 h-6 rounded-full bg-cyan-500 text-slate-950 font-black flex items-center justify-center shrink-0 text-[11px]">1</span>
+        <span class="truncate">1. Tâm lý & Khóa chất lượng</span>
+      </button>
+      <button id="step-pill-2" onclick="goToWorkflowStep(2)" class="flex items-center gap-2.5 p-2 rounded-xl border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-white font-semibold transition text-left">
+        <span class="w-6 h-6 rounded-full bg-slate-800 text-slate-300 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
+        <span class="truncate">2. Định danh & VietQR</span>
+      </button>
+      <button id="step-pill-3" onclick="goToWorkflowStep(3)" class="flex items-center gap-2.5 p-2 rounded-xl border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-white font-semibold transition text-left">
+        <span class="w-6 h-6 rounded-full bg-slate-800 text-slate-300 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
+        <span class="truncate">3. Phòng chờ & Bảo hiểm hoàn tiền</span>
+      </button>
+      <button id="step-pill-4" onclick="goToWorkflowStep(4)" class="flex items-center gap-2.5 p-2 rounded-xl border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-white font-semibold transition text-left">
+        <span class="w-6 h-6 rounded-full bg-slate-800 text-slate-300 font-bold flex items-center justify-center shrink-0 text-[11px]">4</span>
+        <span class="truncate">4. Cào thẻ Giờ G</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Confetti Celebration Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- ============================================================================
        MAIN CONTENT CONTAINER
        ============================================================================ -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-10">
