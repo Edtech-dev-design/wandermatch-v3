@@ -1722,15 +1722,23 @@
 
         <!-- POST-TRIP FEEDBACK LOOP TO SUPABASE & GEMINI (/api/feedback) -->
         <div class="border-t border-slate-800 pt-6 space-y-4">
-          <div class="flex items-center justify-between">
+          <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h4 class="text-sm font-extrabold text-white flex items-center gap-2">
-                <i class="fa-solid fa-star text-amber-400"></i> Đánh Giá Sau Chuyến Đi & Nuôi Bộ Nhớ AI (`/api/feedback`)
+                <i class="fa-solid fa-star text-amber-400"></i> Đánh Giá Sau Chuyến Đi &amp; Vòng Lặp Học Từ Phản Hồi AI (`/api/feedback` +15 Điểm Ưu Tiên)
               </h4>
-              <p class="text-xs text-slate-400">Phản hồi của bạn được lưu vào cột `past_feedback_summary` trên Supabase để Gemini 2.5 Flash cá nhân hóa chuyến đi tiếp theo.</p>
+              <p class="text-xs text-slate-400">Khi bạn nhắc từ khóa <em>"biển/nắng ấm"</em>, <em>"di sản/văn hóa"</em> hoặc <em>"núi cao/rừng thông"</em>, AI tự động cộng <strong>+15 điểm ưu tiên</strong> cho nhóm địa điểm tương ứng ở lần đặt tiếp theo.</p>
             </div>
-            <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-cyan-950 text-cyan-300 border border-cyan-700">AI MEMORY LOOP</span>
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-cyan-950 text-cyan-300 border border-cyan-700">AI FEEDBACK LOOP (+15Đ)</span>
           </div>
+
+          <div class="flex flex-wrap items-center gap-2 text-[11px]">
+            <span class="text-slate-400 font-semibold">Thử nghiệm từ khóa kích hoạt +15đ:</span>
+            <button type="button" onclick="document.getElementById('cw-feedback-review').value='Chuyến đi tuyệt vời! Lần tới tôi rất thích đi biển nắng ấm và ăn hải sản làng chài.'" class="px-2.5 py-1 rounded-lg bg-blue-950/80 hover:bg-blue-900 text-blue-300 border border-blue-700 font-bold transition">🌊 "Thích biển &amp; nắng ấm" (+15đ Quy Nhơn/Phú Quốc)</button>
+            <button type="button" onclick="document.getElementById('cw-feedback-review').value='Rất hài lòng! Chuyến tiếp theo tôi muốn khám phá di sản văn hóa cố đô và lịch sử.'" class="px-2.5 py-1 rounded-lg bg-purple-950/80 hover:bg-purple-900 text-purple-300 border border-purple-700 font-bold transition">🏛️ "Mê di sản &amp; văn hóa" (+15đ Huế)</button>
+            <button type="button" onclick="document.getElementById('cw-feedback-review').value='Resort rất yên tĩnh! Lần sau tôi vẫn muốn đi núi cao rừng thông hoang sơ săn mây.'" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border border-emerald-700 font-bold transition">🏔️ "Thích núi cao &amp; rừng thông" (+15đ Măng Đen/Đà Lạt)</button>
+          </div>
+
           <form onsubmit="submitCloudTripFeedback(event)" class="grid grid-cols-1 md:grid-cols-12 gap-3 text-xs items-end bg-slate-900/70 p-4 rounded-2xl border border-slate-800">
             <div class="md:col-span-2">
               <label class="block text-slate-400 mb-1">Điểm (1-5 ★):</label>
@@ -1743,13 +1751,13 @@
               </select>
             </div>
             <div class="md:col-span-7">
-              <label class="block text-slate-400 mb-1">Nhận xét thực tế về khách sạn, thời tiết & ẩm thực:</label>
-              <input id="cw-feedback-review" type="text" required value="Resort rất yên tĩnh, thông xanh mát, đồ ăn bản địa chuẩn giá niêm yết!" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-white">
+              <label class="block text-slate-400 mb-1">Nhận xét thực tế &amp; mong muốn chuyến tiếp theo:</label>
+              <input id="cw-feedback-review" type="text" required value="Chuyến đi tuyệt vời! Lần tới tôi rất thích đi biển nắng ấm và ăn hải sản làng chài." class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-white">
             </div>
             <div class="md:col-span-3">
               <button type="submit" class="w-full py-2.5 rounded-xl btn-glow-emerald text-white font-black text-xs shadow transition flex items-center justify-center gap-1.5">
                 <i class="fa-solid fa-paper-plane"></i>
-                <span>Lưu Vào AI Memory</span>
+                <span>Lưu Vào AI Memory (+15đ)</span>
               </button>
             </div>
           </form>
