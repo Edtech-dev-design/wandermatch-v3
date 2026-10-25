@@ -3546,6 +3546,16 @@ function renderRefundCalculator(selectedTier = 'TIER_1') {
 
 function executeRefundSimulation(tier, amount) {
   showToast('info', `Đang kết nối Napas 247 để hoàn trả ${amount.toLocaleString('vi-VN')}đ...`);
+
+  // Ghi nhận và tính toán qua Reverse Proxy
+  callBackendApi('/cancellation/calculate', {
+    price: state.selectedBudget,
+    hoursBeforeDeparture: tier === 'TIER_1' ? 80 : 36,
+    isDestinationRevealed: tier === 'TIER_3'
+  }).then(res => {
+    if (res && res.success) console.log('💸 [ReverseProxy /api/cancellation/calculate] Verified:', res);
+  });
+
   setTimeout(() => {
     ESCROW_LEDGER.unshift({
       txId: `TX-REF-${Date.now().toString().slice(-5)}`,
