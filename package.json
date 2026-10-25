@@ -1,23 +1,15 @@
 {
-  "name": "wandermatch-v3",
+  "name": "wandermatch-fullstack",
   "version": "3.0.0",
-  "description": "WANDERMATCH (BẢN ĐỒ MÙ) — PHIÊN BẢN 3.0: Corporate VietQR, Conditional Refund, Hard-Commit SLA & AI Smart Arrival Concierge",
-  "main": "server.js",
+  "private": true,
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js",
-    "sync": "node auto-sync-github.js"
+    "sync": "node auto-sync-github.js",
+    "dev:worker": "wrangler dev worker.js --port 8787",
+    "deploy:worker": "wrangler deploy worker.js",
+    "deploy": "wrangler deploy worker.js"
   },
-  "keywords": [
-    "wandermatch",
-    "blind-trip",
-    "vietqr",
-    "napas247",
-    "ai-concierge",
-    "post-arrival",
-    "refund-engine",
-    "travel-startup"
-  ],
-  "author": "Principal Full-Stack Architect & Senior UI/UX Designer",
-  "license": "MIT"
+  "devDependencies": {
+    "wrangler": "^3.80.0"
+  }
 }

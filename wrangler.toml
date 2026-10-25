@@ -1,0 +1,14 @@
+name = "wandermatch-api"
+main = "worker.js"
+compatibility_date = "2026-04-01"
+workers_dev = true
+keep_vars = true
+
+[vars]
+COMPANY_BANK_ID = "MB"
+COMPANY_ACCOUNT_NO = "0988888888"
+COMPANY_ACCOUNT_NAME = "CONG TY TNHH WANDERMATCH VN"
+ALLOWED_ORIGIN = "*"
+
+[observability]
+enabled = true
