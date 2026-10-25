@@ -1476,15 +1476,60 @@
           </h4>
 
           <div class="flex flex-wrap gap-3">
-            <button onclick="simulateForceMajeure('LEVEL_A')" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-amber-500/50 text-amber-300 font-bold text-xs transition flex items-center gap-2">
+            <button onclick="simulateForceMajeure('LEVEL_A'); simulateCloudRefundScenario('FORCE_MAJEURE');" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-amber-500/50 text-amber-300 font-bold text-xs transition flex items-center gap-2">
               <i class="fa-solid fa-tornado"></i>
               <span data-i18n="force_a_btn">🚨 Giả Lập Cấp Độ A: Bão Lũ/Thiên Tai (Hoàn 100% + Voucher 300K)</span>
             </button>
-            <button onclick="simulateForceMajeure('LEVEL_B')" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-rose-500/50 text-rose-300 font-bold text-xs transition flex items-center gap-2">
+            <button onclick="simulateForceMajeure('LEVEL_B'); simulateCloudRefundScenario('FORCE_MAJEURE');" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-rose-500/50 text-rose-300 font-bold text-xs transition flex items-center gap-2">
               <i class="fa-solid fa-hospital"></i>
               <span data-i18n="force_b_btn">🏥 Giả Lập Cấp Độ B: Cấp Cứu Y Tế (Hoàn 85% hoặc 100% Ví)</span>
             </button>
+            <button onclick="simulateCloudRefundScenario('EARLY_72H')" class="px-4 py-2.5 rounded-xl bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 font-bold text-xs transition">
+              ⚡ Cloud API: EARLY_72H (Hoàn 90%)
+            </button>
+            <button onclick="simulateCloudRefundScenario('LATE_24_72H')" class="px-4 py-2.5 rounded-xl bg-amber-950/60 hover:bg-amber-900 border border-amber-500/40 text-amber-300 font-bold text-xs transition">
+              ⚡ Cloud API: LATE_24_72H (Hoàn 65%)
+            </button>
+            <button onclick="simulateCloudRefundScenario('UNDER_24H')" class="px-4 py-2.5 rounded-xl bg-rose-950/60 hover:bg-rose-900 border border-rose-500/40 text-rose-300 font-bold text-xs transition">
+              ⚡ Cloud API: UNDER_24H (Khóa 100%)
+            </button>
           </div>
+          <div id="cw-refund-api-output" class="hidden p-4 rounded-2xl bg-slate-950 border border-cyan-500/40 text-xs space-y-1.5 mt-3"></div>
+        </div>
+
+        <!-- POST-TRIP FEEDBACK LOOP TO SUPABASE & GEMINI (/api/feedback) -->
+        <div class="border-t border-slate-800 pt-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="text-sm font-extrabold text-white flex items-center gap-2">
+                <i class="fa-solid fa-star text-amber-400"></i> Đánh Giá Sau Chuyến Đi & Nuôi Bộ Nhớ AI (`/api/feedback`)
+              </h4>
+              <p class="text-xs text-slate-400">Phản hồi của bạn được lưu vào cột `past_feedback_summary` trên Supabase để Gemini 2.5 Flash cá nhân hóa chuyến đi tiếp theo.</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-cyan-950 text-cyan-300 border border-cyan-700">AI MEMORY LOOP</span>
+          </div>
+          <form onsubmit="submitCloudTripFeedback(event)" class="grid grid-cols-1 md:grid-cols-12 gap-3 text-xs items-end bg-slate-900/70 p-4 rounded-2xl border border-slate-800">
+            <div class="md:col-span-2">
+              <label class="block text-slate-400 mb-1">Điểm (1-5 ★):</label>
+              <select id="cw-feedback-rating" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs font-bold text-amber-400">
+                <option value="5">★★★★★ (5/5)</option>
+                <option value="4">★★★★☆ (4/5)</option>
+                <option value="3">★★★☆☆ (3/5)</option>
+                <option value="2">★★☆☆☆ (2/5)</option>
+                <option value="1">★☆☆☆☆ (1/5)</option>
+              </select>
+            </div>
+            <div class="md:col-span-7">
+              <label class="block text-slate-400 mb-1">Nhận xét thực tế về khách sạn, thời tiết & ẩm thực:</label>
+              <input id="cw-feedback-review" type="text" required value="Resort rất yên tĩnh, thông xanh mát, đồ ăn bản địa chuẩn giá niêm yết!" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-white">
+            </div>
+            <div class="md:col-span-3">
+              <button type="submit" class="w-full py-2.5 rounded-xl btn-glow-emerald text-white font-black text-xs shadow transition flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>Lưu Vào AI Memory</span>
+              </button>
+            </div>
+          </form>
         </div>
 
       </div>
