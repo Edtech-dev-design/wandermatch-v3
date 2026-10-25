@@ -4019,6 +4019,10 @@ function switchView(viewName) {
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
+  if (typeof window.update4StepProgressBar === 'function') {
+    window.update4StepProgressBar(viewName);
+  }
+
   if (viewName === 'scratch') {
     setTimeout(initScratchCard, 100);
   }
