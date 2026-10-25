@@ -1,0 +1,768 @@
+/* ============================================================================
+   WANDERMATCH 3.0 — LUXURY DARK GLASSMORPHISM DESIGN SYSTEM
+   Fonts: Outfit (Headings) & Inter (Body)
+   ============================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
+:root,
+[data-theme="cyan"] {
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  
+  --bg-dark-900: #090d16;
+  --bg-dark-800: #0f172a;
+  --bg-dark-700: #1e293b;
+  
+  --card-glass: rgba(17, 24, 39, 0.72);
+  --card-glass-hover: rgba(30, 41, 59, 0.85);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-glow: rgba(56, 189, 248, 0.35);
+  
+  --accent-cyan: #06b6d4;
+  --accent-secondary: #3b82f6;
+  --accent-rgb: 6, 182, 212;
+  --accent-light: #67e8f9;
+  --accent-bg-soft: rgba(6, 182, 212, 0.16);
+  --accent-violet: #8b5cf6;
+  --accent-amber: #f59e0b;
+  --accent-emerald: #10b981;
+  --accent-rose: #f43f5e;
+  --bg-radial-1: rgba(139, 92, 246, 0.16);
+  --bg-radial-2: rgba(6, 182, 212, 0.16);
+  --bg-radial-3: rgba(16, 185, 129, 0.12);
+}
+
+/* Theme 2: Emerald Forest (Xanh Rừng Thông Đà Lạt) */
+[data-theme="emerald"] {
+  --bg-dark-900: #04130f;
+  --bg-dark-800: #06241c;
+  --bg-dark-700: #0d3b2e;
+  --card-glass: rgba(6, 34, 27, 0.76);
+  --card-glass-hover: rgba(12, 52, 41, 0.88);
+  --border-glass: rgba(52, 211, 153, 0.16);
+  --border-glow: rgba(16, 185, 129, 0.45);
+  --accent-cyan: #10b981;
+  --accent-secondary: #059669;
+  --accent-rgb: 16, 185, 129;
+  --accent-light: #6ee7b7;
+  --accent-bg-soft: rgba(16, 185, 129, 0.18);
+  --bg-radial-1: rgba(16, 185, 129, 0.22);
+  --bg-radial-2: rgba(20, 184, 166, 0.18);
+  --bg-radial-3: rgba(5, 150, 105, 0.15);
+}
+
+/* Theme 3: Sunset Amber (Cam Hoàng Hôn Nhiệt Đới) */
+[data-theme="sunset"] {
+  --bg-dark-900: #160a06;
+  --bg-dark-800: #27120b;
+  --bg-dark-700: #3d1c11;
+  --card-glass: rgba(40, 18, 11, 0.76);
+  --card-glass-hover: rgba(60, 27, 17, 0.88);
+  --border-glass: rgba(251, 146, 60, 0.16);
+  --border-glow: rgba(249, 115, 22, 0.45);
+  --accent-cyan: #f97316;
+  --accent-secondary: #ea580c;
+  --accent-rgb: 249, 115, 22;
+  --accent-light: #fdba74;
+  --accent-bg-soft: rgba(249, 115, 22, 0.18);
+  --bg-radial-1: rgba(249, 115, 22, 0.22);
+  --bg-radial-2: rgba(234, 179, 8, 0.16);
+  --bg-radial-3: rgba(244, 63, 94, 0.15);
+}
+
+/* Theme 4: Sakura Rose (Hồng Anh Đào) */
+[data-theme="sakura"] {
+  --bg-dark-900: #150714;
+  --bg-dark-800: #280d26;
+  --bg-dark-700: #42153f;
+  --card-glass: rgba(42, 14, 41, 0.75);
+  --card-glass-hover: rgba(64, 21, 61, 0.88);
+  --border-glass: rgba(244, 114, 182, 0.18);
+  --border-glow: rgba(236, 72, 153, 0.45);
+  --accent-cyan: #ec4899;
+  --accent-secondary: #db2777;
+  --accent-rgb: 236, 72, 153;
+  --accent-light: #f9a8d4;
+  --accent-bg-soft: rgba(236, 72, 153, 0.18);
+  --bg-radial-1: rgba(236, 72, 153, 0.22);
+  --bg-radial-2: rgba(192, 132, 252, 0.18);
+  --bg-radial-3: rgba(244, 63, 94, 0.15);
+}
+
+/* Theme 5: Royal Amethyst (Tím Hoàng Gia) */
+[data-theme="royal"] {
+  --bg-dark-900: #0d071b;
+  --bg-dark-800: #1a0f33;
+  --bg-dark-700: #2c1a54;
+  --card-glass: rgba(26, 15, 52, 0.76);
+  --card-glass-hover: rgba(42, 24, 82, 0.88);
+  --border-glass: rgba(167, 139, 250, 0.18);
+  --border-glow: rgba(139, 92, 246, 0.45);
+  --accent-cyan: #8b5cf6;
+  --accent-secondary: #6366f1;
+  --accent-rgb: 139, 92, 246;
+  --accent-light: #c4b5fd;
+  --accent-bg-soft: rgba(139, 92, 246, 0.2);
+  --bg-radial-1: rgba(139, 92, 246, 0.24);
+  --bg-radial-2: rgba(99, 102, 241, 0.18);
+  --bg-radial-3: rgba(217, 70, 239, 0.14);
+}
+
+/* Theme 6: Daylight Pearl (Giao Diện Sáng Tinh Khôi) */
+[data-theme="light"] {
+  --bg-dark-900: #f0f7ff;
+  --bg-dark-800: #ffffff;
+  --bg-dark-700: #e2e8f0;
+  --card-glass: rgba(255, 255, 255, 0.88);
+  --card-glass-hover: rgba(255, 255, 255, 0.98);
+  --border-glass: rgba(15, 23, 42, 0.12);
+  --border-glow: rgba(2, 132, 199, 0.35);
+  --accent-cyan: #0284c7;
+  --accent-secondary: #2563eb;
+  --accent-rgb: 2, 132, 199;
+  --accent-light: #0369a1;
+  --accent-bg-soft: rgba(2, 132, 199, 0.12);
+  --bg-radial-1: rgba(56, 189, 248, 0.18);
+  --bg-radial-2: rgba(139, 92, 246, 0.12);
+  --bg-radial-3: rgba(16, 185, 129, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-dark-900) !important;
+  color: #f1f5f9;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  background-image: 
+    radial-gradient(circle at 15% 15%, var(--bg-radial-1) 0%, transparent 40%),
+    radial-gradient(circle at 85% 25%, var(--bg-radial-2) 0%, transparent 45%),
+    radial-gradient(circle at 50% 85%, var(--bg-radial-3) 0%, transparent 50%);
+  background-attachment: fixed;
+  transition: background-color 0.35s ease, color 0.25s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+  background: var(--card-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.glass-card {
+  background: var(--card-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-glass);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  background: var(--card-glass-hover);
+  border-color: var(--border-glow);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35), 0 0 20px rgba(var(--accent-rgb), 0.18);
+}
+
+.glass-input {
+  background: var(--bg-dark-800);
+  border: 1px solid var(--border-glass);
+  color: inherit;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.glass-input:focus {
+  outline: none;
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.25);
+  background: var(--bg-dark-800);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-dark-900);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent-cyan);
+  border-radius: 4px;
+}
+
+/* Glowing text and buttons */
+.glow-cyan {
+  text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.6);
+}
+
+.glow-violet {
+  text-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+}
+
+.btn-glow-cyan {
+  background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-secondary) 100%);
+  box-shadow: 0 4px 20px rgba(var(--accent-rgb), 0.35);
+  color: #ffffff !important;
+  transition: all 0.25s ease;
+}
+.btn-glow-cyan:hover {
+  box-shadow: 0 6px 28px rgba(var(--accent-rgb), 0.55);
+  transform: translateY(-2px);
+}
+
+.btn-glow-emerald {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35);
+  transition: all 0.25s ease;
+}
+.btn-glow-emerald:hover {
+  box-shadow: 0 6px 28px rgba(16, 185, 129, 0.55);
+  transform: translateY(-2px);
+}
+
+.btn-glow-amber {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.35);
+  transition: all 0.25s ease;
+}
+.btn-glow-amber:hover {
+  box-shadow: 0 6px 28px rgba(245, 158, 11, 0.55);
+  transform: translateY(-2px);
+}
+
+/* Scratch Card Canvas Styles */
+.scratch-container {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  height: 320px;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.scratch-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.scratch-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  cursor: grab;
+  touch-action: none;
+}
+.scratch-canvas:active {
+  cursor: grabbing;
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.animate-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.08) 20%,
+    rgba(255, 255, 255, 0.2) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 2.5s infinite;
+}
+
+/* Pulse badge */
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 0.4; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.pulse-ring {
+  animation: pulse-ring 2s infinite ease-in-out;
+}
+
+/* Timeline dot connecting line */
+.timeline-stem {
+  position: relative;
+}
+.timeline-stem::before {
+  content: '';
+  position: absolute;
+  top: 28px;
+  bottom: -20px;
+  left: 17px;
+  width: 2px;
+  background: linear-gradient(to bottom, #06b6d4, rgba(6, 182, 212, 0.1));
+}
+.timeline-stem:last-child::before {
+  display: none;
+}
+
+/* Toast Notifications */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  min-width: 320px;
+  max-width: 440px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: toast-in 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s ease;
+}
+
+@keyframes toast-in {
+  from {
+    transform: translateY(20px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Rating Stars */
+.star-btn {
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+.star-btn:hover {
+  transform: scale(1.2);
+}
+
+/* Range slider custom styling */
+input[type=range] {
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  height: 6px;
+  outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.8);
+  transition: transform 0.15s ease;
+}
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+}
+
+/* Dynamic Theme Overrides for Accent Classes */
+.bg-cyan-500 {
+  background-color: var(--accent-cyan) !important;
+  color: #ffffff !important;
+}
+.text-cyan-300,
+.text-cyan-400 {
+  color: var(--accent-light) !important;
+}
+.bg-cyan-500\/20,
+.bg-cyan-950,
+.bg-cyan-950\/80,
+.bg-cyan-950\/40,
+.bg-cyan-950\/30 {
+  background-color: var(--accent-bg-soft) !important;
+}
+.border-cyan-400,
+.border-cyan-500\/40,
+.border-cyan-500\/30,
+.border-cyan-700,
+.border-cyan-800 {
+  border-color: var(--border-glow) !important;
+}
+.timeline-stem::before {
+  background: linear-gradient(to bottom, var(--accent-cyan), rgba(var(--accent-rgb), 0.1)) !important;
+}
+
+/* Light Mode Contrast Overrides */
+[data-theme="light"] body {
+  color: #0f172a !important;
+}
+[data-theme="light"] .text-white,
+[data-theme="light"] .text-slate-100,
+[data-theme="light"] .text-slate-200 {
+  color: #0f172a !important;
+}
+[data-theme="light"] .text-slate-300,
+[data-theme="light"] .text-slate-400 {
+  color: #334155 !important;
+}
+[data-theme="light"] .bg-slate-950,
+[data-theme="light"] .bg-slate-950\/80,
+[data-theme="light"] .bg-slate-950\/70,
+[data-theme="light"] .bg-slate-900,
+[data-theme="light"] .bg-slate-900\/90,
+[data-theme="light"] .bg-slate-900\/80,
+[data-theme="light"] .bg-slate-900\/60 {
+  background-color: rgba(241, 245, 249, 0.92) !important;
+}
+[data-theme="light"] .bg-slate-800,
+[data-theme="light"] .bg-slate-800\/80 {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+[data-theme="light"] .border-slate-800,
+[data-theme="light"] .border-slate-700 {
+  border-color: #cbd5e1 !important;
+}
+[data-theme="light"] .text-emerald-300,
+[data-theme="light"] .text-emerald-400 {
+  color: #047857 !important;
+}
+[data-theme="light"] .text-amber-300,
+[data-theme="light"] .text-amber-400 {
+  color: #b45309 !important;
+}
+[data-theme="light"] .bg-emerald-950,
+[data-theme="light"] .bg-emerald-950\/90,
+[data-theme="light"] .bg-emerald-950\/70 {
+  background-color: rgba(16, 185, 129, 0.14) !important;
+}
+[data-theme="light"] .bg-amber-950,
+[data-theme="light"] .bg-amber-950\/80,
+[data-theme="light"] .bg-amber-950\/40,
+[data-theme="light"] .bg-amber-950\/30 {
+  background-color: rgba(245, 158, 11, 0.14) !important;
+}
+[data-theme="light"] #dest-hero-img ~ div .text-white,
+[data-theme="light"] .btn-glow-cyan,
+[data-theme="light"] .btn-glow-emerald {
+  color: #ffffff !important;
+}
+
+.theme-swatch-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+.theme-swatch-btn:hover {
+  transform: scale(1.2);
+}
+.theme-swatch-btn.active-theme {
+  transform: scale(1.2);
+  border-color: #ffffff;
+  box-shadow: 0 0 0 2px var(--accent-cyan);
+}
+
+/* ============================================================================
+   PRAGMATIC CONSUMER UTILITIES & 5-PILLAR EXTENSIONS (V3.1)
+   ============================================================================ */
+
+.text-aurora-teal {
+  color: #00f2fe !important;
+}
+
+.bg-aurora-teal {
+  background-color: #00f2fe !important;
+}
+
+.border-aurora-teal {
+  border-color: rgba(0, 242, 254, 0.6) !important;
+}
+
+.glow-aurora {
+  text-shadow: 0 0 14px rgba(0, 242, 254, 0.75);
+}
+
+.box-glow-aurora {
+  box-shadow: 0 0 30px rgba(0, 242, 254, 0.22);
+}
+
+/* Custom Toggle Switch */
+.toggle-switch-checkbox {
+  appearance: none;
+  width: 44px;
+  height: 24px;
+  background: #1e293b;
+  border-radius: 9999px;
+  position: relative;
+  outline: none;
+  cursor: pointer;
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.toggle-switch-checkbox::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  background: #94a3b8;
+  border-radius: 50%;
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.toggle-switch-checkbox:checked {
+  background: linear-gradient(135deg, #06b6d4, #059669);
+  border-color: #06b6d4;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+}
+
+.toggle-switch-checkbox:checked::before {
+  transform: translateX(20px);
+  background: #ffffff;
+}
+
+/* Packing Checklist Items */
+.checklist-item {
+  transition: all 0.2s ease;
+}
+.checklist-item.checked {
+  opacity: 0.6;
+  text-decoration: line-through;
+  background: rgba(16, 185, 129, 0.08) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+/* Print Styles for Exporting Itinerary */
+@media print {
+  header, nav, #budget-breakdown-container, #dest-hero-img, #view-quiz, #view-vietqr, #view-scratch, #view-b2b, #toast-container, button {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+  .glass-panel, .glass-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+  }
+  #detailed-day-itinerary-container {
+    display: block !important;
+  }
+}
+
+/* ============================================================================
+   ULTRA-LUXURY GRAPHIC & VISUAL SYSTEM (V3.2 GRAPHIC ENHANCEMENT)
+   Boarding Pass Perforations, EMV Smart Chip, Holographic Sheens & Specular Highlights
+   ============================================================================ */
+
+/* 1. Specular Border Highlights (Apple VisionOS / macOS Sequoia style) */
+.specular-card {
+  position: relative;
+  overflow: hidden;
+}
+.specular-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* 2. Boarding Pass Card with Perforated Ticket Notches */
+.boarding-pass-card {
+  position: relative;
+  background: radial-gradient(circle at top left, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
+  border: 1px solid rgba(var(--accent-rgb), 0.35);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(var(--accent-rgb), 0.15);
+}
+
+.ticket-notch-left,
+.ticket-notch-right {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  background-color: var(--bg-dark-900);
+  border-radius: 9999px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+}
+.ticket-notch-left {
+  left: -14px;
+  border-right: 1px solid rgba(var(--accent-rgb), 0.35);
+}
+.ticket-notch-right {
+  right: -14px;
+  border-left: 1px solid rgba(var(--accent-rgb), 0.35);
+}
+
+.ticket-perforation {
+  position: relative;
+  border-top: 2px dashed rgba(255, 255, 255, 0.18);
+  margin: 1.5rem 0;
+}
+
+/* 3. Barcode Graphic Styling */
+.barcode-visual {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 38px;
+  opacity: 0.85;
+}
+.barcode-bar {
+  background-color: #cbd5e1;
+  height: 100%;
+}
+
+/* 4. EMV Gold Smart Chip (for Corporate VietQR & Payout Cards) */
+.emv-chip {
+  width: 44px;
+  height: 34px;
+  background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #b45309 100%);
+  border-radius: 6px;
+  border: 1px solid #78350f;
+  position: relative;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6), 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+.emv-chip::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(120, 53, 15, 0.6);
+  border-radius: 3px;
+  background: radial-gradient(circle, transparent 40%, rgba(120, 53, 15, 0.3) 100%);
+}
+
+/* 5. Contactless NFC Waves Graphic */
+.nfc-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 6. Holographic & Metallic Foil Sheen */
+.holographic-sheen {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(6, 182, 212, 0.15) 25%, rgba(139, 92, 246, 0.15) 50%, rgba(245, 158, 11, 0.15) 75%, rgba(255, 255, 255, 0.05) 100%);
+  background-size: 200% 200%;
+  animation: holo-shift 6s ease infinite;
+}
+
+@keyframes holo-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 7. Live Pulse Radar Beacon */
+.radar-beacon {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  background-color: #10b981;
+  border-radius: 9999px;
+  box-shadow: 0 0 10px #10b981;
+}
+.radar-beacon::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border: 2px solid #10b981;
+  border-radius: 9999px;
+  animation: radar-wave 1.8s infinite ease-out;
+}
+
+@keyframes radar-wave {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* 8. Luxury Floating Badges */
+.luxury-badge-gold {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.4) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.6);
+  color: #fef3c7;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25);
+}
+
+.luxury-badge-cyan {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.25) 0%, rgba(14, 116, 144, 0.4) 100%);
+  border: 1px solid rgba(103, 232, 249, 0.6);
+  color: #ecfeff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.25);
+}
+
+/* 9. Image Glass Overlays on Hover */
+.poi-card-image-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+}
+.poi-card-image-wrap img {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.poi-card-image-wrap:hover img {
+  transform: scale(1.08);
+}
+.poi-card-image-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(15, 23, 42, 0.85) 100%);
+  pointer-events: none;
+}

@@ -1,9 +1,35 @@
+# Dependencies
 node_modules/
-.DS_Store
-Thumbs.db
-*.log
+.pnp
+.pnp.js
+
+# Environment & Cloudflare Worker secrets
+.dev.vars
+.dev.vars.*
 .env
+.env.*
+.env.local
+.env.production
+
+# Netlify & Cloudflare Wrangler CLI artifacts
+.netlify/
+.wrangler/
+
+# Build outputs & caches
+dist/
+build/
 bin/
 obj/
 __pycache__/
 *.pyc
+
+# Logs & Temporary files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS specific files
+.DS_Store
+Thumbs.db
+Desktop.ini

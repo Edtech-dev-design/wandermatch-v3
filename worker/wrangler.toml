@@ -1,0 +1,15 @@
+name = "wandermatch-worker"
+main = "src/index.js"
+compatibility_date = "2024-04-01"
+
+[vars]
+ENVIRONMENT = "production"
+APP_NAME = "WanderMatch v3.0 API Engine"
+CORS_ALLOW_ORIGIN = "*"
+
+[observability]
+enabled = true
+
+# Cloudflare Workers configuration for WanderMatch 3.0
+# Handles AI Concierge, Napas 247 eKYC, Corporate VietQR,
+# Time-Tiered Conditional Refund, B2B SLA Hard-Commit & Group Split-Bill.
