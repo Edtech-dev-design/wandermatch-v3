@@ -4216,6 +4216,7 @@
 
     window.selectAiSuggestedDestination = function(destKey, cityName) {
       window.cwState.aiSuggestedDestKey = destKey;
+      window.cwState.aiMatchedDestKey = destKey;
       const sel = document.getElementById('planner-dest-select');
       if (sel) sel.value = 'blind';
       if (window.state) {
@@ -4238,11 +4239,11 @@
 
     window.applyPersonaPreset = function(presetKey) {
       const presets = {
-        MANG_DEN: { healing: 98, nature: 98, solitude: 95, comfort: 65, culture: 70, label: "Độc hành Núi rừng -> Măng Đen" },
-        DA_LAT: { healing: 90, nature: 85, solitude: 75, comfort: 88, culture: 75, label: "Chữa lành & Sương mù -> Đà Lạt" },
-        HUE: { healing: 85, nature: 70, solitude: 85, comfort: 85, culture: 99, label: "Di sản Cố đô & Văn hóa -> Huế" },
-        QUY_NHON: { healing: 80, nature: 92, solitude: 70, comfort: 85, culture: 60, label: "Biển tự nhiên yên bình -> Quy Nhơn" },
-        PHU_QUOC: { healing: 65, nature: 80, solitude: 40, comfort: 99, culture: 50, label: "Resort 5 sao sôi động -> Phú Quốc" }
+        MANG_DEN: { healing: 98, nature: 98, solitude: 95, comfort: 65, culture: 70, label: "Độc hành Núi rừng -> Măng Đen", destKey: "mangden" },
+        DA_LAT: { healing: 90, nature: 85, solitude: 75, comfort: 88, culture: 75, label: "Chữa lành & Sương mù -> Đà Lạt", destKey: "dalat" },
+        HUE: { healing: 85, nature: 70, solitude: 85, comfort: 85, culture: 99, label: "Di sản Cố đô & Văn hóa -> Huế", destKey: "hue" },
+        QUY_NHON: { healing: 80, nature: 92, solitude: 70, comfort: 85, culture: 60, label: "Biển tự nhiên yên bình -> Quy Nhơn", destKey: "quynhon" },
+        PHU_QUOC: { healing: 65, nature: 80, solitude: 40, comfort: 99, culture: 50, label: "Resort 5 sao sôi động -> Phú Quốc", destKey: "phuquoc" }
       };
       const vec = presets[presetKey] || presets.MANG_DEN;
       ['healing', 'nature', 'solitude', 'comfort', 'culture'].forEach(k => {
@@ -4256,6 +4257,10 @@
       const sel = document.getElementById('planner-dest-select');
       if (sel) sel.value = 'blind';
       if (window.state) window.state.selectedDestination = 'blind';
+      if (window.cwState && vec.destKey) {
+        window.cwState.aiSuggestedDestKey = vec.destKey;
+        window.cwState.aiMatchedDestKey = vec.destKey;
+      }
 
       window.handleLivePersonaChange(true);
       if (typeof showToast === 'function') {
