@@ -2277,11 +2277,11 @@ function renderTripSummaryCard() {
         </div>
       </div>
 
-      <!-- Nút Chốt Chuyến Đi & Thanh Toán VietQR Ngay -->
+      <!-- Nút Chốt Chuyến Đi -> Sang Bước 2: Xác Nhận Tài Khoản & Thanh Toán VietQR -->
       <div class="pt-2">
         <button onclick="goToPaymentWithBudget()" class="w-full py-4 rounded-2xl btn-glow-emerald text-white font-black text-sm lg:text-base shadow-2xl flex items-center justify-center gap-2 transition hover:scale-[1.01]">
-          <i class="fa-solid fa-credit-card"></i>
-          <span>💳 CHỐT KẾ HOẠCH & TIẾN HÀNH THANH TOÁN VIETQR (${budget.toLocaleString('vi-VN')} VNĐ) NGAY</span>
+          <i class="fa-solid fa-building-columns"></i>
+          <span>🏦 SANG BƯỚC 2: XÁC NHẬN TÀI KHOẢN (NAPAS 247) &amp; THANH TOÁN VIETQR (${budget.toLocaleString('vi-VN')} VNĐ)</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
       </div>
