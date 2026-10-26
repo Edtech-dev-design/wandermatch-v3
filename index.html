@@ -2683,10 +2683,21 @@
         <!-- URL Input & Copy/Share Actions -->
         <div class="md:col-span-7 space-y-3 text-xs">
           <div>
-            <label class="block text-slate-300 font-bold mb-1">Đường link chia sẻ cho thiết bị khác (Vercel / Public URL):</label>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-slate-300 font-bold">Đường link chia sẻ cho thiết bị khác (Vercel / Public URL):</label>
+              <span class="text-[10px] text-cyan-400 font-mono">Real-time QR</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-1.5 mb-2">
+              <button type="button" onclick="setShareUrlPreset('https://wandermatch-v3.vercel.app')" class="px-2.5 py-1 rounded-lg bg-indigo-950 hover:bg-indigo-900 border border-indigo-500/50 text-indigo-200 font-bold text-[10px] transition flex items-center gap-1">
+                <i class="fa-solid fa-cloud"></i> <span>⚡ Vercel Cloud Toàn Cầu</span>
+              </button>
+              <button type="button" onclick="setShareUrlPreset('http://172.166.0.187:3000')" class="px-2.5 py-1 rounded-lg bg-emerald-950 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-200 font-bold text-[10px] transition flex items-center gap-1">
+                <i class="fa-solid fa-wifi"></i> <span>📶 Wi-Fi Nội Bộ (172.166.0.187:3000)</span>
+              </button>
+            </div>
             <input id="share-device-url-input" type="url" value="https://wandermatch-v3.vercel.app" oninput="updateShareQrPreview(this.value)" class="w-full glass-input rounded-xl px-3 py-2.5 font-mono text-xs text-emerald-300 font-bold">
             <p class="text-[11px] text-slate-400 mt-1">
-              Bạn có thể dán link Vercel của bạn vào ô trên — mã QR bên trái sẽ tự động cập nhật theo thời gian thực!
+              Bạn có thể dán link Vercel của bạn vào ô trên hoặc bấm nút chọn nhanh — mã QR bên trái sẽ tự động cập nhật ngay lập tức!
             </p>
           </div>
 
