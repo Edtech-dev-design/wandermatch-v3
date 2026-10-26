@@ -4442,6 +4442,17 @@
       document.getElementById('share-device-modal')?.classList.add('hidden');
     };
 
+    window.setShareUrlPreset = function(presetUrl) {
+      const input = document.getElementById('share-device-url-input');
+      if (input) {
+        input.value = presetUrl;
+        window.updateShareQrPreview(presetUrl);
+        if (typeof showToast === 'function') {
+          showToast('success', `📱 Đã chuyển mã QR sang: ${presetUrl}`);
+        }
+      }
+    };
+
     window.updateShareQrPreview = function(urlVal) {
       const cleanUrl = (urlVal || 'https://wandermatch-v3.vercel.app').trim();
       try {
