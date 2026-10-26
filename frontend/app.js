@@ -3963,17 +3963,7 @@ function handleLiveBudgetInput(val) {
   state.selectedBudget = num;
 
   updateQuickBudgetButtons(num);
-  renderTripSummaryCard();
-  renderDetailedDayItinerary();
-  renderBudgetAllocation();
-  renderValueGuaranteeCalculator();
-  renderTransparentValueReceipt();
-  renderPackingChecklist();
-  if (state.paymentMode === 'GROUP') {
-    initGroupBooking();
-  }
   updateVietQrDisplay();
-  renderRefundCalculator();
 }
 
 function updateVietQrDisplay() {
@@ -4042,9 +4032,72 @@ function goToPaymentWithBudget() {
   showToast('info', `🏦 Đã sang Bước 2: Xác nhận Tài khoản Ngân hàng (Napas 247) & Thanh toán VietQR (${state.selectedBudget.toLocaleString('vi-VN')}đ).`);
 }
 
-function handleGeneratePlan() {
+// Cập nhật giá trị hiển thị khi thay đổi dropdown mà KHÔNG tự ý cuộn màn hình
+function updateTripPlannerPreview() {
   const destSelect = document.getElementById('planner-dest-select')?.value || 'blind';
-  const budgetRaw = document.getElementById('planner-budget-input')?.value || '5000000';
+  const budgetRaw = document.getElementById('planner-budget-input')?.value || '3200000';
+  const pax = Number(document.getElementById('planner-pax-select')?.value || '2');
+  const dur = document.getElementById('planner-dur-select')?.value || '3d2n';
+
+  state.selectedDestination = destSelect;
+  state.selectedBudget = Math.max(1000000, Number(budgetRaw));
+  state.selectedPax = pax;
+  state.selectedDuration = dur;
+
+  updateQuickBudgetButtons(state.selectedBudget);
+}
+
+// Khi khách bấm chọn chip ngân sách nhanh: CHỈ cập nhật số tiền, KHÔNG tự ý cuộn màn hình
+function setQuickBudget(amount) {
+  const input = document.getElementById('planner-budget-input');
+  if (input) input.value = amount;
+  state.selectedBudget = amount;
+  updateQuickBudgetButtons(amount);
+}
+
+// CHUẨN HÓA QUY TRÌNH: BỘ ĐIỀU HƯỚNG 4 TAB GỢI Ý DU LỊCH
+function switchPlannerSection(sectionKey) {
+  const secMap = {
+    itins: document.getElementById('planner-sec-itins'),
+    deals: document.getElementById('planner-sec-deals'),
+    pois: document.getElementById('planner-sec-pois'),
+    guarantees: document.getElementById('planner-sec-guarantees')
+  };
+  const btnMap = {
+    itins: document.getElementById('planner-tab-btn-itins'),
+    deals: document.getElementById('planner-tab-btn-deals'),
+    pois: document.getElementById('planner-tab-btn-pois'),
+    guarantees: document.getElementById('planner-tab-btn-guarantees')
+  };
+
+  Object.keys(secMap).forEach(key => {
+    if (secMap[key]) {
+      if (key === sectionKey) {
+        secMap[key].classList.remove('hidden');
+      } else {
+        secMap[key].classList.add('hidden');
+      }
+    }
+    if (btnMap[key]) {
+      if (key === sectionKey) {
+        btnMap[key].className = 'planner-tab-btn active px-4 py-2.5 rounded-xl text-xs font-black transition flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 shadow-md';
+      } else {
+        btnMap[key].className = 'planner-tab-btn px-4 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center gap-2';
+      }
+    }
+  });
+}
+window.switchPlannerSection = switchPlannerSection;
+
+// CHỈ KHI NÀO KHÁCH BẤM NÚT "🚀 AI BẮT ĐẦU TẠO LỊCH TRÌNH ĐỘC BẢN" THÌ MỚI DI CHUYỂN & HIỆN KẾT QUẢ
+function triggerAiTripPlanner() {
+  switchPlannerSection('itins');
+  handleGeneratePlan(true);
+}
+
+function handleGeneratePlan(shouldScroll = false) {
+  const destSelect = document.getElementById('planner-dest-select')?.value || 'blind';
+  const budgetRaw = document.getElementById('planner-budget-input')?.value || '3200000';
   const pax = Number(document.getElementById('planner-pax-select')?.value || '2');
   const dur = document.getElementById('planner-dur-select')?.value || '3d2n';
 
@@ -4079,7 +4132,7 @@ function handleGeneratePlan() {
   if (typeof initGroupBooking === 'function') initGroupBooking();
 
   const resolvedData = getCurrentDestData();
-  const modeLabel = destSelect === 'blind' ? `Blind AI Match → ${resolvedData.name.vi}` : resolvedData.name.vi;
+  const modeLabel = destSelect === 'blind' ? `🎲 Du Lịch Mù AI (Khám Phá ${resolvedData.name.vi})` : resolvedData.name.vi;
 
   // Lưu lịch sử kế hoạch AI vào LocalStorage
   try {
@@ -4096,31 +4149,162 @@ function handleGeneratePlan() {
     localStorage.setItem('wm_saved_itineraries', JSON.stringify(savedPlans));
   } catch (e) {}
 
-  showToast('success', `🎉 AI đã phân tích & lập lộ trình chi tiết: ${modeLabel} (${state.selectedBudget.toLocaleString('vi-VN')}đ)!`);
-
-  const itinContainer = document.getElementById('itineraries-container');
-  if (itinContainer) {
-    itinContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  // CHỈ CUỘN MÀN HÌNH VÀ BÁO TOAST KHI KHÁCH CHỦ ĐỘNG ẤN NÚT
+  if (shouldScroll) {
+    showToast('success', `🎉 AI đã xuất xong 3 phương án độc bản cho ${modeLabel} (${state.selectedBudget.toLocaleString('vi-VN')}đ)!`);
+    const itinContainer = document.getElementById('itineraries-container') || document.getElementById('planner-sec-itins');
+    if (itinContainer) {
+      itinContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
-}
-
-function setQuickBudget(amount) {
-  const input = document.getElementById('planner-budget-input');
-  if (input) input.value = amount;
-  state.selectedBudget = amount;
-  handleGeneratePlan();
 }
 
 // ============================================================================
 // 5. RENDER 3 ITINERARIES
 // ============================================================================
 
+
+// ============================================================================
+// PROCEDURAL UNIQUE BLIND ITINERARY ENGINE (MỖI LẦN SINH LÀ 1 LỘ TRÌNH ĐỘC BẢN)
+// Đảm bảo không một lịch trình du lịch mù nào bị trùng lặp!
+// ============================================================================
+const BLIND_POIS_POOL = {
+  morning: [
+    { name: "Cano Cao Tốc Ra Đảo Hoang Sơ & Lặn San Hô Tự Nhiên", act: "Lướt sóng cano 15 phút đến vùng vịnh nước trong vắt 2 màu ngắm rạn san hô tự nhiên", cost: 350000, tip: "Nước biển buổi sáng trong vắt nhìn thấu đáy cát trắng", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
+    { name: "Săn Mây Đỉnh Đồi & Thưởng Thức Trà Thảo Mộc Rừng", act: "Đón bình minh rực rỡ trên biển mây bồng bềnh và nhâm nhi cà phê nguyên chất", cost: 95000, tip: "Nên có mặt lúc 05:30 sáng để bắt trọn khoảnh khắc mặt trời ló dạng", img: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80" },
+    { name: "Chinh Phục Con Đường Đá Ven Biển & Cổng Trời Thiên Nhiên", act: "Tản bộ ngắm các ghềnh đá kỳ vĩ hàng triệu năm tuổi và hít hà hương gió biển", cost: 45000, tip: "Đi giày thể thao đế bám tốt để di chuyển an toàn trên đá ven biển", img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80" },
+    { name: "Khám Phá Bản Làng Dệt Thổ Cẩm & Uống Nước Suối Khoáng", act: "Trải nghiệm đời sống mộc mạc và tìm hiểu văn hóa dân tộc bản địa độc đáo", cost: 60000, tip: "Có thể mua đồ thủ công tinh xảo làm quà ủng hộ bà con địa phương", img: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80" }
+  ],
+  afternoon: [
+    { name: "Chèo Thuyền SUP Khám Phá Hẻm Vực & Rừng Cổ Thụ", act: "Thả trôi theo dòng suối ngọc bích phẳng lặng lọt thỏm giữa hai vách đá cao vút", cost: 200000, tip: "Trang bị túi chống nước cho điện thoại để ghi lại những góc ảnh ngoạn mục", img: "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=600&q=80" },
+    { name: "Tắm Khoáng Nóng Thảo Dược & Xông Hơi Phục Hồi Thân Tâm", act: "Ngâm mình trong nguồn khoáng tự nhiên giúp thư giãn cơ thể và hồi phục năng lượng", cost: 250000, tip: "Uống nhiều nước ấm trước và sau khi tắm khoáng để thải độc tốt nhất", img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80" },
+    { name: "Khu Vườn Nông Trại Hữu Cơ & Thưởng Thức Bánh Trái Tươi", act: "Tự tay thu hoạch dâu tây, cà chua bi và thưởng thức sinh tố trái cây chín mọng", cost: 120000, tip: "Trái cây ngọt lịm không dùng thuốc trừ sâu, trẻ em và gia đình rất thích", img: "https://images.unsplash.com/photo-1511497584788-87676104235f?auto=format&fit=crop&w=600&q=80" },
+    { name: "Thám Hiểm Hang Động Thạch Nhũ & Rừng Trúc Bình Yên", act: "Chiêm ngưỡng kiến tạo thiên nhiên kỳ ảo và lắng nghe tiếng chim rừng ríu rít", cost: 80000, tip: "Nhiệt độ trong hang luôn mát mẻ khoảng 22°C bất kể ngoài trời nắng nóng", img: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80" }
+  ],
+  evening: [
+    { name: "Bữa Tối Nướng BBQ Hải Sản / Thịt Rừng Bên Ánh Lửa Trại", act: "Thưởng thức hải sản tươi rói nướng mọi kèm sốt ớt xanh bản địa cay nồng ấm cúng", cost: 350000, tip: "Bàn đặt riêng bên bờ biển hoặc bìa rừng thông cực kỳ lãng mạn", img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80" },
+    { name: "Cafe Acoustic Mộc Mạc & Ngắm Toàn Cảnh Phố Đêm Lung Linh", act: "Lắng nghe những giai điệu guitar mộc êm dịu và ngắm nhìn thung lũng ánh sáng", cost: 75000, tip: "Nên gọi cocktail nhẹ hoặc trà hoa cúc mật ong ấm bụng", img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80" },
+    { name: "Khám Phá Thiên Đường Ẩm Thực Chợ Đêm & Món Ăn Đường Phố", act: "Thưởng thức bánh căn nóng hổi, chè trôi nước và sữa hạt nóng thơm phức", cost: 110000, tip: "Tất cả hàng quán đối tác đều được WanderMatch kiểm định vệ sinh an toàn thực phẩm", img: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=600&q=80" }
+  ]
+};
+
+function getUniqueBlindItineraries() {
+  const seed = Date.now().toString(36).slice(-4).toUpperCase();
+  const prefs = (window.currentUser && window.currentUser.preferences) || { focus: 'HEALING_NATURE' };
+
+  // Sinh 3 phương án ngẫu nhiên độc bản
+  const shuffle = arr => [...arr].sort(() => 0.5 - Math.random());
+  
+  const mPool = shuffle(BLIND_POIS_POOL.morning);
+  const aPool = shuffle(BLIND_POIS_POOL.afternoon);
+  const ePool = shuffle(BLIND_POIS_POOL.evening);
+
+  return [
+    {
+      id: 1,
+      persona_focus: "🌿 Lộ Trình 1: Nghỉ Dưỡng Chữa Lành & Thiên Nhiên Hoang Sơ",
+      title: { vi: `Phương Án A: ${mPool[0].name.split('&')[0]} & ${ePool[0].name.split('&')[0]}`, en: "Option A: Healing & Pristine Nature" },
+      tagline: { vi: `Hành trình bí mật độc bản (Mã vé: #WM-${seed}-A) • Khách sạn 4-5 sao có hồ bơi riêng`, en: "Unique blind itinerary with verified 4-star boutique hotel" },
+      slots: [
+        {
+          time: "08:00 - 11:30",
+          poi_name: { vi: mPool[0].name, en: mPool[0].name },
+          activity: { vi: mPool[0].act, en: mPool[0].act },
+          cost_est: mPool[0].cost.toLocaleString('vi-VN') + "đ",
+          tips: { vi: mPool[0].tip, en: mPool[0].tip },
+          img: mPool[0].img
+        },
+        {
+          time: "14:30 - 17:30",
+          poi_name: { vi: aPool[0].name, en: aPool[0].name },
+          activity: { vi: aPool[0].act, en: aPool[0].act },
+          cost_est: aPool[0].cost.toLocaleString('vi-VN') + "đ",
+          tips: { vi: aPool[0].tip, en: aPool[0].tip },
+          img: aPool[0].img
+        },
+        {
+          time: "18:30 - 21:30",
+          poi_name: { vi: ePool[0].name, en: ePool[0].name },
+          activity: { vi: ePool[0].act, en: ePool[0].act },
+          cost_est: ePool[0].cost.toLocaleString('vi-VN') + "đ",
+          tips: { vi: ePool[0].tip, en: ePool[0].tip },
+          img: ePool[0].img
+        }
+      ]
+    },
+    {
+      id: 2,
+      persona_focus: "⚡ Lộ Trình 2: Phiêu Lưu Khám Phá & Check-In Biển Đảo Mạo Hiểm",
+      title: { vi: `Phương Án B: ${mPool[1].name.split('&')[0]} & ${aPool[1].name.split('&')[0]}`, en: "Option B: Coastal Thrills & Hidden Peaks" },
+      tagline: { vi: `Dành cho tín đồ thích vận động và khám phá (Mã vé: #WM-${seed}-B)`, en: "Dynamic adventure tailored for explorers" },
+      slots: [
+        {
+          time: "07:30 - 11:00",
+          poi_name: { vi: mPool[1].name, en: mPool[1].name },
+          activity: { vi: mPool[1].act, en: mPool[1].act },
+          cost_est: mPool[1].cost.toLocaleString('vi-VN') + "đ",
+          tips: { vi: mPool[1].tip, en: mPool[1].tip },
+          img: mPool[1].img
+        },
+        {
+          time: "14:00 - 17:30",
+          poi_name: { vi: aPool[1].name, en: aPool[1].name },
+          activity: { vi: aPool[1].act, en: aPool[1].act },
+          cost_est: aPool[1].cost.toLocaleString('vi-VN') + "đ",
+          tips: { vi: aPool[1].tip, en: aPool[1].tip },
+          img: aPool[1].img
+        },
+        {
+          time: "19:00 - 22:00",
+          poi_name: { vi: ePool[1].name, en: ePool[1].name },
+          activity: { vi: ePool[1].act, en: ePool[1].act },
+          cost_est: ePool[1].cost.toLocaleString('vi-VN') + "đ",
+          tips: { vi: ePool[1].tip, en: ePool[1].tip },
+          img: ePool[1].img
+        }
+      ]
+    },
+    {
+      id: 3,
+      persona_focus: "🍜 Lộ Trình 3: Tinh Hoa Ẩm Thực Bản Địa & Chill Hoàng Hôn",
+      title: { vi: `Phương Án C: ${mPool[2].name.split('&')[0]} & ${ePool[2].name.split('&')[0]}`, en: "Option C: Food Paradise & Sunset Chill" },
+      tagline: { vi: `Khám phá thiên đường ẩm thực và hoàng hôn rực rỡ (Mã vé: #WM-${seed}-C)`, en: "Gastronomic secrets & scenic viewpoints" },
+      slots: [
+        {
+          time: "08:30 - 12:00",
+          poi_name: { vi: mPool[2].name, en: mPool[2].name },
+          activity: { vi: mPool[2].act, en: mPool[2].act },
+          cost_est: mPool[2].cost.toLocaleString('vi-VN') + "đ",
+          tips: { vi: mPool[2].tip, en: mPool[2].tip },
+          img: mPool[2].img
+        },
+        {
+          time: "15:00 - 18:00",
+          poi_name: { vi: aPool[2].name, en: aPool[2].name },
+          activity: { vi: aPool[2].act, en: aPool[2].act },
+          cost_est: aPool[2].cost.toLocaleString('vi-VN') + "đ",
+          tips: { vi: aPool[2].tip, en: aPool[2].tip },
+          img: aPool[2].img
+        },
+        {
+          time: "18:30 - 21:30",
+          poi_name: { vi: ePool[2].name, en: ePool[2].name },
+          activity: { vi: ePool[2].act, en: ePool[2].act },
+          cost_est: ePool[2].cost.toLocaleString('vi-VN') + "đ",
+          tips: { vi: ePool[2].tip, en: ePool[2].tip },
+          img: ePool[2].img
+        }
+      ]
+    }
+  ];
+}
+
 function renderItineraries() {
   const container = document.getElementById('itineraries-container');
   if (!container) return;
 
-  const data = getCurrentDestData();
-  const itineraries = data.itineraries;
+  const destSelect = (window.state && window.state.selectedDestination) || 'blind';
+  const itineraries = (destSelect === 'blind') ? getUniqueBlindItineraries() : getCurrentDestData().itineraries;
 
   container.innerHTML = itineraries.map(itin => {
     const isSelected = state.activeItineraryId === itin.id;
@@ -4133,28 +4317,28 @@ function renderItineraries() {
       const tip = s.tips[state.currentLang] || s.tips.vi;
 
       return `
-        <div class="timeline-stem flex gap-4 pb-6">
+        <div class="timeline-stem flex gap-3 sm:gap-4 pb-5 min-w-0 max-w-full">
           <div class="flex flex-col items-center">
-            <div class="w-9 h-9 rounded-full bg-cyan-500/20 border border-cyan-400 text-cyan-300 flex items-center justify-center font-bold text-xs shrink-0 z-10 shadow-lg shadow-cyan-500/20">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-cyan-500/20 border border-cyan-400 text-cyan-300 flex items-center justify-center font-bold text-xs shrink-0 z-10 shadow-lg shadow-cyan-500/20">
               <i class="fa-solid fa-clock"></i>
             </div>
           </div>
-          <div class="flex-1 bg-slate-900/60 rounded-xl p-4 border border-slate-700/50 hover:border-cyan-500/40 transition">
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-              <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 border border-cyan-800">
+          <div class="flex-1 min-w-0 bg-slate-900/60 rounded-xl p-3 sm:p-4 border border-slate-700/50 hover:border-cyan-500/40 transition overflow-hidden">
+            <div class="flex items-center justify-between gap-2 mb-2 min-w-0">
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 border border-cyan-800 shrink-0 whitespace-nowrap">
                 ${s.time}
               </span>
-              <span class="text-xs font-bold text-emerald-400 flex items-center gap-1">
+              <span class="text-xs font-bold text-emerald-400 flex items-center gap-1 shrink-0 whitespace-nowrap ml-auto">
                 <i class="fa-solid fa-receipt"></i> ${s.cost_est}
               </span>
             </div>
-            <div class="flex gap-3 mt-2">
-              <img src="${s.img}" alt="${pName}" class="w-20 h-20 rounded-lg object-cover shrink-0 border border-slate-700 shadow-md">
+            <div class="flex gap-2.5 sm:gap-3 mt-2 min-w-0">
+              <img src="${s.img}" alt="${pName}" class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover shrink-0 border border-slate-700 shadow-md">
               <div class="flex-1 min-w-0">
                 <h5 class="text-sm font-bold text-slate-100 truncate">${pName}</h5>
                 <p class="text-xs text-slate-300 mt-1 line-clamp-2">${act}</p>
-                <div class="mt-2 text-[11px] text-amber-300/90 flex items-center gap-1.5 bg-amber-950/40 px-2 py-1 rounded border border-amber-900/40">
-                  <i class="fa-solid fa-lightbulb"></i> <span>${tip}</span>
+                <div class="mt-2 text-[11px] text-amber-300/90 flex items-center gap-1.5 bg-amber-950/40 px-2 py-1 rounded border border-amber-900/40 min-w-0">
+                  <i class="fa-solid fa-lightbulb shrink-0 text-[10px]"></i> <span class="truncate">${tip}</span>
                 </div>
               </div>
             </div>
@@ -4164,7 +4348,7 @@ function renderItineraries() {
     }).join('');
 
     return `
-      <div class="glass-card rounded-2xl p-6 border ${isSelected ? 'border-cyan-400 ring-2 ring-cyan-400/30' : 'border-slate-800'} relative flex flex-col justify-between">
+      <div class="glass-card rounded-2xl p-5 sm:p-6 border ${isSelected ? 'border-cyan-400 ring-2 ring-cyan-400/30' : 'border-slate-800'} relative flex flex-col justify-between min-w-0 overflow-hidden">
         ${isSelected ? `
           <div class="absolute -top-3.5 right-6 px-3 py-1 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 text-xs font-black shadow-lg flex items-center gap-1">
             <i class="fa-solid fa-check"></i> ${t('itinerary_btn_selected')}
