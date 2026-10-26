@@ -2649,6 +2649,116 @@
     </div>
   </div>
 
+  <!-- ============================================================================
+       MODAL: SHARE TO OTHER DEVICES VIA VERCEL & LIVE QR CODE
+       ============================================================================ -->
+  <div id="share-device-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md hidden animate-fadeIn">
+    <div class="glass-panel rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto border border-cyan-500/50 shadow-2xl p-6 lg:p-8 space-y-5">
+      <div class="flex items-start justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/50 text-cyan-300 flex items-center justify-center text-xl">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+          </div>
+          <div>
+            <span class="text-[11px] font-black text-cyan-400 uppercase tracking-wider">CHIA SẺ ĐA THIẾT BỊ • VERCEL CLOUD &amp; QR CODE</span>
+            <h3 class="text-lg font-extrabold text-white">Mở Web Trên Điện Thoại, Máy Tính Bảng Hoặc Gửi Cho Bạn Bè</h3>
+          </div>
+        </div>
+        <button onclick="closeShareDeviceModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-center bg-slate-900/90 p-5 rounded-2xl border border-slate-800">
+        <!-- Live Scannable QR Code -->
+        <div class="md:col-span-5 flex flex-col items-center space-y-2">
+          <div class="p-3 bg-white rounded-2xl shadow-xl border-2 border-cyan-400">
+            <img id="share-device-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https%3A%2F%2Fwandermatch-v3.vercel.app" alt="Vercel Share QR Code" class="w-44 h-44 rounded-lg object-contain">
+          </div>
+          <span class="text-[11px] font-bold text-cyan-300 flex items-center gap-1">
+            <i class="fa-solid fa-camera"></i> Mở Camera / Zalo trên điện thoại để quét
+          </span>
+        </div>
+
+        <!-- URL Input & Copy/Share Actions -->
+        <div class="md:col-span-7 space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-300 font-bold mb-1">Đường link chia sẻ cho thiết bị khác (Vercel / Public URL):</label>
+            <input id="share-device-url-input" type="url" value="https://wandermatch-v3.vercel.app" oninput="updateShareQrPreview(this.value)" class="w-full glass-input rounded-xl px-3 py-2.5 font-mono text-xs text-emerald-300 font-bold">
+            <p class="text-[11px] text-slate-400 mt-1">
+              Bạn có thể dán link Vercel của bạn vào ô trên — mã QR bên trái sẽ tự động cập nhật theo thời gian thực!
+            </p>
+          </div>
+
+          <div class="flex flex-wrap gap-2 pt-1">
+            <button type="button" onclick="copyShareDeviceUrl()" class="flex-1 py-2.5 px-3 rounded-xl btn-glow-cyan text-slate-950 font-black text-xs shadow flex items-center justify-center gap-1.5">
+              <i class="fa-regular fa-copy"></i>
+              <span>Sao Chép Link</span>
+            </button>
+            <button type="button" onclick="triggerNativeShare()" class="flex-1 py-2.5 px-3 rounded-xl btn-glow-emerald text-white font-black text-xs shadow flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-share-nodes"></i>
+              <span>Gửi Qua Zalo / Messenger</span>
+            </button>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1 text-[11px]">
+            <div class="font-bold text-amber-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-wifi"></i> Mẹo mở nhanh trong cùng mạng Wi-Fi (LAN):
+            </div>
+            <div class="text-slate-300">
+              Nếu điện thoại bắt cùng Wi-Fi với máy tính này, bạn cũng có thể gõ <code class="text-cyan-300 font-mono">ipconfig</code> trên máy tính để lấy IP (VD: <code class="text-emerald-300 font-mono">http://192.168.1.x:3000</code>) và nhập vào ô trên để quét QR mở ngay!
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3-Step Vercel Deployment & Sharing Guide -->
+      <div class="space-y-3 text-xs bg-slate-950/90 p-5 rounded-2xl border border-indigo-500/40">
+        <div class="flex items-center justify-between">
+          <h4 class="font-extrabold text-white text-sm flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation rotate-180 text-cyan-400"></i> Hướng Dẫn 3 Bước Lấy Link Vercel Mở Trên Mọi Thiết Bị (4G / 5G / Wi-Fi Toàn Cầu)
+          </h4>
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-600/50">ĐÃ CẤU HÌNH SẴN 100%</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
+            <span class="px-2 py-0.5 rounded bg-cyan-500 text-slate-950 font-black text-[10px]">BƯỚC 1 • GITHUB READY</span>
+            <div class="font-bold text-white">Code Đã Có Sẵn Trên GitHub</div>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              Toàn bộ file <code class="text-cyan-300">vercel.json</code>, <code class="text-cyan-300">api/index.js</code> và giao diện mới nhất đã được đẩy tự động lên kho <strong class="text-emerald-300">Edtech-dev-design/wandermatch-v3</strong>.
+            </p>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
+            <span class="px-2 py-0.5 rounded bg-indigo-500 text-white font-black text-[10px]">BƯỚC 2 • IMPORT VERCEL</span>
+            <div class="font-bold text-white">Bấm Import Trên Vercel</div>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              Mở <a href="https://vercel.com/new" target="_blank" rel="noopener" class="text-cyan-300 underline font-bold">vercel.com/new</a> (đăng nhập bằng GitHub) ➔ Chọn kho <strong>wandermatch-v3</strong> ➔ Bấm <strong>Deploy</strong> (không cần chỉnh cài đặt).
+            </p>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
+            <span class="px-2 py-0.5 rounded bg-emerald-500 text-slate-950 font-black text-[10px]">BƯỚC 3 • QUÉT QR &amp; GỬI LINK</span>
+            <div class="font-bold text-white">Mở Trên Điện Thoại Khác</div>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              Sau 15 giây, Vercel cấp link <code class="text-emerald-300">https://wandermatch-v3.vercel.app</code>. Gửi link này hoặc quét mã QR trên là mọi điện thoại đều dùng được ngay!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-1">
+        <a href="https://vercel.com/new" target="_blank" rel="noopener" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs shadow flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-up-right-from-square"></i> <span>Mở Trang Deploy Vercel (vercel.com/new)</span>
+        </a>
+        <button onclick="closeShareDeviceModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast-container"></div>
 
   <!-- Application Logic -->
