@@ -428,6 +428,67 @@
             </div>
           </div>
 
+          <!-- 5D Psychometric Sliders & Blacklist Filter (Nằm Trực Tiếp Tại Bước 1 Để Khách Tùy Chỉnh Lộ Trình) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 pt-1 border-b border-slate-800/80 pb-4 text-xs">
+            <div class="lg:col-span-7 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-cyan-300 flex items-center gap-1.5">
+                  <i class="fa-solid fa-sliders"></i> 5 Trục Tâm Lý Cá Nhân Hóa (Kéo thanh trượt để đổi lộ trình trực tiếp):
+                </span>
+                <span class="text-[10px] font-mono text-slate-400">Công thức: 100 - &Delta; Euclid + Cosine</span>
+              </div>
+              <div class="grid grid-cols-5 gap-2 text-center">
+                <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 space-y-1">
+                  <span class="text-[10px] text-slate-300 font-semibold block">🌿 Chữa lành</span>
+                  <input id="cw-vec-healing" type="number" min="10" max="100" value="98" oninput="document.getElementById('cw-range-healing').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-cyan-300 text-sm focus:outline-none">
+                  <input id="cw-range-healing" type="range" min="10" max="100" value="98" oninput="document.getElementById('cw-vec-healing').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-cyan-400 cursor-pointer">
+                </div>
+                <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 space-y-1">
+                  <span class="text-[10px] text-slate-300 font-semibold block">🏔️ Thiên nhiên</span>
+                  <input id="cw-vec-nature" type="number" min="10" max="100" value="98" oninput="document.getElementById('cw-range-nature').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-emerald-300 text-sm focus:outline-none">
+                  <input id="cw-range-nature" type="range" min="10" max="100" value="98" oninput="document.getElementById('cw-vec-nature').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-emerald-400 cursor-pointer">
+                </div>
+                <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 space-y-1">
+                  <span class="text-[10px] text-slate-300 font-semibold block">🧘 Độc hành</span>
+                  <input id="cw-vec-solitude" type="number" min="10" max="100" value="95" oninput="document.getElementById('cw-range-solitude').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-indigo-300 text-sm focus:outline-none">
+                  <input id="cw-range-solitude" type="range" min="10" max="100" value="95" oninput="document.getElementById('cw-vec-solitude').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-indigo-400 cursor-pointer">
+                </div>
+                <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 space-y-1">
+                  <span class="text-[10px] text-slate-300 font-semibold block">👑 Nghỉ dưỡng</span>
+                  <input id="cw-vec-comfort" type="number" min="10" max="100" value="65" oninput="document.getElementById('cw-range-comfort').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-amber-300 text-sm focus:outline-none">
+                  <input id="cw-range-comfort" type="range" min="10" max="100" value="65" oninput="document.getElementById('cw-vec-comfort').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-amber-400 cursor-pointer">
+                </div>
+                <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 space-y-1">
+                  <span class="text-[10px] text-slate-300 font-semibold block">🏛️ Văn hóa</span>
+                  <input id="cw-vec-culture" type="number" min="10" max="100" value="70" oninput="document.getElementById('cw-range-culture').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-rose-300 text-sm focus:outline-none">
+                  <input id="cw-range-culture" type="range" min="10" max="100" value="70" oninput="document.getElementById('cw-vec-culture').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-rose-400 cursor-pointer">
+                </div>
+              </div>
+            </div>
+
+            <div class="lg:col-span-5 space-y-2">
+              <span class="font-bold text-rose-300 block">🚫 Loại Trừ Thành Phố Đã Đi (Blacklist — Điểm = 0 ngay lập tức):</span>
+              <div class="flex flex-wrap gap-1.5">
+                <label class="px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
+                  <input type="checkbox" name="cw-blacklist" value="Đà Lạt" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Đà Lạt</span>
+                </label>
+                <label class="px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
+                  <input type="checkbox" name="cw-blacklist" value="Quy Nhơn" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Quy Nhơn</span>
+                </label>
+                <label class="px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
+                  <input type="checkbox" name="cw-blacklist" value="Măng Đen" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Măng Đen</span>
+                </label>
+                <label class="px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
+                  <input type="checkbox" name="cw-blacklist" value="Huế" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Huế</span>
+                </label>
+                <label class="px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
+                  <input type="checkbox" name="cw-blacklist" value="Phú Quốc" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Phú Quốc</span>
+                </label>
+              </div>
+              <input id="cw-blacklist-text" type="text" oninput="handleLivePersonaChange()" placeholder="Hoặc gõ tên tỉnh/thành muốn chặn (VD: Đà Lạt, Huế)..." class="w-full glass-input rounded-xl px-3 py-1.5 text-xs text-rose-200 border border-rose-500/30">
+            </div>
+          </div>
+
           <!-- Live 5-City Score Ranking Cards -->
           <div id="live-ai-route-analysis-box" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 text-xs">
             <!-- Populated dynamically in real time by handleLivePersonaChange() -->
