@@ -4399,7 +4399,8 @@
       }
 
       // 4. Nếu đang ở chế độ Bản đồ mù AI (blind), tự động đồng bộ toàn bộ Lộ trình chi tiết từng ngày bên dưới!
-      if (window.state && window.state.selectedDestination === 'blind') {
+      const currentSelected = (window.state && window.state.selectedDestination) || document.getElementById('planner-dest-select')?.value || 'blind';
+      if (currentSelected === 'blind') {
         if (typeof renderDestinationHero === 'function') renderDestinationHero();
         if (typeof renderTripSummaryCard === 'function') renderTripSummaryCard();
         if (typeof renderDetailedDayItinerary === 'function') renderDetailedDayItinerary();
