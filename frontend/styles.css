@@ -766,3 +766,125 @@ input[type=range]::-webkit-slider-thumb:hover {
   background: linear-gradient(180deg, transparent 40%, rgba(15, 23, 42, 0.85) 100%);
   pointer-events: none;
 }
+
+/* ============================================================================
+   10. COMMERCIAL E-COMMERCE ENHANCEMENTS: AUTH, PROFILE, SLA REFUND & MOBILE
+   ============================================================================ */
+
+/* Mobile Bottom Navigation Bar */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: rgba(10, 15, 26, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 999;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.mobile-nav-item.active,
+.mobile-nav-item:hover {
+  color: var(--accent-cyan);
+}
+
+.mobile-nav-item i {
+  font-size: 16px;
+}
+
+/* User Profile Badge & Dropdown */
+.user-profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.user-profile-badge:hover {
+  border-color: rgba(6, 182, 212, 0.7);
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+}
+
+/* Fixed Refund SLA Guarantee Badge */
+.sla-refund-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(6, 182, 212, 0.15) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  color: #6ee7b7;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+/* SLA 24H Timeline Steps */
+.sla-timeline-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+}
+
+.sla-timeline-step::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: -50%;
+  right: 50%;
+  height: 2px;
+  background: rgba(148, 163, 184, 0.2);
+  z-index: 1;
+}
+
+.sla-timeline-step:first-child::before {
+  display: none;
+}
+
+.sla-timeline-step.completed::before,
+.sla-timeline-step.active::before {
+  background: #10b981;
+}
+
+/* Prevent horizontal overflow on mobile */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-bottom: 70px;
+  }
+}
