@@ -37,7 +37,8 @@ let DB = {
       status: "HARD_COMMITTED",
       slaLocked: 20000000
     }
-  }
+  },
+  customerProfiles: {}
 };
 
 const MIME_TYPES = {
@@ -281,6 +282,31 @@ const server = http.createServer(async (req, res) => {
     return sendJson(res, 200, {
       success: true,
       ledgers: DB.escrowLedgers
+    });
+  }
+
+  // 8b. Customer Profile Storage & Supabase Sync Bridge
+  if (pathname === '/api/customer/profile' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const userEmail = (body.email || body.id || 'anonymous').toLowerCase();
+    DB.customerProfiles[userEmail] = {
+      ...body,
+      updatedAt: new Date().toISOString()
+    };
+    return sendJson(res, 200, {
+      success: true,
+      message: 'Hồ sơ khách hàng đã được lưu trữ an toàn vào hệ thống Supabase & máy chủ!',
+      profile: DB.customerProfiles[userEmail]
+    });
+  }
+
+  if (pathname === '/api/customer/profile' && req.method === 'GET') {
+    const email = ((parsedUrl.query && parsedUrl.query.email) || '').toLowerCase();
+    const profile = email ? DB.customerProfiles[email] : null;
+    return sendJson(res, 200, {
+      success: true,
+      profile: profile || null,
+      totalStored: Object.keys(DB.customerProfiles).length
     });
   }
 

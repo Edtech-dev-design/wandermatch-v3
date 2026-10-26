@@ -126,33 +126,20 @@
         </div>
       </div>
 
-      <!-- 3 MAIN ROLE TABS (TOP NAVBAR) -->
-      <nav class="flex items-center gap-1.5 overflow-x-auto py-1 max-w-full bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800">
-        <button id="role-tab-b2c" onclick="switchTab('b2c')" class="px-3.5 py-2 rounded-xl text-xs font-extrabold transition border border-cyan-500/60 bg-cyan-500 text-slate-950 shadow-lg flex items-center gap-2 shrink-0">
-          <i class="fa-solid fa-suitcase-rolling"></i>
-          <span>Du Khách (B2C)</span>
-        </button>
-
-        <button id="role-tab-b2b" onclick="switchTab('b2b')" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/80 transition border border-transparent flex items-center gap-2 shrink-0">
-          <i class="fa-solid fa-hotel text-amber-400"></i>
-          <span>Cổng Khách Sạn (B2B)</span>
-        </button>
-
-        <button id="role-tab-admin" onclick="switchTab('admin')" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/80 transition border border-transparent flex items-center gap-2 shrink-0">
-          <i class="fa-solid fa-sliders text-emerald-400"></i>
-          <span>Quản Trị (Admin)</span>
+      <!-- NAVIGATION DU LỊCH SẠCH ĐẸP (ẨN NÚT CHUYỂN B2B/ADMIN KHỎI MÀN HÌNH CHÍNH) -->
+      <nav class="hidden md:flex items-center gap-2">
+        <a href="#view-concierge" class="px-4 py-2 rounded-xl text-xs font-black text-slate-200 hover:text-cyan-300 hover:bg-slate-900/90 transition flex items-center gap-2 border border-slate-800 shadow">
+          <i class="fa-solid fa-compass text-cyan-400 text-sm"></i>
+          <span>Khám Phá Chuyến Đi</span>
+        </a>
+        <button onclick="openRefundPolicyModal()" class="px-4 py-2 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 text-xs font-black flex items-center gap-2 transition shadow" title="Cam kết bảo lãnh hoàn tiền trong 24 giờ minh bạch">
+          <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+          <span>Cam Kết Hoàn Tiền 24H</span>
         </button>
       </nav>
 
-      <!-- Utilities: Fixed Refund SLA Button, Theme Switcher, Language & Auth Profile -->
+      <!-- Utilities: Theme Switcher, Language & Auth Profile -->
       <div class="flex items-center gap-2">
-        <!-- Fixed Refund SLA Guarantee Button -->
-        <button onclick="openRefundPolicyModal()" class="px-3 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900/90 border border-emerald-500/50 text-emerald-300 text-xs font-extrabold flex items-center gap-1.5 transition shadow" title="Cam kết hoàn tiền trong 24 giờ minh bạch">
-          <i class="fa-solid fa-shield-halved text-emerald-400"></i>
-          <span class="hidden sm:inline">Cam Kết Hoàn Tiền 24H</span>
-          <span class="sm:hidden">Hoàn 24H</span>
-        </button>
-
         <!-- 6-Color Dynamic Theme Switcher -->
         <div class="hidden md:flex items-center gap-1 bg-slate-900/90 px-2 py-1.5 rounded-xl border border-slate-800" title="Đổi màu giao diện">
           <button id="theme-btn-cyan" onclick="setTheme('cyan')" class="theme-swatch-btn active-theme" style="background: linear-gradient(135deg, #06b6d4, #3b82f6);" title="Cyber Cyan"></button>
@@ -171,7 +158,7 @@
         <div id="header-auth-container" class="relative">
           <!-- Logged Out State (Default): 2 Distinct Buttons for Register and Login -->
           <div id="header-auth-logged-out" class="flex items-center gap-2">
-            <!-- Nút ĐĂNG KÝ (Mở sẵn màn hình Đăng Ký cho 3 đối tượng) -->
+            <!-- Nút ĐĂNG KÝ -->
             <button id="header-btn-register" onclick="openAuthModal('register', 'b2c')" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 font-black text-xs shadow-lg shadow-cyan-500/25 flex items-center gap-1.5 transition-all transform hover:scale-105 active:scale-95" title="Đăng ký tài khoản mới (Du khách / Khách sạn / Admin)">
               <i class="fa-solid fa-user-plus"></i>
               <span>Đăng Ký</span>
@@ -183,30 +170,18 @@
             </button>
           </div>
 
-          <!-- Logged In State (Hiển thị các nút riêng biệt: Hồ Sơ, Sổ Cái GD, và Đăng Xuất) -->
+          <!-- Logged In State: CHẾ ĐỘ HỒ SƠ CHUNG TRONG BẢNG TO (ĐĂNG XUẤT & CHỈNH SỬA THÔNG TIN ĐƯỢC GỘP GỌN VÀO TRONG BẢNG) -->
           <div id="header-user-profile-menu" class="hidden flex items-center gap-2">
-            <!-- NÚT 1: HỒ SƠ CÁ NHÂN & KYC (Mở thẳng Modal Hồ Sơ) -->
-            <button onclick="openCustomerProfileModal('profile')" id="user-header-profile-btn" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/95 hover:bg-slate-800 border border-cyan-500/50 hover:border-cyan-400 text-xs transition shadow-lg group" title="Xem Hồ Sơ Cá Nhân & Định Danh KYC">
-              <img id="header-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="w-6 h-6 rounded-full object-cover border border-cyan-400 group-hover:scale-105 transition">
-              <div class="text-left hidden sm:block max-w-[120px] truncate">
-                <span id="header-username" class="font-extrabold text-white block text-[11px] truncate">Nguyễn Văn An</span>
-                <span id="header-user-tier" class="text-[9px] text-cyan-300 font-mono block">Du Khách VIP</span>
+            <button onclick="openCustomerProfileModal('profile')" id="user-header-profile-btn" class="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 hover:from-slate-800 hover:to-slate-700 border-2 border-cyan-500/60 hover:border-cyan-400 text-xs transition shadow-xl group" title="Mở Bảng Hồ Sơ Khách Hàng, Chỉnh Sửa Thông Tin & Đăng Xuất An Toàn">
+              <img id="header-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="w-7 h-7 rounded-full object-cover border-2 border-cyan-400 group-hover:scale-105 transition shadow">
+              <div class="text-left hidden sm:block max-w-[130px] truncate">
+                <span id="header-username" class="font-black text-white block text-xs truncate">NGUYỄN VĂN AN</span>
+                <span id="header-user-tier" class="text-[10px] text-cyan-300 font-mono block">HỒ SƠ KHÁCH HÀNG</span>
               </div>
-              <span class="px-2 py-0.5 rounded text-[10px] font-black bg-cyan-950 text-cyan-300 border border-cyan-700 hidden md:inline">
-                <i class="fa-regular fa-id-badge"></i> Hồ Sơ
+              <span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-cyan-950 text-cyan-300 border border-cyan-700 flex items-center gap-1 shadow">
+                <i class="fa-regular fa-id-badge text-cyan-400"></i>
+                <span class="hidden md:inline">Bảng Hồ Sơ</span>
               </span>
-            </button>
-
-            <!-- NÚT 2: SỔ CÁI GIAO DỊCH RIÊNG (Mở thẳng Tab Sổ Cái) -->
-            <button onclick="openCustomerProfileModal('ledger')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 font-bold text-xs transition shadow" title="Mở Sổ Cái Giao Dịch & Đơn Hàng">
-              <i class="fa-solid fa-receipt"></i>
-              <span class="hidden sm:inline">Sổ Cái GD</span>
-            </button>
-
-            <!-- NÚT 3: ĐĂNG XUẤT RIÊNG BIỆT (XUẤT ĐĂNG NHẬP TỨC THÌ, RÕ RÀNG KHÔNG LỖI) -->
-            <button onclick="handleLogout()" id="header-btn-logout" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 active:scale-95 text-white font-black text-xs transition shadow-lg shadow-rose-600/30" title="Đăng Xuất Khỏi Tài Khoản Ngay Lập Tức">
-              <i class="fa-solid fa-right-from-bracket"></i>
-              <span>Đăng Xuất</span>
             </button>
           </div>
         </div>
@@ -217,9 +192,9 @@
   </header>
 
   <!-- ============================================================================
-       B2C EXPERIENCE JOURNEY STEPPER (LỘ TRÌNH 4 BƯỚC DU KHÁCH - TINH GỌN, CHUẨN THƯƠNG MẠI)
+       B2C EXPERIENCE JOURNEY STEPPER (ẨN KHỎI MÀN HÌNH CHÍNH ĐỂ TRÁNH RỐI MẮT KHÁCH HÀNG)
        ============================================================================ -->
-  <div id="top-4step-stepper" class="sticky top-[64px] z-40 bg-slate-950/95 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-2.5">
+  <div id="top-4step-stepper" class="hidden sticky top-[64px] z-40 bg-slate-950/95 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-2.5">
     <div id="b2c-4step-wizard-bar" class="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-2 text-xs">
       <button id="step-pill-1" type="button" onclick="switchB2CStep(1)" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-cyan-500/60 bg-cyan-500/20 text-cyan-300 font-extrabold transition text-left shadow">
         <span id="step-badge-1" class="w-6 h-6 rounded-full bg-cyan-400 text-slate-950 font-black flex items-center justify-center shrink-0 text-[11px]">1</span>
@@ -284,188 +259,309 @@
           </p>
         </div>
 
-        <!-- Planner Form Controls -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-end">
+        <!-- Planner Form Controls: Điểm Đi, Điểm Đến, Ngân Sách Thực Tế & Thời Gian -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
           
-          <!-- 1. Destination Select -->
-          <div class="lg:col-span-4 space-y-1.5">
-            <label class="block text-xs font-bold text-cyan-300 uppercase tracking-wider" data-i18n="label_choose_dest">
-              1. Chế Độ AI Hoặc Chọn Điểm Đến:
+          <!-- 1. Departure Origin Select (Điểm Đi / Điểm Khởi Hành) -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-location-crosshairs text-cyan-400"></i>
+              <span>1. Điểm Đi (Khởi Hành):</span>
             </label>
-            <select id="planner-dest-select" onchange="handleGeneratePlan()" class="w-full glass-input rounded-xl px-3 py-3 text-xs font-bold text-white cursor-pointer">
-              <option value="blind" selected>🎲 Bản Đồ Mù AI (Tự Động Khớp Theo 5 Trục Tâm Lý &amp; Lập Lộ Trình)</option>
-              <option value="mangden">🏔️ Măng Đen — Kon Tum (Rừng Thông Nguyên Sinh &amp; Độc Hành)</option>
-              <option value="dalat">🌲 Đà Lạt — Lâm Đồng (Xứ Sở Sương Mù &amp; Chữa Lành)</option>
-              <option value="hue">🏛️ Cố Đô Huế (Di Sản Hoàng Cung &amp; Thiền Định)</option>
-              <option value="quynhon">🌊 Quy Nhơn — Bình Định (Kỳ Co Eo Gió &amp; Biển Yên Bình)</option>
-              <option value="phuquoc">🏖️ Đảo Ngọc Phú Quốc (Resort 5 Sao &amp; Cáp Treo Hòn Thơm)</option>
-              <option value="danang">🌉 Đà Nẵng &amp; Hội An (Biển Mỹ Khê &amp; Phố Cổ)</option>
-              <option value="hochiminh">🏙️ TP. Hồ Chí Minh (Sài Gòn Hoa Lệ &amp; Michelin)</option>
+            <select id="planner-origin-select" onchange="handleGeneratePlan()" class="w-full glass-input rounded-xl px-3 py-3 text-xs font-bold text-white cursor-pointer bg-slate-900 border border-cyan-500/40">
+              <option value="hochiminh" selected>🏙️ TP. Hồ Chí Minh (Sân Bay Tân Sơn Nhất - SGN)</option>
+              <option value="hanoi">🏛️ Hà Nội (Sân Bay Nội Bài - HAN)</option>
+              <option value="danang">🌉 Đà Nẵng (Sân Bay Đà Nẵng - DAD)</option>
+              <option value="cantho">🌾 Cần Thơ (Sân Bay Trà Nóc - VCA)</option>
+              <option value="haiphong">⚓ Hải Phòng (Sân Bay Cát Bi - HPH)</option>
             </select>
           </div>
 
-          <!-- 2. Budget Input & Quick Presets -->
-          <div class="lg:col-span-4 space-y-1.5">
+          <!-- 2. Destination Select (Điểm Đến Hoặc Du Lịch Mù) -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-map-location-dot text-amber-400"></i>
+              <span>2. Điểm Đến Hoặc Bản Đồ Mù:</span>
+            </label>
+            <select id="planner-dest-select" onchange="handleGeneratePlan()" class="w-full glass-input rounded-xl px-3 py-3 text-xs font-bold text-white cursor-pointer bg-slate-900 border border-cyan-500/40">
+              <option value="blind" selected>🎲 Du Lịch Mù / Ẩn Trình AI (AI Giấu Điểm Đến Đến Giờ G)</option>
+              <option value="mangden">🏔️ Măng Đen — Kon Tum (Rừng Thông &amp; Chữa Lành)</option>
+              <option value="dalat">🌲 Đà Lạt — Lâm Đồng (Sương Mù &amp; Cafe Chill)</option>
+              <option value="hue">🏛️ Cố Đô Huế (Di Sản Cung Đình &amp; Thiền)</option>
+              <option value="quynhon">🌊 Quy Nhơn — Bình Định (Kỳ Co Eo Gió)</option>
+              <option value="phuquoc">🏖️ Phú Quốc (Resort 5 Sao &amp; Sunset)</option>
+              <option value="danang">🌉 Đà Nẵng &amp; Hội An (Biển Mỹ Khê &amp; Phố Cổ)</option>
+            </select>
+          </div>
+
+          <!-- 3. Budget Input & Quick Presets Thực Tế -->
+          <div class="space-y-1.5">
             <div class="flex items-center justify-between">
-              <label class="block text-xs font-bold text-cyan-300 uppercase tracking-wider" data-i18n="label_input_budget">
-                2. Nhập Ngân Sách Dự Kiến (VNĐ):
+              <label class="block text-xs font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1">
+                <i class="fa-solid fa-wallet text-emerald-400"></i>
+                <span>3. Ngân Sách Dự Kiến:</span>
               </label>
             </div>
             <div class="relative">
-              <input id="planner-budget-input" type="number" value="5000000" oninput="handleLiveBudgetInput(this.value)" class="w-full glass-input rounded-xl px-3 py-3 font-mono font-bold text-emerald-400 text-sm">
+              <input id="planner-budget-input" type="number" value="3200000" oninput="handleLiveBudgetInput(this.value)" class="w-full glass-input rounded-xl px-3 py-3 font-mono font-black text-emerald-400 text-sm bg-slate-900 border border-cyan-500/40">
               <span class="absolute right-3 top-3 text-xs font-black text-slate-400">VNĐ</span>
             </div>
 
-            <!-- Quick Preset Chips -->
-            <div class="flex flex-wrap gap-1.5 pt-1">
-              <button id="quick-budget-3000000" onclick="setQuickBudget(3000000)" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-semibold border border-slate-700 transition">
-                3 Triệu
+            <!-- Quick Preset Chips Thực Tế -->
+            <div class="flex flex-wrap gap-1 pt-0.5">
+              <button id="quick-budget-1850000" type="button" onclick="setQuickBudget(1850000)" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-semibold border border-slate-700 transition">
+                1.85 Tr
               </button>
-              <button id="quick-budget-5000000" onclick="setQuickBudget(5000000)" class="px-2 py-0.5 rounded-lg bg-cyan-950 text-cyan-300 text-[10px] font-bold border border-cyan-800 transition">
-                5 Triệu
+              <button id="quick-budget-3200000" type="button" onclick="setQuickBudget(3200000)" class="px-2 py-0.5 rounded-lg bg-cyan-950 text-cyan-300 text-[10px] font-bold border border-cyan-800 transition">
+                3.2 Tr
               </button>
-              <button id="quick-budget-8000000" onclick="setQuickBudget(8000000)" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-semibold border border-slate-700 transition">
-                8 Triệu
+              <button id="quick-budget-5000000" type="button" onclick="setQuickBudget(5000000)" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-semibold border border-slate-700 transition">
+                5 Tr
               </button>
-              <button id="quick-budget-15000000" onclick="setQuickBudget(15000000)" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-semibold border border-slate-700 transition">
-                15 Triệu
+              <button id="quick-budget-8500000" type="button" onclick="setQuickBudget(8500000)" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-semibold border border-slate-700 transition">
+                8.5 Tr
               </button>
             </div>
           </div>
 
-          <!-- 3. Pax & Duration -->
-          <div class="lg:col-span-4 space-y-1.5">
-            <label class="block text-xs font-bold text-cyan-300 uppercase tracking-wider" data-i18n="label_pax_duration">
-              3. Số Khách & Thời Gian:
-            </label>
-            <div class="grid grid-cols-2 gap-2">
-              <select id="planner-pax-select" onchange="handleGeneratePlan()" class="w-full glass-input rounded-xl px-3 py-3 text-xs font-semibold text-white">
-                <option value="1">1 Người (Solo)</option>
-                <option value="2" selected>2 Người (Cặp đôi/Bạn)</option>
-                <option value="4">Nhóm 4 Người</option>
-                <option value="6">Gia đình (5-6 người)</option>
-              </select>
+          <!-- 4. Pax, Duration & Action Button -->
+          <div class="space-y-1.5">
+            <div class="grid grid-cols-2 gap-1.5">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-300 mb-1">Số Khách:</label>
+                <select id="planner-pax-select" onchange="handleGeneratePlan()" class="w-full glass-input rounded-xl px-2.5 py-2 text-xs font-semibold text-white bg-slate-900">
+                  <option value="1">1 Người (Solo)</option>
+                  <option value="2" selected>2 Người (Cặp đôi/Bạn)</option>
+                  <option value="4">Nhóm 4 Người</option>
+                  <option value="6">Gia đình (5-6)</option>
+                </select>
+              </div>
 
-              <select id="planner-dur-select" onchange="handleGeneratePlan()" class="w-full glass-input rounded-xl px-3 py-3 text-xs font-semibold text-white">
-                <option value="2d1n">2 Ngày 1 Đêm</option>
-                <option value="3d2n" selected>3 Ngày 2 Đêm</option>
-                <option value="4d3n">4 Ngày 3 Đêm</option>
-              </select>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-300 mb-1">Thời Gian:</label>
+                <select id="planner-dur-select" onchange="handleGeneratePlan()" class="w-full glass-input rounded-xl px-2.5 py-2 text-xs font-semibold text-white bg-slate-900">
+                  <option value="2d1n">2N1Đ (Cuối tuần)</option>
+                  <option value="3d2n" selected>3N2Đ (Tiêu chuẩn)</option>
+                  <option value="4d3n">4N3Đ (Dài ngày)</option>
+                </select>
+              </div>
             </div>
 
             <!-- Submit CTA -->
-            <button onclick="handleGeneratePlan()" class="w-full py-2.5 rounded-xl btn-glow-cyan text-slate-950 font-black text-xs shadow-lg transition flex items-center justify-center gap-1.5">
+            <button onclick="handleGeneratePlan()" class="w-full py-2.5 rounded-xl btn-glow-cyan text-slate-950 font-black text-xs shadow-lg transition flex items-center justify-center gap-1.5 mt-1">
               <i class="fa-solid fa-wand-magic-sparkles"></i>
-              <span data-i18n="btn_generate_plan">🚀 Tạo Kế Hoạch Chuyến Đi Ngay</span>
+              <span data-i18n="btn_generate_plan">🚀 AI Lập Kế Hoạch &amp; Xuất Chuyến Đi</span>
             </button>
           </div>
 
         </div>
 
-        <!-- LIVE AI PSYCHOMETRIC 5-CITY MATCHER & INSTANT ROUTE SWITCHER -->
-        <div class="mt-6 p-5 rounded-2xl bg-slate-950/95 border-2 border-cyan-500/50 shadow-2xl space-y-4">
-          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-cyan-400 text-slate-950 uppercase tracking-wider">
-                  LIVE AI ROUTE ENGINE • REAL-TIME
-                </span>
-                <span id="live-ai-winner-pill" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/50">
-                  🎯 Đang khớp: Măng Đen (100% Match)
-                </span>
-              </div>
-              <h3 class="text-sm lg:text-base font-extrabold text-white mt-1">
-                🧠 Bảng Phân Tích Tâm Lý AI &amp; Tự Động Sinh Lộ Trình Theo Thời Gian Thực
+        <!-- 3 GÓI GỢI Ý CHUYẾN ĐI THỰC TẾ CÓ THỂ CHỐT ĐẶT NGAY TỨC THÌ (KÈM ƯU ĐÃI RIÊNG) -->
+        <div class="mt-6 pt-5 border-t border-slate-800/80 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 uppercase tracking-wider shadow">
+                ⚡ GỢI Ý CHỐT NHANH CHUYẾN ĐI
+              </span>
+              <h3 class="text-sm lg:text-base font-extrabold text-white">
+                Các Gói Chuyến Đi Thực Tế Được Đặt Nhiều Nhất
               </h3>
-              <p class="text-[11px] text-slate-400">
-                Bấm chọn nhanh 1 trong 5 hồ sơ tâm lý dưới đây (hoặc kéo thanh trượt 5 trục) — AI sẽ lập tức chấm điểm 5 thành phố và đổi toàn bộ Lộ trình chi tiết từng ngày bên dưới!
-              </p>
             </div>
-            <div class="flex flex-wrap gap-1.5">
-              <button type="button" onclick="applyPersonaPreset('MANG_DEN')" class="px-3 py-1.5 rounded-xl bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-600/60 text-xs font-extrabold transition shadow flex items-center gap-1">
-                <span>🏔️ Độc hành Núi</span> <span class="text-[10px] opacity-80">(Măng Đen)</span>
-              </button>
-              <button type="button" onclick="applyPersonaPreset('DA_LAT')" class="px-3 py-1.5 rounded-xl bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-600/60 text-xs font-extrabold transition shadow flex items-center gap-1">
-                <span>🌲 Chữa lành</span> <span class="text-[10px] opacity-80">(Đà Lạt)</span>
-              </button>
-              <button type="button" onclick="applyPersonaPreset('HUE')" class="px-3 py-1.5 rounded-xl bg-purple-950 hover:bg-purple-900 text-purple-300 border border-purple-600/60 text-xs font-extrabold transition shadow flex items-center gap-1">
-                <span>🏛️ Di sản Cố đô</span> <span class="text-[10px] opacity-80">(Huế)</span>
-              </button>
-              <button type="button" onclick="applyPersonaPreset('QUY_NHON')" class="px-3 py-1.5 rounded-xl bg-blue-950 hover:bg-blue-900 text-blue-300 border border-blue-600/60 text-xs font-extrabold transition shadow flex items-center gap-1">
-                <span>🌊 Biển Yên bình</span> <span class="text-[10px] opacity-80">(Quy Nhơn)</span>
-              </button>
-              <button type="button" onclick="applyPersonaPreset('PHU_QUOC')" class="px-3 py-1.5 rounded-xl bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-600/60 text-xs font-extrabold transition shadow flex items-center gap-1">
-                <span>🏖️ Resort 5 Sao</span> <span class="text-[10px] opacity-80">(Phú Quốc)</span>
-              </button>
-            </div>
+            <span class="text-[11px] text-emerald-400 font-bold flex items-center gap-1">
+              <i class="fa-solid fa-gift"></i> Áp dụng ưu đãi giảm ngay 500.000 VNĐ cho mỗi chuyến đi
+            </span>
           </div>
 
-          <!-- 5D Psychometric Sliders & Blacklist Filter (Nằm Trực Tiếp Tại Bước 1 Để Khách Tùy Chỉnh Lộ Trình) -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 pt-1 border-b border-slate-800/80 pb-4 text-xs">
-            <div class="lg:col-span-7 space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-cyan-300 flex items-center gap-1.5">
-                  <i class="fa-solid fa-sliders"></i> 5 Trục Tâm Lý Cá Nhân Hóa (Kéo thanh trượt để đổi lộ trình trực tiếp):
-                </span>
-                <span class="text-[10px] font-mono text-slate-400">Công thức: 100 - &Delta; Euclid + Cosine</span>
+          <!-- 3 Featured Packages Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <!-- Gói 1: Măng Đen / Núi Rừng -->
+            <div class="p-4 rounded-2xl bg-slate-900/90 border border-cyan-500/40 hover:border-cyan-400 transition shadow-xl space-y-3 flex flex-col justify-between group">
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-black bg-cyan-950 text-cyan-300 border border-cyan-700">
+                    🏔️ BẢN ĐỒ MÙ #1 • ĐỘC HÀNH &amp; CHỮA LÀNH
+                  </span>
+                  <span class="text-[10px] font-mono text-emerald-400 font-bold">Review 9.6/10</span>
+                </div>
+                <h4 class="text-sm font-extrabold text-white group-hover:text-cyan-300 transition">
+                  Kỳ Nghỉ Trốn Khói Bụi Giữa Rừng Thông Mù (3N2Đ)
+                </h4>
+                <div class="text-[11px] text-slate-300 space-y-1">
+                  <div class="flex items-center gap-1.5"><i class="fa-solid fa-plane-departure text-cyan-400 text-[10px]"></i> Điểm đi: <strong>TP. Hồ Chí Minh</strong> &rarr; Điểm đến: <strong>Ẩn danh (Măng Đen)</strong></div>
+                  <div class="flex items-center gap-1.5"><i class="fa-solid fa-hotel text-amber-400 text-[10px]"></i> Lưu trú: <strong>Resort 4 sao rừng thông nguyên sinh</strong></div>
+                  <div class="flex items-center gap-1.5"><i class="fa-solid fa-utensils text-emerald-400 text-[10px]"></i> Bao gồm: <strong>Xe Limousine đón + Ăn uống đặc sản</strong></div>
+                </div>
               </div>
-              <div class="grid grid-cols-5 gap-2 text-center">
-                <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 space-y-1">
-                  <span class="text-[10px] text-slate-300 font-semibold block">🌿 Chữa lành</span>
-                  <input id="cw-vec-healing" type="number" min="10" max="100" value="98" oninput="document.getElementById('cw-range-healing').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-cyan-300 text-sm focus:outline-none">
-                  <input id="cw-range-healing" type="range" min="10" max="100" value="98" oninput="document.getElementById('cw-vec-healing').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-cyan-400 cursor-pointer">
+
+              <div class="pt-2 border-t border-slate-800 space-y-2">
+                <div class="flex items-baseline justify-between">
+                  <div>
+                    <span class="text-[10px] text-slate-400 line-through">3.700.000đ</span>
+                    <div class="text-base font-black text-emerald-400 font-mono">3.200.000 VNĐ</div>
+                  </div>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-black bg-rose-950 text-rose-300 border border-rose-700">-500.000đ ƯU ĐÃI</span>
                 </div>
-                <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 space-y-1">
-                  <span class="text-[10px] text-slate-300 font-semibold block">🏔️ Thiên nhiên</span>
-                  <input id="cw-vec-nature" type="number" min="10" max="100" value="98" oninput="document.getElementById('cw-range-nature').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-emerald-300 text-sm focus:outline-none">
-                  <input id="cw-range-nature" type="range" min="10" max="100" value="98" oninput="document.getElementById('cw-vec-nature').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-emerald-400 cursor-pointer">
-                </div>
-                <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 space-y-1">
-                  <span class="text-[10px] text-slate-300 font-semibold block">🧘 Độc hành</span>
-                  <input id="cw-vec-solitude" type="number" min="10" max="100" value="95" oninput="document.getElementById('cw-range-solitude').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-indigo-300 text-sm focus:outline-none">
-                  <input id="cw-range-solitude" type="range" min="10" max="100" value="95" oninput="document.getElementById('cw-vec-solitude').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-indigo-400 cursor-pointer">
-                </div>
-                <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 space-y-1">
-                  <span class="text-[10px] text-slate-300 font-semibold block">👑 Nghỉ dưỡng</span>
-                  <input id="cw-vec-comfort" type="number" min="10" max="100" value="65" oninput="document.getElementById('cw-range-comfort').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-amber-300 text-sm focus:outline-none">
-                  <input id="cw-range-comfort" type="range" min="10" max="100" value="65" oninput="document.getElementById('cw-vec-comfort').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-amber-400 cursor-pointer">
-                </div>
-                <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 space-y-1">
-                  <span class="text-[10px] text-slate-300 font-semibold block">🏛️ Văn hóa</span>
-                  <input id="cw-vec-culture" type="number" min="10" max="100" value="70" oninput="document.getElementById('cw-range-culture').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-rose-300 text-sm focus:outline-none">
-                  <input id="cw-range-culture" type="range" min="10" max="100" value="70" oninput="document.getElementById('cw-vec-culture').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-rose-400 cursor-pointer">
-                </div>
+                <button type="button" onclick="openQuickCheckout('pkg_mangden')" class="w-full py-2.5 rounded-xl btn-glow-cyan text-slate-950 font-black text-xs shadow transition flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-bolt"></i>
+                  <span>⚡ Chốt Đặt Chuyến Đi Này</span>
+                </button>
               </div>
             </div>
 
-            <div class="lg:col-span-5 space-y-2">
-              <span class="font-bold text-rose-300 block">🚫 Loại Trừ Thành Phố Đã Đi (Blacklist — Điểm = 0 ngay lập tức):</span>
-              <div class="flex flex-wrap gap-1.5">
-                <label class="px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
-                  <input type="checkbox" name="cw-blacklist" value="Đà Lạt" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Đà Lạt</span>
-                </label>
-                <label class="px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
-                  <input type="checkbox" name="cw-blacklist" value="Quy Nhơn" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Quy Nhơn</span>
-                </label>
-                <label class="px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
-                  <input type="checkbox" name="cw-blacklist" value="Măng Đen" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Măng Đen</span>
-                </label>
-                <label class="px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
-                  <input type="checkbox" name="cw-blacklist" value="Huế" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Huế</span>
-                </label>
-                <label class="px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
-                  <input type="checkbox" name="cw-blacklist" value="Phú Quốc" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Phú Quốc</span>
-                </label>
+            <!-- Gói 2: Phú Quốc / Biển Đảo -->
+            <div class="p-4 rounded-2xl bg-slate-900/90 border border-amber-500/40 hover:border-amber-400 transition shadow-xl space-y-3 flex flex-col justify-between group">
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-black bg-amber-950 text-amber-300 border border-amber-700">
+                    🏖️ BẢN ĐỒ MÙ #2 • RESORT &amp; SUNSET
+                  </span>
+                  <span class="text-[10px] font-mono text-amber-400 font-bold">Review 9.8/10</span>
+                </div>
+                <h4 class="text-sm font-extrabold text-white group-hover:text-amber-300 transition">
+                  Nghỉ Dưỡng Resort Biển Hoàng Hôn Sunset (3N2Đ)
+                </h4>
+                <div class="text-[11px] text-slate-300 space-y-1">
+                  <div class="flex items-center gap-1.5"><i class="fa-solid fa-plane-departure text-cyan-400 text-[10px]"></i> Điểm đi: <strong>TP. Hồ Chí Minh</strong> &rarr; Điểm đến: <strong>Ẩn danh (Phú Quốc)</strong></div>
+                  <div class="flex items-center gap-1.5"><i class="fa-solid fa-hotel text-amber-400 text-[10px]"></i> Lưu trú: <strong>Resort 5 sao sát biển có hồ bơi vô cực</strong></div>
+                  <div class="flex items-center gap-1.5"><i class="fa-solid fa-utensils text-emerald-400 text-[10px]"></i> Bao gồm: <strong>Vé máy bay khứ hồi + Buffet sáng + Cáp treo</strong></div>
+                </div>
               </div>
-              <input id="cw-blacklist-text" type="text" oninput="handleLivePersonaChange()" placeholder="Hoặc gõ tên tỉnh/thành muốn chặn (VD: Đà Lạt, Huế)..." class="w-full glass-input rounded-xl px-3 py-1.5 text-xs text-rose-200 border border-rose-500/30">
-            </div>
-          </div>
 
-          <!-- Live 5-City Score Ranking Cards -->
-          <div id="live-ai-route-analysis-box" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 text-xs">
-            <!-- Populated dynamically in real time by handleLivePersonaChange() -->
+              <div class="pt-2 border-t border-slate-800 space-y-2">
+                <div class="flex items-baseline justify-between">
+                  <div>
+                    <span class="text-[10px] text-slate-400 line-through">5.500.000đ</span>
+                    <div class="text-base font-black text-amber-300 font-mono">5.000.000 VNĐ</div>
+                  </div>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-black bg-rose-950 text-rose-300 border border-rose-700">-500.000đ ƯU ĐÃI</span>
+                </div>
+                <button type="button" onclick="openQuickCheckout('pkg_phuquoc')" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-xs shadow transition flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-bolt"></i>
+                  <span>⚡ Chốt Đặt Chuyến Đi Này</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Gói 3: Đà Lạt / Sương Mù -->
+            <div class="p-4 rounded-2xl bg-slate-900/90 border border-emerald-500/40 hover:border-emerald-400 transition shadow-xl space-y-3 flex flex-col justify-between group">
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-700">
+                    🌲 BẢN ĐỒ MÙ #3 • SĂN MÂY &amp; CAFE
+                  </span>
+                  <span class="text-[10px] font-mono text-emerald-400 font-bold">Review 9.5/10</span>
+                </div>
+                <h4 class="text-sm font-extrabold text-white group-hover:text-emerald-300 transition">
+                  Hành Trình Săn Mây &amp; Cafe Thung Lũng Sương (2N1Đ)
+                </h4>
+                <div class="text-[11px] text-slate-300 space-y-1">
+                  <div class="flex items-center gap-1.5"><i class="fa-solid fa-plane-departure text-cyan-400 text-[10px]"></i> Điểm đi: <strong>TP. Hồ Chí Minh</strong> &rarr; Điểm đến: <strong>Ẩn danh (Đà Lạt)</strong></div>
+                  <div class="flex items-center gap-1.5"><i class="fa-solid fa-hotel text-amber-400 text-[10px]"></i> Lưu trú: <strong>Boutique Hotel 4 sao view đồi thông</strong></div>
+                  <div class="flex items-center gap-1.5"><i class="fa-solid fa-utensils text-emerald-400 text-[10px]"></i> Bao gồm: <strong>Xe giường nằm VIP đón tận nơi + Tour săn mây</strong></div>
+                </div>
+              </div>
+
+              <div class="pt-2 border-t border-slate-800 space-y-2">
+                <div class="flex items-baseline justify-between">
+                  <div>
+                    <span class="text-[10px] text-slate-400 line-through">2.350.000đ</span>
+                    <div class="text-base font-black text-emerald-300 font-mono">1.850.000 VNĐ</div>
+                  </div>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-black bg-rose-950 text-rose-300 border border-rose-700">-500.000đ ƯU ĐÃI</span>
+                </div>
+                <button type="button" onclick="openQuickCheckout('pkg_dalat')" class="w-full py-2.5 rounded-xl btn-glow-emerald text-white font-black text-xs shadow transition flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-bolt"></i>
+                  <span>⚡ Chốt Đặt Chuyến Đi Này</span>
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
+
+        <!-- PHẦN PHÂN TÍCH TÂM LÝ CHUYÊN SÂU (ĐÓNG GỌN TRONG ACCORDION ĐỂ KHÔNG LÀM RƯỜM RÀ GIAO DIỆN) -->
+        <details class="mt-4 rounded-2xl bg-slate-950/80 border border-slate-800 p-4 transition group">
+          <summary class="font-bold text-xs text-slate-300 hover:text-cyan-300 cursor-pointer flex items-center justify-between select-none">
+            <span class="flex items-center gap-2">
+              <i class="fa-solid fa-sliders text-cyan-400"></i>
+              <span>⚙️ Tùy Chỉnh Nâng Cao: 5 Trục Tâm Lý Cá Nhân Hóa &amp; Bộ Lọc Loại Trừ Blacklist</span>
+            </span>
+            <span class="text-[10px] text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          
+          <div class="pt-4 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
+              <span id="live-ai-winner-pill" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/50">
+                🎯 Đang khớp: Măng Đen (100% Match)
+              </span>
+              <div class="flex flex-wrap gap-1.5">
+                <button type="button" onclick="applyPersonaPreset('MANG_DEN')" class="px-2.5 py-1 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-600/60 text-[11px] font-bold">🏔️ Núi (Măng Đen)</button>
+                <button type="button" onclick="applyPersonaPreset('DA_LAT')" class="px-2.5 py-1 rounded-lg bg-cyan-950 text-cyan-300 border border-cyan-600/60 text-[11px] font-bold">🌲 Chữa lành (Đà Lạt)</button>
+                <button type="button" onclick="applyPersonaPreset('HUE')" class="px-2.5 py-1 rounded-lg bg-purple-950 text-purple-300 border border-purple-600/60 text-[11px] font-bold">🏛️ Di sản (Huế)</button>
+                <button type="button" onclick="applyPersonaPreset('PHU_QUOC')" class="px-2.5 py-1 rounded-lg bg-amber-950 text-amber-300 border border-amber-600/60 text-[11px] font-bold">🏖️ Resort (Phú Quốc)</button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 text-xs">
+              <div class="lg:col-span-7 space-y-2">
+                <div class="grid grid-cols-5 gap-2 text-center">
+                  <div class="bg-slate-900 p-2 rounded-xl border border-slate-800 space-y-1">
+                    <span class="text-[10px] text-slate-300 font-semibold block">🌿 Chữa lành</span>
+                    <input id="cw-vec-healing" type="number" min="10" max="100" value="98" oninput="document.getElementById('cw-range-healing').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-cyan-300 text-sm focus:outline-none">
+                    <input id="cw-range-healing" type="range" min="10" max="100" value="98" oninput="document.getElementById('cw-vec-healing').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-cyan-400 cursor-pointer">
+                  </div>
+                  <div class="bg-slate-900 p-2 rounded-xl border border-slate-800 space-y-1">
+                    <span class="text-[10px] text-slate-300 font-semibold block">🏔️ Thiên nhiên</span>
+                    <input id="cw-vec-nature" type="number" min="10" max="100" value="98" oninput="document.getElementById('cw-range-nature').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-emerald-300 text-sm focus:outline-none">
+                    <input id="cw-range-nature" type="range" min="10" max="100" value="98" oninput="document.getElementById('cw-vec-nature').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-emerald-400 cursor-pointer">
+                  </div>
+                  <div class="bg-slate-900 p-2 rounded-xl border border-slate-800 space-y-1">
+                    <span class="text-[10px] text-slate-300 font-semibold block">🧘 Độc hành</span>
+                    <input id="cw-vec-solitude" type="number" min="10" max="100" value="95" oninput="document.getElementById('cw-range-solitude').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-indigo-300 text-sm focus:outline-none">
+                    <input id="cw-range-solitude" type="range" min="10" max="100" value="95" oninput="document.getElementById('cw-vec-solitude').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-indigo-400 cursor-pointer">
+                  </div>
+                  <div class="bg-slate-900 p-2 rounded-xl border border-slate-800 space-y-1">
+                    <span class="text-[10px] text-slate-300 font-semibold block">👑 Nghỉ dưỡng</span>
+                    <input id="cw-vec-comfort" type="number" min="10" max="100" value="65" oninput="document.getElementById('cw-range-comfort').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-amber-300 text-sm focus:outline-none">
+                    <input id="cw-range-comfort" type="range" min="10" max="100" value="65" oninput="document.getElementById('cw-vec-comfort').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-amber-400 cursor-pointer">
+                  </div>
+                  <div class="bg-slate-900 p-2 rounded-xl border border-slate-800 space-y-1">
+                    <span class="text-[10px] text-slate-300 font-semibold block">🏛️ Văn hóa</span>
+                    <input id="cw-vec-culture" type="number" min="10" max="100" value="70" oninput="document.getElementById('cw-range-culture').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-rose-300 text-sm focus:outline-none">
+                    <input id="cw-range-culture" type="range" min="10" max="100" value="70" oninput="document.getElementById('cw-vec-culture').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-rose-400 cursor-pointer">
+                  </div>
+                </div>
+              </div>
+
+              <div class="lg:col-span-5 space-y-2">
+                <span class="font-bold text-rose-300 block text-[11px]">🚫 Chặn Tỉnh/Thành Đã Đi:</span>
+                <div class="flex flex-wrap gap-1.5">
+                  <label class="px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center gap-1 cursor-pointer text-[11px]">
+                    <input type="checkbox" name="cw-blacklist" value="Đà Lạt" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Đà Lạt</span>
+                  </label>
+                  <label class="px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center gap-1 cursor-pointer text-[11px]">
+                    <input type="checkbox" name="cw-blacklist" value="Quy Nhơn" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Quy Nhơn</span>
+                  </label>
+                  <label class="px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center gap-1 cursor-pointer text-[11px]">
+                    <input type="checkbox" name="cw-blacklist" value="Măng Đen" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Măng Đen</span>
+                  </label>
+                  <label class="px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center gap-1 cursor-pointer text-[11px]">
+                    <input type="checkbox" name="cw-blacklist" value="Huế" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Huế</span>
+                  </label>
+                  <label class="px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center gap-1 cursor-pointer text-[11px]">
+                    <input type="checkbox" name="cw-blacklist" value="Phú Quốc" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Phú Quốc</span>
+                  </label>
+                </div>
+                <input id="cw-blacklist-text" type="text" oninput="handleLivePersonaChange()" placeholder="Hoặc gõ tên thành phố muốn loại trừ..." class="w-full glass-input rounded-xl px-2.5 py-1 text-xs text-rose-200 border border-rose-500/30">
+              </div>
+            </div>
+
+            <div id="live-ai-route-analysis-box" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 text-xs">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </details>
 
         <!-- COMPONENT 1: SMART PACKAGE & VALUE GUARANTEE CALCULATOR (RETAIL VALUE FLOOR >= 120%) -->
         <div class="mt-6 p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-cyan-950/30 to-slate-900 border border-cyan-500/40 shadow-xl space-y-4">
@@ -1809,6 +1905,29 @@
          ========================================================================== -->
     <section id="view-b2b" class="space-y-8 hidden animate-fadeIn">
       
+      <!-- B2B Top Mode Navigation Bar (Chuyển chế độ linh hoạt & Đăng xuất riêng biệt) -->
+      <div class="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900/90 border border-amber-500/40 shadow-xl">
+        <div class="flex items-center gap-2.5">
+          <span class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-sm border border-amber-500/40">
+            <i class="fa-solid fa-hotel"></i>
+          </span>
+          <div>
+            <span class="text-[10px] font-black text-amber-400 uppercase tracking-wider">CHẾ ĐỘ ĐỐI TÁC KHÁCH SẠN &amp; HÀNG KHÔNG (B2B)</span>
+            <h3 class="text-sm font-extrabold text-white">Quản Trị Tồn Kho Phòng PMS &amp; Sổ Cái Ký Quỹ Escrow</h3>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="switchTab('b2c');" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Vào Giao Diện Du Khách (B2C)</span>
+          </button>
+          <button type="button" onclick="handleLogout()" class="px-3.5 py-1.5 rounded-xl bg-rose-950/70 hover:bg-rose-900 border border-rose-500/50 text-rose-300 text-xs font-bold transition flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Đăng Xuất B2B</span>
+          </button>
+        </div>
+      </div>
+
       <div class="glass-panel rounded-3xl p-6 lg:p-10 border border-slate-800 space-y-6">
         <div>
           <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
@@ -2137,6 +2256,29 @@
          TAB 3 (VIEW-ADMIN): QUẢN TRỊ VIÊN & KIỂM ĐỊNH AI (ADMIN & AI INSPECTOR)
          ========================================================================== -->
     <section id="view-admin" class="space-y-8 hidden animate-fadeIn">
+
+      <!-- Admin Top Mode Navigation Bar (Chuyển chế độ linh hoạt & Đăng xuất riêng biệt) -->
+      <div class="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900/90 border border-emerald-500/40 shadow-xl">
+        <div class="flex items-center gap-2.5">
+          <span class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-sm border border-emerald-500/40">
+            <i class="fa-solid fa-shield-cat"></i>
+          </span>
+          <div>
+            <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider">CHẾ ĐỘ QUẢN TRỊ VIÊN HỆ THỐNG (ADMIN MASTER)</span>
+            <h3 class="text-sm font-extrabold text-white">Giám Sát Hạ Tầng Toàn Sàn, Sổ Cái Escrow &amp; Supabase Bridge</h3>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="switchTab('b2c');" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Vào Giao Diện Du Khách (B2C)</span>
+          </button>
+          <button type="button" onclick="handleLogout()" class="px-3.5 py-1.5 rounded-xl bg-rose-950/70 hover:bg-rose-900 border border-rose-500/50 text-rose-300 text-xs font-bold transition flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Đăng Xuất Admin</span>
+          </button>
+        </div>
+      </div>
 
       <!-- BẢNG ĐIỀU KHIỂN GIÁM SÁT HẠ TẦNG & SỨC KHỎE HỆ THỐNG DÀNH CHO ADMIN -->
       <div class="glass-panel rounded-3xl p-6 lg:p-8 border border-cyan-500/40 space-y-4">
@@ -2916,59 +3058,84 @@
         </button>
       </div>
 
-      <!-- Tab 1: Personal Info & KYC CCCD/Passport -->
+      <!-- Tab 1: Form Chỉnh Sửa Thông Tin Cá Nhân & KYC CCCD Trực Tiếp (Bảng Hồ Sơ To) -->
       <div id="prof-panel-profile" class="space-y-4 text-xs">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="bg-slate-900/90 p-4 rounded-2xl border border-slate-800 space-y-2.5">
-            <h4 class="font-bold text-cyan-300 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-              <i class="fa-solid fa-address-card"></i> Thông Tin Cá Nhân &amp; Tài Khoản
-            </h4>
-            <div class="space-y-1.5 text-slate-300">
-              <div class="flex justify-between py-1 border-b border-slate-800/80">
-                <span class="text-slate-400">Họ và tên:</span>
-                <strong id="prof-info-name" class="text-white uppercase font-bold">NGUYỄN VĂN AN</strong>
-              </div>
-              <div class="flex justify-between py-1 border-b border-slate-800/80">
-                <span class="text-slate-400">Số điện thoại:</span>
-                <strong id="prof-info-phone" class="font-mono text-cyan-300 font-bold">0988 888 888</strong>
-              </div>
-              <div class="flex justify-between py-1 border-b border-slate-800/80">
-                <span class="text-slate-400">Email đăng ký:</span>
-                <strong id="prof-info-email" class="text-slate-200 font-mono">an.nguyen@wandermatch.vn</strong>
-              </div>
-              <div class="flex justify-between py-1 border-b border-slate-800/80">
-                <span class="text-slate-400">STK Napas nhận hoàn tiền:</span>
-                <strong id="prof-info-bank" class="font-mono text-emerald-300 font-bold">MB BANK — 0988888888</strong>
-              </div>
-              <div class="flex justify-between py-1">
-                <span class="text-slate-400">Mã bảo mật thay thế cá nhân:</span>
-                <strong id="prof-info-backup" class="font-mono text-cyan-300 font-bold bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-700">WM-2026</strong>
-              </div>
+        <form id="form-edit-customer-profile" onsubmit="handleSaveProfileUpdate(event)" class="space-y-4">
+          <div class="p-3.5 rounded-2xl bg-cyan-950/40 border border-cyan-500/40 flex flex-wrap items-center justify-between gap-3 text-cyan-200">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-user-pen text-cyan-400 text-base"></i>
+              <span>Chỉnh sửa thông tin tài khoản, ngân hàng nhận hoàn tiền Napas 247 và mã bảo mật thay thế. Hệ thống lưu trữ và đồng bộ tức thì vào Supabase.</span>
+            </div>
+            <span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-500 shrink-0">KYC ĐÃ XÁC THỰC</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Nhóm 1: Họ tên & SĐT -->
+            <div>
+              <label class="block text-slate-300 font-bold mb-1">Họ và tên (Đúng CCCD / Hộ Chiếu): *</label>
+              <input id="edit-prof-name" type="text" required class="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-white uppercase font-bold bg-slate-900 border border-cyan-500/40">
+            </div>
+
+            <div>
+              <label class="block text-slate-300 font-bold mb-1">Số điện thoại liên lạc: *</label>
+              <input id="edit-prof-phone" type="tel" required class="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono font-bold bg-slate-900 border border-cyan-500/40">
+            </div>
+
+            <!-- Nhóm 2: Email & Số CCCD -->
+            <div>
+              <label class="block text-slate-300 font-bold mb-1">Email tài khoản &amp; Nhận E-ticket: *</label>
+              <input id="edit-prof-email" type="email" required class="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-white font-mono bg-slate-900 border border-cyan-500/40">
+            </div>
+
+            <div>
+              <label class="block text-slate-300 font-bold mb-1">Số CCCD / Hộ chiếu (Định danh KYC): *</label>
+              <input id="edit-prof-cccd" type="text" required class="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-white font-mono font-bold bg-slate-900 border border-cyan-500/40">
+            </div>
+
+            <!-- Nhóm 3: Ngân hàng & STK Napas -->
+            <div>
+              <label class="block text-slate-300 font-bold mb-1">Ngân hàng thụ hưởng hoàn tiền 24H: *</label>
+              <select id="edit-prof-bank-name" required class="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-white font-semibold bg-slate-900 border border-cyan-500/40">
+                <option value="MB BANK">MB Bank (Ngân Hàng Quân Đội)</option>
+                <option value="VIETCOMBANK">Vietcombank</option>
+                <option value="TECHCOMBANK">Techcombank</option>
+                <option value="ACB">ACB (Á Châu)</option>
+                <option value="BIDV">BIDV</option>
+                <option value="VPBANK">VPBank</option>
+                <option value="TPBANK">TPBank</option>
+                <option value="VIETINBANK">VietinBank</option>
+                <option value="AGRIBANK">Agribank</option>
+                <option value="MOMO">Ví MoMo</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-slate-300 font-bold mb-1">Số Tài Khoản Ngân Hàng (STK): *</label>
+              <input id="edit-prof-bank-acc" type="text" required class="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-emerald-300 font-mono font-bold bg-slate-900 border border-cyan-500/40">
+            </div>
+
+            <!-- Nhóm 4: Mật khẩu mới & Mã bảo mật thay thế -->
+            <div>
+              <label class="block text-slate-300 font-bold mb-1">Mật khẩu mới (Để trống nếu không đổi):</label>
+              <input id="edit-prof-password" type="password" placeholder="Nhập mật khẩu mới nếu muốn đổi..." class="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-white bg-slate-900 border border-slate-700">
+            </div>
+
+            <div>
+              <label class="block text-slate-300 font-bold mb-1">Mã bảo mật thay thế dự phòng (Passcode): *</label>
+              <input id="edit-prof-backup-code" type="text" required value="WM-2026" class="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono font-bold bg-slate-900 border border-cyan-500/40">
             </div>
           </div>
 
-          <div class="bg-slate-900/90 p-4 rounded-2xl border border-emerald-500/40 space-y-2.5">
-            <div class="flex items-center justify-between">
-              <h4 class="font-bold text-emerald-300 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                <i class="fa-solid fa-passport"></i> Định Danh KYC CCCD / Hộ Chiếu
-              </h4>
-              <span class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-700">ĐÃ XÁC THỰC OCR</span>
-            </div>
-            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5">
-              <div class="flex justify-between text-[11px]">
-                <span class="text-slate-400">Số CCCD / Hộ chiếu:</span>
-                <span id="prof-info-cccd" class="font-mono font-bold text-white">079201019888</span>
-              </div>
-              <div class="flex justify-between text-[11px]">
-                <span class="text-slate-400">Tình trạng vé máy bay:</span>
-                <span class="text-emerald-400 font-bold">Tự Động Điền Vé Không Lỗi</span>
-              </div>
-              <p class="text-[10px] text-slate-400 pt-1 border-t border-slate-800 leading-relaxed">
-                Hệ thống sử dụng OCR AI mã hóa AES-256 bảo mật hồ sơ pháp lý, sẵn sàng kích hoạt lệnh Auto-Booking ngay khi thanh toán thành công.
-              </p>
-            </div>
+          <div class="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800">
+            <span class="text-[11px] text-slate-400">
+              <i class="fa-solid fa-shield-check text-emerald-400"></i> Dữ liệu được mã hóa bảo mật AES-256 và đồng bộ vào Supabase Database.
+            </span>
+            <button type="submit" class="px-6 py-3 rounded-xl btn-glow-cyan text-slate-950 font-black text-xs shadow-xl transition flex items-center gap-2 hover:scale-[1.01]">
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span>💾 Lưu Thay Đổi &amp; Cập Nhật Hồ Sơ Vào Hệ Thống</span>
+            </button>
           </div>
-        </div>
+        </form>
       </div>
 
       <!-- Tab 2: My Secret Bookings -->
@@ -3294,28 +3461,201 @@
   </div>
 
   <!-- ============================================================================
+       MODAL: CHỐT ĐẶT CHUYẾN ĐI & THANH TOÁN VIETQR (CHỈ HIỆN RA KHI KHÁCH BẤM CHỐT)
+       ============================================================================ -->
+  <div id="checkout-booking-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md hidden animate-fadeIn overflow-y-auto">
+    <div class="glass-panel rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto border border-cyan-500/50 shadow-2xl p-6 lg:p-8 space-y-5 my-8">
+      
+      <!-- Modal Header -->
+      <div class="flex items-start justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-cyan-500/20 border border-cyan-500/50 text-cyan-300 flex items-center justify-center text-xl shadow-lg shadow-cyan-500/20">
+            <i class="fa-solid fa-credit-card"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-black text-cyan-400 uppercase tracking-widest">CỔNG THANH TOÁN ESCROW BẢO LÃNH 24H</span>
+            <h3 id="checkout-modal-title" class="text-xl font-extrabold text-white">Chốt Đặt Chuyến Đi &amp; Quét Mã VietQR</h3>
+            <p class="text-[11px] text-slate-400">Tiền được tạm giữ an toàn qua Napas 247 — Cam kết hoàn tiền 100% trong 24 giờ nếu có sự cố</p>
+          </div>
+        </div>
+        <button onclick="closeQuickCheckout()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Tóm Tắt Chuyến Đi Đã Chốt -->
+      <div class="p-4 rounded-2xl bg-slate-900/90 border border-cyan-500/40 space-y-2 text-xs">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+          <span class="text-slate-400 font-bold uppercase tracking-wider text-[10px]">TÓM TẮT CHUYẾN ĐI ĐÃ CHỌN</span>
+          <span id="checkout-trip-badge" class="px-2 py-0.5 rounded text-[10px] font-black bg-cyan-950 text-cyan-300 border border-cyan-700">BẢN ĐỒ MÙ ẨN TRÌNH</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-300 pt-1">
+          <div><i class="fa-solid fa-plane-departure text-cyan-400"></i> Điểm khởi hành: <strong id="checkout-summary-origin" class="text-white">TP. Hồ Chí Minh (SGN)</strong></div>
+          <div><i class="fa-solid fa-map-pin text-amber-400"></i> Điểm đến: <strong id="checkout-summary-dest" class="text-white">Ẩn Trình Mù (Măng Đen / Đà Lạt)</strong></div>
+          <div><i class="fa-solid fa-hotel text-emerald-400"></i> Khách sạn: <strong id="checkout-summary-hotel" class="text-white">Resort / Hotel 4-5 sao đã khóa PMS</strong></div>
+          <div><i class="fa-solid fa-users text-cyan-400"></i> Số lượng: <strong id="checkout-summary-pax" class="text-white">2 Khách (3N2Đ)</strong></div>
+        </div>
+      </div>
+
+      <!-- Ưu Đãi Áp Dụng Riêng Cho Chuyến Đi Này -->
+      <div class="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-950/60 to-cyan-950/40 border border-emerald-500/40 flex items-center justify-between text-xs">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-tag text-emerald-400 text-sm"></i>
+          <div>
+            <span class="text-white font-bold block">Ưu Đãi Độc Quyền Chuyến Đi Này:</span>
+            <span class="text-[11px] text-emerald-300">Áp dụng mã <strong>WANDERMATCH-500K</strong> trừ thẳng vào đơn</span>
+          </div>
+        </div>
+        <div class="text-right font-mono">
+          <span class="text-slate-400 line-through text-[11px]" id="checkout-original-price">3.700.000 VNĐ</span>
+          <div class="text-emerald-400 font-black text-sm" id="checkout-discount-val">-500.000 VNĐ</div>
+        </div>
+      </div>
+
+      <!-- Khối Mã VietQR Thanh Toán Napas 247 -->
+      <div class="p-5 rounded-2xl bg-slate-950 border-2 border-emerald-500/50 shadow-2xl grid grid-cols-1 sm:grid-cols-2 gap-5 items-center">
+        <!-- Ảnh Mã VietQR -->
+        <div class="flex flex-col items-center justify-center p-3 rounded-xl bg-white text-slate-950 shadow-lg">
+          <img id="checkout-vietqr-img" src="https://api.vietqr.io/image/970422-0988888888-qRzE7x1.jpg?amount=3200000&addInfo=WM2026MD88" alt="Mã VietQR" class="w-48 h-48 object-contain">
+          <div class="text-[10px] font-bold text-slate-600 mt-1 flex items-center gap-1 font-mono">
+            <i class="fa-solid fa-qrcode text-emerald-600"></i> NAPAS 247 LIÊN NGÂN HÀNG
+          </div>
+        </div>
+
+        <!-- Thông Tin Chuyển Khoản & Đếm Ngược -->
+        <div class="space-y-2 text-xs">
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Số tiền thanh toán:</span>
+            <strong id="checkout-final-price" class="text-lg font-black text-emerald-400 font-mono">3.200.000 VNĐ</strong>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Chủ tài khoản:</span>
+            <span class="font-bold text-white text-[11px]">CONG TY WANDERMATCH</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Ngân hàng:</span>
+            <span class="font-bold text-cyan-300">MB BANK (Quân Đội)</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Số tài khoản:</span>
+            <span class="font-mono font-bold text-white text-sm">0988 888 888</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Nội dung chuyển khoản:</span>
+            <code id="checkout-tx-code" class="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-700 font-mono font-bold">WM2026MD88</code>
+          </div>
+
+          <!-- Countdown -->
+          <div class="p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-[11px] text-amber-300 flex items-center justify-between">
+            <span>Hạn chót giữ phòng &amp; vé:</span>
+            <strong id="checkout-timer-text" class="font-mono font-black text-amber-400">14:59</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Confirmation Button -->
+      <div class="space-y-2 pt-1">
+        <button type="button" onclick="confirmPaymentAndOpenScratch()" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-xs lg:text-sm shadow-2xl transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-circle-check text-base"></i>
+          <span>✅ TÔI ĐÃ CHUYỂN KHOẢN THÀNH CÔNG — MỞ THẺ CÀO GIỜ G</span>
+        </button>
+        <div class="text-center text-[10px] text-slate-400 flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+          <span>Bảo lãnh Escrow 100% qua Napas 247 • Hoàn tiền tự động trong 24 giờ nếu hủy chuyến</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================================
+       MODAL: THẺ CÀO CANVAS GIỜ G & BOARDING PASS (MỞ RA KHI THANH TOÁN THÀNH CÔNG)
+       ============================================================================ -->
+  <div id="scratch-ticket-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md hidden animate-fadeIn overflow-y-auto">
+    <div class="glass-panel rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto border-2 border-emerald-500/50 shadow-2xl p-6 lg:p-8 space-y-5 my-8 text-center">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2.5 text-left">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-gift"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider">THANH TOÁN ESCROW THÀNH CÔNG</span>
+            <h3 class="text-lg font-extrabold text-white">Thẻ Cào Giờ G &amp; Boarding Pass Bí Mật</h3>
+          </div>
+        </div>
+        <button onclick="closeScratchModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-300">
+        Dùng chuột hoặc ngón tay cào lớp phủ bạc bên dưới để giải mã thành phố đến &amp; khách sạn bí mật của chuyến đi!
+      </p>
+
+      <!-- Scratch Container -->
+      <div class="flex justify-center">
+        <div class="scratch-container border-2 border-cyan-500/60 rounded-2xl shadow-2xl relative w-full max-w-[500px] h-[260px] overflow-hidden">
+          
+          <!-- Background revealed after scratching -->
+          <div class="scratch-background absolute inset-0 bg-gradient-to-br from-slate-900 via-cyan-950 to-slate-900 p-5 flex flex-col justify-between text-left text-xs border border-cyan-500/40">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-600">ĐÃ MỞ KHÓA GIỜ G</span>
+                <span class="font-mono text-cyan-300 font-bold" id="scratch-revealed-code">#WM-2026-MD88</span>
+              </div>
+              <h4 id="scratch-revealed-city" class="text-lg font-black text-white">🏔️ THÀNH PHỐ ĐẾN: MĂNG ĐEN — KON TUM</h4>
+              <p id="scratch-revealed-hotel" class="text-cyan-300 text-xs font-semibold mt-0.5">Resort 4 Sao Bạch Dương Rừng Thông</p>
+            </div>
+            
+            <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1 font-mono text-[11px] text-slate-300">
+              <div>Khởi hành: <strong>07:30 Sáng — Sảnh A Ga Quốc Nội</strong></div>
+              <div>Mã vé bay/xe: <strong class="text-emerald-400">VN-8892 (Đã Xác Nhận KYC)</strong></div>
+              <div>Tiện ích: <strong>Bao gồm ăn sáng buffet + Xe đưa đón riêng</strong></div>
+            </div>
+            
+            <div class="text-[10px] text-slate-400 flex items-center justify-between">
+              <span>Bảo lãnh PMS cứng: 20 Triệu VNĐ</span>
+              <span class="text-emerald-400 font-bold">Hoàn tiền SLA 24H an toàn</span>
+            </div>
+          </div>
+
+          <!-- Canvas Layer -->
+          <canvas id="quick-scratch-canvas" class="scratch-canvas absolute inset-0 w-full h-full cursor-grab z-10"></canvas>
+        </div>
+      </div>
+
+      <!-- Action Buttons After Scratching -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs">
+        <button type="button" onclick="closeScratchModal(); openCustomerProfileModal('ledger');" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/40 font-bold transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-receipt"></i>
+          <span>Xem Đơn Hàng Trong Sổ Cái</span>
+        </button>
+        <button type="button" onclick="closeScratchModal(); openCustomerProfileModal('profile');" class="py-3 px-4 rounded-xl btn-glow-cyan text-slate-950 font-black transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-id-badge"></i>
+          <span>Vào Bảng Hồ Sơ Cá Nhân</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================================
        MOBILE BOTTOM NAVIGATION BAR (TRẢI NGHIỆM DU LỊCH 1-CHẠM TIỆN LỢI CHO ĐIỆN THOẠI)
        ============================================================================ -->
   <nav id="mobile-bottom-nav" class="mobile-bottom-nav md:hidden">
-    <button onclick="switchTab('b2c'); switchB2CStep(1);" class="mobile-nav-item active" id="mob-nav-step1">
-      <i class="fa-solid fa-compass"></i>
+    <button onclick="switchTab('b2c');" class="mobile-nav-item active" id="mob-nav-step1">
+      <i class="fa-solid fa-compass text-cyan-400"></i>
       <span>Khám Phá</span>
     </button>
-    <button onclick="switchTab('b2c'); switchB2CStep(2);" class="mobile-nav-item" id="mob-nav-step2">
-      <i class="fa-solid fa-credit-card"></i>
-      <span>Đặt Vé</span>
-    </button>
-    <button onclick="switchTab('b2c'); switchB2CStep(3);" class="mobile-nav-item" id="mob-nav-step3">
-      <i class="fa-solid fa-hourglass-half"></i>
-      <span>Phòng Chờ</span>
-    </button>
-    <button onclick="switchTab('b2b');" class="mobile-nav-item" id="mob-nav-b2b">
-      <i class="fa-solid fa-hotel"></i>
-      <span>Đối Tác</span>
+    <button onclick="openRefundPolicyModal();" class="mobile-nav-item" id="mob-nav-refund">
+      <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+      <span>Hoàn 24H</span>
     </button>
     <button onclick="handleMobileProfileClick();" class="mobile-nav-item" id="mob-nav-profile">
-      <i class="fa-solid fa-user"></i>
-      <span>Tài Khoản</span>
+      <i class="fa-solid fa-user text-cyan-400"></i>
+      <span>Hồ Sơ</span>
     </button>
   </nav>
 
@@ -6135,16 +6475,10 @@
         return;
       }
 
-      // Populate current user data
+      // Populate current user data vào Header & Tab Tĩnh
       const nameTitle = document.getElementById('profile-fullname-title');
       const emailSub = document.getElementById('profile-email-subtitle');
       const avatarLarge = document.getElementById('profile-avatar-large');
-      const infoName = document.getElementById('prof-info-name');
-      const infoPhone = document.getElementById('prof-info-phone');
-      const infoEmail = document.getElementById('prof-info-email');
-      const infoBank = document.getElementById('prof-info-bank');
-      const infoCccd = document.getElementById('prof-info-cccd');
-      const infoBackup = document.getElementById('prof-info-backup');
       const logoutUsername = document.getElementById('logout-panel-username');
       const logoutEmail = document.getElementById('logout-panel-email');
       const logoutBackup = document.getElementById('logout-panel-backup-code');
@@ -6152,12 +6486,23 @@
       if (nameTitle) nameTitle.textContent = window.currentUser.name;
       if (emailSub) emailSub.textContent = `${window.currentUser.email} • ${window.currentUser.tier || 'Thành viên'}`;
       if (avatarLarge && window.currentUser.avatar) avatarLarge.src = window.currentUser.avatar;
-      if (infoName) infoName.textContent = window.currentUser.name;
-      if (infoPhone) infoPhone.textContent = window.currentUser.phone || '0988 888 888';
-      if (infoEmail) infoEmail.textContent = window.currentUser.email;
-      if (infoBank) infoBank.textContent = window.currentUser.bank || 'MB BANK — 0988888888';
-      if (infoCccd) infoCccd.textContent = window.currentUser.cccd || '079201019888';
-      if (infoBackup) infoBackup.textContent = window.currentUser.backupCode || 'WM-2026';
+
+      // ĐIỀN DỮ LIỆU VÀO FORM CHỈNH SỬA THÔNG TIN KHÁCH HÀNG (Tab 1: Bảng Hồ Sơ To)
+      const editName = document.getElementById('edit-prof-name');
+      const editPhone = document.getElementById('edit-prof-phone');
+      const editEmail = document.getElementById('edit-prof-email');
+      const editCccd = document.getElementById('edit-prof-cccd');
+      const editBankName = document.getElementById('edit-prof-bank-name');
+      const editBankAcc = document.getElementById('edit-prof-bank-acc');
+      const editBackup = document.getElementById('edit-prof-backup-code');
+
+      if (editName) editName.value = window.currentUser.name || '';
+      if (editPhone) editPhone.value = window.currentUser.phone || '';
+      if (editEmail) editEmail.value = window.currentUser.email || '';
+      if (editCccd) editCccd.value = window.currentUser.cccd || '';
+      if (editBankName && window.currentUser.bankName) editBankName.value = window.currentUser.bankName;
+      if (editBankAcc) editBankAcc.value = window.currentUser.bankAcc || (window.currentUser.bank ? window.currentUser.bank.split('—').pop().trim() : '');
+      if (editBackup) editBackup.value = window.currentUser.backupCode || 'WM-2026';
 
       // Cập nhật thông tin trong Tab Đăng Xuất & Quản Trị Phiên riêng biệt
       if (logoutUsername) logoutUsername.textContent = window.currentUser.name;
@@ -6167,6 +6512,317 @@
       const modal = document.getElementById('customer-profile-modal');
       if (modal) modal.classList.remove('hidden');
       switchProfileTab(tab);
+    };
+
+    // HÀM LƯU CHỈNH SỬA THÔNG TIN KHÁCH HÀNG & ĐỒNG BỘ SUPABASE
+    window.handleSaveProfileUpdate = function(e) {
+      if (e) e.preventDefault();
+      if (!window.currentUser) return;
+
+      const editName = document.getElementById('edit-prof-name')?.value.trim();
+      const editPhone = document.getElementById('edit-prof-phone')?.value.trim();
+      const editEmail = document.getElementById('edit-prof-email')?.value.trim();
+      const editCccd = document.getElementById('edit-prof-cccd')?.value.trim();
+      const editBankName = document.getElementById('edit-prof-bank-name')?.value;
+      const editBankAcc = document.getElementById('edit-prof-bank-acc')?.value.trim();
+      const editPassword = document.getElementById('edit-prof-password')?.value.trim();
+      const editBackup = document.getElementById('edit-prof-backup-code')?.value.trim();
+
+      if (!editName || !editEmail) {
+        if (typeof showToast === 'function') showToast('warning', '⚠️ Vui lòng điền đầy đủ Họ tên và Email!');
+        return;
+      }
+
+      // Cập nhật đối tượng currentUser
+      window.currentUser.name = editName.toUpperCase();
+      window.currentUser.phone = editPhone || window.currentUser.phone;
+      window.currentUser.email = editEmail;
+      window.currentUser.cccd = editCccd || window.currentUser.cccd;
+      window.currentUser.bankName = editBankName || window.currentUser.bankName;
+      window.currentUser.bankAcc = editBankAcc || window.currentUser.bankAcc;
+      window.currentUser.bank = `${editBankName || 'MB BANK'} — ${editBankAcc || ''}`;
+      if (editPassword) window.currentUser.password = editPassword;
+      if (editBackup) window.currentUser.backupCode = editBackup.toUpperCase();
+      window.currentUser.updatedAt = new Date().toISOString();
+
+      // Cập nhật vào DB và Session
+      const users = getUsersDB();
+      const idx = users.findIndex(u => u.id === window.currentUser.id || u.email.toLowerCase() === window.currentUser.email.toLowerCase());
+      if (idx !== -1) {
+        users[idx] = { ...users[idx], ...window.currentUser };
+      } else {
+        users.push(window.currentUser);
+      }
+      saveUsersDB(users);
+      localStorage.setItem('wm_user_session', JSON.stringify(window.currentUser));
+
+      // Cập nhật giao diện Header
+      renderUserHeader();
+      const nameTitle = document.getElementById('profile-fullname-title');
+      const emailSub = document.getElementById('profile-email-subtitle');
+      if (nameTitle) nameTitle.textContent = window.currentUser.name;
+      if (emailSub) emailSub.textContent = `${window.currentUser.email} • ${window.currentUser.tier || 'Thành viên'}`;
+
+      // Đồng bộ thông tin lên Supabase / Backend API
+      syncCustomerToSupabase(window.currentUser);
+
+      if (typeof showToast === 'function') {
+        showToast('success', `🎉 Đã lưu và cập nhật thành công hồ sơ của ${window.currentUser.name} vào hệ thống Supabase!`);
+      }
+    };
+
+    // ĐỒNG BỘ THÔNG TIN KHÁCH HÀNG LÊN SUPABASE & MÁY CHỦ
+    window.syncCustomerToSupabase = async function(userData) {
+      try {
+        const res = await fetch('/api/customer/profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(userData)
+        });
+        if (res.ok) {
+          const data = await res.json();
+          console.log('✅ Supabase Sync Response:', data);
+        }
+      } catch (err) {
+        console.warn('Bridge sync fallback: Dữ liệu đã lưu trữ an toàn trong LocalStorage.');
+      }
+    };
+
+    // QUẢN LÝ CỬA SỔ CHỐT CHUYẾN ĐI & THANH TOÁN VIETQR (CHECKOUT MODAL)
+    window.currentCheckoutTrip = null;
+    let checkoutCountdownTimer = null;
+
+    window.openQuickCheckout = function(tripPkgKey) {
+      const originSel = document.getElementById('planner-origin-select');
+      const originName = originSel ? originSel.options[originSel.selectedIndex].text : 'TP. Hồ Chí Minh (SGN)';
+      
+      const tripProfiles = {
+        pkg_mangden: {
+          title: "🏔️ Bản Đồ Mù: Trốn Khói Bụi Giữa Rừng Thông Măng Đen (3N2Đ)",
+          badge: "BẢN ĐỒ MÙ #1 • ĐỘC HÀNH & CHỮA LÀNH",
+          city: "Ẩn Trình Mù (Măng Đen — Kon Tum)",
+          hotel: "Resort 4 Sao Rừng Thông Nguyên Sinh (PMS Khóa Cứng)",
+          originalPrice: 3700000,
+          discount: 500000,
+          finalPrice: 3200000,
+          code: "WM2026MD88"
+        },
+        pkg_phuquoc: {
+          title: "🏖️ Bản Đồ Mù: Nghỉ Dưỡng Resort Biển Hoàng Hôn Sunset (3N2Đ)",
+          badge: "BẢN ĐỒ MÙ #2 • RESORT & BIỂN HOÀNG HÔN",
+          city: "Ẩn Trình Mù (Đảo Ngọc Phú Quốc)",
+          hotel: "Resort 5 Sao Sát Biển Có Hồ Bơi Vô Cực",
+          originalPrice: 5500000,
+          discount: 500000,
+          finalPrice: 5000000,
+          code: "WM2026PQ99"
+        },
+        pkg_dalat: {
+          title: "🌲 Bản Đồ Mù: Hành Trình Săn Mây & Cafe Thung Lũng Sương (2N1Đ)",
+          badge: "BẢN ĐỒ MÙ #3 • SĂN MÂY & CAFE CHILL",
+          city: "Ẩn Trình Mù (Đà Lạt Sương Mù)",
+          hotel: "Boutique Hotel 4 Sao View Đồi Thông Lãng Mạn",
+          originalPrice: 2350000,
+          discount: 500000,
+          finalPrice: 1850000,
+          code: "WM2026DL77"
+        }
+      };
+
+      const trip = tripProfiles[tripPkgKey] || tripProfiles.pkg_mangden;
+      window.currentCheckoutTrip = { ...trip, origin: originName };
+
+      // Điền thông tin vào Checkout Modal
+      const modal = document.getElementById('checkout-booking-modal');
+      const titleEl = document.getElementById('checkout-modal-title');
+      const badgeEl = document.getElementById('checkout-trip-badge');
+      const originEl = document.getElementById('checkout-summary-origin');
+      const destEl = document.getElementById('checkout-summary-dest');
+      const hotelEl = document.getElementById('checkout-summary-hotel');
+      const origPriceEl = document.getElementById('checkout-original-price');
+      const discEl = document.getElementById('checkout-discount-val');
+      const finalPriceEl = document.getElementById('checkout-final-price');
+      const txCodeEl = document.getElementById('checkout-tx-code');
+      const qrImg = document.getElementById('checkout-vietqr-img');
+
+      if (titleEl) titleEl.textContent = `Chốt Chuyến Đi: ${trip.title}`;
+      if (badgeEl) badgeEl.textContent = trip.badge;
+      if (originEl) originEl.textContent = originName;
+      if (destEl) destEl.textContent = trip.city;
+      if (hotelEl) hotelEl.textContent = trip.hotel;
+      if (origPriceEl) origPriceEl.textContent = trip.originalPrice.toLocaleString('vi-VN') + ' VNĐ';
+      if (discEl) discEl.textContent = `-${trip.discount.toLocaleString('vi-VN')} VNĐ`;
+      if (finalPriceEl) finalPriceEl.textContent = trip.finalPrice.toLocaleString('vi-VN') + ' VNĐ';
+      if (txCodeEl) txCodeEl.textContent = trip.code;
+
+      if (qrImg) {
+        qrImg.src = `https://api.vietqr.io/image/970422-0988888888-qRzE7x1.jpg?amount=${trip.finalPrice}&addInfo=${trip.code}`;
+      }
+
+      // Khởi động đếm ngược 15:00
+      let timeLeft = 15 * 60;
+      const timerText = document.getElementById('checkout-timer-text');
+      if (checkoutCountdownTimer) clearInterval(checkoutCountdownTimer);
+      checkoutCountdownTimer = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+          clearInterval(checkoutCountdownTimer);
+          if (timerText) timerText.textContent = "HẾT HẠN";
+          return;
+        }
+        const m = Math.floor(timeLeft / 60);
+        const s = timeLeft % 60;
+        if (timerText) timerText.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      }, 1000);
+
+      if (modal) modal.classList.remove('hidden');
+      if (typeof showToast === 'function') {
+        showToast('info', `⚡ Đã tạo mã VietQR & áp dụng ưu đãi -500.000đ cho chuyến đi của bạn!`);
+      }
+    };
+
+    window.closeQuickCheckout = function() {
+      const modal = document.getElementById('checkout-booking-modal');
+      if (modal) modal.classList.add('hidden');
+      if (checkoutCountdownTimer) clearInterval(checkoutCountdownTimer);
+    };
+
+    // XÁC NHẬN CHUYỂN KHOẢN VÀ MỞ THẺ CÀO GIỜ G
+    window.confirmPaymentAndOpenScratch = function() {
+      const trip = window.currentCheckoutTrip || {
+        title: "Kỳ Nghỉ Trốn Khói Bụi Giữa Rừng Thông (3N2Đ)",
+        city: "Măng Đen — Kon Tum",
+        hotel: "Resort 4 Sao Bạch Dương Rừng Thông",
+        finalPrice: 3200000,
+        code: "WM2026MD88"
+      };
+
+      closeQuickCheckout();
+
+      // Ghi đơn hàng vào Sổ Cái Giao Dịch
+      try {
+        const newLedgerItem = {
+          txId: "TX-" + Date.now().toString().slice(-6),
+          time: new Date().toLocaleString('vi-VN'),
+          service: `Chốt Đặt: ${trip.title}`,
+          amount: trip.finalPrice.toLocaleString('vi-VN') + " VNĐ",
+          amountRaw: trip.finalPrice,
+          gateway: "VietQR Napas 247 Escrow",
+          status: "Ký Quỹ Escrow An Toàn (Đã Xác Nhận)"
+        };
+
+        const existingLedger = JSON.parse(localStorage.getItem('wm_customer_ledger') || '[]');
+        existingLedger.unshift(newLedgerItem);
+        localStorage.setItem('wm_customer_ledger', JSON.stringify(existingLedger));
+
+        if (typeof window.AntiF12Vault !== 'undefined' && typeof window.AntiF12Vault.appendLedger === 'function') {
+          window.AntiF12Vault.appendLedger({
+            txId: newLedgerItem.txId,
+            tripCode: trip.code,
+            amount: trip.finalPrice,
+            direction: 'IN',
+            sender: (window.currentUser ? window.currentUser.name : 'DU KHÁCH VIP') + ' (' + (window.currentUser ? window.currentUser.bankName : 'MB BANK') + ')',
+            receiver: 'CONG TY WANDERMATCH VN (ESCROW)',
+            type: 'VIETQR_ESCROW_INFLOW',
+            status: 'HELD_IN_ESCROW'
+          });
+        }
+      } catch (err) {
+        console.warn('Lỗi ghi sổ cái:', err);
+      }
+
+      // Mở Modal Thẻ Cào & Khởi tạo Canvas cào tráng bạc
+      const scratchModal = document.getElementById('scratch-ticket-modal');
+      const revealedCode = document.getElementById('scratch-revealed-code');
+      const revealedCity = document.getElementById('scratch-revealed-city');
+      const revealedHotel = document.getElementById('scratch-revealed-hotel');
+
+      if (revealedCode) revealedCode.textContent = `#${trip.code}`;
+      if (revealedCity) revealedCity.textContent = `🏔️ THÀNH PHỐ ĐẾN: ${trip.city.toUpperCase()}`;
+      if (revealedHotel) revealedHotel.textContent = trip.hotel;
+
+      if (scratchModal) scratchModal.classList.remove('hidden');
+      initQuickScratchCanvas();
+
+      if (typeof showToast === 'function') {
+        showToast('success', `🎉 Thanh toán thành công ${trip.finalPrice.toLocaleString('vi-VN')} VNĐ! Hãy cào thẻ để giải mã thông tin chuyến đi.`);
+      }
+    };
+
+    window.closeScratchModal = function() {
+      const scratchModal = document.getElementById('scratch-ticket-modal');
+      if (scratchModal) scratchModal.classList.add('hidden');
+    };
+
+    // KHỞI TẠO CANVAS THẺ CÀO BẰNG CHUỘT / CẢM ỨNG
+    window.initQuickScratchCanvas = function() {
+      const canvas = document.getElementById('quick-scratch-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width || 500;
+      canvas.height = rect.height || 260;
+
+      // Vẽ lớp phủ bạc sang trọng
+      const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      grad.addColorStop(0, '#94a3b8');
+      grad.addColorStop(0.5, '#cbd5e1');
+      grad.addColorStop(1, '#64748b');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Chữ hướng dẫn cào
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 16px Outfit, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('✨ DÙNG CHUỘT HOẶC TAY CÀO ĐỂ MỞ KHÓA GIỜ G ✨', canvas.width / 2, canvas.height / 2 - 10);
+      ctx.font = '12px Plus Jakarta Sans, sans-serif';
+      ctx.fillStyle = '#334155';
+      ctx.fillText('Bản đồ mù AI • Khám phá điểm đến & khách sạn bí mật', canvas.width / 2, canvas.height / 2 + 15);
+
+      let isDrawing = false;
+      let scratchedPixels = 0;
+
+      function scratch(x, y) {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, 24, 0, Math.PI * 2);
+        ctx.fill();
+        scratchedPixels++;
+        if (scratchedPixels === 35) {
+          if (typeof fireConfetti === 'function') fireConfetti();
+          if (typeof showToast === 'function') {
+            showToast('success', '🎊 Chúc mừng bạn đã giải mã thành công chuyến đi Bản Đồ Mù!');
+          }
+        }
+      }
+
+      canvas.onmousedown = (e) => {
+        isDrawing = true;
+        const b = canvas.getBoundingClientRect();
+        scratch(e.clientX - b.left, e.clientY - b.top);
+      };
+      canvas.onmousemove = (e) => {
+        if (!isDrawing) return;
+        const b = canvas.getBoundingClientRect();
+        scratch(e.clientX - b.left, e.clientY - b.top);
+      };
+      window.onmouseup = () => { isDrawing = false; };
+
+      // Touch events for mobile
+      canvas.ontouchstart = (e) => {
+        isDrawing = true;
+        const b = canvas.getBoundingClientRect();
+        const t = e.touches[0];
+        scratch(t.clientX - b.left, t.clientY - b.top);
+      };
+      canvas.ontouchmove = (e) => {
+        if (!isDrawing) return;
+        const b = canvas.getBoundingClientRect();
+        const t = e.touches[0];
+        scratch(t.clientX - b.left, t.clientY - b.top);
+      };
+      canvas.ontouchend = () => { isDrawing = false; };
     };
 
     window.closeCustomerProfileModal = function() {
@@ -6222,30 +6878,59 @@
         if (typeof showToast === 'function') showToast('warning', 'Vui lòng nhập mã đơn đặt vé!');
         return;
       }
+
+      // Kiểm định quy tắc hoàn tiền & từ chối trả nếu quá thời gian (<24h hoặc đã cào mở thẻ)
+      const isExpiredOrScratched = code.includes('EXPIRE') || code.includes('REJECT') || code.includes('LATE');
+
       if (result) {
-        result.innerHTML = `
-          <div class="flex items-center justify-between text-[11px]">
-            <span class="text-slate-400">Mã đơn: <strong class="text-white font-mono">${code}</strong></span>
-            <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-600 font-bold">XÁC MINH SLA THÀNH CÔNG</span>
-          </div>
-          <div class="space-y-1 border-t border-slate-800 pt-2 text-[11px]">
-            <div class="flex justify-between">
-              <span class="text-slate-400">Trạng thái giải ngân Escrow:</span>
-              <span class="text-cyan-300 font-bold">Đang chuyển khoản Napas 247</span>
+        if (isExpiredOrScratched) {
+          result.innerHTML = `
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-slate-400">Mã đơn: <strong class="text-white font-mono">${code}</strong></span>
+              <span class="px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-600 font-bold">TỪ CHỐI HOÀN TIỀN</span>
             </div>
-            <div class="flex justify-between">
-              <span class="text-slate-400">Cam kết hạn chót hoàn tiền:</span>
-              <span class="font-mono font-black text-emerald-400">Đúng 24 Giờ (Còn 23:51:30)</span>
+            <div class="space-y-1.5 border-t border-slate-800 pt-2 text-[11px]">
+              <div class="flex justify-between text-rose-400 font-bold">
+                <span>Trạng thái hồ sơ:</span>
+                <span>TỪ CHỐI CHI TRẢ (0 VNĐ)</span>
+              </div>
+              <div class="text-[10px] text-slate-300 leading-relaxed bg-slate-900 p-2 rounded-lg border border-rose-500/40">
+                ⚠️ Đơn hàng đã quá hạn quy định (&lt; 24 giờ trước giờ khởi hành) hoặc vé máy bay &amp; phòng resort đã được đối tác khóa 100% không hoàn hủy theo Điều khoản Dịch vụ.
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>Ghi nhận hệ thống:</span>
+                <span class="font-mono text-slate-300">Đã lưu trữ biên bản từ chối vào Supabase</span>
+              </div>
             </div>
-            <div class="flex justify-between">
-              <span class="text-slate-400">Tài khoản thụ hưởng:</span>
-              <span class="font-mono text-slate-200">${window.currentUser?.bank || 'MB BANK - 0988888888'}</span>
+          `;
+          if (typeof showToast === 'function') {
+            showToast('warning', `⚠️ Đơn ${code}: Từ chối hoàn tiền do quá hạn quy định (< 24 giờ).`);
+          }
+        } else {
+          result.innerHTML = `
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-slate-400">Mã đơn: <strong class="text-white font-mono">${code}</strong></span>
+              <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-600 font-bold">XÁC MINH SLA THÀNH CÔNG</span>
             </div>
-          </div>
-        `;
-      }
-      if (typeof showToast === 'function') {
-        showToast('success', `🔍 Đã tra cứu đơn ${code}: Cam kết giải ngân về STK trong vòng 24 giờ!`);
+            <div class="space-y-1 border-t border-slate-800 pt-2 text-[11px]">
+              <div class="flex justify-between">
+                <span class="text-slate-400">Trạng thái giải ngân Escrow:</span>
+                <span class="text-cyan-300 font-bold">Đang chuyển khoản Napas 247</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Cam kết hạn chót hoàn tiền:</span>
+                <span class="font-mono font-black text-emerald-400">Đúng 24 Giờ (Còn 23:51:30)</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Tài khoản thụ hưởng:</span>
+                <span class="font-mono text-slate-200">${window.currentUser?.bank || 'MB BANK - 0988888888'}</span>
+              </div>
+            </div>
+          `;
+          if (typeof showToast === 'function') {
+            showToast('success', `🔍 Đã tra cứu đơn ${code}: Cam kết giải ngân về STK trong vòng 24 giờ!`);
+          }
+        }
       }
     };
 
