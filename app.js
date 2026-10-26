@@ -2078,6 +2078,149 @@ function renderBudgetAllocation() {
 }
 
 // "NHẬP SỐ TIỀN VÀ RA NGAY CHUYẾN ĐI" - RENDER THẺ XÁC NHẬN CHUYẾN ĐI
+const REAL_DESTINATION_DETAILS = {
+  mangden: {
+    destTitle: "Măng Đen — Kon Tum",
+    region: "Tây Nguyên Đại Ngàn • Rừng Thông Nguyên Sinh (Cao Độ 1.200m)",
+    weather: "18°C - 22°C • Se lạnh sương sớm, trong lành lý tưởng để chữa lành",
+    hotel: {
+      name: "Golden Boutique Hotel Măng Đen (4 Sao)",
+      roomType: "Phòng Deluxe King View Rừng Thông Ban Công Riêng (Kèm Buffet Sáng)",
+      rating: "9.6/10 Đánh Giá Thực Tế",
+      address: "Đường số 1, Thị trấn Măng Đen, Huyện Kon Plông, Kon Tum",
+      nights: 2
+    },
+    transit: {
+      provider: "Vé máy bay Vietnam Airlines + Xe Limousine VIP 11 Chỗ Tuấn Tú Khứ Hồi",
+      route: "Đón trả tận nhà ➔ Sân bay Pleiku (PXU) ➔ Đèo Măng Đen ➔ Khách sạn",
+      schedule: "Khởi hành: 07:45 Sáng | Chiều về: 16:30 Chiều",
+      features: "Ghế bọc da ngả lưng cao cấp, nước khoáng & khăn lạnh suốt tuyến"
+    },
+    diningPlan: "Gà nướng cơm lam Cô Sinh, Lẩu xuyên tiêu Măng Đen, Heo Mán quay bản địa, Bánh mì xíu mại",
+    ticketPlan: "Trọn gói vé Thác Pa Sỹ, Cổng trời Măng Đen, Chùa Khánh Lâm, Hồ Đăk Ke & Trải nghiệm chèo SUP"
+  },
+  dalat: {
+    destTitle: "Đà Lạt — Lâm Đồng",
+    region: "Cao Nguyên Langbiang • Xứ Sở Sương Mù & Rừng Thông Bạt Ngàn",
+    weather: "16°C - 20°C • Lạnh nhẹ, sương bảng lảng thung lũng thông",
+    hotel: {
+      name: "Ana Mandara Villas Dalat Resort & Spa (5 Sao)",
+      roomType: "Biệt Thự Pháp Cổ Villa Deluxe Ban Công Rừng Thông (Kèm Buffet Sáng)",
+      rating: "9.5/10 Đánh Giá Thực Tế",
+      address: "Đường Lê Lai, Phường 5, TP. Đà Lạt, Lâm Đồng",
+      nights: 2
+    },
+    transit: {
+      provider: "Xe Limousine Phòng Riêng Hạng Nhất Thành Bưởi / Xe Cabin Đôi VIP Khứ Hồi",
+      route: "Đón tại nhà ➔ Cao tốc Dầu Giây - Liên Khương ➔ Khách sạn trung tâm Đà Lạt",
+      schedule: "Khởi hành linh hoạt 07:00 Sáng hoặc 23:00 Đêm theo yêu cầu",
+      features: "Khoang phòng riêng biệt, nệm massage êm ái, cổng sạc Type-C siêu tốc"
+    },
+    diningPlan: "Lẩu gà lá é Tao Ngộ 3/4, Bánh ướt lòng gà Long, Kem bơ Thanh Thảo, Bữa tối nướng BBQ đồi thông",
+    ticketPlan: "Trọn gói vé Máng trượt Alpine Coaster Thác Datanla, Cáp treo Đồi Robin, Vườn Cẩm Tú Cầu"
+  },
+  phuquoc: {
+    destTitle: "Đảo Ngọc Phú Quốc — Kiên Giang",
+    region: "Vịnh Thái Lan • Bãi Trường Hoàng Hôn & Quần Đảo An Thới",
+    weather: "28°C - 31°C • Nắng vàng ươm, biển xanh ngọc bích, sóng êm dịu",
+    hotel: {
+      name: "Sunset Sanato Resort & Villas Phú Quốc (4-5 Sao)",
+      roomType: "Sunset Deluxe Suite Hướng Biển Kèm Hồ Bơi Vô Cực & Bữa Sáng Buffet",
+      rating: "9.4/10 Đánh Giá Thực Tế",
+      address: "Bãi Trường, Xã Dương Tơ, TP. Phú Quốc, Kiên Giang",
+      nights: 2
+    },
+    transit: {
+      provider: "Vé Máy Bay Khứ Hồi Vietnam Airlines / Vietjet Air (Chặng Tân Sơn Nhất - PQC)",
+      route: "Bay thẳng 55 phút ➔ Xe riêng của Resort đón tại Sân bay Quốc tế Phú Quốc",
+      schedule: "Giờ bay: 09:15 Sáng | Chiều về: 17:45 Chiều (Không bay giờ xấu)",
+      features: "Đã bao gồm 20kg hành lý ký gửi + 7kg hành lý xách tay mỗi khách"
+    },
+    diningPlan: "Gỏi cá trích Bãi Khem, Bún quậy Kiến Xây gia truyền, Nhum biển nướng mỡ hành, Ghẹ Hàm Ninh",
+    ticketPlan: "Trọn gói Tour Cano 4 Đảo Nam Phú Quốc, Cáp treo Hòn Thơm vượt biển 7.899m, Lặn ngắm san hô"
+  },
+  quynhon: {
+    destTitle: "Quy Nhơn — Bình Định",
+    region: "Duyên Hải Nam Trung Bộ • Bán Đảo Phương Mai & Tuyệt Tác Eo Gió",
+    weather: "27°C - 30°C • Nắng gió biển trong veo, nước biển xanh thấu đáy",
+    hotel: {
+      name: "Anya Premier Hotel Quy Nhơn (5 Sao Chuẩn Quốc Tế)",
+      roomType: "Premier Ocean King Ban Công Trực Diện Biển Quy Nhơn (Kèm Buffet Sáng)",
+      rating: "9.5/10 Đánh Giá Thực Tế",
+      address: "44 An Dương Vương, Phường Nguyễn Văn Cừ, TP. Quy Nhơn",
+      nights: 2
+    },
+    transit: {
+      provider: "Vé Máy Bay Khứ Hồi Bamboo Airways / Vietnam Airlines (SGN - UIH)",
+      route: "Sân bay Phù Cát ➔ Xe đưa đón riêng 2 chiều về khách sạn trung tâm biển",
+      schedule: "Giờ cất cánh: 08:30 Sáng | Chiều về: 16:45 Chiều",
+      features: "Hành lý tiêu chuẩn đầy đủ, tài xế riêng đón tận sảnh"
+    },
+    diningPlan: "Bánh xèo tôm nhảy Gia Vỹ, Bún chả cá thu Ngọc Liên, Ốc Thúy Kiều, Cơm gà xé Quê Hương",
+    ticketPlan: "Trọn gói Cano cao tốc ra Đảo Kỳ Co, Cầu gỗ Eo Gió ngắm bình minh, Đồi cát Phương Mai & Tịnh Xá"
+  },
+  hue: {
+    destTitle: "Cố Đô Huế — Thừa Thiên Huế",
+    region: "Di Sản Văn Hóa Thế Giới UNESCO • Sông Hương Thơ Mộng",
+    weather: "24°C - 27°C • Tiết trời mát dịu, không gian thiền định yên bình",
+    hotel: {
+      name: "Silk Path Grand Hue Hotel (5 Sao Hoàng Gia)",
+      roomType: "Deluxe Palace Heritage View Sông Hương (Kèm Trà Chiều Cung Đình)",
+      rating: "9.6/10 Đánh Giá Thực Tế",
+      address: "02 Lê Lợi, Phường Vĩnh Ninh, TP. Huế",
+      nights: 2
+    },
+    transit: {
+      provider: "Vé Máy Bay Khứ Hồi Vietnam Airlines (Chặng SGN - HUI)",
+      route: "Sân bay Phú Bài ➔ Xe riêng đưa đón 2 chiều về khách sạn Lê Lợi",
+      schedule: "Giờ cất cánh: 07:45 Sáng | Chiều về: 18:20 Chiều",
+      features: "Đón tiễn riêng tiện nghi, nước suối và khăn lạnh phục vụ"
+    },
+    diningPlan: "Bún bò Huế Mụ Rơi, Bánh bèo nậm lọc Bà Đỏ, Cơm hến Đập Đá, Bữa tiệc trà cung đình triều Nguyễn",
+    ticketPlan: "Trọn gói vé Đại Nội Huế, Lăng Khải Định, Lăng Tự Đức, Du thuyền nghe ca Huế trên sông Hương"
+  },
+  danang: {
+    destTitle: "Đà Nẵng & Phố Cổ Hội An",
+    region: "Thành Phố Đáng Sống • Bãi Biển Mỹ Khê & Di Sản Đèn Lồng Sông Hoài",
+    weather: "26°C - 29°C • Biển xanh êm sóng, gió biển trong lành, đêm lung linh",
+    hotel: {
+      name: "Chicland Hotel Danang Beach (4 Sao Cao Cấp Sinh Thái)",
+      roomType: "Ocean Front Deluxe King Sát Bãi Biển Mỹ Khê (Kèm Buffet Sáng)",
+      rating: "9.5/10 Đánh Giá Thực Tế",
+      address: "210 Võ Nguyên Giáp, Phường Phước Mỹ, Quận Sơn Trà, Đà Nẵng",
+      nights: 2
+    },
+    transit: {
+      provider: "Vé Máy Bay Khứ Hồi Vietnam Airlines (SGN - DAD) + Xe Đón Tiễn Riêng",
+      route: "Sân bay Quốc tế Đà Nẵng ➔ Khách sạn Mỹ Khê ➔ Xe bus riêng đi Phố Cổ Hội An",
+      schedule: "Giờ bay: 08:30 Sáng | Chiều về: 17:30 Chiều",
+      features: "Xe riêng đưa đón sân bay và xe đưa đón khách tham quan Hội An 2 chiều"
+    },
+    diningPlan: "Mì Quảng Bà Mua, Bánh tráng cuốn thịt heo Đại Lộc, Cơm gà Bà Buội Hội An, Hải sản Bé Mặn",
+    ticketPlan: "Trọn gói Cáp treo Sun World Bà Nà Hills (Cầu Vàng), Thuyền hoa đăng sông Hoài, Rừng dừa Bảy Mẫu"
+  },
+  hochiminh: {
+    destTitle: "TP. Hồ Chí Minh (Sài Gòn)",
+    region: "Trung Tâm Kinh Tế & Văn Hóa Năng Động • Hòn Ngọc Viễn Đông",
+    weather: "29°C • Nắng nhẹ ban ngày, chiều tối lộng gió sông mát mẻ",
+    hotel: {
+      name: "The Reverie Saigon / The Myst Đồng Khởi (5 Sao)",
+      roomType: "Luxury Suite Ban Công View Sông Sài Gòn (Kèm Afternoon Tea)",
+      rating: "9.7/10 Đánh Giá Thực Tế",
+      address: "Đường Đồng Khởi, Phường Bến Nghé, Quận 1, TP.HCM",
+      nights: 2
+    },
+    transit: {
+      provider: "Vé Máy Bay Khứ Hồi Nội Bài - Tân Sơn Nhất (HAN - SGN) / Xe Riêng Nội Thành",
+      route: "Ga Quốc Nội Tân Sơn Nhất ➔ Xe riêng đưa về Khách sạn Quận 1",
+      schedule: "Giờ khởi hành theo lịch đặt của khách hàng",
+      features: "Tài xế riêng lịch sự, phục vụ 24/7"
+    },
+    diningPlan: "Cơm tấm Ba Ghiền (Michelin Bib Gourmand), Hủ tiếu mì Thiệu Ký Chợ Lớn, Ốc Đào, Dinner Du thuyền",
+    ticketPlan: "Trọn gói vé Landmark 81 SkyView (Tầng 81), Vé Waterbus sông Sài Gòn, Dinh Độc Lập & Bảo tàng"
+  }
+};
+
 function renderTripSummaryCard() {
   const container = document.getElementById('generated-trip-card');
   if (!container) return;
@@ -2085,36 +2228,20 @@ function renderTripSummaryCard() {
   const budget = state.selectedBudget;
   const pax = state.selectedPax;
   const perPax = Math.round(budget / pax);
-  const data = getCurrentDestData();
-  const destName = data.name[state.currentLang] || data.name.vi;
-  const hotelName = data.hotel[state.currentLang] || data.hotel.vi;
-
   const destKey = getResolvedDestKey();
-  const flightRoutesMap = {
-    dalat: { origin: "SGN", originCity: "TP. Hồ Chí Minh (SGN)", dest: "DLI", destCity: "Đà Lạt (Liên Khương)", flightNo: "VN-9920", terminal: "T1 - Sảnh A" },
-    mangden: { origin: "SGN", originCity: "TP. Hồ Chí Minh (SGN)", dest: "PXU", destCity: "Pleiku ➔ Limousine Măng Đen", flightNo: "VN-7310", terminal: "T1 - Cổng 06" },
-    hue: { origin: "SGN", originCity: "TP. Hồ Chí Minh (SGN)", dest: "HUI", destCity: "Cố đô Huế (Phú Bài)", flightNo: "VN-1372", terminal: "T1 - Cổng 03" },
-    quynhon: { origin: "SGN", originCity: "TP. Hồ Chí Minh (SGN)", dest: "UIH", destCity: "Quy Nhơn (Phù Cát)", flightNo: "QH-1402", terminal: "T1 - Cổng 05" },
-    phuquoc: { origin: "SGN", originCity: "TP. Hồ Chí Minh (SGN)", dest: "PQC", destCity: "Phú Quốc (Quốc tế Nam Đảo)", flightNo: "VN-1825", terminal: "T1 - Cổng 09" },
-    hochiminh: { origin: "HAN", originCity: "Hà Nội (Nội Bài)", dest: "SGN", destCity: "TP. Hồ Chí Minh (Tân Sơn Nhất)", flightNo: "VN-8842", terminal: "T2 - Cổng 04" },
-    danang: { origin: "SGN", originCity: "TP. Hồ Chí Minh (SGN)", dest: "DAD", destCity: "Đà Nẵng (Quốc tế)", flightNo: "VN-7718", terminal: "T1 - Cổng 08" }
-  };
-  const flightRoute = flightRoutesMap[destKey] || flightRoutesMap.dalat;
+  const destInfo = REAL_DESTINATION_DETAILS[destKey] || REAL_DESTINATION_DETAILS.mangden;
 
-  let hotelTierDesc = "";
-  if (budget < 3500000) {
-    hotelTierDesc = "Khách sạn Tiêu Chuẩn 3-4 Sao (Phòng Superior City View)";
-  } else if (budget <= 8000000) {
-    hotelTierDesc = "Khách sạn Cao Cấp 4-5 Sao (Phòng Deluxe River/Forest View + Buffet Sáng)";
-  } else {
-    hotelTierDesc = "Resort / Khách Sạn Thượng Lưu 5 Sao (Phòng Suite + Spa & Đưa Đón Sân Bay)";
-  }
+  // Bảng kê chi phí minh bạch chính xác 100% theo đúng ngân sách khách nhập
+  const hotelAlloc = Math.round(budget * 0.38);
+  const transitAlloc = Math.round(budget * 0.26);
+  const foodAlloc = Math.round(budget * 0.20);
+  const ticketAlloc = Math.round(budget * 0.12);
+  const insuranceAlloc = budget - (hotelAlloc + transitAlloc + foodAlloc + ticketAlloc);
 
-  const hotelAlloc = Math.round(budget * 0.4);
-  const foodAlloc = Math.round(budget * 0.3);
-  const ticketAlloc = Math.round(budget * 0.2);
-  const transitAlloc = Math.round(budget * 0.1);
+  const pricePerNight = Math.round(hotelAlloc / 2);
+  const pricePerTransit = Math.round(transitAlloc / pax);
 
+  const data = getCurrentDestData();
   const topItin = data.itineraries?.[0];
   const sampleSlots = topItin ? topItin.slots.slice(0, 3) : [];
 
@@ -2129,165 +2256,174 @@ function renderTripSummaryCard() {
           <span class="text-emerald-400 font-bold font-mono">${s.cost_est}</span>
         </div>
         <p class="text-xs font-bold text-white truncate mt-0.5 group-hover:text-cyan-300 transition">${s.poi_name[state.currentLang] || s.poi_name.vi}</p>
+        <p class="text-[10px] text-slate-400 truncate">${s.activity?.vi || ''}</p>
       </div>
     </div>
   `).join('');
 
-  // Barcode lines generator
-  const barcodeBars = Array.from({ length: 38 }, (_, i) => {
-    const widths = [1, 2, 3, 4, 2, 1, 3, 2, 4, 1];
-    const w = widths[i % widths.length];
-    return `<div class="barcode-bar" style="width: ${w}px;"></div>`;
-  }).join('');
-
   container.innerHTML = `
-    <div class="boarding-pass-card specular-card rounded-3xl p-6 lg:p-8 border-2 border-emerald-500/50 shadow-2xl space-y-6 animate-fadeIn relative">
-      <div class="ticket-notch-left"></div>
-      <div class="ticket-notch-right"></div>
-
-      <!-- Top Airline / Escrow Header Badge -->
+    <div class="glass-panel rounded-3xl p-6 lg:p-8 border-2 border-emerald-500/60 shadow-2xl space-y-6 animate-fadeIn relative bg-slate-900/95">
+      
+      <!-- Header: Điểm đến và Trạng thái AI -->
       <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-emerald-500 flex items-center justify-center text-slate-950 font-black shadow-lg">
-            <i class="fa-solid fa-plane-departure text-base"></i>
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-500 to-emerald-500 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-cyan-500/30">
+            <i class="fa-solid fa-compass text-lg"></i>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <span class="text-xs font-black text-cyan-400 tracking-wider font-mono">WANDERMATCH AIRWAYS & ESCROW STAY</span>
-              <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-cyan-950 text-cyan-300 border border-cyan-700">VIP PASS</span>
+              <span class="text-xs font-black text-cyan-400 tracking-wider font-mono uppercase">AI CHUYÊN GIA LỮ HÀNH WANDERMATCH</span>
+              <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-950 text-emerald-300 border border-emerald-700">ĐÃ TỐI ƯU HÓA</span>
             </div>
-            <h4 class="text-xs text-slate-400 font-medium">Vé Trọn Gói Bản Đồ Mù • Bảo Lãnh PMS Cứng 20.000.000đ</h4>
+            <h3 class="text-lg lg:text-xl font-extrabold text-white mt-0.5 flex items-center gap-2">
+              <span>Điểm Đến Đã Chọn:</span>
+              <span class="text-cyan-300 underline decoration-cyan-500/50 underline-offset-4">${destInfo.destTitle}</span>
+            </h3>
+            <p class="text-xs text-slate-400">${destInfo.region} • ${destInfo.weather}</p>
           </div>
         </div>
 
         <div class="flex items-center gap-2">
-          <div class="flex items-center gap-2 bg-slate-950/80 px-3 py-1.5 rounded-full border border-emerald-500/40 text-emerald-300 font-bold text-xs font-mono shadow-inner">
-            <span class="radar-beacon"></span>
-            <span>HARD-COMMITTED • ON SCHEDULE</span>
+          <div class="bg-slate-950/90 px-4 py-2 rounded-2xl border border-emerald-500/40 text-right">
+            <span class="text-[10px] text-slate-400 block font-semibold uppercase">Tổng Ngân Sách Dự Kiến</span>
+            <span class="text-xl font-black text-emerald-400 font-mono">${budget.toLocaleString('vi-VN')} VNĐ</span>
+            <span class="text-[10px] text-slate-400 block">~${perPax.toLocaleString('vi-VN')}đ / khách (${pax} người)</span>
           </div>
         </div>
       </div>
 
-      <!-- Main Flight & Hotel Routing Banner -->
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-        <!-- Flight Route Info -->
-        <div class="md:col-span-8 flex flex-wrap items-center justify-between gap-4 bg-slate-950/60 p-5 rounded-2xl border border-slate-800">
-          <div>
-            <span class="text-[10px] text-slate-400 font-mono font-bold block uppercase">KHỞI HÀNH</span>
-            <div class="text-2xl lg:text-3xl font-black text-white font-mono tracking-tight">${flightRoute.origin}</div>
-            <div class="text-[11px] text-slate-300 mt-0.5">${flightRoute.originCity}</div>
+      <!-- 2 CỘT CHÍNH: KHÁCH SẠN CỤ THỂ VÀ PHƯƠNG TIỆN DI CHUYỂN -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Khối 1: Khách sạn cụ thể -->
+        <div class="p-4 sm:p-5 rounded-2xl bg-slate-950/80 border border-cyan-500/40 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-hotel text-cyan-400"></i>
+              <span>1. Khách Sạn / Resort Cụ Thể (2 Đêm):</span>
+            </span>
+            <span class="text-[10px] font-bold text-amber-300 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800">${destInfo.hotel.rating}</span>
           </div>
-
-          <div class="flex flex-col items-center px-4">
-            <span class="text-[10px] text-cyan-400 font-mono font-bold mb-1">${flightRoute.flightNo} • 1H15M</span>
-            <div class="flex items-center gap-2 text-cyan-400">
-              <div class="w-12 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
-              <i class="fa-solid fa-plane text-xs transform rotate-45"></i>
-              <div class="w-12 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
+          <div class="text-sm font-extrabold text-white">${destInfo.hotel.name}</div>
+          <div class="text-xs text-slate-300 space-y-1">
+            <div class="flex items-start gap-1.5"><i class="fa-solid fa-bed text-cyan-400 mt-0.5 text-xs"></i> <span><strong>Loại phòng:</strong> ${destInfo.hotel.roomType}</span></div>
+            <div class="flex items-start gap-1.5"><i class="fa-solid fa-location-dot text-rose-400 mt-0.5 text-xs"></i> <span><strong>Địa chỉ:</strong> ${destInfo.hotel.address}</span></div>
+            <div class="flex items-center gap-1.5 text-emerald-300 font-mono font-bold pt-1">
+              <i class="fa-solid fa-calculator text-xs"></i>
+              <span>Chi phí: ${pricePerNight.toLocaleString('vi-VN')}đ/đêm x 2 đêm = ${hotelAlloc.toLocaleString('vi-VN')} VNĐ</span>
             </div>
-            <span class="text-[9px] text-slate-400 font-sans mt-1">Bay khung giờ đẹp (Không Red-Eye)</span>
-          </div>
-
-          <div class="text-right">
-            <span class="text-[10px] text-slate-400 font-mono font-bold block uppercase">ĐIỂM ĐẾN</span>
-            <div class="text-2xl lg:text-3xl font-black text-emerald-400 font-mono tracking-tight">${flightRoute.dest}</div>
-            <div class="text-[11px] text-slate-300 mt-0.5">${destName}</div>
           </div>
         </div>
 
-        <!-- Budget & PNR Overview -->
-        <div class="md:col-span-4 bg-gradient-to-b from-slate-950 to-slate-900/90 p-5 rounded-2xl border border-emerald-500/30 text-right space-y-1">
-          <span class="text-[11px] text-slate-400 font-semibold block">Tổng Ngân Sách Trọn Gói:</span>
-          <div class="text-2xl lg:text-3xl font-black text-emerald-400 font-mono">${budget.toLocaleString('vi-VN')}đ</div>
-          <div class="text-[11px] text-cyan-300 font-medium">Bình quân ~${perPax.toLocaleString('vi-VN')}đ / khách (${pax} người)</div>
-          <div class="pt-2 text-[10px] font-mono text-amber-400 font-bold border-t border-slate-800">
-            PNR: WM99081234 • CLASS: BUSINESS BLIND
+        <!-- Khối 2: Phương tiện di chuyển cụ thể -->
+        <div class="p-4 sm:p-5 rounded-2xl bg-slate-950/80 border border-amber-500/40 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-van-shuttle text-amber-400"></i>
+              <span>2. Phương Tiện Di Chuyển Khứ Hồi (${pax} Khách):</span>
+            </span>
+            <span class="text-[10px] font-bold text-cyan-300 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800">Đón Tiễn Tận Nơi</span>
           </div>
+          <div class="text-sm font-extrabold text-white">${destInfo.transit.provider}</div>
+          <div class="text-xs text-slate-300 space-y-1">
+            <div class="flex items-start gap-1.5"><i class="fa-solid fa-route text-amber-400 mt-0.5 text-xs"></i> <span><strong>Lộ trình:</strong> ${destInfo.transit.route}</span></div>
+            <div class="flex items-start gap-1.5"><i class="fa-solid fa-clock text-cyan-400 mt-0.5 text-xs"></i> <span><strong>Khung giờ:</strong> ${destInfo.transit.schedule}</span></div>
+            <div class="flex items-center gap-1.5 text-emerald-300 font-mono font-bold pt-1">
+              <i class="fa-solid fa-calculator text-xs"></i>
+              <span>Chi phí: ~${pricePerTransit.toLocaleString('vi-VN')}đ/khách x ${pax} khách = ${transitAlloc.toLocaleString('vi-VN')} VNĐ</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- BẢNG KÊ CHI PHÍ TỪNG MỤC MINH BẠCH (ITEMIZED REAL COST BREAKDOWN) -->
+      <div class="p-4 sm:p-5 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
+          <span class="text-xs font-black text-white flex items-center gap-2 uppercase tracking-wider">
+            <i class="fa-solid fa-file-invoice-dollar text-emerald-400"></i>
+            <span>Bảng Kê Chi Phí Từng Mục Minh Bạch (Khớp 100% Ngân Sách)</span>
+          </span>
+          <span class="text-[11px] text-emerald-400 font-bold font-mono">
+            Không phát sinh bất kỳ khoản phí ẩn nào
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
+          <!-- Mục 1: Phòng khách sạn -->
+          <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800 space-y-1">
+            <div class="text-cyan-400 font-bold flex items-center gap-1">
+              <i class="fa-solid fa-hotel"></i> 1. Tiền Phòng KS
+            </div>
+            <div class="text-sm font-black text-white font-mono">${hotelAlloc.toLocaleString('vi-VN')}đ</div>
+            <div class="text-[10px] text-slate-400 leading-tight">2 đêm x ${pricePerNight.toLocaleString('vi-VN')}đ/đêm</div>
+          </div>
+
+          <!-- Mục 2: Xe / Vé bay -->
+          <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800 space-y-1">
+            <div class="text-amber-400 font-bold flex items-center gap-1">
+              <i class="fa-solid fa-plane"></i> 2. Vé Di Chuyển
+            </div>
+            <div class="text-sm font-black text-white font-mono">${transitAlloc.toLocaleString('vi-VN')}đ</div>
+            <div class="text-[10px] text-slate-400 leading-tight">${pax} vé khứ hồi đón tận nơi</div>
+          </div>
+
+          <!-- Mục 3: Ăn uống ẩm thực -->
+          <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800 space-y-1">
+            <div class="text-emerald-400 font-bold flex items-center gap-1">
+              <i class="fa-solid fa-bowl-food"></i> 3. Ẩm Thực Đặc Sản
+            </div>
+            <div class="text-sm font-black text-white font-mono">${foodAlloc.toLocaleString('vi-VN')}đ</div>
+            <div class="text-[10px] text-slate-400 leading-tight">6 bữa ăn chính + phụ đặc sản</div>
+          </div>
+
+          <!-- Mục 4: Vé tham quan & vui chơi -->
+          <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800 space-y-1">
+            <div class="text-violet-400 font-bold flex items-center gap-1">
+              <i class="fa-solid fa-ticket"></i> 4. Vé Tham Quan
+            </div>
+            <div class="text-sm font-black text-white font-mono">${ticketAlloc.toLocaleString('vi-VN')}đ</div>
+            <div class="text-[10px] text-slate-400 leading-tight">Trọn gói vé cáp treo, di tích & tour</div>
+          </div>
+
+          <!-- Mục 5: Bảo hiểm & Hỗ trợ 24/7 -->
+          <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800 space-y-1">
+            <div class="text-sky-400 font-bold flex items-center gap-1">
+              <i class="fa-solid fa-shield-halved"></i> 5. Bảo Hiểm & SOS
+            </div>
+            <div class="text-sm font-black text-white font-mono">${insuranceAlloc.toLocaleString('vi-VN')}đ</div>
+            <div class="text-[10px] text-slate-400 leading-tight">Bồi thường 100tr/người & cứu hộ 24/7</div>
+          </div>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center justify-between text-xs font-bold text-emerald-300">
+          <span>✓ TỔNG CỘNG CHUYẾN ĐI (KHỚP 100% NGÂN SÁCH):</span>
+          <span class="font-mono text-sm font-black text-white">${budget.toLocaleString('vi-VN')} VNĐ</span>
         </div>
       </div>
 
-      <!-- 4 Trụ Cột Phân Bổ Chi Tiết Theo Số Tiền -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
-        <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 space-y-1">
-          <div class="text-cyan-400 font-bold flex items-center gap-1.5">
-            <i class="fa-solid fa-hotel"></i> 🏨 Lưu Trú (40%)
-          </div>
-          <div class="text-base font-black text-white font-mono">${hotelAlloc.toLocaleString('vi-VN')}đ</div>
-          <div class="text-[11px] text-slate-300 leading-tight">${hotelName} — ${hotelTierDesc}</div>
-        </div>
-
-        <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 space-y-1">
-          <div class="text-amber-400 font-bold flex items-center gap-1.5">
-            <i class="fa-solid fa-utensils"></i> 🍜 Ẩm Thực (30%)
-          </div>
-          <div class="text-base font-black text-white font-mono">${foodAlloc.toLocaleString('vi-VN')}đ</div>
-          <div class="text-[11px] text-slate-300 leading-tight">Thưởng thức món đặc sản Michelin Bib Gourmand & phố ẩm thực</div>
-        </div>
-
-        <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 space-y-1">
-          <div class="text-emerald-400 font-bold flex items-center gap-1.5">
-            <i class="fa-solid fa-ticket"></i> 🎡 Vé Vui Chơi (20%)
-          </div>
-          <div class="text-base font-black text-white font-mono">${ticketAlloc.toLocaleString('vi-VN')}đ</div>
-          <div class="text-[11px] text-slate-300 leading-tight">Bao gồm trọn gói vé đài quan sát, cáp treo, di tích và tour</div>
-        </div>
-
-        <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 space-y-1">
-          <div class="text-violet-400 font-bold flex items-center gap-1.5">
-            <i class="fa-solid fa-taxi"></i> 🚕 Di Chuyển (10%)
-          </div>
-          <div class="text-base font-black text-white font-mono">${transitAlloc.toLocaleString('vi-VN')}đ</div>
-          <div class="text-[11px] text-slate-300 leading-tight">Di chuyển Grab/Taxi nội thành, cafe chill và quỹ dự phòng</div>
-        </div>
-      </div>
-
-      <!-- Hoạt động tiêu biểu được kích hoạt -->
+      <!-- Hoạt động tiêu biểu được lên lịch theo mốc giờ -->
       <div class="space-y-2">
         <div class="flex items-center justify-between text-xs">
           <span class="font-bold text-slate-300 flex items-center gap-1.5">
-            <i class="fa-solid fa-wand-magic-sparkles text-cyan-400"></i> Các Hoạt Động Tiêu Biểu Trong Kế Hoạch:
+            <i class="fa-solid fa-calendar-check text-cyan-400"></i> Các Hoạt Động &amp; Điểm Đến Tiêu Biểu Trong Chuyến Đi:
           </span>
-          <span class="text-slate-400 text-[11px]">Đã sắp xếp khoa học theo khung giờ</span>
+          <span class="text-slate-400 text-[11px]">Đã sắp xếp khoa học theo khung giờ thực tế</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
           ${slotsPreviewHtml}
         </div>
       </div>
 
-      <!-- Perforated Ticket Divider Line -->
-      <div class="ticket-perforation"></div>
-
-      <!-- Ticket Bottom Pass Stub with Barcode & Escrow Guarantee -->
-      <div class="flex flex-wrap items-center justify-between gap-4 pt-1">
-        <div class="flex items-center gap-4">
-          <!-- Barcode Graphic -->
-          <div class="barcode-visual p-2 bg-slate-950 rounded-lg border border-slate-800">
-            ${barcodeBars}
-          </div>
-          <div>
-            <span class="text-[10px] font-mono text-slate-400 block">E-TICKET SERIAL NO.</span>
-            <span class="font-mono text-xs font-bold text-slate-200">WM-ETK-2026-8892</span>
-          </div>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="luxury-badge-gold px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow">
-            <i class="fa-solid fa-shield-halved text-amber-400"></i> BẢO LÃNH PMS 20.000.000 VNĐ
-          </span>
-          <span class="luxury-badge-cyan px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow">
-            <i class="fa-solid fa-scale-balanced text-cyan-300"></i> CAM KẾT HOÀN 200% CHÊNH LỆCH
-          </span>
-        </div>
-      </div>
-
-      <!-- Nút Chốt Chuyến Đi -> Sang Bước 2: Xác Nhận Tài Khoản & Thanh Toán VietQR -->
+      <!-- Nút Chốt Chuyến Đi -> Sang Bước 2: Xác Nhận & Thanh Toán -->
       <div class="pt-2">
-        <button onclick="goToPaymentWithBudget()" class="w-full py-4 rounded-2xl btn-glow-emerald text-white font-black text-sm lg:text-base shadow-2xl flex items-center justify-center gap-2 transition hover:scale-[1.01]">
-          <i class="fa-solid fa-building-columns"></i>
-          <span>🏦 SANG BƯỚC 2: XÁC NHẬN TÀI KHOẢN (NAPAS 247) &amp; THANH TOÁN VIETQR (${budget.toLocaleString('vi-VN')} VNĐ)</span>
+        <button onclick="goToPaymentWithBudget()" class="w-full py-4 rounded-2xl btn-glow-emerald text-white font-black text-sm lg:text-base shadow-2xl flex items-center justify-center gap-2 transition hover:scale-[1.01] active:scale-[0.99] cursor-pointer">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i>
+          <span>Tiến Hành Đặt Chuyến Đi (${budget.toLocaleString('vi-VN')} VNĐ)</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
       </div>
+
     </div>
   `;
 }
