@@ -3620,24 +3620,24 @@ function simulateForceMajeure(level) {
 // ============================================================================
 
 function initScratchCard() {
-  const canvas = document.getElementById('scratch-canvas');
+  const canvas = document.getElementById('scratch-canvas') || document.getElementById('scratchCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const container = canvas.parentElement;
 
   canvas.style.display = 'block';
   canvas.style.opacity = '1';
-  const measuredW = (container && container.offsetWidth) || canvas.offsetWidth || 640;
-  const measuredH = (container && container.offsetHeight) || canvas.offsetHeight || 280;
-  canvas.width = Math.max(320, measuredW);
+  const measuredW = (container && container.offsetWidth) || canvas.offsetWidth || 580;
+  const measuredH = (container && container.offsetHeight) || canvas.offsetHeight || 320;
+  canvas.width = Math.max(300, measuredW);
   canvas.height = Math.max(220, measuredH);
 
-  // ANTI-F12 LEAK PROTECTION: Giữ niêm phong trên DOM cho tới khi cào đạt >= 40%
+  // ANTI-F12 LEAK PROTECTION: Giữ niêm phong trên DOM cho tới khi cào đạt >= 35%
   const revealedCity = document.getElementById('scratch-revealed-city');
   const revealedHotel = document.getElementById('scratch-revealed-hotel');
   if (!state.isScratchedRevealed) {
     if (revealedCity) revealedCity.textContent = "🔒 ĐANG NIÊM PHONG BỞI AI ESCROW";
-    if (revealedHotel) revealedHotel.textContent = "Cào trên 40% diện tích thẻ bạc để giải mã Điểm Đến, Vé Bay & Mã Phòng Cứng SLA";
+    if (revealedHotel) revealedHotel.textContent = "Cào trên 35% diện tích thẻ bạc để giải mã Điểm Đến, Vé Bay & Mã Phòng Cứng SLA";
   }
 
   // Vẽ nền tráng kim loại bóng bẩy cao cấp
@@ -3710,7 +3710,7 @@ function initScratchCard() {
     if (progressEl) progressEl.textContent = `${percent}%`;
     if (barEl) barEl.style.width = `${percent}%`;
 
-    if (percent >= 40 && !state.isScratchedRevealed) {
+    if (percent >= 35 && !state.isScratchedRevealed) {
       state.isScratchedRevealed = true;
       revealCardFull();
     }
@@ -3749,6 +3749,7 @@ function initScratchCard() {
   window.addEventListener('touchend', () => { isDrawing = false; });
   canvas.ontouchmove = scratch;
 }
+window.initScratchCard = initScratchCard;
 
 // ============================================================================
 // 10. NAPAS 247 & VIETQR ENGINE

@@ -178,14 +178,12 @@ async function encryptAES(plainText, secretKeyStr = "WandermatchDefaultSecretKey
 }
 
 function getSupabaseHeaders(env) {
-  const key = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SECRET_KEY || "";
+  const key = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SECRET_KEY || env.SUPABASE_KEY || "";
   const headers = {
     "apikey": key,
+    "Authorization": `Bearer ${key}`,
     "Content-Type": "application/json"
   };
-  if (!key.startsWith("sb_")) {
-    headers["Authorization"] = `Bearer ${key}`;
-  }
   return headers;
 }
 
@@ -284,8 +282,9 @@ export default {
   async fetch(request, env) {
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization"
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey, X-Requested-With",
+      "Access-Control-Max-Age": "86400"
     };
 
     if (request.method === "OPTIONS") {
@@ -683,9 +682,9 @@ export default {
         },
         {
           id: "SCENARIO_3",
-          profileName: "Kịch bản 3: Khách thích Resort biển 5 sao sôi động",
+          profileName: "Kịch bản 3: Khách thích Resort biển 5 sao sôi động + Blacklist Đà Lạt",
           vector: { healing: 65, nature: 80, solitude: 40, comfort: 99, culture: 50 },
-          blacklist: [],
+          blacklist: ["Đà Lạt"],
           feedback: ""
         }
       ];
@@ -753,11 +752,53 @@ export default {
 
     // 8. HEALTH CHECK JSON (/api/health)
     if (url.pathname === "/api/health") {
+      const startTime = Date.now();
+      let supabaseStatus = "FALLBACK_MEMORY (Đang dùng Két sắt Dự phòng)";
+      let supabaseConnected = false;
+
+      if (hasSupabase) {
+        try {
+          const sbHeaders = getSupabaseHeaders(env);
+          const sbRes = await fetch(`${env.SUPABASE_URL}/rest/v1/b2b_inventories?select=id&limit=1`, {
+            method: "GET",
+            headers: sbHeaders
+          });
+          if (sbRes.ok) {
+            supabaseStatus = "CONNECTED (Đọc/Ghi Database Thật)";
+            supabaseConnected = true;
+          } else {
+            supabaseStatus = `FALLBACK_MEMORY (Đang dùng Két sắt Dự phòng - Supabase HTTP ${sbRes.status})`;
+          }
+        } catch (err) {
+          supabaseStatus = `FALLBACK_MEMORY (Đang dùng Két sắt Dự phòng - ${err.message})`;
+        }
+      } else {
+        supabaseStatus = "FALLBACK_MEMORY (Đang dùng Két sắt Dự phòng - Cần cấu hình SUPABASE_URL & SUPABASE_SERVICE_ROLE_KEY)";
+      }
+
+      const hasGemini = Boolean(env.GEMINI_API_KEY && !env.GEMINI_API_KEY.includes("DAN_"));
+      const aiStatus = hasGemini ? "GEMINI_2_5_FLASH_ACTIVE" : "LOCAL_VECTOR_COSINE_ACTIVE (AI Toán học Nội bộ)";
+
+      const bankId = env.COMPANY_BANK_ID || "MB";
+      const accountNo = env.COMPANY_ACCOUNT_NO || "0988888888";
+      const accountName = env.COMPANY_ACCOUNT_NAME || "CONG TY TNHH WANDERMATCH VN";
+      const responseTimeMs = Date.now() - startTime;
+
       return new Response(JSON.stringify({
+        worker_status: "ONLINE",
+        response_time_ms: responseTimeMs,
+        timestamp: new Date().toISOString(),
+        supabase_status: supabaseStatus,
+        ai_status: aiStatus,
+        vietqr_status: "READY",
+        company_bank: {
+          bank_id: bankId,
+          account_no: accountNo,
+          account_name: accountName
+        },
         service: "WanderMatch v3.0 Fullstack Cloud Worker (Frontend + API Unified)",
-        aiEngine: "Gemini 2.5 Flash + Weighted Euclidean & Cosine Active",
-        supabaseConnected: hasSupabase,
-        geminiConfigured: Boolean(env.GEMINI_API_KEY && !env.GEMINI_API_KEY.includes("DAN_"))
+        supabaseConnected,
+        geminiConfigured: hasGemini
       }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 

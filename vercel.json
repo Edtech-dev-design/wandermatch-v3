@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "framework": null,
+  "installCommand": "echo 'Skip install for static frontend'",
+  "buildCommand": "echo 'Static build ready for Vercel'",
+  "outputDirectory": ".",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    }
+  ]
+}
