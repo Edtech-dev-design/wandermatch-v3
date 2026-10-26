@@ -498,7 +498,7 @@ const I18N = {
 const state = {
   currentLang: 'vi',
   currentTab: 'concierge', // 'concierge' | 'quiz' | 'vietqr' | 'scratch' | 'b2b'
-  selectedDestination: 'hochiminh', // 'hochiminh' | 'dalat' | 'danang' | 'blind'
+  selectedDestination: 'blind', // 'blind' | 'mangden' | 'dalat' | 'hue' | 'quynhon' | 'phuquoc' | 'hochiminh' | 'danang'
   selectedBudget: 5000000, // Custom user budget in VND
   selectedPax: 2,
   selectedDuration: '3d2n',
@@ -539,6 +539,7 @@ const state = {
   },
   sosClaimed: false
 };
+window.state = state;
 
 // ============================================================================
 // REVERSE PROXY API BRIDGE (/api/*)
