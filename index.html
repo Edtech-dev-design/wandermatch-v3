@@ -798,218 +798,190 @@
         </div>
       </div>
 
+      <!-- STEP 1 -> STEP 2 DEDICATED BOTTOM CTA BANNER (TÁCH BẠCH GỢI Ý AI VỚI THANH TOÁN & XÁC NHẬN TK) -->
+      <div class="glass-panel rounded-3xl p-6 lg:p-8 border-2 border-emerald-500/50 bg-gradient-to-r from-slate-950 via-emerald-950/30 to-slate-950 shadow-2xl flex flex-wrap items-center justify-between gap-4">
+        <div class="space-y-1">
+          <span class="px-3 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-950 uppercase tracking-wider">
+            HOÀN TẤT BƯỚC 1: KHÁM PHÁ GỢI Ý LỘ TRÌNH AI
+          </span>
+          <h3 class="text-lg lg:text-xl font-extrabold text-white">
+            Bạn Đã Ưng Ý Lộ Trình &amp; Điểm Đến Gợi Ý Của AI?
+          </h3>
+          <p class="text-xs text-slate-300">
+            Phần gợi ý lộ trình và phần xác nhận tài khoản / thanh toán đã được tách riêng hoàn toàn. Bấm nút bên phải để sang <strong>Bước 2: Định Danh Tài Khoản Nhận Hoàn Tiền (Napas 247) &amp; Quét Mã VietQR</strong>.
+          </p>
+        </div>
+        <button type="button" onclick="switchB2CStep(2)" class="px-6 py-4 rounded-2xl btn-glow-emerald text-white font-black text-xs lg:text-sm shadow-2xl transition flex items-center gap-2.5 shrink-0 hover:scale-[1.01]">
+          <i class="fa-solid fa-building-columns"></i>
+          <span>Sang Bước 2: Xác Nhận Tài Khoản &amp; Thanh Toán VietQR</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+
     </section>
 
     <!-- ==========================================================================
-         VIEW 2: PERSONA QUIZ & eKYC NAPAS 247
+         BƯỚC 2A: XÁC NHẬN ĐỊNH DANH CCCD & TÀI KHOẢN NGÂN HÀNG NHẬN HOÀN TIỀN (NAPAS 247)
+         (Tách biệt hoàn toàn khỏi Bước 1 Gợi Ý Lộ Trình AI)
          ========================================================================== -->
-    <section id="view-quiz" class="space-y-8 animate-fadeIn">
-      <div class="glass-panel rounded-3xl p-6 lg:p-10 border border-slate-800">
-        <div class="max-w-2xl mb-8">
-          <span class="px-3 py-1 rounded-full text-xs font-bold bg-violet-500/20 text-violet-300 border border-violet-500/40">
-            AI PSYCHOMETRIC MATCHING
-          </span>
-          <h2 class="text-2xl lg:text-3xl font-extrabold text-white mt-2" data-i18n="quiz_title">
-            Trắc Nghiệm Tâm Lý Du Lịch & Định Danh STK Napas 247
-          </h2>
-          <p class="text-xs lg:text-sm text-slate-400 mt-1" data-i18n="quiz_subtitle">
-            Đo lường Travel Persona để AI kết nối điểm đến ẩn trình và kích hoạt cổng hoàn tiền tự động 100% minh bạch.
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          
-          <div class="space-y-6">
-            <h4 class="text-sm font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
-              <i class="fa-solid fa-sliders"></i> 4 Trục Tâm Lý Du Lịch
-            </h4>
-
-            <div class="space-y-4 bg-slate-900/60 p-5 rounded-2xl border border-slate-800">
-              <div>
-                <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
-                  <span>🌿 Chữa lành & Tĩnh dưỡng (Healing)</span>
-                  <span id="val-healing" class="text-cyan-400 font-bold">85%</span>
-                </div>
-                <input id="slider-healing" type="range" min="0" max="100" value="85" class="w-full">
-              </div>
-
-              <div>
-                <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
-                  <span>🍜 Khám phá Ẩm thực (Gastronomy)</span>
-                  <span id="val-foodie" class="text-cyan-400 font-bold">70%</span>
-                </div>
-                <input id="slider-foodie" type="range" min="0" max="100" value="70" class="w-full">
-              </div>
-
-              <div>
-                <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
-                  <span>🧗 Mạo hiểm & Trải nghiệm (Adventure)</span>
-                  <span id="val-adventure" class="text-cyan-400 font-bold">45%</span>
-                </div>
-                <input id="slider-adventure" type="range" min="0" max="100" value="45" class="w-full">
-              </div>
-
-              <div>
-                <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
-                  <span>👑 Nghỉ dưỡng Cao cấp (Luxury Resort)</span>
-                  <span id="val-resort" class="text-cyan-400 font-bold">90%</span>
-                </div>
-                <input id="slider-resort" type="range" min="0" max="100" value="90" class="w-full">
-              </div>
+    <section id="view-quiz" class="space-y-8 hidden animate-fadeIn">
+      <div class="glass-panel rounded-3xl p-6 lg:p-10 border border-cyan-500/40 shadow-2xl space-y-6">
+        
+        <!-- Top Header & Back to Step 1 Button -->
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-800 pb-5">
+          <div class="max-w-2xl">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-3 py-1 rounded-full text-xs font-black bg-cyan-500 text-slate-950 uppercase tracking-wider shadow">
+                BƯỚC 2A • ĐỊNH DANH TÀI KHOẢN &amp; BẢO VỆ HOÀN TIỀN
+              </span>
+              <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+                <i class="fa-solid fa-shield-check"></i> Tách biệt khỏi trang Gợi ý Lộ trình
+              </span>
             </div>
-
-            <!-- Preset Packages -->
-            <div>
-              <h4 class="text-sm font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-2 mb-3" data-i18n="budget_title">
-                Hoặc Chọn Gói Ngân Sách Định Sẵn:
-              </h4>
-
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div onclick="setQuickBudget(3500000); switchView('concierge');" class="glass-card rounded-xl p-4 border border-slate-800 cursor-pointer text-center">
-                  <div class="text-xs text-slate-400 font-medium" data-i18n="package_std">Tiết Kiệm Thông Minh</div>
-                  <div class="text-base font-black text-white mt-1">3.500.000đ</div>
-                  <span class="text-[10px] text-slate-500">Khách sạn 3-4 sao</span>
-                </div>
-
-                <div onclick="setQuickBudget(5000000); switchView('concierge');" class="glass-card rounded-xl p-4 border border-cyan-400 bg-cyan-950/30 ring-2 ring-cyan-400/40 cursor-pointer text-center relative">
-                  <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-cyan-500 text-slate-950 text-[9px] font-black uppercase">
-                    HOT
-                  </span>
-                  <div class="text-xs text-slate-300 font-medium" data-i18n="package_prm">Trải Nghiệm Tiêu Chuẩn</div>
-                  <div class="text-base font-black text-cyan-300 mt-1">5.000.000đ</div>
-                  <span class="text-[10px] text-slate-400">Khách sạn 4 sao + Vé</span>
-                </div>
-
-                <div onclick="setQuickBudget(10000000); switchView('concierge');" class="glass-card rounded-xl p-4 border border-slate-800 cursor-pointer text-center">
-                  <div class="text-xs text-slate-400 font-medium" data-i18n="package_lux">Nghỉ Dưỡng Thượng Lưu</div>
-                  <div class="text-base font-black text-white mt-1">10.000.000đ</div>
-                  <span class="text-[10px] text-slate-500">Resort 5 sao & Spa</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="space-y-3">
-              <label class="text-xs font-semibold text-slate-300">Ràng buộc ẩm thực / Dị ứng:</label>
-              <div class="flex flex-wrap gap-2">
-                <span class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 text-xs flex items-center gap-1.5">
-                  Không ăn cay <i class="fa-solid fa-check text-[10px] text-cyan-400"></i>
-                </span>
-                <span class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 text-xs flex items-center gap-1.5">
-                  Dị ứng hải sản vỏ cứng <i class="fa-solid fa-check text-[10px] text-cyan-400"></i>
-                </span>
-              </div>
-            </div>
+            <h2 class="text-2xl lg:text-3xl font-extrabold text-white mt-2" data-i18n="quiz_title">
+              Xác Nhận CCCD &amp; Tài Khoản Ngân Hàng Nhận Hoàn Tiền (Napas 247)
+            </h2>
+            <p class="text-xs lg:text-sm text-slate-300 mt-1" data-i18n="quiz_subtitle">
+              Để đảm bảo an toàn tài chính tuyệt đối, hệ thống đối chiếu trùng khớp 100% <strong>Họ tên CCCD</strong> với <strong>Chủ Tài Khoản Ngân Hàng cá nhân</strong> (nhận tiền hoàn tự động trong 2 giây nếu hủy chuyến) trước khi xuất mã thanh toán VietQR bên dưới.
+            </p>
           </div>
 
-          <!-- Column 2: OCR CCCD & Napas 247 Bank Account Verification -->
-          <div class="space-y-6">
-            <h4 class="text-sm font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
-              <i class="fa-solid fa-id-card"></i> eKYC & STK Nhận Hoàn Tiền
-            </h4>
+          <button type="button" onclick="switchB2CStep(1)" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-cyan-500/40 font-bold text-xs transition flex items-center gap-2 shrink-0 shadow">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Quay Lại Bước 1: Xem / Đổi Gợi Ý Lộ Trình AI</span>
+          </button>
+        </div>
 
-            <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3">
+        <!-- Tóm Tắt Kế Hoạch Chuyến Đi Đã Chọn Từ Bước 1 -->
+        <div id="step2-locked-trip-summary" class="p-4 rounded-2xl bg-slate-950/90 border border-emerald-500/40 flex flex-wrap items-center justify-between gap-4 text-xs">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 flex items-center justify-center text-base font-black">
+              <i class="fa-solid fa-route"></i>
+            </div>
+            <div>
+              <span class="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider block">KẾ HOẠCH CHUYẾN ĐI ĐÃ CHỌN TỪ BƯỚC 1</span>
+              <div id="step2-summary-dest-title" class="text-sm font-extrabold text-white">🎲 Chế độ Bản Đồ Mù AI (Khớp #1 theo 5 trục tâm lý của bạn)</div>
+              <div id="step2-summary-subtext" class="text-[11px] text-slate-400">Đã khóa lộ trình chi tiết từng ngày • Cam kết giá trị thực tế &ge; 120%</div>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-3 font-mono">
+            <span class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300">
+              Ngân sách: <strong id="step2-summary-budget" class="text-emerald-400">5.000.000 VNĐ</strong>
+            </span>
+            <span class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300">
+              Số khách: <strong id="step2-summary-pax" class="text-cyan-300">2 Người</strong>
+            </span>
+          </div>
+        </div>
+
+        <!-- OCR CCCD & Napas 247 Quick Verification Cards -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between">
+            <div class="space-y-3">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-slate-300 flex items-center gap-2" data-i18n="ocr_card_title">
-                  <i class="fa-solid fa-camera text-cyan-400"></i> OCR Trích Xuất CCCD / Hộ Chiếu
+                  <i class="fa-solid fa-id-card text-cyan-400"></i> 1. Định Danh CCCD / Hộ Chiếu Điện Tử (eKYC)
                 </span>
-                <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
+                <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 font-bold">
                   <i class="fa-solid fa-check"></i> ĐÃ XÁC THỰC OCR
                 </span>
               </div>
 
-              <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 text-xs space-y-1">
-                <div class="text-slate-400" data-i18n="ocr_verified_name">Họ và tên in hoa không dấu:</div>
-                <div class="text-sm font-black text-cyan-300 tracking-wider">NGUYEN VAN AN</div>
-                <div class="text-[11px] text-slate-500">Số CCCD: 079095012345 • Ngày cấp: 12/08/2021</div>
+              <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs space-y-1">
+                <div class="text-slate-400" data-i18n="ocr_verified_name">Họ và tên chuẩn hóa (IN HOA KHÔNG DẤU):</div>
+                <div id="ocr-preview-holder-name" class="text-sm font-black text-cyan-300 tracking-wider font-mono">NGUYEN VAN AN</div>
+                <div class="text-[11px] text-slate-400">Mã hóa AES-GCM 256-bit • Chỉ dùng để xuất vé bay &amp; nhận phòng</div>
               </div>
             </div>
 
-            <!-- Napas 247 Bank Linking -->
-            <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 space-y-4">
+            <div class="pt-2 flex flex-wrap gap-2 text-[11px]">
+              <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-lock text-emerald-400"></i> Chống chuyển nhượng chợ đen
+              </span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-bolt text-cyan-400"></i> Tự động đồng bộ tên chủ TK
+              </span>
+            </div>
+          </div>
+
+          <!-- Napas 247 Bank Linking -->
+          <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 space-y-3">
+            <div class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-2">
                 <div class="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-xs">
                   <i class="fa-solid fa-building-columns"></i>
                 </div>
                 <div>
-                  <h5 class="text-xs font-bold text-white" data-i18n="napas_title">Định Danh STK Ngân Hàng Nhận Hoàn Tiền (Napas 247)</h5>
-                  <p class="text-[11px] text-slate-400">Tự động hoàn tiền trong 2 giây nếu chuyến đi bị hủy hợp lệ.</p>
+                  <h5 class="text-xs font-bold text-white" data-i18n="napas_title">2. Kiểm Tra Nhanh Liên Kết Napas 247</h5>
+                  <p class="text-[11px] text-slate-400">Đảm bảo STK nhận hoàn tiền hoạt động thông suốt 24/7.</p>
                 </div>
               </div>
+              <button type="button" onclick="simulateNapasVerification()" class="px-3 py-1.5 rounded-xl btn-glow-cyan text-slate-950 font-black text-[11px] shadow transition flex items-center gap-1.5 shrink-0">
+                <i class="fa-solid fa-bolt"></i>
+                <span data-i18n="napas_btn_verify">Ping Napas 247</span>
+              </button>
+            </div>
 
-              <div class="space-y-3 text-xs">
-                <div>
-                  <label class="block text-slate-400 mb-1">Ngân hàng nhận:</label>
-                  <select id="napas-bank-select" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs">
-                    <option value="MB">MBBank - Ngân Hàng Quân Đội</option>
-                    <option value="VCB">Vietcombank - Ngân Hàng Ngoại Thương</option>
-                    <option value="TCB">Techcombank - Ngân Hàng Kỹ Thương</option>
-                    <option value="BIDV">BIDV - Đầu Tư & Phát Triển</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label class="block text-slate-400 mb-1">Số tài khoản cá nhân:</label>
-                  <input id="napas-acc-input" type="text" value="0388998899" class="w-full glass-input rounded-xl px-3 py-2.5 font-mono text-xs">
-                </div>
-
-                <button onclick="simulateNapasVerification()" class="w-full py-2.5 rounded-xl btn-glow-cyan text-slate-950 font-bold text-xs shadow-md transition flex items-center justify-center gap-2">
-                  <i class="fa-solid fa-bolt"></i>
-                  <span data-i18n="napas_btn_verify">⚡ Xác Thực Napas 247 Ngay</span>
-                </button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div>
+                <label class="block text-slate-400 mb-1">Ngân hàng nhận hoàn tiền:</label>
+                <select id="napas-bank-select" onchange="document.getElementById('cw-bank-code').value=this.value;" class="w-full glass-input rounded-xl px-3 py-2 text-xs">
+                  <option value="MB">MBBank - Ngân Hàng Quân Đội</option>
+                  <option value="VCB">Vietcombank - Ngân Hàng Ngoại Thương</option>
+                  <option value="TCB">Techcombank - Ngân Hàng Kỹ Thương</option>
+                  <option value="BIDV">BIDV - Đầu Tư &amp; Phát Triển</option>
+                </select>
               </div>
-
-              <div id="napas-verify-result">
-                <div class="bg-emerald-950/70 p-3 rounded-xl border border-emerald-600/50 flex items-center justify-between text-xs">
-                  <div>
-                    <div class="font-bold text-emerald-300 flex items-center gap-1.5">
-                      <i class="fa-solid fa-circle-check"></i> ACTIVE_VERIFIED (Napas 247)
-                    </div>
-                    <div class="text-slate-300 text-[11px] mt-0.5">
-                      Chủ tài khoản: <strong>NGUYEN VAN AN</strong> (Trùng khớp 100% với CCCD)
-                    </div>
-                  </div>
-                  <span class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px] border border-emerald-500/40">
-                    KHÓA AN TOÀN
-                  </span>
-                </div>
+              <div>
+                <label class="block text-slate-400 mb-1">Số tài khoản cá nhân:</label>
+                <input id="napas-acc-input" type="text" value="0388998899" oninput="document.getElementById('cw-bank-account').value=this.value;" class="w-full glass-input rounded-xl px-3 py-2 font-mono text-xs">
               </div>
             </div>
 
-            <button onclick="switchView('vietqr')" class="w-full py-3.5 rounded-2xl btn-glow-emerald text-white font-extrabold text-sm shadow-xl transition flex items-center justify-center gap-2">
-              <span>Tiếp Tục Đến Cổng VietQR Doanh Nghiệp</span>
-              <i class="fa-solid fa-arrow-right"></i>
-            </button>
-
+            <div id="napas-verify-result">
+              <div class="bg-emerald-950/70 p-2.5 rounded-xl border border-emerald-600/50 flex items-center justify-between text-xs">
+                <div>
+                  <div class="font-bold text-emerald-300 flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-check"></i> ACTIVE_VERIFIED (Napas 247)
+                  </div>
+                  <div class="text-slate-300 text-[11px] mt-0.5">
+                    Chủ tài khoản: <strong>NGUYEN VAN AN</strong> (Trùng khớp 100% với CCCD)
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px] border border-emerald-500/40">
+                  KHÓA AN TOÀN
+                </span>
+              </div>
+            </div>
           </div>
-
         </div>
 
         <!-- ======================================================================
-             CLOUDFLARE WORKER V3.0 LIVE AI BLIND BOOKING & eKYC ENGINE (/api/create-booking)
+             BIỂU MẪU XÁC NHẬN TÀI KHOẢN & KHỞI TẠO ĐƠN HÀNG VIETQR (/api/create-booking)
              ====================================================================== -->
-        <div class="mt-8 pt-8 border-t border-slate-800 space-y-5">
+        <div class="pt-4 border-t border-slate-800 space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
               <span class="px-3 py-1 rounded-full text-[11px] font-black bg-cyan-500 text-slate-950 uppercase tracking-wider shadow">
-                CLOUD WORKER V3.0 • AES-GCM 256-BIT • VECTOR COSINE 5D
+                XÁC THỰC TÀI KHOẢN &amp; KHÓA MÃ THANH TOÁN VIETQR
               </span>
-              <h3 class="text-xl font-extrabold text-white mt-2">
-                🚀 Đặt Chuyến Đi Mù AI & Định Danh eKYC Trực Tiếp Qua Cloud Worker (`/api/create-booking`)
+              <h3 class="text-lg lg:text-xl font-extrabold text-white mt-1.5">
+                📝 Điền Thông Tin Định Danh Chủ Thẻ &amp; Xác Nhận Ngân Sách Thanh Toán
               </h3>
-              <p class="text-xs text-slate-400 mt-0.5">
-                Kiểm tra trùng khớp 100% Họ Tên CCCD với Chủ TK Ngân Hàng (`normalizeVNName`), mã hóa AES-GCM 256-bit, lọc thành phố Blacklist và sinh VietQR chia tiền tự động.
+              <p class="text-xs text-slate-400">
+                Khi bạn gõ Họ tên CCCD, hệ thống tự động chuyển sang chữ IN HOA KHÔNG DẤU ở ô Tên Chủ Tài Khoản và tạo mã VietQR tương ứng ngay bên dưới.
               </p>
             </div>
             <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-2 rounded-xl border border-slate-800 text-xs">
               <span class="text-slate-400">Worker API URL:</span>
-              <input id="cloud-worker-url-input" type="text" value="" placeholder="Mặc định: Cùng tên miền (/api/...)" class="glass-input rounded-lg px-2.5 py-1 text-xs font-mono text-cyan-300 w-56">
+              <input id="cloud-worker-url-input" type="text" value="" placeholder="Mặc định: Cùng tên miền (/api/...)" class="glass-input rounded-lg px-2.5 py-1 text-xs font-mono text-cyan-300 w-52">
             </div>
           </div>
 
           <form id="cloud-booking-form" onsubmit="createCloudBlindBooking(event)" class="bg-slate-900/75 p-6 rounded-2xl border border-cyan-500/30 space-y-5 text-xs">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label class="block text-slate-300 font-bold mb-1">Email nhận vé & lịch sử AI:</label>
+                <label class="block text-slate-300 font-bold mb-1">Email nhận vé &amp; biên lai Escrow:</label>
                 <input id="cw-email" type="email" required value="nguyenvanan@wandermatch.vn" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs font-medium">
               </div>
               <div>
@@ -1077,92 +1049,26 @@
               </div>
             </div>
 
-            <!-- 5D Persona Vector (Sliders + Quick Profile Presets) & Blacklist Cities -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-3 border-t border-slate-800">
-              <div class="space-y-3">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                  <span class="font-bold text-cyan-300 block">📊 5 Trục Tâm Lý (Khoảng Cách Euclid &amp; Cosine):</span>
-                  <div class="flex flex-wrap gap-1">
-                    <button type="button" onclick="applyPersonaPreset('MANG_DEN')" class="px-2 py-0.5 rounded bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-700 text-[10px] font-bold transition" title="Độc hành + Thiên nhiên hoang sơ">🏔️ Độc hành Núi</button>
-                    <button type="button" onclick="applyPersonaPreset('DA_LAT')" class="px-2 py-0.5 rounded bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-700 text-[10px] font-bold transition" title="Chữa lành + Nghỉ dưỡng cân bằng">🌲 Chữa lành</button>
-                    <button type="button" onclick="applyPersonaPreset('HUE')" class="px-2 py-0.5 rounded bg-purple-950 hover:bg-purple-900 text-purple-300 border border-purple-700 text-[10px] font-bold transition" title="Văn hóa Cố đô & Di sản">🏛️ Di sản Cố đô</button>
-                    <button type="button" onclick="applyPersonaPreset('QUY_NHON')" class="px-2 py-0.5 rounded bg-blue-950 hover:bg-blue-900 text-blue-300 border border-blue-700 text-[10px] font-bold transition" title="Biển tự nhiên yên bình">🌊 Biển Yên bình</button>
-                    <button type="button" onclick="applyPersonaPreset('PHU_QUOC')" class="px-2 py-0.5 rounded bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-700 text-[10px] font-bold transition" title="Resort 5 sao sôi động">🏖️ Resort 5 Sao</button>
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-5 gap-2 text-center">
-                  <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 space-y-1">
-                    <span class="text-[10px] text-slate-400 block">Chữa lành</span>
-                    <input id="cw-vec-healing" type="number" min="10" max="100" value="98" oninput="document.getElementById('cw-range-healing').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-cyan-300 text-sm focus:outline-none">
-                    <input id="cw-range-healing" type="range" min="10" max="100" value="98" oninput="document.getElementById('cw-vec-healing').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-cyan-400 cursor-pointer">
-                  </div>
-                  <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 space-y-1">
-                    <span class="text-[10px] text-slate-400 block">Thiên nhiên</span>
-                    <input id="cw-vec-nature" type="number" min="10" max="100" value="98" oninput="document.getElementById('cw-range-nature').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-emerald-300 text-sm focus:outline-none">
-                    <input id="cw-range-nature" type="range" min="10" max="100" value="98" oninput="document.getElementById('cw-vec-nature').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-emerald-400 cursor-pointer">
-                  </div>
-                  <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 space-y-1">
-                    <span class="text-[10px] text-slate-400 block">Độc hành</span>
-                    <input id="cw-vec-solitude" type="number" min="10" max="100" value="95" oninput="document.getElementById('cw-range-solitude').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-indigo-300 text-sm focus:outline-none">
-                    <input id="cw-range-solitude" type="range" min="10" max="100" value="95" oninput="document.getElementById('cw-vec-solitude').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-indigo-400 cursor-pointer">
-                  </div>
-                  <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 space-y-1">
-                    <span class="text-[10px] text-slate-400 block">Nghỉ dưỡng</span>
-                    <input id="cw-vec-comfort" type="number" min="10" max="100" value="65" oninput="document.getElementById('cw-range-comfort').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-amber-300 text-sm focus:outline-none">
-                    <input id="cw-range-comfort" type="range" min="10" max="100" value="65" oninput="document.getElementById('cw-vec-comfort').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-amber-400 cursor-pointer">
-                  </div>
-                  <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 space-y-1">
-                    <span class="text-[10px] text-slate-400 block">Văn hóa</span>
-                    <input id="cw-vec-culture" type="number" min="10" max="100" value="70" oninput="document.getElementById('cw-range-culture').value=this.value; handleLivePersonaChange();" class="w-full bg-transparent text-center font-black text-rose-300 text-sm focus:outline-none">
-                    <input id="cw-range-culture" type="range" min="10" max="100" value="70" oninput="document.getElementById('cw-vec-culture').value=this.value; handleLivePersonaChange();" class="w-full h-1 accent-rose-400 cursor-pointer">
-                  </div>
-                </div>
-              </div>
-
-              <div class="space-y-2.5">
-                <span class="font-bold text-rose-300 block">🚫 Danh Sách Loại Trừ Điểm Đến (Blacklist — Điểm = 0 ngay lập tức):</span>
-                <div class="flex flex-wrap gap-2 pt-0.5">
-                  <label class="px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
-                    <input type="checkbox" name="cw-blacklist" value="Đà Lạt" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Đà Lạt</span>
-                  </label>
-                  <label class="px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
-                    <input type="checkbox" name="cw-blacklist" value="Quy Nhơn" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Quy Nhơn</span>
-                  </label>
-                  <label class="px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
-                    <input type="checkbox" name="cw-blacklist" value="Măng Đen" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Măng Đen</span>
-                  </label>
-                  <label class="px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
-                    <input type="checkbox" name="cw-blacklist" value="Huế" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Huế</span>
-                  </label>
-                  <label class="px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-1.5 cursor-pointer hover:border-rose-500/50">
-                    <input type="checkbox" name="cw-blacklist" value="Phú Quốc" onchange="handleLivePersonaChange()" class="rounded text-rose-500"> <span>Phú Quốc</span>
-                  </label>
-                </div>
-                <input id="cw-blacklist-text" type="text" oninput="handleLivePersonaChange()" placeholder="Hoặc gõ tên tỉnh/thành muốn chặn (VD: Đà Lạt, Huế)..." class="w-full glass-input rounded-xl px-3 py-2 text-xs text-rose-200 border border-rose-500/30">
-              </div>
-            </div>
-
             <!-- AI PROCESSING 3-STEP STEPPER (1.8s VISUAL PROGRESS) -->
             <div id="ai-processing-stepper-box" class="hidden p-5 rounded-2xl bg-slate-950 border-2 border-cyan-500/50 space-y-3">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-black text-cyan-300 uppercase tracking-wider flex items-center gap-2">
-                  <i class="fa-solid fa-microchip fa-spin text-cyan-400"></i> AI ENGINE ĐANG XỬ LÝ & NIÊM PHONG CHUYẾN ĐI...
+                  <i class="fa-solid fa-microchip fa-spin text-cyan-400"></i> HỆ THỐNG ĐANG XÁC THỰC TÀI KHOẢN &amp; KHỞI TẠO MÃ VIETQR...
                 </span>
                 <span id="ai-stepper-timer-badge" class="font-mono text-[11px] text-amber-400 font-bold">1.8s</span>
               </div>
               <div class="space-y-2 text-xs">
                 <div id="ai-step-row-1" class="p-2.5 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-400 flex items-center gap-2.5 transition-all">
                   <i id="ai-step-icon-1" class="fa-solid fa-circle-notch fa-spin text-cyan-400"></i>
-                  <span>[1/3] Đang đối chiếu CCCD & STK qua cổng Napas 247...</span>
+                  <span>[1/3] Đang đối chiếu CCCD &amp; STK qua cổng Napas 247...</span>
                 </div>
                 <div id="ai-step-row-2" class="p-2.5 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-400 flex items-center gap-2.5 transition-all">
                   <i id="ai-step-icon-2" class="fa-regular fa-circle text-slate-500"></i>
-                  <span>[2/3] AI đang quét quỹ phòng 4-5 sao giờ chót & khóa biên độ tiết kiệm &ge; 20%...</span>
+                  <span>[2/3] Đang khóa quỹ phòng 4-5 sao giờ chót &amp; biên độ tiết kiệm &ge; 20%...</span>
                 </div>
                 <div id="ai-step-row-3" class="p-2.5 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-400 flex items-center gap-2.5 transition-all">
                   <i id="ai-step-icon-3" class="fa-regular fa-circle text-slate-500"></i>
-                  <span>[3/3] Đang niêm phong điểm đến & khởi tạo mã VietQR Công ty...</span>
+                  <span>[3/3] Đang niêm phong điểm đến &amp; xuất mã VietQR Công ty bên dưới...</span>
                 </div>
               </div>
             </div>
@@ -1170,8 +1076,8 @@
             <div id="cw-create-booking-result" class="hidden p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/50 space-y-2 text-xs"></div>
 
             <button id="btn-cw-submit-booking" type="submit" class="w-full py-3.5 rounded-2xl btn-glow-cyan text-slate-950 font-black text-sm shadow-xl transition flex items-center justify-center gap-2">
-              <i class="fa-solid fa-wand-magic-sparkles"></i>
-              <span>🔒 Xác Thực STK & Khóa Chuyến Đi (Mã Hóa AES-256 & Sinh Mã VietQR)</span>
+              <i class="fa-solid fa-shield-check"></i>
+              <span>🔒 Xác Nhận Tài Khoản &amp; Cập Nhật Mã Thanh Toán VietQR Bên Dưới</span>
             </button>
           </form>
         </div>
@@ -1179,15 +1085,15 @@
     </section>
 
     <!-- ==========================================================================
-         VIEW 3: CORPORATE VIETQR PAYMENT GATEWAY (CHUẨN CHỈ THANH TOÁN THEO NGÂN SÁCH)
+         BƯỚC 2B: CỔNG THANH TOÁN CORPORATE VIETQR & CHIA TIỀN NHÓM (SPLIT-BILL)
          ========================================================================== -->
     <section id="view-vietqr" class="space-y-8 hidden animate-fadeIn">
-      <div class="glass-panel rounded-3xl p-6 lg:p-10 border border-slate-800">
+      <div class="glass-panel rounded-3xl p-6 lg:p-10 border border-emerald-500/40">
         
         <div class="text-center max-w-2xl mx-auto mb-8">
           <div class="flex items-center justify-center gap-2 mb-2">
-            <span class="px-3 py-1 rounded-full text-xs font-black bg-cyan-500 text-slate-950 shadow-lg" data-i18n="vietqr_title">
-              Cổng Thanh Toán Corporate VietQR WanderMatch
+            <span class="px-3 py-1 rounded-full text-xs font-black bg-emerald-500 text-slate-950 shadow-lg" data-i18n="vietqr_title">
+              BƯỚC 2B • CỔNG THANH TOÁN CORPORATE VIETQR
             </span>
             <span id="payment-status-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1.5">
               <i class="fa-solid fa-clock"></i> <span>Hạn giữ phòng: <strong id="payment-countdown">14:59</strong></span>
@@ -1195,10 +1101,11 @@
           </div>
 
           <h2 class="text-2xl lg:text-3xl font-extrabold text-white mt-2" data-i18n="vietqr_subtitle">
-            Mã QR Động Pháp Nhân Doanh Nghiệp — Tự Động Khóa Quỹ Tạm Giữ Escrow
+            Quét Mã VietQR Pháp Nhân Công Ty — Khóa Quỹ Tạm Giữ Escrow
           </h2>
           <p class="text-xs text-slate-400 mt-1">
-            Số tiền trên mã QR được khóa chuẩn xác theo ngân sách bạn vừa lập: <strong id="vietqr-subtitle-amount" class="text-emerald-400 font-bold">5.000.000 VNĐ</strong>
+            Số tiền trên mã QR được khóa chuẩn xác theo ngân sách bạn vừa xác nhận: <strong id="vietqr-subtitle-amount" class="text-emerald-400 font-bold">5.000.000 VNĐ</strong>
+          </p>
           <!-- Mode Switcher: Individual vs Group Split Bill -->
           <div class="mt-4 flex items-center justify-center gap-2">
             <button id="btn-mode-individual-qr" onclick="setPaymentMode('INDIVIDUAL')" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-cyan-500 text-slate-950 shadow-lg flex items-center gap-2">
