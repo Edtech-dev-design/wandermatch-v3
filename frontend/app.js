@@ -4080,7 +4080,28 @@ function handleGeneratePlan() {
 
   const resolvedData = getCurrentDestData();
   const modeLabel = destSelect === 'blind' ? `Blind AI Match → ${resolvedData.name.vi}` : resolvedData.name.vi;
+
+  // Lưu lịch sử kế hoạch AI vào LocalStorage
+  try {
+    const savedPlans = JSON.parse(localStorage.getItem('wm_saved_itineraries') || '[]');
+    savedPlans.unshift({
+      id: 'plan_' + Date.now(),
+      createdAt: new Date().toLocaleString('vi-VN'),
+      destination: modeLabel,
+      budget: state.selectedBudget,
+      pax: pax,
+      duration: dur
+    });
+    if (savedPlans.length > 20) savedPlans.pop();
+    localStorage.setItem('wm_saved_itineraries', JSON.stringify(savedPlans));
+  } catch (e) {}
+
   showToast('success', `🎉 AI đã phân tích & lập lộ trình chi tiết: ${modeLabel} (${state.selectedBudget.toLocaleString('vi-VN')}đ)!`);
+
+  const itinContainer = document.getElementById('itineraries-container');
+  if (itinContainer) {
+    itinContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
 }
 
 function setQuickBudget(amount) {
