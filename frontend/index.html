@@ -3292,9 +3292,9 @@
       let stepIndex = 1;
       if (typeof activeViewOrStep === 'number') {
         stepIndex = activeViewOrStep;
-      } else if (activeViewOrStep === 'quiz' || activeViewOrStep === 'concierge') {
+      } else if (activeViewOrStep === 'concierge') {
         stepIndex = 1;
-      } else if (activeViewOrStep === 'vietqr') {
+      } else if (activeViewOrStep === 'quiz' || activeViewOrStep === 'vietqr') {
         stepIndex = 2;
       } else if (activeViewOrStep === 'scratch') {
         stepIndex = window.cwState?.isCurrentBookingUnlocked ? 4 : 3;
