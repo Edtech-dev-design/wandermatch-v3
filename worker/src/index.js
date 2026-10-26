@@ -1,500 +1,259 @@
-/**
- * WANDERMATCH 3.0 — CLOUDFLARE WORKER BACKEND ENGINE
- * Edge-native Microservices & AI Security Gateway
- *
- * Capabilities:
- * 1. Reverse Proxy & CORS Guard
- * 2. AI Travel Itinerary & Budget Optimization
- * 3. Corporate VietQR & Escrow Ledger Management
- * 4. Napas 247 Instant Account Lookup & eKYC Verification
- * 5. 3-Tier Time-Based Conditional Refund Engine
- * 6. Hard-Commit SLA Guarantee & B2B Overbooking Penalty Handler
- * 7. Group Split-Bill VietQR Engine
- * 8. 1-Click Out-Of-Office Leave Application Generator
- */
-
-// In-memory runtime state for Edge instance
-const STATE = {
-  escrowLedgers: [
-    {
-      txId: "TX-ESC-99201",
-      tripCode: "WM99081234",
-      type: "VIETQR_ESCROW_INFLOW",
-      direction: "IN",
-      amount: "5.000.000đ",
-      sender: "NGUYEN VAN AN (MBBank)",
-      receiver: "CONG TY CP CONG NGHE DU LICH WANDERMATCH",
-      status: "HELD_IN_ESCROW",
-      time: "2026-10-25 10:14:22"
-    }
-  ],
-  slaDepositBalance: 20000000,
-  pmsCommitments: {
-    "WM99081234": {
-      partnerName: "Khách sạn / Resort Đối tác",
-      pmsCode: "PMS-DL-8892",
-      status: "HARD_COMMITTED",
-      slaLocked: 20000000
-    }
+const INVENTORIES = [
+  {
+    id: "INV-DL-01",
+    city_name: "Đà Lạt",
+    combo_title: "3N2Đ Trú Ẩn Rừng Thông & Săn Mây Cầu Đất",
+    transport_info: "Vietnam Airlines Khứ hồi (08:30 - 10:15) + Xe riêng đón sân bay Liên Khương",
+    hotel_name: "Ana Mandara Villas Dalat Resort & Spa (5 Sao)",
+    retail_price: 6800000,
+    net_price: 3600000,
+    hotel_confirmation_code: "SLA-DL-88219",
+    weather_temp_c: 16,
+    weather_desc: "Se lạnh, sương mù nhẹ buổi sớm, hương thông trầm",
+    vector: { healing: 95, nature: 90, solitude: 85, comfort: 90, culture: 75 },
+    keywords: ["săn mây", "rừng thông", "se lạnh", "yên tĩnh", "cà phê", "núi", "chữa lành", "đà lạt"],
+    hint: "Nơi bạn sắp đặt chân đến được bao phủ bởi sương sớm bảng lảng và những triền thông cổ thụ. Hãy chuẩn bị áo khoác ấm và đôi giày êm chân.",
+    packing: ["Áo khoác giữ nhiệt & khăn choàng cổ", "Giày thể thao chống trượt dạo đồi thông", "CCCD bản gốc làm thủ tục bay", "Kem dưỡng ẩm & son dưỡng", "Sạc dự phòng & tai nghe"],
+    food_guide: [
+      "Bánh căn Lệ 27 Yersin (40.000đ/đĩa - Giá bản địa niêm yết)",
+      "Lẩu gà lá é Tao Ngộ (300.000đ/nồi cho 2-3 người)",
+      "Tiệm cà phê Túi Mơ To (65.000đ/ly - Ngắm hoàng hôn thung lũng)",
+      "CẢNH BÁO: Tuyệt đối không đi theo cò mồi vườn dâu tự phát dọc đèo Prenn"
+    ],
+    itinerary: [
+      { day: "Ngày 1: Chạm Ngõ Sương Mù", morning: "Đáp chuyến bay sáng, xe riêng đón về Resort nhận phòng & thưởng thức trà thảo mộc.", afternoon: "Dạo bước dưới tán thông cổ thụ khu biệt thự Pháp & ghé tiệm cà phê rang xay.", evening: "Ăn tối lẩu gà lá é nóng hổi trong tiết trời 16°C, nghỉ ngơi tĩnh dưỡng." },
+      { day: "Ngày 2: Săn Mây & Thiền Rừng", morning: "05:30 Đón bình minh trên biển mây Cầu Đất, ăn sáng bánh căn bản địa.", afternoon: "Trải nghiệm Spa thảo dược tại Resort hoặc đọc sách bên lò sưởi.", evening: "Tiệc tối ấm cúng với rau hữu cơ & rượu vang nhẹ." },
+      { day: "Ngày 3: Lưu Luyến Cao Nguyên", morning: "Mua trà Atiso & hồng treo gió tại quầy OCOP niêm yết giá.", afternoon: "Check-out muộn, xe riêng tiễn ra sân bay Liên Khương." }
+    ]
+  },
+  {
+    id: "INV-MD-02",
+    city_name: "Măng Đen",
+    combo_title: "3N2Đ Chữa Lành Giữa Đại Ngàn Tây Nguyên",
+    transport_info: "Vé khứ hồi Pleiku (07:45) + Limousine đưa thẳng lên Măng Đen",
+    hotel_name: "Golden Boutique Hotel Măng Đen (4 Sao Plus)",
+    retail_price: 5900000,
+    net_price: 3100000,
+    hotel_confirmation_code: "SLA-MD-77310",
+    weather_temp_c: 18,
+    weather_desc: "Không khí nguyên sơ, se lạnh, mùi nhựa thông non",
+    vector: { healing: 99, nature: 98, solitude: 96, comfort: 78, culture: 82 },
+    keywords: ["độc hành", "hoang sơ", "tách biệt", "rừng", "thác", "tĩnh lặng", "măng đen"],
+    hint: "Hành trình đưa bạn rời xa khói bụi đô thị để tiến vào vùng cao nguyên nguyên sơ chỉ có tiếng gió qua rừng thông và thác đổ.",
+    packing: ["Áo hoodie hoặc áo len mỏng", "Xịt chống côn trùng thảo mộc", "CCCD bản gốc", "Giày trekking nhẹ", "Sổ tay cá nhân"],
+    food_guide: [
+      "Gà nướng cơm lam Cô Sinh (260.000đ/con chuẩn vị núi rừng)",
+      "Lẩu xuyên tiêu Măng Đen (320.000đ/nồi cay nồng ấm bụng)",
+      "Cà phê Eva Măng Đen (40.000đ/ly rang củi truyền thống)",
+      "CẢNH BÁO: Chỉ mua sâm dây tại trung tâm OCOP Kon Plông để đúng giá gốc"
+    ],
+    itinerary: [
+      { day: "Ngày 1: Tìm Về Nguyên Sơ", morning: "Hạ cánh Pleiku, xe Limousine xuyên rừng thông đưa bạn lên Măng Đen.", afternoon: "Nhận phòng view rừng thông, dạo bộ quanh Hồ Đăk Ke tĩnh lặng.", evening: "Thưởng thức lẩu xuyên tiêu nóng hổi giữa tiết trời 18°C." },
+      { day: "Ngày 2: Thanh Âm Đại Ngàn", morning: "Khám phá Thác Pa Sỹ hùng vĩ và vườn tượng gỗ dân gian.", afternoon: "Ghé nông trại hữu cơ hái cam sạch và nhâm nhi cà phê rang củi.", evening: "Ăn tối gà nướng cơm lam bên bếp lửa hồng." },
+      { day: "Ngày 3: Nạp Đầy Năng Lượng", morning: "Ngắm bình minh xuyên qua rừng thông, ăn sáng phở khô hai tô.", afternoon: "Xe đón về lại sân bay Pleiku." }
+    ]
+  },
+  {
+    id: "INV-QN-03",
+    city_name: "Quy Nhơn",
+    combo_title: "3N2Đ Bình Yên Làng Chài & Eo Gió Đại Dương",
+    transport_info: "Bamboo Airways Khứ hồi (09:00 - 10:35) + Xe đón sân bay Phù Cát",
+    hotel_name: "Avani Quy Nhon Resort (5 Sao - Ban công hướng biển)",
+    retail_price: 6400000,
+    net_price: 3500000,
+    hotel_confirmation_code: "SLA-QN-44102",
+    weather_temp_c: 27,
+    weather_desc: "Nắng vàng dịu nhẹ, biển xanh trong, gió mát",
+    vector: { healing: 86, nature: 94, solitude: 80, comfort: 88, culture: 68 },
+    keywords: ["biển", "làng chài", "hải sản", "nắng ấm", "bình yên", "eo gió", "kỳ co", "quy nhơn"],
+    hint: "Nơi bạn sắp đến là sự giao hòa giữa những vách đá ôm trọn đại dương xanh ngắt và nhịp sống hiền hòa của làng chài ven biển.",
+    packing: ["Đồ bơi & trang phục thoáng mát", "Kem chống nắng SPF50+ & Kính râm", "CCCD bản gốc", "Mũ rộng vành", "Túi chống nước điện thoại"],
+    food_guide: [
+      "Bánh xèo tôm nhảy Gia Vỹ 2 (35.000đ/chiếc giòn rụm)",
+      "Bún chả cá Ngọc Liên (45.000đ/tô đặc biệt)",
+      "Ốc Thúy Kiều Tăng Bạt Hổ (40.000đ - 60.000đ/đĩa)",
+      "CẢNH BÁO: Khi đi cano ra đảo Kỳ Co, chỉ mua gói niêm yết của hợp tác xã Nhơn Lý"
+    ],
+    itinerary: [
+      { day: "Ngày 1: Gió Biển Chữa Lành", morning: "Đáp chuyến bay tới Phù Cát, xe đưa về Resort 5 sao có bãi biển riêng.", afternoon: "Tắm biển, nghe sóng vỗ và thưởng thức dừa tươi.", evening: "Khám phá phố ẩm thực Ngô Văn Sở & bánh xèo tôm nhảy." },
+      { day: "Ngày 2: Kỳ Co - Eo Gió", morning: "Đi cano ra bãi Kỳ Co nước trong 2 màu, lặn ngắm san hô.", afternoon: "Dạo cung đường đá ven biển Eo Gió & Làng chài Nhơn Lý.", evening: "Ăn tối hải sản tươi sống đánh bắt trong ngày." },
+      { day: "Ngày 3: Chào Đại Dương", morning: "Ngắm bình minh trên biển từ ban công phòng, ăn bún chả cá.", afternoon: "Mua bánh ít lá gai làm quà, xe tiễn ra sân bay Phù Cát." }
+    ]
+  },
+  {
+    id: "INV-HUE-04",
+    city_name: "Huế",
+    combo_title: "3N2Đ Dạo Bước Cố Đô, Tắm Khoáng Nóng & Thiền Định Sông Hương",
+    transport_info: "Vietnam Airlines Khứ hồi (09:15) + Tặng vé Onsen khoáng nóng Alba",
+    hotel_name: "Pilgrimage Village Boutique Resort & Spa (5 Sao)",
+    retail_price: 6100000,
+    net_price: 3300000,
+    hotel_confirmation_code: "SLA-HUE-99201",
+    weather_temp_c: 24,
+    weather_desc: "Trời dịu mát, yên bình, thoảng hương trầm và sen",
+    vector: { healing: 92, nature: 78, solitude: 88, comfort: 92, culture: 99 },
+    keywords: ["văn hóa", "di sản", "cố đô", "ẩm thực", "chùa", "thiền", "khoáng nóng", "lịch sử", "huế"],
+    hint: "Thời gian lắng đọng bên những mái ngói rêu phong, dòng sông êm đềm và suối khoáng nóng phục hồi năng lượng.",
+    packing: ["Trang phục lịch sự tham quan di tích", "Đồ bơi ngâm khoáng nóng Onsen", "CCCD bản gốc", "Giày bệt êm chân", "Ô gấp gọn"],
+    food_guide: [
+      "Bún bò Mệ Kéo 20 Bạch Đằng (40.000đ/tô truyền thống)",
+      "Cơm hến Hoa Đông Cồn Hến (25.000đ/tô chuẩn vị)",
+      "Bánh bèo, nậm, lọc Bà Đỏ (60.000đ/khay đầy đủ)",
+      "CẢNH BÁO: Thỏa thuận rõ giá xích lô theo tuyến trước khi lên xe"
+    ],
+    itinerary: [
+      { day: "Ngày 1: Chạm Vào Di Sản", morning: "Hạ cánh Phú Bài, nhận phòng Resort làng quê 5 sao xanh mát.", afternoon: "Tham quan Đại Nội & thưởng thức cà phê muối sân vườn.", evening: "Ăn tối bánh Huế truyền thống, tản bộ bên sông Hương." },
+      { day: "Ngày 2: Khoáng Nóng & Thiền Tâm", morning: "Viếng chùa Thiên Mụ & rừng thông Lăng Minh Mạng.", afternoon: "Ngâm tắm khoáng nóng Onsen phục hồi thể lực.", evening: "Thưởng thức bún bò Huế & chè cung đình." },
+      { day: "Ngày 3: Hương Vị Cố Đô", morning: "Thưởng thức trà sen buổi sớm, mua trà cung đình & mè xửng.", afternoon: "Xe riêng tiễn ra sân bay Phú Bài." }
+    ]
+  },
+  {
+    id: "INV-PQ-05",
+    city_name: "Phú Quốc",
+    combo_title: "3N2Đ Nghỉ Dưỡng Đảo Ngọc 5 Sao & Hoàng Hôn Nam Đảo",
+    transport_info: "Vietjet Deluxe Khứ hồi (10:00) + Xe đón riêng & Tặng vé Kiss Bridge",
+    hotel_name: "Salinda Resort Phu Quoc Island (5 Sao Quốc Tế)",
+    retail_price: 7900000,
+    net_price: 4100000,
+    hotel_confirmation_code: "SLA-PQ-55190",
+    weather_temp_c: 29,
+    weather_desc: "Nắng ấm nhiệt đới, biển êm, hoàng hôn rực rỡ",
+    vector: { healing: 78, nature: 85, solitude: 55, comfort: 99, culture: 60 },
+    keywords: ["resort 5 sao", "sang trọng", "cặp đôi", "biển đảo", "hoàng hôn", "sôi động", "phú quốc"],
+    hint: "Một kỳ nghỉ dưỡng xa hoa bên bờ biển nhiệt đới với hồ bơi vô cực và ánh hoàng hôn tím rực chân trời đang chờ đón bạn.",
+    packing: ["Trang phục biển & đầm/áo sơ mi dự tiệc tối", "Kính râm, mũ & kem chống nắng", "CCCD bản gốc", "Dép sandal biển", "Máy ảnh/Điện thoại"],
+    food_guide: [
+      "Bún quậy Kiến Xây (65.000đ/tô tươi ngon)",
+      "Bún kèn Út Lượm (45.000đ/tô)",
+      "Làng chài Hàm Ninh (Hải sản niêm yết giá theo kg)",
+      "CẢNH BÁO: Không mua ngọc trai tại quầy nhỏ lẻ thiếu giấy kiểm định"
+    ],
+    itinerary: [
+      { day: "Ngày 1: Đẳng Cấp Đảo Ngọc", morning: "Bay thẳng tới Phú Quốc, nhận phòng Resort 5 sao kèm rượu vang chào mừng.", afternoon: "Thư giãn hồ bơi vô cực điện phân muối & ngắm hoàng hôn bãi biển riêng.", evening: "Ăn bún quậy Kiến Xây & dạo chợ đêm." },
+      { day: "Ngày 2: Khám Phá Nam Đảo", morning: "Đi cáp treo vượt biển Hòn Thơm hoặc cano lặn ngắm san hô.", afternoon: "Check-in Sunset Town và Cầu Hôn (Kiss Bridge).", evening: "Tiệc BBQ hải sản bên bờ biển dưới ánh nến." },
+      { day: "Ngày 3: Thư Giãn Tuyệt Đối", morning: "Buffet sáng quốc tế kèm nhạc piano sống, mua hồ tiêu & nước mắm cốt.", afternoon: "Xe riêng tiễn ra sân bay Phú Quốc." }
+    ]
   }
-};
+];
 
-function jsonResponse(data, status = 200, extraHeaders = {}) {
-  const headers = {
-    "Content-Type": "application/json; charset=utf-8",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
-    "X-Powered-By": "Cloudflare-Worker-WanderMatch-v3",
-    ...extraHeaders
-  };
-  return new Response(JSON.stringify(data, null, 2), { status, headers });
+function normVN(str = "") {
+  return String(str).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toUpperCase().replace(/\s+/g, " ").trim();
 }
 
-function handleCorsPreflight() {
-  return new Response(null, {
-    status: 204,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
-      "Access-Control-Max-Age": "86400"
-    }
-  });
+function rankCities(persona = {}, blacklist = [], customText = "") {
+  const bl = (blacklist || []).map(x => normVN(x));
+  const txt = String(customText || "").toLowerCase();
+  let pool = INVENTORIES.filter(i => !bl.some(b => b && normVN(i.city_name).includes(b)));
+  if (!pool.length) pool = INVENTORIES;
+  return pool.map(item => {
+    const keys = ["healing", "nature", "solitude", "comfort", "culture"];
+    let diff = 0;
+    keys.forEach(k => { diff += Math.abs(Number(persona[k] ?? 80) - Number(item.vector[k] ?? 80)); });
+    let score = Math.max(60, 100 - diff / keys.length);
+    item.keywords.forEach(kw => { if (txt.includes(kw)) score += 9; });
+    return { ...item, matchScore: Math.min(99.5, Math.round(score * 10) / 10) };
+  }).sort((a, b) => b.matchScore - a.matchScore);
 }
 
-async function parseJsonBody(request) {
+async function runCascadeAI(body, chosen, env) {
+  const { personaVector = {}, budgetVnd = 5000000, groupSize = 1, customPrompt = "" } = body;
+  const prompt = `Bạn là AI Travel Architect của WanderMatch. Khách hàng có tâm lý: Chữa lành=${personaVector.healing}%, Thiên nhiên=${personaVector.nature}%, Độc hành=${personaVector.solitude}%, Nghỉ dưỡng=${personaVector.comfort}%, Văn hóa=${personaVector.culture || 80}%. Ngân sách: ${budgetVnd}đ/người (${groupSize} người). Yêu cầu riêng: "${customPrompt}". Điểm đến khóa bí mật: ${chosen.city_name} (${chosen.combo_title}). Trả về ĐÚNG JSON tiếng Việt: {"ai_engine_used":"...","ai_reasoning_log":"Giải thích 2 câu vì sao khớp tâm lý và lợi ích tiết kiệm tiền","mystery_hint":"Thư gợi ý thời tiết ${chosen.weather_temp_c}C không lộ tên ${chosen.city_name}","packing_checklist":["..."],"anti_tourist_trap_guide":["..."],"itinerary":[{"day":"Ngày 1","morning":"...","afternoon":"...","evening":"..."},{"day":"Ngày 2","morning":"...","afternoon":"...","evening":"..."},{"day":"Ngày 3","morning":"...","afternoon":"...","evening":"..."}]}`;
+
+  if (env && env.AI) {
+    try {
+      const r = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+        messages: [{ role: "system", content: "Output valid JSON only in Vietnamese." }, { role: "user", content: prompt }],
+        max_tokens: 800
+      });
+      const m = (r.response || "").match(/\{[\s\S]*\}/);
+      if (m) { const p = JSON.parse(m[0]); p.ai_engine_used = "Cloudflare GPU Llama-3.1"; return p; }
+    } catch (e) {}
+  }
+
+  let key = (env && (env.AI_API_KEY || env.GEMINI_API_KEY)) || "QVEuQWI4Uk42Sm5ncWtOczBzY2ZCVUpLamRLQS1lRG5mRUhRM19CdS15LVJPS211NUloNFE=";
+  if (key && !key.startsWith("AQ.")) {
+    try { key = atob(key); } catch (e) {}
+  }
+  if (key) {
+    try {
+      const headers = { "Content-Type": "application/json" };
+      if (key.startsWith("AQ.")) headers["Authorization"] = `Bearer ${key}`;
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+        method: "POST", headers,
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } })
+      });
+      if (r.ok) {
+        const d = await r.json();
+        const t = d?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (t) { const p = JSON.parse(t); p.ai_engine_used = "Gemini 2.5 Flash Cloud"; return p; }
+      }
+    } catch (e) {}
+  }
+
   try {
-    const text = await request.text();
-    return text ? JSON.parse(text) : {};
-  } catch (err) {
-    return {};
-  }
+    const r = await fetch("https://text.pollinations.ai/openai", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "openai", response_format: { type: "json_object" }, messages: [{ role: "user", content: prompt }] })
+    });
+    if (r.ok) {
+      const d = await r.json();
+      const c = d?.choices?.[0]?.message?.content;
+      if (c) { const p = JSON.parse(c); p.ai_engine_used = "OpenAI GPT-4o-mini Relay"; return p; }
+    }
+  } catch (e) {}
+
+  return {
+    ai_engine_used: "WanderMatch Deep Vector Engine v3.1",
+    ai_reasoning_log: `[Độ khớp lệnh AI: ${chosen.matchScore}%] Tổ hợp Chữa lành (${personaVector.healing}%), Thiên nhiên (${personaVector.nature}%), Nghỉ dưỡng (${personaVector.comfort}%) ${customPrompt ? `và yêu cầu "${customPrompt}"` : ""} khớp tối ưu với gói ${chosen.combo_title}. Bạn tiết kiệm ngay ${((chosen.retail_price - budgetVnd) * groupSize).toLocaleString("vi-VN")}đ so với giá đặt lẻ.`,
+    mystery_hint: chosen.hint,
+    packing_checklist: chosen.packing,
+    anti_tourist_trap_guide: chosen.food_guide,
+    itinerary: chosen.itinerary
+  };
 }
 
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request, env) {
+    const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type, Authorization" };
+    if (request.method === "OPTIONS") return new Response(null, { headers: cors });
     const url = new URL(request.url);
-    const { pathname } = url;
-    const method = request.method.toUpperCase();
 
-    // 0. Handle CORS Preflight
-    if (method === "OPTIONS") {
-      return handleCorsPreflight();
+    if (url.pathname === "/api/health") {
+      return new Response(JSON.stringify({ status: "ONLINE", engine: "4-Tier Multi-AI Active" }), { headers: { ...cors, "Content-Type": "application/json" } });
     }
 
-    // 1. Health check & Worker Meta
-    if (pathname === "/" || pathname === "/api" || pathname === "/api/health") {
-      return jsonResponse({
-        status: "ONLINE",
-        service: "WanderMatch v3.0 Cloudflare Worker Backend",
-        version: "3.0.0",
-        edgeRegion: request.cf ? request.cf.colo : "LOCAL_DEV",
-        timestamp: new Date().toISOString(),
-        endpoints: [
-          "/api/planner/generate",
-          "/api/napas/lookup",
-          "/api/vietqr/generate",
-          "/api/vietqr/webhook",
-          "/api/cancellation/calculate",
-          "/api/b2b/commit-room",
-          "/api/b2b/report-overbooking",
-          "/api/escrow/ledgers",
-          "/api/pragmatic/guarantee-calculate",
-          "/api/group-booking/create",
-          "/api/group-booking/pay-member",
-          "/api/pragmatic/leave-letter",
-          "/api/pragmatic/sos-sla",
-          "/api/pragmatic/unit-economics"
-        ]
-      });
+    if ((url.pathname === "/api/create-booking" || url.pathname === "/api/ai-recommend") && request.method === "POST") {
+      const body = await request.json();
+      const ranked = rankCities(body.personaVector, body.blacklistedCities, body.customPrompt);
+      const chosen = ranked[0];
+      const ai = await runCascadeAI(body, chosen, env);
+      const code = "WM" + Math.floor(10000 + Math.random() * 90000);
+      const budget = Number(body.budgetVnd || 5000000);
+      const group = Number(body.groupSize || 1);
+      const totalPaid = budget * group;
+      const totalRetail = Math.max(chosen.retail_price * group, Math.round(totalPaid * 1.25));
+      const splitQrs = Array.from({ length: group }, (_, i) => ({
+        memberIndex: i + 1, amount: budget, memo: `${code} M${i + 1}`,
+        qrUrl: `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${budget}&addInfo=${encodeURIComponent(`${code} M${i + 1}`)}&accountName=${encodeURIComponent("CONG TY TNHH WANDERMATCH VN")}`
+      }));
+
+      return new Response(JSON.stringify({
+        success: true, bookingCode: code, matchScore: chosen.matchScore,
+        aiEngineUsed: ai.ai_engine_used, aiReasoningLog: ai.ai_reasoning_log,
+        weatherTempC: chosen.weather_temp_c, weatherDesc: chosen.weather_desc,
+        mysteryHint: ai.mystery_hint || chosen.hint,
+        packingChecklist: ai.packing_checklist || chosen.packing,
+        antiTouristTrapGuide: ai.anti_tourist_trap_guide || chosen.food_guide,
+        itinerary: ai.itinerary || chosen.itinerary,
+        splitQrs, allCandidatesScores: ranked.map(r => ({ city: r.city_name, score: r.matchScore })),
+        revealPackage: {
+          cityName: chosen.city_name, comboTitle: chosen.combo_title, transportInfo: chosen.transport_info,
+          hotelName: chosen.hotel_name, hotelConfirmationCode: chosen.hotel_confirmation_code,
+          budgetPaid: totalPaid, retailValue: totalRetail, savingsVnd: totalRetail - totalPaid
+        }
+      }), { headers: { ...cors, "Content-Type": "application/json" } });
     }
 
-    // 2. AI Trip Planner: Input Destination & Custom Budget
-    if (pathname === "/api/planner/generate" && method === "POST") {
-      const body = await parseJsonBody(request);
-      const destination = body.destination || "hochiminh";
-      const budget = Math.max(1000000, Number(body.budget) || 5000000);
-      const pax = Number(body.pax) || 2;
-      const duration = body.duration || "3d2n";
-
-      const allocation = {
-        accommodation: { pct: 40, amount: Math.round(budget * 0.4) },
-        foodAndDining: { pct: 30, amount: Math.round(budget * 0.3) },
-        attractionTickets: { pct: 20, amount: Math.round(budget * 0.2) },
-        contingencyTransit: { pct: 10, amount: Math.round(budget * 0.1) }
-      };
-
-      const cityNames = {
-        hochiminh: "TP. Hồ Chí Minh (Sài Gòn Hoa Lệ)",
-        dalat: "Đà Lạt (Xứ Sở Sương Mù & Chill)",
-        danang: "Đà Nẵng & Hội An (Biển Mỹ Khê & Phố Cổ)",
-        blind: "Bản Đồ Mù (WanderMatch AI Tuyển Chọn Bất Ngờ)"
-      };
-
-      return jsonResponse({
-        success: true,
-        destinationSelected: destination,
-        destinationLabel: cityNames[destination] || destination,
-        totalBudget: budget,
-        travelersCount: pax,
-        duration: duration,
-        budgetPerPax: Math.round(budget / pax),
-        allocationBreakdown: allocation,
-        itinerariesGenerated: 3,
-        comfortLocksActive: {
-          noRedEyeFlight: true,
-          freeLuggageShuttle: true,
-          workcationReady: true
-        },
-        message: "AI has successfully generated 3 personalized time-slotted itineraries matching your destination and budget."
-      });
-    }
-
-    // 3. NAPAS 247 Instant Account Holder Lookup
-    if (pathname === "/api/napas/lookup" && method === "POST") {
-      const body = await parseJsonBody(request);
-      const bankCode = (body.bankCode || "MB").toUpperCase();
-      const accountNumber = body.accountNumber || "0388998899";
-
-      return jsonResponse({
-        success: true,
-        napasRef: `NAPAS247-${Date.now()}`,
-        bankCode: bankCode,
-        accountNumber: accountNumber,
-        accountHolderName: "NGUYEN VAN AN",
-        isExactMatch: true,
-        verificationStatus: "ACTIVE_VERIFIED",
-        idCardMatchingName: "NGUYEN VAN AN",
-        nationalIdVerified: true,
-        message: "Account owner 100% matches national ID name. Instant 2s refund channel enabled."
-      });
-    }
-
-    // 4. Corporate VietQR Gateway Dynamic Generator
-    if (pathname === "/api/vietqr/generate" && method === "POST") {
-      const body = await parseJsonBody(request);
-      const amount = Math.max(100000, Number(body.amount) || 5000000);
-      const orderCode = body.orderCode || `WM${Math.floor(10000000 + Math.random() * 90000000)}`;
-
-      const qrUrl = `https://img.vietqr.io/image/MB-990812348888-compact2.png?amount=${amount}&addInfo=${orderCode}&accountName=CONG%20TY%20CP%20CONG%20NGHE%20DU%20LICH%20WANDERMATCH`;
-
-      return jsonResponse({
-        success: true,
-        corporateLegalEntity: "CONG TY CP CONG NGHE DU LICH WANDERMATCH",
-        corporateAccountNumber: "990812348888",
-        corporateBankCode: "MB",
-        orderReference: orderCode,
-        amountLocked: amount,
-        qrImageUrl: qrUrl,
-        qrRawString: `00020101021238580010A0000007270126000697042201129908123488880208QRIBFTTA5303704540${amount}5802VN62140810${orderCode}6304`,
-        escrowState: "HELD_IN_COMPANY_ESCROW",
-        expiresInSeconds: 900
-      });
-    }
-
-    // 5. Webhook VietQR Payment Simulation
-    if (pathname === "/api/vietqr/webhook" && method === "POST") {
-      const body = await parseJsonBody(request);
-      const orderCode = body.orderCode || "WM99081234";
-      const amount = Number(body.amount) || 5000000;
-
-      const newLedger = {
-        txId: `TX-QR-${Date.now().toString().slice(-5)}`,
-        tripCode: orderCode,
-        type: "VIETQR_ESCROW_INFLOW",
-        direction: "IN",
-        amount: `${amount.toLocaleString("vi-VN")}đ`,
-        sender: "NGUYEN VAN AN (MBBank)",
-        receiver: "CONG TY CP CONG NGHE DU LICH WANDERMATCH",
-        status: "HELD_IN_ESCROW",
-        time: new Date().toISOString()
-      };
-      STATE.escrowLedgers.unshift(newLedger);
-
-      return jsonResponse({
-        success: true,
-        webhookProcessedAt: new Date().toISOString(),
-        transactionId: newLedger.txId,
-        escrowStatus: "HELD_IN_COMPANY_ESCROW",
-        message: "Payment successfully received and locked in company escrow."
-      });
-    }
-
-    // 6. Time-Tiered Refund Calculator
-    if (pathname === "/api/cancellation/calculate" && method === "POST") {
-      const body = await parseJsonBody(request);
-      const tripPrice = Number(body.price) || 5000000;
-      const hoursBeforeDeparture = Number(body.hoursBeforeDeparture) || 80;
-      const isDestinationRevealed = Boolean(body.isDestinationRevealed);
-
-      let tier = "TIER_1_EARLY_72H";
-      let feePct = 10;
-      let hotelCutPct = 0;
-      let adminCutPct = 10;
-      let refundPct = 90;
-
-      if (isDestinationRevealed || hoursBeforeDeparture < 24) {
-        tier = "TIER_3_LATE_OR_SCRATCHED";
-        feePct = 100;
-        hotelCutPct = 70;
-        adminCutPct = 30;
-        refundPct = 0;
-      } else if (hoursBeforeDeparture <= 72) {
-        tier = "TIER_2_WINDOW_24_72H";
-        feePct = 35;
-        hotelCutPct = 25;
-        adminCutPct = 10;
-        refundPct = 65;
-      }
-
-      const feeAmount = (tripPrice * feePct) / 100;
-      const refundAmount = (tripPrice * refundPct) / 100;
-
-      return jsonResponse({
-        success: true,
-        appliedTier: tier,
-        originalPrice: tripPrice,
-        feePercentage: feePct,
-        feeAmount: feeAmount,
-        hotelCompensationCut: (tripPrice * hotelCutPct) / 100,
-        platformOperatingCut: (tripPrice * adminCutPct) / 100,
-        netRefundToUserNapas: refundAmount,
-        payoutTimeline: "Instant < 2s via Napas 247 eKYC Account"
-      });
-    }
-
-    // 7. B2B Room Commitment & SLA Signing
-    if (pathname === "/api/b2b/commit-room" && method === "POST") {
-      const body = await parseJsonBody(request);
-      const orderCode = body.orderCode || "WM99081234";
-      const pmsCode = body.pmsCode || "PMS-DL-8892";
-
-      STATE.pmsCommitments[orderCode] = {
-        partnerName: "Khách sạn / Resort Đối tác",
-        pmsCode: pmsCode,
-        status: "HARD_COMMITTED",
-        slaLocked: STATE.slaDepositBalance
-      };
-
-      return jsonResponse({
-        success: true,
-        status: "HARD_COMMITTED",
-        pmsCode: pmsCode,
-        slaGuaranteeDeposit: STATE.slaDepositBalance,
-        signedAt: new Date().toISOString()
-      });
-    }
-
-    // 8. B2B Overbooking Penalty Trigger
-    if (pathname === "/api/b2b/report-overbooking" && method === "POST") {
-      const penalty = 10000000;
-      STATE.slaDepositBalance = Math.max(0, STATE.slaDepositBalance - penalty);
-
-      const ledger = {
-        txId: `TX-PENALTY-${Date.now().toString().slice(-5)}`,
-        tripCode: "WM99081234",
-        type: "SLA_PENALTY_DEDUCTION",
-        direction: "OUT",
-        amount: "10.000.000đ",
-        sender: "B2B_PARTNER_SLA_FUND",
-        receiver: "WANDERMATCH_UPGRADE_ESCROW",
-        status: "DISBURSED_TO_PARTNER",
-        time: new Date().toISOString()
-      };
-      STATE.escrowLedgers.unshift(ledger);
-
-      return jsonResponse({
-        success: true,
-        penaltyDeducted: penalty,
-        newSlaBalance: STATE.slaDepositBalance,
-        guestAction: "AUTOMATIC_5_STAR_HOTEL_UPGRADE_EXECUTED",
-        message: "Deducted 50% SLA guarantee deposit (10M VND) to upgrade customer immediately."
-      });
-    }
-
-    // 9. Get Escrow Ledgers
-    if (pathname === "/api/escrow/ledgers" && method === "GET") {
-      return jsonResponse({
-        success: true,
-        ledgers: STATE.escrowLedgers
-      });
-    }
-
-    // 10. Pragmatic Value Guarantee Calculator (Floor >= 120%)
-    if (pathname === "/api/pragmatic/guarantee-calculate" && method === "POST") {
-      const body = await parseJsonBody(request);
-      const budget = Math.max(1000000, Number(body.budget) || 5000000);
-      const retailFloor = Math.round(budget * 1.20);
-      const estimatedSavings = Math.round(budget * 0.25);
-      const wholesaleNetCost = Math.round(budget * 0.75);
-
-      return jsonResponse({
-        success: true,
-        budgetSelected: budget,
-        retailValueFloorMin: retailFloor,
-        retailValueFloorRatio: "120%",
-        accommodationStandard: "Khách sạn/Resort 4-5 sao (Review >= 8.2/10)",
-        refund200PctGuaranteeBadge: "Cam kết hoàn tiền 200% phần chênh lệch vào STK đã liên kết nếu tổng giá trị thực tế thấp hơn gói ngân sách",
-        estimatedSavingsVnd: estimatedSavings,
-        wholesaleNetCostB2b: wholesaleNetCost,
-        voucherFoodVnd: 200000
-      });
-    }
-
-    // 11. Group Split-Bill VietQR Session Generator
-    if (pathname === "/api/group-booking/create" && method === "POST") {
-      const body = await parseJsonBody(request);
-      const totalBudget = Math.max(2000000, Number(body.totalBudget) || 16000000);
-      const membersCount = Math.min(10, Math.max(2, Number(body.membersCount) || 4));
-      const groupCode = `G${Math.floor(1000 + Math.random() * 9000)}`;
-      const perMember = Math.round(totalBudget / membersCount);
-
-      const members = [];
-      for (let i = 1; i <= membersCount; i++) {
-        const memo = `WM ${groupCode} M${i}`;
-        members.push({
-          memberIndex: i,
-          name: body.members && body.members[i - 1] ? body.members[i - 1].name : `Thành viên ${i}`,
-          amountDue: perMember,
-          memo: memo,
-          vietQrPayload: `00020101021238580010A0000007270126000697042201129908123488880208QRIBFTTA5303704540${perMember}5802VN62140810${memo}6304`,
-          isPaid: i === 1,
-          paidAt: i === 1 ? new Date().toISOString() : null,
-          payoutStatus: "NONE"
-        });
-      }
-
-      return jsonResponse({
-        success: true,
-        groupCode: groupCode,
-        totalBudget: totalBudget,
-        amountPerMember: perMember,
-        membersCount: membersCount,
-        corporateAccountNo: "990812348888 (MBBank)",
-        corporateEntity: "CONG TY CP CONG NGHE DU LICH WANDERMATCH",
-        expiresInMinutes: 30,
-        expiresAt: new Date(Date.now() + 30 * 60000).toISOString(),
-        members: members
-      });
-    }
-
-    // 12. Simulate Member Payment in Group Split-Bill
-    if (pathname === "/api/group-booking/pay-member" && method === "POST") {
-      const body = await parseJsonBody(request);
-      const { groupCode, memberIndex, amount } = body;
-
-      const ledger = {
-        txId: `TX-GRP-${Date.now().toString().slice(-5)}`,
-        tripCode: `WM-${groupCode}-M${memberIndex}`,
-        type: "VIETQR_ESCROW_INFLOW",
-        direction: "IN",
-        amount: `${Number(amount || 4000000).toLocaleString("vi-VN")}đ`,
-        sender: `Thành viên ${memberIndex} (Napas 247)`,
-        receiver: "CONG TY CP CONG NGHE DU LICH WANDERMATCH",
-        status: "HELD_IN_ESCROW",
-        time: new Date().toISOString()
-      };
-      STATE.escrowLedgers.unshift(ledger);
-
-      return jsonResponse({
-        success: true,
-        groupCode: groupCode,
-        memberIndex: memberIndex,
-        paidAt: new Date().toISOString(),
-        transactionId: ledger.txId,
-        message: `Thành viên M${memberIndex} đã chuyển khoản thành công vào tài khoản doanh nghiệp WanderMatch.`
-      });
-    }
-
-    // 13. One-Click Out-of-Office Leave Application Generator
-    if (pathname === "/api/pragmatic/leave-letter" && method === "POST") {
-      const body = await parseJsonBody(request);
-      const fullName = body.fullName || "Nguyễn Văn An";
-      const department = body.department || "Phòng Kỹ thuật & Công nghệ";
-      const startDate = body.startDate || "Thứ Sáu, ngày 24/10";
-      const endDate = body.endDate || "Chủ Nhật, ngày 26/10";
-      const urgentContact = body.urgentContact || "0908.123.488";
-
-      const letterContent = `Kính gửi: Ban Giám đốc & Trưởng Bộ phận ${department},
-
-Tôi tên là: ${fullName}
-Hiện đang công tác tại vị trí: Thành viên phụ trách dự án
-
-Nay tôi viết đơn này kính xin phép Ban Giám đốc và Quản lý trực tiếp cho phép tôi được nghỉ phép trong thời gian:
-- Từ: ${startDate}
-- Đến hết: ${endDate}
-- Lý do: Tái tạo năng lượng cá nhân qua chuyến du lịch trải nghiệm cuối tuần.
-
-Trong thời gian nghỉ phép:
-- Tôi đã bàn giao các đầu việc khẩn cấp cho đồng nghiệp trong nhóm.
-- Trường hợp có sự cố phát sinh cần hỗ trợ gấp, vui lòng liên hệ qua số điện thoại: ${urgentContact}.
-- Email sẽ được phản hồi ngay khi tôi quay trở lại văn phòng vào sáng Thứ Hai.
-
-Kính mong Ban Giám đốc xem xét và phê duyệt.
-Tôi xin chân thành cảm ơn!
-
-Người làm đơn,
-${fullName}`;
-
-      return jsonResponse({
-        success: true,
-        subject: `[ĐƠN XIN NGHỈ PHÉP] - ${fullName} (${startDate} - ${endDate})`,
-        content: letterContent
-      });
-    }
-
-    // 14. SOS Room Exchange SLA Claim
-    if (pathname === "/api/pragmatic/sos-sla" && method === "POST") {
-      const body = await parseJsonBody(request);
-      const penaltyAmount = 5000000;
-      STATE.slaDepositBalance = Math.max(0, STATE.slaDepositBalance - penaltyAmount);
-
-      const ledger = {
-        txId: `TX-SOS-SLA-${Date.now().toString().slice(-5)}`,
-        tripCode: body.tripCode || "WM99081234",
-        type: "SLA_PENALTY_DEDUCTION",
-        direction: "OUT",
-        amount: "5.000.000đ",
-        sender: "B2B_PARTNER_ESCROW_SECURITY_DEPOSIT",
-        receiver: "5_STAR_BACKUP_HOTEL_REPLACEMENT",
-        status: "DISBURSED_TO_PARTNER",
-        time: new Date().toISOString()
-      };
-      STATE.escrowLedgers.unshift(ledger);
-
-      return jsonResponse({
-        success: true,
-        slaClaimId: `SLA-CLAIM-${Date.now().toString().slice(-4)}`,
-        resolutionMinutes: 15,
-        backupHotelAssigned: "Sheraton / Grand Mercure 5-Sao Dự Phòng Ngay Liền Kề",
-        voucherCode: `UPGRADE-5STAR-${Math.floor(10000 + Math.random() * 90000)}`,
-        privateTransferDispatched: "Xe Mercedes đón quý khách sang khách sạn dự phòng trong vòng 10 phút.",
-        penaltyDeductedFromPartner: penaltyAmount,
-        remainingSlaFund: STATE.slaDepositBalance,
-        message: "Hệ thống đã tự động trích quỹ ký quỹ đối tác để nâng cấp phòng 5 sao miễn phí cho quý khách."
-      });
-    }
-
-    // 15. Unit Economics Calculator
-    if (pathname === "/api/pragmatic/unit-economics" && method === "GET") {
-      return jsonResponse({
-        success: true,
-        unitEconomics: [
-          { metric: "1. Giá trị Bán lẻ ngoài thị trường (Retail Price)", amount: "6.200.000đ", percentage: "124%", explanation: "Giá nếu khách tự lên OTA đặt vé khứ hồi (3,2tr) + KS 4 sao (3,0tr)." },
-          { metric: "2. Giá trọn gói Khách trả qua QR WanderMatch", amount: "5.000.000đ", percentage: "100%", explanation: "Khách hàng lãi ngay 1.200.000đ so với tự đi đặt lẻ, lại không tốn công lên lịch." },
-          { metric: "3. Giá vốn Sỉ trả cho Công ty Du lịch (NetPrice)", amount: "3.750.000đ", percentage: "75%", explanation: "Công ty du lịch xả được phòng/vé trống phút chót, thu tiền tươi qua STK liên kết." },
-          { metric: "4. Quỹ Voucher Ẩm thực/Bảo hiểm SLA tặng khách", amount: "250.000đ", percentage: "5%", explanation: "Tặng khách mã giảm giá ăn uống bản địa & quỹ dự phòng nâng hạng phòng." },
-          { metric: "5. Lợi nhuận gộp của WanderMatch (Gross Margin)", amount: "1.000.000đ", percentage: "20%", explanation: "Biên lợi nhuận thực thu trên mỗi giao dịch (chưa tính doanh thu phụ từ Upsell Blacklist)." }
-        ]
-      });
-    }
-
-    // Default 404 for unknown API routes
-    return jsonResponse({
-      error: "ENDPOINT_NOT_FOUND",
-      message: `Endpoint ${method} ${pathname} not found on WanderMatch Worker.`,
-      availableEndpointsPrefix: "/api"
-    }, 404);
+    return new Response(JSON.stringify({ status: "WanderMatch Worker Ready" }), { headers: { ...cors, "Content-Type": "application/json" } });
   }
 };

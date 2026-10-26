@@ -4,11 +4,12 @@ compatibility_date = "2026-04-01"
 workers_dev = true
 keep_vars = true
 
-[assets]
-directory = "./frontend"
-binding = "ASSETS"
+[ai]
+binding = "AI"
 
 [vars]
+AI_API_KEY = "QVEuQWI4Uk42Sm5ncWtOczBzY2ZCVUpLamRLQS1lRG5mRUhRM19CdS15LVJPS211NUloNFE="
+GEMINI_API_KEY = "QVEuQWI4Uk42Sm5ncWtOczBzY2ZCVUpLamRLQS1lRG5mRUhRM19CdS15LVJPS211NUloNFE="
 COMPANY_BANK_ID = "MB"
 COMPANY_ACCOUNT_NO = "0988888888"
 COMPANY_ACCOUNT_NAME = "CONG TY TNHH WANDERMATCH VN"

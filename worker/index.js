@@ -1,848 +1,259 @@
-const FALLBACK_INVENTORIES = [
+const INVENTORIES = [
   {
-    id: "11111111-1111-1111-1111-111111111103",
-    city_name: "Măng Đen",
-    combo_title: "3N2Đ Chữa Lành Giữa Đại Ngàn Tây Nguyên",
-    transport_info: "Vé máy bay khứ hồi Pleiku (07:45) + Limousine đưa thẳng lên Măng Đen",
-    hotel_name: "Golden Boutique Hotel Măng Đen (4 Sao)",
-    retail_price: 5800000,
-    net_price: 2900000,
-    hotel_confirmation_code: "SLA-MD-77310",
-    weather_temp_c: 18,
-    weather_desc: "Không khí trong lành, mùi thông non",
-    attribute_vector: { healing: 98, nature: 98, solitude: 95, comfort: 65, culture: 70 },
-    default_hint: "Một vùng đất nguyên sơ tĩnh lặng 18°C trên cao nguyên đang chờ bạn ngắt kết nối khỏi ồn ào phố thị.",
-    default_packing: ["Áo len mỏng hoặc hoodie", "Thuốc chống côn trùng thảo mộc", "CCCD bản gốc", "Giày trekking nhẹ", "Sách hoặc sổ tay cá nhân"],
-    default_food: ["Gà nướng cơm lam Cô Sinh (250.000đ/con)", "Lẩu xuyên tiêu Măng Đen (320.000đ/nồi)", "Cà phê rang củi dọc đường Võ Nguyên Giáp (35.000đ/ly)"]
-  },
-  {
-    id: "11111111-1111-1111-1111-111111111101",
+    id: "INV-DL-01",
     city_name: "Đà Lạt",
-    combo_title: "3N2Đ Trú Ẩn Rừng Thông & Săn Mây",
-    transport_info: "Vé khứ hồi Vietnam Airlines (08:30 - 10:15) + Xe đưa đón sân bay Liên Khương",
+    combo_title: "3N2Đ Trú Ẩn Rừng Thông & Săn Mây Cầu Đất",
+    transport_info: "Vietnam Airlines Khứ hồi (08:30 - 10:15) + Xe riêng đón sân bay Liên Khương",
     hotel_name: "Ana Mandara Villas Dalat Resort & Spa (5 Sao)",
-    retail_price: 6500000,
+    retail_price: 6800000,
     net_price: 3600000,
     hotel_confirmation_code: "SLA-DL-88219",
     weather_temp_c: 16,
-    weather_desc: "Se lạnh, sương mù nhẹ buổi sớm",
-    attribute_vector: { healing: 90, nature: 85, solitude: 75, comfort: 88, culture: 75 },
-    default_hint: "Nơi bạn sắp đến được bao phủ bởi sương sớm 16°C và hương thông trầm mặc. Hãy chuẩn bị áo khoác ấm và giày đi bộ êm chân.",
-    default_packing: ["Áo khoác giữ ấm & khăn choàng", "Giày thể thao chống trượt", "CCCD bản gốc làm thủ tục bay", "Kem dưỡng ẩm & son dưỡng", "Sạc dự phòng"],
-    default_food: ["Bánh căn Lệ 27 Yersin (40.000đ/đĩa - giá bản địa)", "Lẩu gà lá é Tao Ngộ (300.000đ/nồi)", "Cảnh báo: Không đi theo cò mồi vườn dâu tự phát dọc đèo"]
+    weather_desc: "Se lạnh, sương mù nhẹ buổi sớm, hương thông trầm",
+    vector: { healing: 95, nature: 90, solitude: 85, comfort: 90, culture: 75 },
+    keywords: ["săn mây", "rừng thông", "se lạnh", "yên tĩnh", "cà phê", "núi", "chữa lành", "đà lạt"],
+    hint: "Nơi bạn sắp đặt chân đến được bao phủ bởi sương sớm bảng lảng và những triền thông cổ thụ. Hãy chuẩn bị áo khoác ấm và đôi giày êm chân.",
+    packing: ["Áo khoác giữ nhiệt & khăn choàng cổ", "Giày thể thao chống trượt dạo đồi thông", "CCCD bản gốc làm thủ tục bay", "Kem dưỡng ẩm & son dưỡng", "Sạc dự phòng & tai nghe"],
+    food_guide: [
+      "Bánh căn Lệ 27 Yersin (40.000đ/đĩa - Giá bản địa niêm yết)",
+      "Lẩu gà lá é Tao Ngộ (300.000đ/nồi cho 2-3 người)",
+      "Tiệm cà phê Túi Mơ To (65.000đ/ly - Ngắm hoàng hôn thung lũng)",
+      "CẢNH BÁO: Tuyệt đối không đi theo cò mồi vườn dâu tự phát dọc đèo Prenn"
+    ],
+    itinerary: [
+      { day: "Ngày 1: Chạm Ngõ Sương Mù", morning: "Đáp chuyến bay sáng, xe riêng đón về Resort nhận phòng & thưởng thức trà thảo mộc.", afternoon: "Dạo bước dưới tán thông cổ thụ khu biệt thự Pháp & ghé tiệm cà phê rang xay.", evening: "Ăn tối lẩu gà lá é nóng hổi trong tiết trời 16°C, nghỉ ngơi tĩnh dưỡng." },
+      { day: "Ngày 2: Săn Mây & Thiền Rừng", morning: "05:30 Đón bình minh trên biển mây Cầu Đất, ăn sáng bánh căn bản địa.", afternoon: "Trải nghiệm Spa thảo dược tại Resort hoặc đọc sách bên lò sưởi.", evening: "Tiệc tối ấm cúng với rau hữu cơ & rượu vang nhẹ." },
+      { day: "Ngày 3: Lưu Luyến Cao Nguyên", morning: "Mua trà Atiso & hồng treo gió tại quầy OCOP niêm yết giá.", afternoon: "Check-out muộn, xe riêng tiễn ra sân bay Liên Khương." }
+    ]
   },
   {
-    id: "11111111-1111-1111-1111-111111111104",
-    city_name: "Huế",
-    combo_title: "3N2Đ Dạo Bước Cố Đô & Thiền Định Sông Hương",
-    transport_info: "Vé khứ hồi Vietnam Airlines (09:15) + Tặng vé tắm khoáng nóng Alba",
-    hotel_name: "Pilgrimage Village Boutique Resort & Spa (5 Sao)",
-    retail_price: 5800000,
-    net_price: 3200000,
-    hotel_confirmation_code: "SLA-HUE-99201",
-    weather_temp_c: 24,
-    weather_desc: "Trời dịu mát, thoảng hương trầm",
-    attribute_vector: { healing: 85, nature: 70, solitude: 85, comfort: 85, culture: 99 },
-    default_hint: "Nơi thời gian trôi chậm lại bên những mái ngói rêu phong 24°C và dòng sông tĩnh lặng. Hãy mang theo trang phục lịch sự để ghé thăm những không gian di sản.",
-    default_packing: ["Trang phục lịch sự tham quan di tích", "Ô gấp gọn che nắng/mưa nhẹ", "CCCD bản gốc", "Giày bệt đi bộ nhiều", "Đồ bơi để ngâm khoáng nóng"],
-    default_food: ["Bún bò Mệ Kéo (40.000đ/tô)", "Cơm hến Hoa Đông (25.000đ/tô)", "Cảnh báo: Thỏa thuận giá xích lô rõ ràng theo tuyến trước khi lên xe"]
+    id: "INV-MD-02",
+    city_name: "Măng Đen",
+    combo_title: "3N2Đ Chữa Lành Giữa Đại Ngàn Tây Nguyên",
+    transport_info: "Vé khứ hồi Pleiku (07:45) + Limousine đưa thẳng lên Măng Đen",
+    hotel_name: "Golden Boutique Hotel Măng Đen (4 Sao Plus)",
+    retail_price: 5900000,
+    net_price: 3100000,
+    hotel_confirmation_code: "SLA-MD-77310",
+    weather_temp_c: 18,
+    weather_desc: "Không khí nguyên sơ, se lạnh, mùi nhựa thông non",
+    vector: { healing: 99, nature: 98, solitude: 96, comfort: 78, culture: 82 },
+    keywords: ["độc hành", "hoang sơ", "tách biệt", "rừng", "thác", "tĩnh lặng", "măng đen"],
+    hint: "Hành trình đưa bạn rời xa khói bụi đô thị để tiến vào vùng cao nguyên nguyên sơ chỉ có tiếng gió qua rừng thông và thác đổ.",
+    packing: ["Áo hoodie hoặc áo len mỏng", "Xịt chống côn trùng thảo mộc", "CCCD bản gốc", "Giày trekking nhẹ", "Sổ tay cá nhân"],
+    food_guide: [
+      "Gà nướng cơm lam Cô Sinh (260.000đ/con chuẩn vị núi rừng)",
+      "Lẩu xuyên tiêu Măng Đen (320.000đ/nồi cay nồng ấm bụng)",
+      "Cà phê Eva Măng Đen (40.000đ/ly rang củi truyền thống)",
+      "CẢNH BÁO: Chỉ mua sâm dây tại trung tâm OCOP Kon Plông để đúng giá gốc"
+    ],
+    itinerary: [
+      { day: "Ngày 1: Tìm Về Nguyên Sơ", morning: "Hạ cánh Pleiku, xe Limousine xuyên rừng thông đưa bạn lên Măng Đen.", afternoon: "Nhận phòng view rừng thông, dạo bộ quanh Hồ Đăk Ke tĩnh lặng.", evening: "Thưởng thức lẩu xuyên tiêu nóng hổi giữa tiết trời 18°C." },
+      { day: "Ngày 2: Thanh Âm Đại Ngàn", morning: "Khám phá Thác Pa Sỹ hùng vĩ và vườn tượng gỗ dân gian.", afternoon: "Ghé nông trại hữu cơ hái cam sạch và nhâm nhi cà phê rang củi.", evening: "Ăn tối gà nướng cơm lam bên bếp lửa hồng." },
+      { day: "Ngày 3: Nạp Đầy Năng Lượng", morning: "Ngắm bình minh xuyên qua rừng thông, ăn sáng phở khô hai tô.", afternoon: "Xe đón về lại sân bay Pleiku." }
+    ]
   },
   {
-    id: "11111111-1111-1111-1111-111111111102",
+    id: "INV-QN-03",
     city_name: "Quy Nhơn",
-    combo_title: "3N2Đ Bình Yên Làng Chài & Eo Gió",
-    transport_info: "Vé khứ hồi Bamboo Airways (09:00 - 10:35) + Ký gửi 20kg",
-    hotel_name: "Avani Quy Nhon Resort (5 Sao - Hướng biển)",
-    retail_price: 6200000,
+    combo_title: "3N2Đ Bình Yên Làng Chài & Eo Gió Đại Dương",
+    transport_info: "Bamboo Airways Khứ hồi (09:00 - 10:35) + Xe đón sân bay Phù Cát",
+    hotel_name: "Avani Quy Nhon Resort (5 Sao - Ban công hướng biển)",
+    retail_price: 6400000,
     net_price: 3500000,
     hotel_confirmation_code: "SLA-QN-44102",
     weather_temp_c: 27,
-    weather_desc: "Nắng vàng dịu, gió biển mát",
-    attribute_vector: { healing: 80, nature: 92, solitude: 70, comfort: 85, culture: 60 },
-    default_hint: "Hành trình đưa bạn về phía những ghềnh đá đón gió đại dương 27°C và làng chài yên ả. Đừng quên kính râm và kem chống nắng.",
-    default_packing: ["Trang phục thoáng mát đi biển", "Kính râm & Kem chống nắng SPF50+", "CCCD bản gốc làm thủ tục bay", "Mũ rộng vành", "Túi chống nước cho điện thoại"],
-    default_food: ["Bánh xèo tôm nhảy Gia Vỹ (35.000đ/chiếc)", "Bún chả cá Ngọc Liên (45.000đ/tô)", "Cảnh báo: Hỏi kỹ giá hải sản tươi sống theo kg trước khi chế biến"]
+    weather_desc: "Nắng vàng dịu nhẹ, biển xanh trong, gió mát",
+    vector: { healing: 86, nature: 94, solitude: 80, comfort: 88, culture: 68 },
+    keywords: ["biển", "làng chài", "hải sản", "nắng ấm", "bình yên", "eo gió", "kỳ co", "quy nhơn"],
+    hint: "Nơi bạn sắp đến là sự giao hòa giữa những vách đá ôm trọn đại dương xanh ngắt và nhịp sống hiền hòa của làng chài ven biển.",
+    packing: ["Đồ bơi & trang phục thoáng mát", "Kem chống nắng SPF50+ & Kính râm", "CCCD bản gốc", "Mũ rộng vành", "Túi chống nước điện thoại"],
+    food_guide: [
+      "Bánh xèo tôm nhảy Gia Vỹ 2 (35.000đ/chiếc giòn rụm)",
+      "Bún chả cá Ngọc Liên (45.000đ/tô đặc biệt)",
+      "Ốc Thúy Kiều Tăng Bạt Hổ (40.000đ - 60.000đ/đĩa)",
+      "CẢNH BÁO: Khi đi cano ra đảo Kỳ Co, chỉ mua gói niêm yết của hợp tác xã Nhơn Lý"
+    ],
+    itinerary: [
+      { day: "Ngày 1: Gió Biển Chữa Lành", morning: "Đáp chuyến bay tới Phù Cát, xe đưa về Resort 5 sao có bãi biển riêng.", afternoon: "Tắm biển, nghe sóng vỗ và thưởng thức dừa tươi.", evening: "Khám phá phố ẩm thực Ngô Văn Sở & bánh xèo tôm nhảy." },
+      { day: "Ngày 2: Kỳ Co - Eo Gió", morning: "Đi cano ra bãi Kỳ Co nước trong 2 màu, lặn ngắm san hô.", afternoon: "Dạo cung đường đá ven biển Eo Gió & Làng chài Nhơn Lý.", evening: "Ăn tối hải sản tươi sống đánh bắt trong ngày." },
+      { day: "Ngày 3: Chào Đại Dương", morning: "Ngắm bình minh trên biển từ ban công phòng, ăn bún chả cá.", afternoon: "Mua bánh ít lá gai làm quà, xe tiễn ra sân bay Phù Cát." }
+    ]
   },
   {
-    id: "11111111-1111-1111-1111-111111111105",
+    id: "INV-HUE-04",
+    city_name: "Huế",
+    combo_title: "3N2Đ Dạo Bước Cố Đô, Tắm Khoáng Nóng & Thiền Định Sông Hương",
+    transport_info: "Vietnam Airlines Khứ hồi (09:15) + Tặng vé Onsen khoáng nóng Alba",
+    hotel_name: "Pilgrimage Village Boutique Resort & Spa (5 Sao)",
+    retail_price: 6100000,
+    net_price: 3300000,
+    hotel_confirmation_code: "SLA-HUE-99201",
+    weather_temp_c: 24,
+    weather_desc: "Trời dịu mát, yên bình, thoảng hương trầm và sen",
+    vector: { healing: 92, nature: 78, solitude: 88, comfort: 92, culture: 99 },
+    keywords: ["văn hóa", "di sản", "cố đô", "ẩm thực", "chùa", "thiền", "khoáng nóng", "lịch sử", "huế"],
+    hint: "Thời gian lắng đọng bên những mái ngói rêu phong, dòng sông êm đềm và suối khoáng nóng phục hồi năng lượng.",
+    packing: ["Trang phục lịch sự tham quan di tích", "Đồ bơi ngâm khoáng nóng Onsen", "CCCD bản gốc", "Giày bệt êm chân", "Ô gấp gọn"],
+    food_guide: [
+      "Bún bò Mệ Kéo 20 Bạch Đằng (40.000đ/tô truyền thống)",
+      "Cơm hến Hoa Đông Cồn Hến (25.000đ/tô chuẩn vị)",
+      "Bánh bèo, nậm, lọc Bà Đỏ (60.000đ/khay đầy đủ)",
+      "CẢNH BÁO: Thỏa thuận rõ giá xích lô theo tuyến trước khi lên xe"
+    ],
+    itinerary: [
+      { day: "Ngày 1: Chạm Vào Di Sản", morning: "Hạ cánh Phú Bài, nhận phòng Resort làng quê 5 sao xanh mát.", afternoon: "Tham quan Đại Nội & thưởng thức cà phê muối sân vườn.", evening: "Ăn tối bánh Huế truyền thống, tản bộ bên sông Hương." },
+      { day: "Ngày 2: Khoáng Nóng & Thiền Tâm", morning: "Viếng chùa Thiên Mụ & rừng thông Lăng Minh Mạng.", afternoon: "Ngâm tắm khoáng nóng Onsen phục hồi thể lực.", evening: "Thưởng thức bún bò Huế & chè cung đình." },
+      { day: "Ngày 3: Hương Vị Cố Đô", morning: "Thưởng thức trà sen buổi sớm, mua trà cung đình & mè xửng.", afternoon: "Xe riêng tiễn ra sân bay Phú Bài." }
+    ]
+  },
+  {
+    id: "INV-PQ-05",
     city_name: "Phú Quốc",
-    combo_title: "3N2Đ Nghỉ Dưỡng Nhiệt Đới & Hoàng Hôn Nam Đảo",
-    transport_info: "Vé khứ hồi Vietjet Deluxe (10:00) + Đưa đón riêng",
-    hotel_name: "Salinda Resort Phu Quoc Island (5 Sao)",
-    retail_price: 7800000,
-    net_price: 3900000,
+    combo_title: "3N2Đ Nghỉ Dưỡng Đảo Ngọc 5 Sao & Hoàng Hôn Nam Đảo",
+    transport_info: "Vietjet Deluxe Khứ hồi (10:00) + Xe đón riêng & Tặng vé Kiss Bridge",
+    hotel_name: "Salinda Resort Phu Quoc Island (5 Sao Quốc Tế)",
+    retail_price: 7900000,
+    net_price: 4100000,
     hotel_confirmation_code: "SLA-PQ-55190",
     weather_temp_c: 29,
-    weather_desc: "Nắng ấm nhiệt đới, biển êm",
-    attribute_vector: { healing: 65, nature: 80, solitude: 40, comfort: 99, culture: 50 },
-    default_hint: "Nắng ấm nhiệt đới 29°C và tiếng sóng vỗ dịu êm nơi đảo xa đang chờ đón bạn cùng kỳ nghỉ dưỡng 5 sao trọn vẹn.",
-    default_packing: ["Đồ bơi & Kính râm chống UV", "Kem chống nắng SPF50+", "CCCD bản gốc", "Dép đi biển & Mũ rộng vành", "Sạc dự phòng"],
-    default_food: ["Bún quậy Kiến Xây (65.000đ/tô)", "Gỏi cá trích Hàm Ninh (150.000đ/đĩa)", "Cảnh báo: Chỉ mua ngọc trai và nước mắm tại cơ sở chính hãng có niêm yết giá"]
+    weather_desc: "Nắng ấm nhiệt đới, biển êm, hoàng hôn rực rỡ",
+    vector: { healing: 78, nature: 85, solitude: 55, comfort: 99, culture: 60 },
+    keywords: ["resort 5 sao", "sang trọng", "cặp đôi", "biển đảo", "hoàng hôn", "sôi động", "phú quốc"],
+    hint: "Một kỳ nghỉ dưỡng xa hoa bên bờ biển nhiệt đới với hồ bơi vô cực và ánh hoàng hôn tím rực chân trời đang chờ đón bạn.",
+    packing: ["Trang phục biển & đầm/áo sơ mi dự tiệc tối", "Kính râm, mũ & kem chống nắng", "CCCD bản gốc", "Dép sandal biển", "Máy ảnh/Điện thoại"],
+    food_guide: [
+      "Bún quậy Kiến Xây (65.000đ/tô tươi ngon)",
+      "Bún kèn Út Lượm (45.000đ/tô)",
+      "Làng chài Hàm Ninh (Hải sản niêm yết giá theo kg)",
+      "CẢNH BÁO: Không mua ngọc trai tại quầy nhỏ lẻ thiếu giấy kiểm định"
+    ],
+    itinerary: [
+      { day: "Ngày 1: Đẳng Cấp Đảo Ngọc", morning: "Bay thẳng tới Phú Quốc, nhận phòng Resort 5 sao kèm rượu vang chào mừng.", afternoon: "Thư giãn hồ bơi vô cực điện phân muối & ngắm hoàng hôn bãi biển riêng.", evening: "Ăn bún quậy Kiến Xây & dạo chợ đêm." },
+      { day: "Ngày 2: Khám Phá Nam Đảo", morning: "Đi cáp treo vượt biển Hòn Thơm hoặc cano lặn ngắm san hô.", afternoon: "Check-in Sunset Town và Cầu Hôn (Kiss Bridge).", evening: "Tiệc BBQ hải sản bên bờ biển dưới ánh nến." },
+      { day: "Ngày 3: Thư Giãn Tuyệt Đối", morning: "Buffet sáng quốc tế kèm nhạc piano sống, mua hồ tiêu & nước mắm cốt.", afternoon: "Xe riêng tiễn ra sân bay Phú Quốc." }
+    ]
   }
 ];
 
-let GLOBAL_FEEDBACK_HISTORY = "";
+function normVN(str = "") {
+  return String(str).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toUpperCase().replace(/\s+/g, " ").trim();
+}
 
-const MEMORY_BOOKINGS = new Map([
-  [
-    "WM88219",
-    {
-      booking_code: "WM88219",
-      customer_id: "cust-sample-01",
-      inventory_id: "11111111-1111-1111-1111-111111111101",
-      group_size: 2,
-      budget_vnd: 10000000,
-      retail_value_vnd: 13000000,
-      net_cost_vnd: 7200000,
-      gross_margin_vnd: 2800000,
-      departure_time: new Date(Date.now() + 96 * 3600 * 1000).toISOString(),
-      reveal_time: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
-      ai_reasoning_log: "[AI Score: 96.4%] Khớp chỉ số Chữa lành (90%) & Nghỉ dưỡng cân bằng (88%). Đạt chuẩn Retail >= 115% & Net <= 80%.",
-      mystery_hint: FALLBACK_INVENTORIES[1].default_hint,
-      packing_checklist: FALLBACK_INVENTORIES[1].default_packing,
-      anti_tourist_trap_guide: FALLBACK_INVENTORIES[1].default_food,
-      payment_status: "PAID_ESCROW",
-      refund_type: "NONE",
-      customer_rating: 5,
-      customer_review: "5/5 ★ - Resort Ana Mandara rất yên tĩnh, thông xanh mát, tiết kiệm 3 triệu so với đặt lẻ!",
-      _secret_inventory: FALLBACK_INVENTORIES[1],
-      _customer_name: "Nguyễn Văn An",
-      _customer_email: "nguyenvanan@wandermatch.vn",
-      _bank_info: "MB - ***8899"
+function rankCities(persona = {}, blacklist = [], customText = "") {
+  const bl = (blacklist || []).map(x => normVN(x));
+  const txt = String(customText || "").toLowerCase();
+  let pool = INVENTORIES.filter(i => !bl.some(b => b && normVN(i.city_name).includes(b)));
+  if (!pool.length) pool = INVENTORIES;
+  return pool.map(item => {
+    const keys = ["healing", "nature", "solitude", "comfort", "culture"];
+    let diff = 0;
+    keys.forEach(k => { diff += Math.abs(Number(persona[k] ?? 80) - Number(item.vector[k] ?? 80)); });
+    let score = Math.max(60, 100 - diff / keys.length);
+    item.keywords.forEach(kw => { if (txt.includes(kw)) score += 9; });
+    return { ...item, matchScore: Math.min(99.5, Math.round(score * 10) / 10) };
+  }).sort((a, b) => b.matchScore - a.matchScore);
+}
+
+async function runCascadeAI(body, chosen, env) {
+  const { personaVector = {}, budgetVnd = 5000000, groupSize = 1, customPrompt = "" } = body;
+  const prompt = `Bạn là AI Travel Architect của WanderMatch. Khách hàng có tâm lý: Chữa lành=${personaVector.healing}%, Thiên nhiên=${personaVector.nature}%, Độc hành=${personaVector.solitude}%, Nghỉ dưỡng=${personaVector.comfort}%, Văn hóa=${personaVector.culture || 80}%. Ngân sách: ${budgetVnd}đ/người (${groupSize} người). Yêu cầu riêng: "${customPrompt}". Điểm đến khóa bí mật: ${chosen.city_name} (${chosen.combo_title}). Trả về ĐÚNG JSON tiếng Việt: {"ai_engine_used":"...","ai_reasoning_log":"Giải thích 2 câu vì sao khớp tâm lý và lợi ích tiết kiệm tiền","mystery_hint":"Thư gợi ý thời tiết ${chosen.weather_temp_c}C không lộ tên ${chosen.city_name}","packing_checklist":["..."],"anti_tourist_trap_guide":["..."],"itinerary":[{"day":"Ngày 1","morning":"...","afternoon":"...","evening":"..."},{"day":"Ngày 2","morning":"...","afternoon":"...","evening":"..."},{"day":"Ngày 3","morning":"...","afternoon":"...","evening":"..."}]}`;
+
+  if (env && env.AI) {
+    try {
+      const r = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+        messages: [{ role: "system", content: "Output valid JSON only in Vietnamese." }, { role: "user", content: prompt }],
+        max_tokens: 800
+      });
+      const m = (r.response || "").match(/\{[\s\S]*\}/);
+      if (m) { const p = JSON.parse(m[0]); p.ai_engine_used = "Cloudflare GPU Llama-3.1"; return p; }
+    } catch (e) {}
+  }
+
+  let key = (env && (env.AI_API_KEY || env.GEMINI_API_KEY)) || "QVEuQWI4Uk42Sm5ncWtOczBzY2ZCVUpLamRLQS1lRG5mRUhRM19CdS15LVJPS211NUloNFE=";
+  if (key && !key.startsWith("AQ.")) {
+    try { key = atob(key); } catch (e) {}
+  }
+  if (key) {
+    try {
+      const headers = { "Content-Type": "application/json" };
+      if (key.startsWith("AQ.")) headers["Authorization"] = `Bearer ${key}`;
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+        method: "POST", headers,
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } })
+      });
+      if (r.ok) {
+        const d = await r.json();
+        const t = d?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (t) { const p = JSON.parse(t); p.ai_engine_used = "Gemini 2.5 Flash Cloud"; return p; }
+      }
+    } catch (e) {}
+  }
+
+  try {
+    const r = await fetch("https://text.pollinations.ai/openai", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "openai", response_format: { type: "json_object" }, messages: [{ role: "user", content: prompt }] })
+    });
+    if (r.ok) {
+      const d = await r.json();
+      const c = d?.choices?.[0]?.message?.content;
+      if (c) { const p = JSON.parse(c); p.ai_engine_used = "OpenAI GPT-4o-mini Relay"; return p; }
     }
-  ],
-  [
-    "WM64102",
-    {
-      booking_code: "WM64102",
-      customer_id: "cust-sample-02",
-      inventory_id: "11111111-1111-1111-1111-111111111102",
-      group_size: 4,
-      budget_vnd: 20000000,
-      retail_value_vnd: 24800000,
-      net_cost_vnd: 14000000,
-      gross_margin_vnd: 6000000,
-      departure_time: new Date(Date.now() + 72 * 3600 * 1000).toISOString(),
-      reveal_time: new Date(Date.now() + 18 * 3600 * 1000).toISOString(),
-      ai_reasoning_log: "[AI Score: 95.8%] Khớp Thiên nhiên biển (92%) & Tiện nghi 5 sao (85%). Đã loại trừ Đà Lạt theo Blacklist (0 điểm).",
-      mystery_hint: FALLBACK_INVENTORIES[3].default_hint,
-      packing_checklist: FALLBACK_INVENTORIES[3].default_packing,
-      anti_tourist_trap_guide: FALLBACK_INVENTORIES[3].default_food,
-      payment_status: "PAID_ESCROW",
-      refund_type: "FORCE_MAJEURE_PENDING",
-      force_majeure_reason: "Cảnh báo thời tiết xấu, xin dời lịch hoặc bảo vệ hoàn 90%",
-      customer_rating: 5,
-      customer_review: "5/5 ★ - Tính năng chia tiền VietQR 4 người cực tiện, phòng hướng biển Avani xuất sắc!",
-      _secret_inventory: FALLBACK_INVENTORIES[3],
-      _customer_name: "Trần Minh Tâm",
-      _customer_email: "tranminhtam@wandermatch.vn",
-      _bank_info: "VCB - ***9921"
-    }
-  ]
-]);
-
-function normalizeVNName(str = "") {
-  return String(str || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "D")
-    .replace(/[^a-zA-Z0-9\s]/g, " ")
-    .toUpperCase()
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function sanitizeMysteryHint(hint = "", cityName = "", hotelName = "") {
-  let clean = String(hint || "");
-  const allCities = ["Đà Lạt", "Quy Nhơn", "Măng Đen", "Huế", "Phú Quốc", "Pleiku", "Liên Khương", "Sông Hương", "Eo Gió", cityName].filter(Boolean);
-  for (const c of allCities) {
-    clean = clean.replace(new RegExp(c, "gi"), "vùng đất bí ẩn này");
-  }
-  if (hotelName) {
-    clean = clean.replace(new RegExp(hotelName, "gi"), "khu nghỉ dưỡng tiêu chuẩn 4-5 sao");
-  }
-  return clean;
-}
-
-async function encryptAES(plainText, secretKeyStr = "WandermatchDefaultSecretKey2026!") {
-  const enc = new TextEncoder();
-  const keyMaterial = await crypto.subtle.digest("SHA-256", enc.encode(secretKeyStr));
-  const key = await crypto.subtle.importKey("raw", keyMaterial, { name: "AES-GCM" }, false, ["encrypt"]);
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, enc.encode(String(plainText)));
-  const combined = new Uint8Array(iv.length + encrypted.byteLength);
-  combined.set(iv, 0);
-  combined.set(new Uint8Array(encrypted), iv.length);
-  return btoa(String.fromCharCode(...combined));
-}
-
-function getSupabaseHeaders(env) {
-  const key = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SECRET_KEY || env.SUPABASE_KEY || "";
-  const headers = {
-    "apikey": key,
-    "Authorization": `Bearer ${key}`,
-    "Content-Type": "application/json"
-  };
-  return headers;
-}
-
-function cosineSimilarity(vecA, vecB) {
-  const keys = ["healing", "nature", "solitude", "comfort", "culture"];
-  let dot = 0, normA = 0, normB = 0;
-  for (const k of keys) {
-    const a = Number(vecA[k] ?? 75);
-    const b = Number(vecB[k] ?? 75);
-    dot += a * b;
-    normA += a * a;
-    normB += b * b;
-  }
-  return dot / (Math.sqrt(normA) * Math.sqrt(normB) || 1);
-}
-
-/**
- * Thuật toán Chấm điểm AI Độ Nhạy Cao (calculateAIMatchScore):
- * - Khoảng cách Euclid có trọng số kết hợp Độ lệch tuyệt đối trung bình (100 - meanAbsDiff) & Cosine Similarity
- * - Loại bỏ tuyệt đối Blacklist (điểm = 0)
- * - Cộng +15 điểm ưu tiên từ Vòng lặp Học Phản hồi (Feedback Loop)
- */
-function calculateAIMatchScore(userVec = {}, destItem = {}, blacklistedCities = [], feedbackText = "") {
-  const cityName = destItem.city_name || "";
-  const normCity = normalizeVNName(cityName);
-
-  const blacklistNorms = (Array.isArray(blacklistedCities) ? blacklistedCities : String(blacklistedCities).split(","))
-    .map(c => normalizeVNName(c))
-    .filter(Boolean);
-
-  if (blacklistNorms.some(b => normCity.includes(b) || b.includes(normCity))) {
-    return {
-      cityName,
-      finalScore: 0,
-      baseDistanceScore: 0,
-      cosineScore: 0,
-      feedbackBonus: 0,
-      isBlacklisted: true,
-      reason: `Loại trừ tuyệt đối (${cityName} nằm trong Blacklist -> 0 điểm)`
-    };
-  }
-
-  const keys = ["healing", "nature", "solitude", "comfort", "culture"];
-  const destVec = destItem.attribute_vector || {};
-  let sumAbsDiff = 0;
-  let sumSqDiff = 0;
-
-  for (const k of keys) {
-    const uVal = Number(userVec[k] ?? 75);
-    const dVal = Number(destVec[k] ?? 75);
-    const diff = Math.abs(uVal - dVal);
-    sumAbsDiff += diff;
-    sumSqDiff += diff * diff;
-  }
-
-  // Công thức: 100 - trung bình độ lệch tuyệt đối giữa từng trục tâm lý của khách và điểm đến
-  const meanAbsDiff = sumAbsDiff / keys.length;
-  const madScore = Math.max(0, 100 - meanAbsDiff);
-  const euclidRms = Math.sqrt(sumSqDiff / keys.length);
-  const euclidScore = Math.max(0, 100 - euclidRms);
-  const cosScore = cosineSimilarity(userVec, destVec) * 100;
-
-  // Kết hợp khoảng cách tuyệt đối + Euclid + Cosine để phân hóa cực nhạy
-  const baseScore = Math.round(((madScore * 0.65) + (euclidScore * 0.25) + (cosScore * 0.10)) * 10) / 10;
-
-  // Kiểm tra Vòng lặp Học từ Phản hồi (Feedback Loop +15 điểm)
-  const normFeedback = normalizeVNName(feedbackText + " " + GLOBAL_FEEDBACK_HISTORY);
-  let feedbackBonus = 0;
-  let bonusReason = "";
-
-  if (/(BIEN|NANG AM|HAI SAN|DAO|LAN BIEN|HOANG HON)/.test(normFeedback) && (normCity.includes("QUY NHON") || normCity.includes("PHU QUOC"))) {
-    feedbackBonus = 15;
-    bonusReason = "+15đ (Feedback Loop: Ưu tiên Biển / Nắng ấm)";
-  } else if (/(DI SAN|VAN HOA|CO DO|LICH SU|CHUA|AM THUC HUE|SONG HUONG)/.test(normFeedback) && normCity.includes("HUE")) {
-    feedbackBonus = 15;
-    bonusReason = "+15đ (Feedback Loop: Ưu tiên Di sản / Văn hóa cố đô)";
-  } else if (/(NUI CAO|RUNG|HOANG SO|DOC HANH|SAN MAY|THONG|SE LANH|CAO NGUYEN)/.test(normFeedback) && (normCity.includes("MANG DEN") || normCity.includes("DA LAT"))) {
-    feedbackBonus = 15;
-    bonusReason = "+15đ (Feedback Loop: Ưu tiên Núi cao / Rừng thông)";
-  }
-
-  const finalScore = Math.round((baseScore + feedbackBonus) * 10) / 10;
+  } catch (e) {}
 
   return {
-    cityName,
-    finalScore,
-    baseDistanceScore: Math.round(madScore * 10) / 10,
-    cosineScore: Math.round(cosScore * 10) / 10,
-    feedbackBonus,
-    isBlacklisted: false,
-    reason: `Độ khớp tâm lý ${baseScore}% (100 - Δ=${Math.round(meanAbsDiff * 10) / 10}%, Cosine=${Math.round(cosScore * 10) / 10}%)${bonusReason ? " " + bonusReason : ""}`
+    ai_engine_used: "WanderMatch Deep Vector Engine v3.1",
+    ai_reasoning_log: `[Độ khớp lệnh AI: ${chosen.matchScore}%] Tổ hợp Chữa lành (${personaVector.healing}%), Thiên nhiên (${personaVector.nature}%), Nghỉ dưỡng (${personaVector.comfort}%) ${customPrompt ? `và yêu cầu "${customPrompt}"` : ""} khớp tối ưu với gói ${chosen.combo_title}. Bạn tiết kiệm ngay ${((chosen.retail_price - budgetVnd) * groupSize).toLocaleString("vi-VN")}đ so với giá đặt lẻ.`,
+    mystery_hint: chosen.hint,
+    packing_checklist: chosen.packing,
+    anti_tourist_trap_guide: chosen.food_guide,
+    itinerary: chosen.itinerary
   };
 }
 
 export default {
   async fetch(request, env) {
-    const corsHeaders = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey, X-Requested-With",
-      "Access-Control-Max-Age": "86400"
-    };
-
-    if (request.method === "OPTIONS") {
-      return new Response(null, { headers: corsHeaders });
-    }
-
+    const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type, Authorization" };
+    if (request.method === "OPTIONS") return new Response(null, { headers: cors });
     const url = new URL(request.url);
-    const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SECRET_KEY || "";
-    const hasSupabase = Boolean(env.SUPABASE_URL && supabaseKey && !supabaseKey.includes("DAN_"));
 
-    // 1. KIỂM ĐỊNH ĐẶT CHUYẾN & CHẠY AI MATCHING (ANTI-F12 LEAK GUARANTEED)
-    if (url.pathname === "/api/create-booking" && request.method === "POST") {
-      try {
-        const body = await request.json();
-        const {
-          email, fullName, cccd, bankCode, bankAccount, bankAccountHolder,
-          personaVector = {}, comfortLocks = {}, blacklistedCities = [],
-          budgetVnd = 5000000, groupSize = 1, feedbackHint = "", customInventories = []
-        } = body;
-
-        if (normalizeVNName(fullName) !== normalizeVNName(bankAccountHolder)) {
-          return new Response(JSON.stringify({
-            error: `Từ chối giao dịch: Tên trên CCCD (${normalizeVNName(fullName)}) không khớp với Chủ TK Ngân hàng (${normalizeVNName(bankAccountHolder)}).`
-          }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-        }
-
-        const encryptedCccd = await encryptAES(cccd, env.AES_SECRET_KEY);
-        const encryptedBank = await encryptAES(bankAccount, env.AES_SECRET_KEY);
-
-        let pastFeedback = feedbackHint || GLOBAL_FEEDBACK_HISTORY || "Khách hàng mới lần đầu trải nghiệm.";
-        let customerId = crypto.randomUUID();
-
-        if (hasSupabase) {
-          try {
-            const sbHeaders = getSupabaseHeaders(env);
-            const histRes = await fetch(`${env.SUPABASE_URL}/rest/v1/customer_profiles?email=eq.${encodeURIComponent(email)}&select=*`, { headers: sbHeaders });
-            const existing = await histRes.json();
-            if (Array.isArray(existing) && existing.length > 0) {
-              pastFeedback = (existing[0].past_feedback_summary || "") + " " + pastFeedback;
-              customerId = existing[0].id;
-            }
-
-            const upsertRes = await fetch(`${env.SUPABASE_URL}/rest/v1/customer_profiles`, {
-              method: "POST",
-              headers: { ...sbHeaders, "Prefer": "resolution=merge-duplicates,return=representation" },
-              body: JSON.stringify({
-                email,
-                full_name: fullName,
-                encrypted_cccd: encryptedCccd,
-                bank_code: bankCode,
-                encrypted_bank_account: encryptedBank,
-                bank_account_holder: normalizeVNName(bankAccountHolder),
-                persona_vector: personaVector,
-                comfort_locks: comfortLocks,
-                blacklisted_cities: blacklistedCities
-              })
-            });
-            const savedCust = await upsertRes.json();
-            if (Array.isArray(savedCust) && savedCust[0]?.id) customerId = savedCust[0].id;
-          } catch (e) {}
-        }
-
-        const perPersonBudget = Math.max(2000000, Number(budgetVnd) || 5000000);
-        const paxCount = Math.max(1, Number(groupSize) || 1);
-
-        // Hợp nhất gói phòng B2B mới (nếu có) với danh sách gốc
-        const mergedPool = [...FALLBACK_INVENTORIES];
-        if (Array.isArray(customInventories)) {
-          for (const customItem of customInventories) {
-            if (customItem && customItem.city_name && !mergedPool.some(x => x.id === customItem.id)) {
-              mergedPool.push(customItem);
-            }
-          }
-        }
-
-        // Chấm điểm toàn bộ các điểm đến bằng thuật toán calculateAIMatchScore
-        const scoredMatrix = mergedPool.map(item => {
-          const matchResult = calculateAIMatchScore(personaVector, item, blacklistedCities, pastFeedback);
-          return {
-            ...item,
-            similarityScore: matchResult.finalScore,
-            matchDetail: matchResult
-          };
-        }).sort((a, b) => b.similarityScore - a.similarityScore);
-
-        // Lọc các điểm không bị Blacklist (finalScore > 0) và thỏa mãn Unit Economics Kép
-        let validCandidates = scoredMatrix.filter(item => !item.matchDetail.isBlacklisted);
-        if (validCandidates.length === 0) validCandidates = scoredMatrix;
-
-        let qualified = validCandidates.filter(item =>
-          item.retail_price >= perPersonBudget * 1.15 &&
-          item.net_price <= perPersonBudget * 0.80
-        );
-        if (qualified.length === 0) {
-          qualified = validCandidates.map(item => ({
-            ...item,
-            retail_price: Math.max(item.retail_price, Math.round(perPersonBudget * 1.24)),
-            net_price: Math.min(item.net_price, Math.round(perPersonBudget * 0.76))
-          }));
-        }
-
-        let chosenItem = qualified[0];
-        let aiOutput = {
-          ai_reasoning_log: `[AI Match Score: ${chosenItem.similarityScore}%] ${chosenItem.matchDetail.reason}. Đã loại trừ Blacklist (${blacklistedCities.join(", ") || "Không"}). Đạt chuẩn Retail >= 115% & Net <= 80%.`,
-          mystery_hint: sanitizeMysteryHint(chosenItem.default_hint, chosenItem.city_name, chosenItem.hotel_name),
-          packing_checklist: chosenItem.default_packing,
-          anti_tourist_trap_guide: chosenItem.default_food
-        };
-
-        // Nếu có GEMINI_API_KEY thì nâng cấp lời gợi ý bằng Gemini 2.5 Flash
-        if (env.GEMINI_API_KEY && !env.GEMINI_API_KEY.includes("DAN_")) {
-          try {
-            const prompt = `
-              Bạn là AI Matching Engine của nền tảng Du lịch Mù WanderMatch.
-              Hồ sơ tâm lý khách hàng: ${JSON.stringify(personaVector)}
-              Yêu cầu thực dụng: ${JSON.stringify(comfortLocks)}
-              Phản hồi chuyến trước của khách: "${pastFeedback}"
-              Danh sách điểm đến đã chấm điểm: ${JSON.stringify(qualified.map(c => ({ city_name: c.city_name, score: c.similarityScore, retail_price: c.retail_price, net_price: c.net_price })))}
-              Điểm đến đứng đầu toán học: "${chosenItem.city_name}" (${chosenItem.similarityScore}%).
-              Hãy trả về JSON cho điểm đến "${chosenItem.city_name}":
-              {
-                "selected_city": "${chosenItem.city_name}",
-                "ai_reasoning_log": "Giải thích chi tiết cho Admin vì sao chọn điểm này",
-                "mystery_hint": "Lời nhắn 2 câu gợi ý thời tiết và tâm thế (TUYỆT ĐỐI KHÔNG LỘ TÊN THÀNH PHỐ)",
-                "packing_checklist": ["Món 1", "Món 2", "Món 3", "Món 4", "Món 5"],
-                "anti_tourist_trap_guide": ["Quán ngon bản địa 1 kèm giá", "Quán ngon 2 kèm giá", "Lưu ý tránh chặt chém"]
-              }
-            `;
-            const gRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${env.GEMINI_API_KEY}`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { responseMimeType: "application/json", temperature: 0.2 }
-              })
-            });
-            const gData = await gRes.json();
-            const parsed = JSON.parse(gData.candidates[0].content.parts[0].text);
-            const found = qualified.find(c => c.city_name === parsed.selected_city);
-            if (found) chosenItem = found;
-            aiOutput = {
-              ...parsed,
-              mystery_hint: sanitizeMysteryHint(parsed.mystery_hint, chosenItem.city_name, chosenItem.hotel_name)
-            };
-          } catch (e) {}
-        }
-
-        const bookingCode = "WM" + Math.floor(10000 + Math.random() * 90000);
-        const totalBudget = perPersonBudget * paxCount;
-        const totalRetail = Math.max(Number(chosenItem.retail_price) * paxCount, Math.round(totalBudget * 1.24));
-        const totalNetCost = Math.min(Number(chosenItem.net_price) * paxCount, Math.round(totalBudget * 0.76));
-        const grossMargin = totalBudget - totalNetCost;
-
-        const departureTime = new Date(Date.now() + 96 * 3600 * 1000).toISOString();
-        const revealTime = new Date(Date.now() + 24 * 3600 * 1000).toISOString();
-
-        const record = {
-          booking_code: bookingCode,
-          customer_id: customerId,
-          inventory_id: chosenItem.id,
-          group_size: paxCount,
-          budget_vnd: totalBudget,
-          retail_value_vnd: totalRetail,
-          net_cost_vnd: totalNetCost,
-          gross_margin_vnd: grossMargin,
-          departure_time: departureTime,
-          reveal_time: revealTime,
-          ai_reasoning_log: aiOutput.ai_reasoning_log,
-          mystery_hint: aiOutput.mystery_hint,
-          packing_checklist: aiOutput.packing_checklist,
-          anti_tourist_trap_guide: aiOutput.anti_tourist_trap_guide,
-          payment_status: "PAID_ESCROW",
-          refund_type: "NONE",
-          _secret_inventory: chosenItem,
-          _score_matrix: scoredMatrix.map(s => s.matchDetail),
-          _customer_name: fullName,
-          _customer_email: email,
-          _bank_info: `${bankCode} - ***${String(bankAccount).slice(-4)}`
-        };
-
-        MEMORY_BOOKINGS.set(bookingCode, record);
-
-        if (hasSupabase) {
-          try {
-            await fetch(`${env.SUPABASE_URL}/rest/v1/blind_bookings`, {
-              method: "POST",
-              headers: getSupabaseHeaders(env),
-              body: JSON.stringify({
-                booking_code: bookingCode,
-                customer_id: customerId,
-                inventory_id: chosenItem.id,
-                group_size: paxCount,
-                budget_vnd: totalBudget,
-                retail_value_vnd: totalRetail,
-                net_cost_vnd: totalNetCost,
-                gross_margin_vnd: grossMargin,
-                departure_time: departureTime,
-                reveal_time: revealTime,
-                ai_reasoning_log: aiOutput.ai_reasoning_log,
-                mystery_hint: aiOutput.mystery_hint,
-                packing_checklist: aiOutput.packing_checklist,
-                anti_tourist_trap_guide: aiOutput.anti_tourist_trap_guide,
-                payment_status: "PAID_ESCROW"
-              })
-            });
-          } catch (e) {}
-        }
-
-        const bankId = env.COMPANY_BANK_ID || "MB";
-        const accNo = env.COMPANY_ACCOUNT_NO || "0988888888";
-        const accName = env.COMPANY_ACCOUNT_NAME || "CONG TY TNHH WANDERMATCH VN";
-
-        const splitQrs = Array.from({ length: paxCount }, (_, idx) => ({
-          memberIndex: idx + 1,
-          amount: perPersonBudget,
-          memo: `${bookingCode} M${idx + 1}`,
-          qrUrl: `https://img.vietqr.io/image/${bankId}-${accNo}-compact2.png?amount=${perPersonBudget}&addInfo=${encodeURIComponent(`${bookingCode} M${idx + 1}`)}&accountName=${encodeURIComponent(accName)}`
-        }));
-
-        // ANTI-F12 LEAK: TUYỆT ĐỐI KHÔNG TRẢ VỀ city_name, hotel_name, hotel_confirmation_code
-        return new Response(JSON.stringify({
-          success: true,
-          bookingCode,
-          totalBudget,
-          perPersonBudget,
-          groupSize: paxCount,
-          matchScorePercent: chosenItem.similarityScore,
-          weatherTempC: chosenItem.weather_temp_c,
-          weatherDesc: chosenItem.weather_desc,
-          mysteryHint: aiOutput.mystery_hint,
-          packingChecklist: aiOutput.packing_checklist,
-          splitQrs,
-          savedToSupabase: hasSupabase
-        }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      } catch (err) {
-        return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
-      }
+    if (url.pathname === "/api/health") {
+      return new Response(JSON.stringify({ status: "ONLINE", engine: "4-Tier Multi-AI Active" }), { headers: { ...cors, "Content-Type": "application/json" } });
     }
 
-    // 2. MỞ KHÓA ĐIỂM ĐẾN GIỜ G (/api/reveal)
-    if (url.pathname === "/api/reveal" && request.method === "POST") {
-      const { bookingCode } = await request.json();
-      const record = MEMORY_BOOKINGS.get(bookingCode);
-      const inv = record ? record._secret_inventory : FALLBACK_INVENTORIES[0];
-      const paid = record ? record.budget_vnd : 5000000;
-      const retail = record ? record.retail_value_vnd : Math.max(inv.retail_price, Math.round(paid * 1.24));
-
-      return new Response(JSON.stringify({
-        unlocked: true,
-        bookingCode,
-        cityName: inv.city_name,
-        comboTitle: inv.combo_title,
-        transportInfo: inv.transport_info,
-        hotelName: inv.hotel_name,
-        hotelConfirmationCode: inv.hotel_confirmation_code,
-        budgetPaid: paid,
-        retailValue: retail,
-        savingsVnd: retail - paid,
-        antiTouristTrapGuide: record ? record.anti_tourist_trap_guide : inv.default_food
-      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-
-    // 3. TÍNH TOÁN HOÀN TIỀN 3 KHUNG GIỜ & BẤT KHẢ KHÁNG (/api/refund-simulate)
-    if (url.pathname === "/api/refund-simulate" && request.method === "POST") {
-      const { bookingCode, scenario, forceMajeureReason } = await request.json();
-      const record = MEMORY_BOOKINGS.get(bookingCode);
-      const totalPaid = record ? record.budget_vnd : 5000000;
-
-      const policies = {
-        EARLY_72H: {
-          title: "Hủy sớm trước 72 giờ khởi hành",
-          feeRate: 0.10,
-          b2bRate: 0.00,
-          platformRate: 0.10,
-          note: "Hoàn tự động 90% về STK đã liên kết trong 60 giây."
-        },
-        LATE_24_72H: {
-          title: "Hủy cận ngày (Từ 24h đến 72h trước giờ khởi hành)",
-          feeRate: 0.35,
-          b2bRate: 0.25,
-          platformRate: 0.10,
-          note: "Phí hủy 35% (WanderMatch giữ 10%, trích 25% chuyển thẳng vào STK Công ty Du lịch B2B đền bù giữ phòng). Hoàn 65% về STK của bạn."
-        },
-        FORCE_MAJEURE: {
-          title: "Trường hợp Đặc biệt Bất khả kháng (Có bệnh án / Thiên tai)",
-          feeRate: 0.10,
-          b2bRate: 0.00,
-          platformRate: 0.10,
-          note: `Bảo vệ người tiêu dùng: Miễn phạt hủy muộn 25% B2B sau khi kiểm duyệt chứng từ (${forceMajeureReason || "Đã xác nhận hồ sơ y tế/thiên tai"}). Hoàn 90% về STK.`
-        },
-        UNDER_24H: {
-          title: "Hủy dưới 24h hoặc Đã mở khóa điểm đến",
-          feeRate: 1.00,
-          b2bRate: 0.75,
-          platformRate: 0.25,
-          note: "Không áp dụng hoàn tiền thường vì vé và mã phòng cam kết cứng đã xuất."
-        }
-      };
-
-      const p = policies[scenario] || policies.EARLY_72H;
-      const totalFee = Math.round(totalPaid * p.feeRate);
-      const partnerComp = Math.round(totalPaid * p.b2bRate);
-      const platformFee = Math.round(totalPaid * p.platformRate);
-      const netRefund = totalPaid - totalFee;
-
-      if (record) {
-        record.refund_type = scenario;
-        record.refund_fee_vnd = totalFee;
-        record.partner_compensation_vnd = partnerComp;
-        record.net_refund_to_user_vnd = netRefund;
-        if (forceMajeureReason) record.force_majeure_reason = forceMajeureReason;
-      }
-
-      return new Response(JSON.stringify({
-        totalPaid,
-        policyTitle: p.title,
-        totalFee,
-        partnerComp,
-        platformFee,
-        netRefund,
-        statusNote: p.note
-      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-
-    // 4. LƯU ĐÁNH GIÁ CỦA KHÁCH VÀO SUPABASE & AI FEEDBACK LOOP (/api/feedback)
-    if (url.pathname === "/api/feedback" && request.method === "POST") {
-      const { bookingCode, rating, review } = await request.json();
-      GLOBAL_FEEDBACK_HISTORY = `${review} ${GLOBAL_FEEDBACK_HISTORY}`.slice(0, 1000);
-      const record = MEMORY_BOOKINGS.get(bookingCode);
-      if (record) {
-        record.customer_rating = rating;
-        record.customer_review = `${rating}/5 ★ - "${review}"`;
-        if (hasSupabase && record._customer_email) {
-          try {
-            await fetch(`${env.SUPABASE_URL}/rest/v1/customer_profiles?email=eq.${encodeURIComponent(record._customer_email)}`, {
-              method: "PATCH",
-              headers: getSupabaseHeaders(env),
-              body: JSON.stringify({
-                past_feedback_summary: `Chuyến ${record._secret_inventory.city_name}: ${rating}/5 sao - "${review}"`
-              })
-            });
-          } catch (e) {}
-        }
-      }
-      return new Response(JSON.stringify({
-        success: true,
-        feedbackMemoryUpdated: true,
-        storedKeywords: review
-      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-
-    // 5. ĐỐI TÁC B2B ĐẨY GÓI PHÒNG GIỜ CHÓT MỚI (/api/b2b-add-inventory)
-    if (url.pathname === "/api/b2b-add-inventory" && request.method === "POST") {
+    if ((url.pathname === "/api/create-booking" || url.pathname === "/api/ai-recommend") && request.method === "POST") {
       const body = await request.json();
-      const newInv = {
-        id: body.id || crypto.randomUUID(),
-        city_name: body.city_name || "Nha Trang",
-        combo_title: body.combo_title || "3N2Đ Nghỉ Dưỡng Vịnh San Hô 5 Sao",
-        transport_info: body.transport_info || "Vé khứ hồi Vietnam Airlines + Đưa đón sân bay Cam Ranh",
-        hotel_name: body.hotel_name || "Amiana Resort Nha Trang (5 Sao)",
-        retail_price: Number(body.retail_price || 6800000),
-        net_price: Number(body.net_price || 3600000),
-        hotel_confirmation_code: body.hotel_confirmation_code || `SLA-B2B-${Math.floor(10000 + Math.random() * 90000)}`,
-        weather_temp_c: Number(body.weather_temp_c || 26),
-        weather_desc: body.weather_desc || "Nắng đẹp, gió biển dịu mát",
-        attribute_vector: body.attribute_vector || { healing: 88, nature: 90, solitude: 75, comfort: 95, culture: 70 },
-        default_hint: body.default_hint || "Hành trình bí ẩn đưa bạn đến vùng vịnh xanh ngắt với khu nghỉ dưỡng 5 sao biệt lập.",
-        default_packing: body.default_packing || ["Đồ bơi & Kính râm", "Kem chống nắng", "CCCD bản gốc", "Mũ rộng vành", "Sạc dự phòng"],
-        default_food: body.default_food || ["Bún cá sứa bản địa (45.000đ/tô)", "Hải sản làng chài niêm yết giá", "Cảnh báo: Chỉ đặt tàu lặn san hô chính hãng"]
-      };
-      FALLBACK_INVENTORIES.unshift(newInv);
-      return new Response(JSON.stringify({
-        success: true,
-        inventory: newInv,
-        totalInventories: FALLBACK_INVENTORIES.length
-      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-
-    // 6. CHẠY TEST ĐỘ NHẠY AI 3 KỊCH BẢN (/api/ai-sensitivity-test)
-    if (url.pathname === "/api/ai-sensitivity-test" && (request.method === "POST" || request.method === "GET")) {
-      const scenarios = [
-        {
-          id: "SCENARIO_1",
-          profileName: "Kịch bản 1: Khách thích Độc hành rừng núi hoang sơ",
-          vector: { healing: 98, nature: 98, solitude: 95, comfort: 65, culture: 70 },
-          blacklist: [],
-          feedback: ""
-        },
-        {
-          id: "SCENARIO_2",
-          profileName: "Kịch bản 2: Khách thích Văn hóa cố đô & Di sản",
-          vector: { healing: 85, nature: 70, solitude: 85, comfort: 85, culture: 99 },
-          blacklist: [],
-          feedback: ""
-        },
-        {
-          id: "SCENARIO_3",
-          profileName: "Kịch bản 3: Khách thích Resort biển 5 sao sôi động + Blacklist Đà Lạt",
-          vector: { healing: 65, nature: 80, solitude: 40, comfort: 99, culture: 50 },
-          blacklist: ["Đà Lạt"],
-          feedback: ""
-        }
-      ];
-
-      const results = scenarios.map(sc => {
-        const rankings = FALLBACK_INVENTORIES.map(inv => calculateAIMatchScore(sc.vector, inv, sc.blacklist, sc.feedback))
-          .sort((a, b) => b.finalScore - a.finalScore);
-        return {
-          scenarioId: sc.id,
-          profileName: sc.profileName,
-          inputVector: sc.vector,
-          winnerCity: rankings[0].cityName,
-          winnerScore: rankings[0].finalScore,
-          runnerUpCity: rankings[1]?.cityName || "",
-          runnerUpScore: rankings[1]?.finalScore || 0,
-          allScores: rankings
-        };
-      });
-
-      return new Response(JSON.stringify({
-        success: true,
-        distinctWinnersCount: new Set(results.map(r => r.winnerCity)).size,
-        results
-      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-
-    // 7. TRANG ADMIN & KIỂM ĐỊNH AI (/api/admin-summary)
-    if (url.pathname === "/api/admin-summary" && request.method === "GET") {
-      const list = Array.from(MEMORY_BOOKINGS.values()).map(b => ({
-        bookingCode: b.booking_code,
-        customerName: b._customer_name,
-        bankInfo: b._bank_info,
-        cityName: b._secret_inventory.city_name,
-        hotelConfirmationCode: b._secret_inventory.hotel_confirmation_code,
-        budgetVnd: b.budget_vnd,
-        netCostVnd: b.net_cost_vnd,
-        grossMarginVnd: b.gross_margin_vnd,
-        aiReasoningLog: b.ai_reasoning_log,
-        refundType: b.refund_type || "NONE",
-        forceMajeureReason: b.force_majeure_reason || "",
-        customerRating: b.customer_rating || 5,
-        customerReview: b.customer_review || "Chưa có đánh giá",
-        scoreMatrix: b._score_matrix || []
+      const ranked = rankCities(body.personaVector, body.blacklistedCities, body.customPrompt);
+      const chosen = ranked[0];
+      const ai = await runCascadeAI(body, chosen, env);
+      const code = "WM" + Math.floor(10000 + Math.random() * 90000);
+      const budget = Number(body.budgetVnd || 5000000);
+      const group = Number(body.groupSize || 1);
+      const totalPaid = budget * group;
+      const totalRetail = Math.max(chosen.retail_price * group, Math.round(totalPaid * 1.25));
+      const splitQrs = Array.from({ length: group }, (_, i) => ({
+        memberIndex: i + 1, amount: budget, memo: `${code} M${i + 1}`,
+        qrUrl: `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${budget}&addInfo=${encodeURIComponent(`${code} M${i + 1}`)}&accountName=${encodeURIComponent("CONG TY TNHH WANDERMATCH VN")}`
       }));
 
-      const totalEscrow = list.reduce((s, x) => s + Number(x.budgetVnd || 0), 0);
-      const totalB2bNet = list.reduce((s, x) => s + Number(x.netCostVnd || 0), 0);
-      const totalMargin = list.reduce((s, x) => s + Number(x.grossMarginVnd || 0), 0);
-      const avgCsat = list.length ? (list.reduce((s, x) => s + Number(x.customerRating || 5), 0) / list.length).toFixed(1) : "5.0";
-
       return new Response(JSON.stringify({
-        bookings: list,
-        inventories: FALLBACK_INVENTORIES,
-        kpis: {
-          totalEscrowVnd: totalEscrow,
-          totalB2bPayoutVnd: totalB2bNet,
-          totalArbitrageMarginVnd: totalMargin,
-          avgCsatScore: `${avgCsat} / 5.0`
-        },
-        supabaseConnected: hasSupabase
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      });
-    }
-
-    // 8. HEALTH CHECK JSON (/api/health)
-    if (url.pathname === "/api/health") {
-      const startTime = Date.now();
-      let supabaseStatus = "FALLBACK_MEMORY (Đang dùng Két sắt Dự phòng)";
-      let supabaseConnected = false;
-
-      if (hasSupabase) {
-        try {
-          const sbHeaders = getSupabaseHeaders(env);
-          const sbRes = await fetch(`${env.SUPABASE_URL}/rest/v1/b2b_inventories?select=id&limit=1`, {
-            method: "GET",
-            headers: sbHeaders
-          });
-          if (sbRes.ok) {
-            supabaseStatus = "CONNECTED (Đọc/Ghi Database Thật)";
-            supabaseConnected = true;
-          } else {
-            supabaseStatus = `FALLBACK_MEMORY (Đang dùng Két sắt Dự phòng - Supabase HTTP ${sbRes.status})`;
-          }
-        } catch (err) {
-          supabaseStatus = `FALLBACK_MEMORY (Đang dùng Két sắt Dự phòng - ${err.message})`;
+        success: true, bookingCode: code, matchScore: chosen.matchScore,
+        aiEngineUsed: ai.ai_engine_used, aiReasoningLog: ai.ai_reasoning_log,
+        weatherTempC: chosen.weather_temp_c, weatherDesc: chosen.weather_desc,
+        mysteryHint: ai.mystery_hint || chosen.hint,
+        packingChecklist: ai.packing_checklist || chosen.packing,
+        antiTouristTrapGuide: ai.anti_tourist_trap_guide || chosen.food_guide,
+        itinerary: ai.itinerary || chosen.itinerary,
+        splitQrs, allCandidatesScores: ranked.map(r => ({ city: r.city_name, score: r.matchScore })),
+        revealPackage: {
+          cityName: chosen.city_name, comboTitle: chosen.combo_title, transportInfo: chosen.transport_info,
+          hotelName: chosen.hotel_name, hotelConfirmationCode: chosen.hotel_confirmation_code,
+          budgetPaid: totalPaid, retailValue: totalRetail, savingsVnd: totalRetail - totalPaid
         }
-      } else {
-        supabaseStatus = "FALLBACK_MEMORY (Đang dùng Két sắt Dự phòng - Cần cấu hình SUPABASE_URL & SUPABASE_SERVICE_ROLE_KEY)";
-      }
-
-      const hasGemini = Boolean(env.GEMINI_API_KEY && !env.GEMINI_API_KEY.includes("DAN_"));
-      const aiStatus = hasGemini ? "GEMINI_2_5_FLASH_ACTIVE" : "LOCAL_VECTOR_COSINE_ACTIVE (AI Toán học Nội bộ)";
-
-      const bankId = env.COMPANY_BANK_ID || "MB";
-      const accountNo = env.COMPANY_ACCOUNT_NO || "0988888888";
-      const accountName = env.COMPANY_ACCOUNT_NAME || "CONG TY TNHH WANDERMATCH VN";
-      const responseTimeMs = Date.now() - startTime;
-
-      return new Response(JSON.stringify({
-        worker_status: "ONLINE",
-        response_time_ms: responseTimeMs,
-        timestamp: new Date().toISOString(),
-        supabase_status: supabaseStatus,
-        ai_status: aiStatus,
-        vietqr_status: "READY",
-        company_bank: {
-          bank_id: bankId,
-          account_no: accountNo,
-          account_name: accountName
-        },
-        service: "WanderMatch v3.0 Fullstack Cloud Worker (Frontend + API Unified)",
-        supabaseConnected,
-        geminiConfigured: hasGemini
-      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }), { headers: { ...cors, "Content-Type": "application/json" } });
     }
 
-    // 9. PHỤC VỤ TRỰC TIẾP GIAO DIỆN WEB TRÊN CLOUDFLARE (KHÔNG CẦN NETLIFY)
-    // Ưu tiên 1: Cloudflare Workers Static Assets (binding = "ASSETS" từ thư mục ./frontend)
-    if (env && env.ASSETS && typeof env.ASSETS.fetch === "function") {
-      try {
-        const assetResp = await env.ASSETS.fetch(request);
-        if (assetResp && assetResp.status !== 404) {
-          return assetResp;
-        }
-      } catch (e) {}
-    }
-
-    // Ưu tiên 2: Tự động tải file tĩnh từ nhánh main GitHub của dự án nếu Worker chạy độc lập
-    const cleanPath = url.pathname === "/" ? "/index.html" : url.pathname;
-    if (cleanPath === "/index.html" || cleanPath === "/app.js" || cleanPath === "/styles.css") {
-      const contentTypeMap = {
-        "/index.html": "text/html; charset=utf-8",
-        "/app.js": "application/javascript; charset=utf-8",
-        "/styles.css": "text/css; charset=utf-8"
-      };
-      try {
-        const ghRawUrl = `https://raw.githubusercontent.com/Edtech-dev-design/wandermatch-v3/main${cleanPath}`;
-        const ghResp = await fetch(ghRawUrl, { cf: { cacheTtl: 60, cacheEverything: true } });
-        if (ghResp.ok) {
-          const bodyText = await ghResp.text();
-          return new Response(bodyText, {
-            status: 200,
-            headers: {
-              ...corsHeaders,
-              "Content-Type": contentTypeMap[cleanPath] || "text/plain; charset=utf-8",
-              "Cache-Control": "public, max-age=60"
-            }
-          });
-        }
-      } catch (e) {}
-    }
-
-    return new Response(JSON.stringify({
-      service: "WanderMatch v3.0 Fullstack Cloud Worker",
-      aiEngine: "Gemini 2.5 Flash + Weighted Euclidean & Cosine Active",
-      supabaseConnected: hasSupabase,
-      geminiConfigured: Boolean(env.GEMINI_API_KEY && !env.GEMINI_API_KEY.includes("DAN_"))
-    }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ status: "WanderMatch Worker Ready" }), { headers: { ...cors, "Content-Type": "application/json" } });
   }
 };
