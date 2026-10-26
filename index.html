@@ -3158,6 +3158,10 @@
       if (!fullNameEl || !bankHolderEl) return;
 
       const normalizedCccdName = normalizeVNName(fullNameEl.value);
+      const ocrPreviewEl = document.getElementById('ocr-preview-holder-name');
+      if (ocrPreviewEl && normalizedCccdName) {
+        ocrPreviewEl.textContent = normalizedCccdName;
+      }
       if (sourceField === 'cccd') {
         bankHolderEl.value = normalizedCccdName;
       } else if (sourceField === 'bank') {
