@@ -156,6 +156,12 @@
           <button id="theme-btn-light" onclick="setTheme('light')" class="theme-swatch-btn" style="background: linear-gradient(135deg, #f8fafc, #38bdf8);" title="Daylight Pearl"></button>
         </div>
 
+        <!-- Share to Other Devices via Vercel & QR Button -->
+        <button onclick="openShareDeviceModal()" class="px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/60 text-cyan-200 text-xs font-extrabold flex items-center gap-1.5 transition shadow-lg" title="Chia sẻ ứng dụng sang điện thoại, máy tính bảng hoặc thiết bị khác qua Vercel & Mã QR">
+          <i class="fa-solid fa-qrcode text-cyan-300 text-sm"></i>
+          <span>Chia Sẻ Thiết Bị (Vercel / QR)</span>
+        </button>
+
         <!-- GitHub Auto-Sync Button -->
         <button onclick="openGithubSyncModal()" class="px-3 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-1.5 transition shadow" title="Tự động đồng bộ & đẩy code lên GitHub khi thay đổi">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
@@ -214,11 +220,16 @@
         </span>
       </div>
 
-      <!-- Action Buttons: Ping All, Config Worker URL, Test AI -->
+      <!-- Action Buttons: Ping All, Share Vercel QR, Config Worker URL, Test AI -->
       <div class="flex flex-wrap items-center gap-2">
         <button type="button" onclick="runFullSystemCheck(false)" class="px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-[11px] shadow-lg transition flex items-center gap-1.5">
           <i class="fa-solid fa-satellite-dish"></i>
           <span>Kiểm Tra Toàn Hệ Thống (Ping All)</span>
+        </button>
+
+        <button type="button" onclick="openShareDeviceModal()" class="px-3 py-1.5 rounded-xl bg-indigo-950 hover:bg-indigo-900 text-indigo-200 border border-indigo-500/50 font-bold text-[11px] shadow flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+          <span>Mở Trên Điện Thoại (Vercel QR)</span>
         </button>
 
         <button type="button" onclick="switchTab('admin'); runAISensitivityTest();" class="px-3 py-1.5 rounded-xl bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/50 font-bold text-[11px] shadow flex items-center gap-1.5 transition">
@@ -239,33 +250,33 @@
       </div>
     </div>
 
-    <!-- Interactive 4-Step Wizard Bar (Shown inside Tab 1: B2C App) -->
+    <!-- Interactive 4-Step Wizard Bar (Tách Bạch Hoàn Toàn: Bước 1 Gợi Ý AI vs Bước 2 Xác Nhận TK & Thanh Toán) -->
     <div id="b2c-4step-wizard-bar" class="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-2 text-xs">
       <button id="step-pill-1" type="button" onclick="switchB2CStep(1)" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-cyan-500/60 bg-cyan-500/20 text-cyan-300 font-extrabold transition text-left shadow">
         <span id="step-badge-1" class="w-6 h-6 rounded-full bg-cyan-400 text-slate-950 font-black flex items-center justify-center shrink-0 text-[11px]">1</span>
         <div class="truncate">
-          <span class="block text-[11px] font-black">Bước 1: Tâm Lý & Khóa Thực Dụng</span>
-          <span class="block text-[10px] opacity-80">5 Trục Vector • Blacklist • Ngân sách</span>
+          <span class="block text-[11px] font-black">Bước 1: AI Phân Tích &amp; Gợi Ý Lộ Trình</span>
+          <span class="block text-[10px] opacity-80">5 Trục Tâm Lý • Blacklist • Lịch trình chi tiết</span>
         </div>
       </button>
       <button id="step-pill-2" type="button" onclick="switchB2CStep(2)" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-white font-semibold transition text-left">
         <span id="step-badge-2" class="w-6 h-6 rounded-full bg-slate-800 text-slate-300 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
         <div class="truncate">
-          <span class="block text-[11px] font-bold">Bước 2: Định Danh STK & VietQR</span>
-          <span class="block text-[10px] opacity-80">Napas 247 • Chia tiền Nhóm QR</span>
+          <span class="block text-[11px] font-bold">Bước 2: Xác Nhận TK &amp; Thanh Toán QR</span>
+          <span class="block text-[10px] opacity-80">Định danh CCCD • Napas 247 • VietQR</span>
         </div>
       </button>
       <button id="step-pill-3" type="button" onclick="switchB2CStep(3)" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-white font-semibold transition text-left">
         <span id="step-badge-3" class="w-6 h-6 rounded-full bg-slate-800 text-slate-300 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
         <div class="truncate">
-          <span class="block text-[11px] font-bold">Bước 3: Phòng Chờ & Hoàn Tiền</span>
+          <span class="block text-[11px] font-bold">Bước 3: Phòng Chờ &amp; Hoàn Tiền</span>
           <span class="block text-[10px] opacity-80">Mystery Hint • Hoàn tiền 3 Khung giờ</span>
         </div>
       </button>
       <button id="step-pill-4" type="button" onclick="switchB2CStep(4)" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-white font-semibold transition text-left">
         <span id="step-badge-4" class="w-6 h-6 rounded-full bg-slate-800 text-slate-300 font-bold flex items-center justify-center shrink-0 text-[11px]">4</span>
         <div class="truncate">
-          <span class="block text-[11px] font-bold">Bước 4: Cào Thẻ Giờ G</span>
+          <span class="block text-[11px] font-bold">Bước 4: Cào Thẻ Giờ G &amp; Nhận Vé</span>
           <span class="block text-[10px] opacity-80">Thẻ cào Canvas • Vé Boarding Pass</span>
         </div>
       </button>
