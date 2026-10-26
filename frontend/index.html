@@ -4124,16 +4124,43 @@
       const subStep4 = document.getElementById('b2c-subview-step4-scratch');
 
       if (window._currentB2CStep === 1) {
+        // BƯỚC 1: Chỉ hiển thị phần AI Phân Tích Tâm Lý & Gợi Ý Lộ Trình (#view-concierge)
+        // Tuyệt đối ẩn phần Xác Nhận Tài Khoản (#view-quiz) và Thanh Toán (#view-vietqr)
         if (vConcierge) vConcierge.classList.remove('hidden');
-        if (vQuiz) vQuiz.classList.remove('hidden');
+        if (vQuiz) vQuiz.classList.add('hidden');
         if (vVietqr) vVietqr.classList.add('hidden');
         if (vScratch) vScratch.classList.add('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else if (window._currentB2CStep === 2) {
+        // BƯỚC 2: Ẩn hoàn toàn phần Gợi Ý Lộ Trình (#view-concierge)
+        // Hiển thị Bước 2A: Xác Nhận Tài Khoản (#view-quiz) + Bước 2B: Thanh Toán VietQR (#view-vietqr)
         if (vConcierge) vConcierge.classList.add('hidden');
-        if (vQuiz) vQuiz.classList.add('hidden');
+        if (vQuiz) vQuiz.classList.remove('hidden');
         if (vVietqr) vVietqr.classList.remove('hidden');
         if (vScratch) vScratch.classList.add('hidden');
+
+        // Đồng bộ tóm tắt chuyến đi từ Bước 1 sang Bước 2
+        const budget = window.state?.selectedBudget || Number(document.getElementById('planner-budget-input')?.value || 5000000);
+        const pax = window.state?.selectedPax || Number(document.getElementById('planner-pax-select')?.value || 2);
+        const destMode = document.getElementById('planner-dest-select')?.value || 'blind';
+        const curDestName = (typeof getCurrentDestData === 'function' && getCurrentDestData()?.name?.vi) || 'Măng Đen / Đà Lạt';
+
+        const sumDestEl = document.getElementById('step2-summary-dest-title');
+        const sumBudgetEl = document.getElementById('step2-summary-budget');
+        const sumPaxEl = document.getElementById('step2-summary-pax');
+        if (sumDestEl) {
+          sumDestEl.textContent = destMode === 'blind'
+            ? `🎲 Bản Đồ Mù AI — Gợi ý #1: ${curDestName}`
+            : `📍 Điểm đến đã chọn: ${curDestName}`;
+        }
+        if (sumBudgetEl) sumBudgetEl.textContent = `${Number(budget).toLocaleString('vi-VN')} VNĐ`;
+        if (sumPaxEl) sumPaxEl.textContent = `${pax} Người`;
+
+        const cwBudgetInput = document.getElementById('cw-budget-vnd');
+        const cwGroupInput = document.getElementById('cw-group-size');
+        if (cwBudgetInput) cwBudgetInput.value = Math.max(2000000, Math.round(budget / Math.max(1, pax)));
+        if (cwGroupInput) cwGroupInput.value = pax;
+        if (typeof updateLiveUnitEconomicsPreview === 'function') updateLiveUnitEconomicsPreview();
         if (typeof updateVietQrDisplay === 'function') updateVietQrDisplay();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else if (window._currentB2CStep === 3) {
