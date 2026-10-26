@@ -4031,8 +4031,12 @@ function copyPaymentAmount() {
 
 function goToPaymentWithBudget() {
   updateVietQrDisplay();
-  switchView('vietqr');
-  showToast('info', `Đã chuyển sang Cổng VietQR. Số tiền khóa cứng: ${state.selectedBudget.toLocaleString('vi-VN')}đ.`);
+  if (typeof window.switchB2CStep === 'function') {
+    window.switchB2CStep(2);
+  } else {
+    switchView('vietqr');
+  }
+  showToast('info', `🏦 Đã sang Bước 2: Xác nhận Tài khoản Ngân hàng (Napas 247) & Thanh toán VietQR (${state.selectedBudget.toLocaleString('vi-VN')}đ).`);
 }
 
 function handleGeneratePlan() {
@@ -5052,17 +5056,30 @@ function switchView(viewName) {
     return;
   }
 
+  if (typeof window.switchB2CStep === 'function') {
+    if (viewName === 'concierge') {
+      window.switchB2CStep(1);
+      return;
+    } else if (viewName === 'quiz' || viewName === 'vietqr') {
+      window.switchB2CStep(2);
+      return;
+    } else if (viewName === 'scratch') {
+      window.switchB2CStep(4);
+      return;
+    }
+  }
+
   const views = ['concierge', 'quiz', 'vietqr', 'scratch', 'b2b'];
   views.forEach(v => {
     const el = document.getElementById(`view-${v}`);
     const navBtn = document.getElementById(`nav-btn-${v}`);
     if (el) {
-      if (viewName === 'concierge' || viewName === 'quiz') {
-        if (v === 'concierge' || v === 'quiz') {
-          el.classList.remove('hidden');
-        } else {
-          el.classList.add('hidden');
-        }
+      if (viewName === 'concierge') {
+        if (v === 'concierge') el.classList.remove('hidden');
+        else el.classList.add('hidden');
+      } else if (viewName === 'quiz' || viewName === 'vietqr') {
+        if (v === 'quiz' || v === 'vietqr') el.classList.remove('hidden');
+        else el.classList.add('hidden');
       } else if (v === viewName) {
         el.classList.remove('hidden');
       } else {
