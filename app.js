@@ -5951,3 +5951,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+// ============================================================================
+// GLOBAL FUNCTION EXPORTS FOR CROSS-SCRIPT COORDINATION (index.html & UI components)
+// ============================================================================
+window.state = state;
+window.t = t;
+window.setLanguage = setLanguage;
+window.setTheme = setTheme;
+window.getResolvedDestKey = getResolvedDestKey;
+window.getCurrentDestData = getCurrentDestData;
+window.renderDestinationHero = renderDestinationHero;
+window.renderBudgetAllocation = renderBudgetAllocation;
+window.renderTripSummaryCard = renderTripSummaryCard;
+window.renderDetailedDayItinerary = renderDetailedDayItinerary;
+window.setActiveDayTab = setActiveDayTab;
+window.printItinerary = printItinerary;
+window.copyFullItineraryToClipboard = copyFullItineraryToClipboard;
+window.renderItineraries = renderItineraries;
+window.renderPois = renderPois;
+window.updateVietQrDisplay = updateVietQrDisplay;
+window.handleGeneratePlan = handleGeneratePlan;
+window.setQuickBudget = setQuickBudget;
+window.switchView = switchView;
+window.renderValueGuaranteeCalculator = renderValueGuaranteeCalculator;
+window.renderPackingChecklist = renderPackingChecklist;
+window.renderTransparentValueReceipt = renderTransparentValueReceipt;
+window.renderAntiTrapSpots = renderAntiTrapSpots;
+window.initGroupBooking = initGroupBooking;
+window.renderRefundCalculator = renderRefundCalculator;
+window.renderEscrowLedger = renderEscrowLedger;
+window.startPaymentCountdown = startPaymentCountdown;
+window.initScratchCard = initScratchCard;
+
