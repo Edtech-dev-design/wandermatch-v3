@@ -1997,10 +1997,12 @@ function applyI18nLabels() {
 // ============================================================================
 
 function getResolvedDestKey() {
-  if (state.selectedDestination === 'blind') {
-    return (window.cwState && window.cwState.aiMatchedDestKey) || 'mangden';
+  const currentDest = (window.state && window.state.selectedDestination) || (typeof state !== 'undefined' && state.selectedDestination) || document.getElementById('planner-dest-select')?.value || 'blind';
+  if (currentDest === 'blind') {
+    const aiKey = window.cwState && (window.cwState.aiSuggestedDestKey || window.cwState.aiMatchedDestKey);
+    return aiKey || 'mangden';
   }
-  return state.selectedDestination || 'hochiminh';
+  return currentDest;
 }
 window.getResolvedDestKey = getResolvedDestKey;
 
