@@ -3484,20 +3484,20 @@
         customerReview: "Đang trong kỳ nghỉ / Chờ đánh giá"
       });
 
-      // Hiển thị kết quả ngay dưới form
+      // Hiển thị kết quả ngay dưới form & tự động cuộn mượt xuống cổng quét mã VietQR (Bước 2B)
       const resBox = document.getElementById('cw-create-booking-result');
       if (resBox) {
         resBox.className = "p-4 rounded-2xl bg-emerald-950/50 border border-emerald-500/50 text-xs space-y-2.5";
         resBox.innerHTML = `
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <span class="font-black text-emerald-300 text-sm">✅ ĐÃ KHÓA ĐƠN MÙ AI & NIÊM PHONG ĐIỂM ĐẾN: #${data.bookingCode}</span>
+            <span class="font-black text-emerald-300 text-sm">✅ ĐÃ XÁC THỰC TÀI KHOẢN &amp; KHÓA ĐƠN MÙ AI: #${data.bookingCode}</span>
             <span class="px-2.5 py-0.5 rounded bg-cyan-950 text-cyan-300 font-mono font-bold border border-cyan-700">Tổng ngân sách: ${Number(data.totalBudget).toLocaleString('vi-VN')} VNĐ (${groupSize} người)</span>
           </div>
           <p class="text-slate-200 italic">🌤️ <strong>Mystery Hint (${data.weatherTempC}°C - ${data.weatherDesc}):</strong> "${data.mysteryHint}"</p>
-          <div class="text-[11px] text-emerald-300 font-mono">🛡️ Bảo mật Anti-F12: Tên thành phố & khách sạn đã được mã hóa kín cho tới khi cào thẻ Giờ G.</div>
+          <div class="text-[11px] text-emerald-300 font-mono">🛡️ Bảo mật Anti-F12: Tên thành phố &amp; khách sạn đã được mã hóa kín cho tới khi cào thẻ Giờ G.</div>
           <div class="flex flex-wrap gap-2 pt-1">
-            <button type="button" onclick="goToWorkflowStep(2)" class="px-4 py-2 rounded-xl btn-glow-emerald text-white font-black text-xs shadow">💳 Bước 2: Sang Cổng VietQR (${data.splitQrs?.length || 1} Mã QR Chia Tiền)</button>
-            <button type="button" onclick="goToWorkflowStep(3)" class="px-4 py-2 rounded-xl btn-glow-cyan text-slate-950 font-black text-xs shadow">🎟️ Bước 3 & 4: Sang Phòng Chờ & Thẻ Cào Giờ G</button>
+            <button type="button" onclick="document.getElementById('view-vietqr')?.scrollIntoView({ behavior: 'smooth', block: 'start' })" class="px-4 py-2 rounded-xl btn-glow-emerald text-white font-black text-xs shadow">💳 Cuộn Xuống Quét Mã VietQR (${data.splitQrs?.length || 1} Mã QR Chia Tiền)</button>
+            <button type="button" onclick="switchB2CStep(3)" class="px-4 py-2 rounded-xl btn-glow-cyan text-slate-950 font-black text-xs shadow">🎟️ Sang Bước 3 &amp; 4: Phòng Chờ &amp; Thẻ Cào Giờ G</button>
           </div>
         `;
         resBox.classList.remove('hidden');
