@@ -1430,6 +1430,498 @@ const DESTINATION_DATA = {
         ]
       }
     ]
+  },
+
+  mangden: {
+    name: {
+      vi: "Măng Đen (Đại Ngàn Nguyên Sơ & Săn Mây)",
+      en: "Mang Den (Pristine Highland & Cloud Hunting)",
+      ko: "망덴 (원시림 고원 & 운해)",
+      ja: "マンデン (原生林と雲海の高原)"
+    },
+    heroImg: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80",
+    weather: {
+      vi: "18°C • Không khí rừng thông nguyên sinh trong lành, sương sớm bảng lảng",
+      en: "18°C • Crisp pine forest air, gentle morning mist",
+      ko: "18°C • 상쾌한 소나무 숲 공기",
+      ja: "18°C • 澄んだ松林の空気と朝霧"
+    },
+    hotel: {
+      vi: "Golden Boutique Hotel Măng Đen (4 Sao - View Rừng Thông)",
+      en: "Golden Boutique Hotel Mang Den (4-Star Pine View)",
+      ko: "골든 부티크 호텔 망덴 (4성급)",
+      ja: "ゴールデンブティックホテル・マンデン (4つ星)"
+    },
+    itineraries: [
+      {
+        id: 1,
+        persona_focus: "🏔️ Độc Hành Chữa Lành & Săn Mây",
+        title: { vi: "Phương Án 1: Săn Mây Đỉnh Ngọc Lễ, Hồ Đăk Ke & Rừng Thông", en: "Option 1: Cloud Hunting & Dak Ke Lake" },
+        tagline: { vi: "Ngắt kết nối hoàn toàn giữa đại ngàn Tây Nguyên 18°C và thưởng thức cà phê rang củi", en: "Disconnect in the 18°C Central Highlands" },
+        slots: [
+          {
+            time: "06:30 - 09:00",
+            poi_name: { vi: "Săn Mây Đồi Đức Mẹ & Đường Thông Cổ Thụ", en: "Cloud Hunting & Pine Avenue" },
+            activity: { vi: "Đón bình minh xuyên qua tán thông ba lá và nhâm nhi cà phê rang củi De Vivre", en: "Sunrise walk & wood-roasted coffee" },
+            cost_est: "65.000đ",
+            tips: { vi: "Mang áo khoác nhẹ vì sáng sớm nhiệt độ khoảng 15-16°C", en: "Bring a light jacket" },
+            img: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=600&q=80"
+          },
+          {
+            time: "10:00 - 13:30",
+            poi_name: { vi: "Thác Pa Sỹ & Gà Nướng Cơm Lam Cô Sinh", en: "Pa Sy Waterfall & Grilled Chicken" },
+            activity: { vi: "Trekking nhẹ xuống thác Pa Sỹ trắng xóa và thưởng thức gà nướng cơm lam bản địa", en: "Light trek to Pa Sy Waterfall & lunch" },
+            cost_est: "180.000đ",
+            tips: { vi: "Gà nướng chấm muối tiêu rừng lá é cực kỳ dậy mùi thơm", en: "Try wild pepper leaf salt" },
+            img: "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?auto=format&fit=crop&w=600&q=80"
+          },
+          {
+            time: "17:30 - 20:30",
+            poi_name: { vi: "Hồ Đăk Ke & Lẩu Xuyên Tiêu Măng Đen", en: "Dak Ke Lake & Hotpot" },
+            activity: { vi: "Dạo bộ quanh hồ Đăk Ke tĩnh lặng và sưởi ấm với nồi lẩu xuyên tiêu cay nồng", en: "Lakeside walk & Sichuan pepper hotpot" },
+            cost_est: "220.000đ",
+            tips: { vi: "Nước lẩu hầm táo đỏ kỷ tử rất ấm bụng trong đêm lạnh", en: "Warm herbal broth" },
+            img: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80"
+          }
+        ]
+      },
+      {
+        id: 2,
+        persona_focus: "🌿 Nông Trại Hữu Cơ & Bản Làng",
+        title: { vi: "Phương Án 2: Làng Kon Pring, Vườn Cam Orfarm & Glamping", en: "Option 2: Kon Pring Village & Organic Farm" },
+        tagline: { vi: "Khám phá văn hóa bản địa Mơ Nâm và hái cam sành, dâu tây hữu cơ trên cao nguyên", en: "Indigenous culture & organic farming" },
+        slots: [
+          {
+            time: "08:30 - 11:30",
+            poi_name: { vi: "Làng Du Lịch Cộng Đồng Kon Pring", en: "Kon Pring Community Village" },
+            activity: { vi: "Tìm hiểu nhà rông truyền thống của người Mơ Nâm và dệt thổ cẩm thủ công", en: "Explore traditional Rong house" },
+            cost_est: "50.000đ",
+            tips: { vi: "Người dân bản địa rất hiếu khách và chân thành", en: "Friendly local hosts" },
+            img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=80"
+          },
+          {
+            time: "14:00 - 17:00",
+            poi_name: { vi: "Nông Trại Hữu Cơ Ê Ban Farm", en: "E Ban Organic Farm" },
+            activity: { vi: "Ngắm đồi hoa cẩm tú cầu, hái dâu tây và thưởng thức trà thảo mộc", en: "Hydrangea hills & organic berries" },
+            cost_est: "90.000đ",
+            tips: { vi: "Hoàng hôn tại Ê Ban Farm nhìn xuống thung lũng rất thơ mộng", en: "Great valley sunset" },
+            img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80"
+          }
+        ]
+      },
+      {
+        id: 3,
+        persona_focus: "🧘 Thiền Định & Tĩnh Tâm",
+        title: { vi: "Phương Án 3: Chùa Khánh Lâm, Hồ Đam Bri & Cafe Tĩnh Lặng", en: "Option 3: Khanh Lam Pagoda & Forest Retreat" },
+        tagline: { vi: "Lộ trình chậm rãi dành cho người cần tái tạo năng lượng tinh thần sâu sắc", en: "Slow-paced spiritual renewal" },
+        slots: [
+          {
+            time: "09:00 - 11:30",
+            poi_name: { vi: "Chùa Khánh Lâm Giữa Rừng Nguyên Sinh", en: "Khanh Lam Forest Pagoda" },
+            activity: { vi: "Bước qua 200 bậc đá dưới tán rừng già tĩnh mịch nghe tiếng chuông chùa ngân vang", en: "Climb 200 stone steps under old-growth trees" },
+            cost_est: "Miễn phí",
+            tips: { vi: "Không gian thanh tịnh bậc nhất Tây Nguyên", en: "Peaceful sanctuary" },
+            img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80"
+          }
+        ]
+      }
+    ],
+    pois: [
+      {
+        id: "poi-md-1",
+        category: "SPECIALTY_FOOD",
+        name: { vi: "Gà Nướng Cơm Lam Cô Sinh Măng Đen", en: "Co Sinh Grilled Chicken & Bamboo Rice" },
+        address: "Quốc lộ 24, Thị trấn Măng Đen, Kon Plông",
+        hours: "08:00 - 21:00",
+        costDisplay: { vi: "250.000đ / con gà bản địa + cơm lam", en: "250,000 VND / whole chicken" },
+        img: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80",
+        description: { vi: "Gà chạy bộ tẩm ướp lá tiêu rừng, mật ong rừng nướng trên than hồng da giòn rụm ăn kèm cơm lam ống nứa dẻo thơm.", en: "Free-range highland chicken grilled with wild honey and forest leaves." },
+        rating: 4.94,
+        reviewsCount: 412,
+        verdictBadge: "TASTY_FAIR_PRICE",
+        reviews: [{ id: "rev-md-1", author: "Hoàng Gia Bảo", rating: 5, date: "2026-10-19", spent: "280.000đ", verdict: "TASTY_FAIR_PRICE", content: "Gà nướng thơm nức mũi, cơm lam chấm muối vừng đậu phộng ngon xuất sắc!" }]
+      },
+      {
+        id: "poi-md-2",
+        category: "ATTRACTION_TICKET",
+        name: { vi: "Khu Sinh Thái Thác Pa Sỹ", en: "Pa Sy Waterfall Eco-Park" },
+        address: "Xã Măng Cành, Huyện Kon Plông, Măng Đen",
+        hours: "07:30 - 17:30",
+        costDisplay: { vi: "Vé vào cổng: 20.000đ / người", en: "Entrance ticket: 20,000 VND" },
+        img: "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?auto=format&fit=crop&w=800&q=80",
+        description: { vi: "Ngọn thác hùng vĩ cao 45m đổ xuống hồ nước trong vắt giữa khu rừng nguyên sinh rộng 25 hecta cùng vườn tượng gỗ dân gian.", en: "Majestic 45m waterfall surrounded by 25 hectares of primary forest." },
+        rating: 4.92,
+        reviewsCount: 530,
+        verdictBadge: "VERY_WORTH_IT",
+        reviews: [{ id: "rev-md-2", author: "Lê Minh Thư", rating: 5, date: "2026-10-15", spent: "20.000đ", verdict: "VERY_WORTH_IT", content: "Không khí mát lạnh trong veo, đường đi xuống thác lát đá rất dễ đi." }]
+      },
+      {
+        id: "poi-md-3",
+        category: "CAFE_SUNSET_CHILL",
+        name: { vi: "De Vivre Café — Cà Phê Rang Củi Giữa Rừng Thông", en: "De Vivre Wood-Roasted Coffee" },
+        address: "Số 21 Đường Hồ Xuân Hương, Măng Đen",
+        hours: "06:30 - 21:30",
+        costDisplay: { vi: "35.000đ - 55.000đ / ly", en: "35,000 - 55,000 VND / drink" },
+        img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80",
+        description: { vi: "Quán cà phê gỗ mộc mạc nhìn thẳng ra thung lũng thông xanh rì, nổi tiếng với hạt Arabica Cầu Đất - Măng Đen rang củi thủ công.", en: "Rustic wooden cafe overlooking the pine valley." },
+        rating: 4.96,
+        reviewsCount: 380,
+        verdictBadge: "VERY_WORTH_IT",
+        reviews: [{ id: "rev-md-3", author: "Trần Quốc Tuấn", rating: 5, date: "2026-10-20", spent: "45.000đ", verdict: "VERY_WORTH_IT", content: "Ngồi ban công gỗ ngắm sương mù bay qua tán thông, cảm giác bình yên tuyệt đối." }]
+      }
+    ]
+  },
+
+  hue: {
+    name: {
+      vi: "Cố Đô Huế (Di Sản Hoàng Cung & Thiền Định)",
+      en: "Imperial Hue (Royal Heritage & Zen River)",
+      ko: "후에 고도 (왕실 유산 & 향강 힐링)",
+      ja: "古都フエ (王宮遺産とフォーン川の癒やし)"
+    },
+    heroImg: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1600&q=80",
+    weather: {
+      vi: "24°C • Trời dịu mát, gió nhẹ bên bờ sông Hương và hương trầm cổ kính",
+      en: "24°C • Pleasant breeze along the Perfume River",
+      ko: "24°C • 향강변의 선선한 바람",
+      ja: "24°C • フォーン川沿いの心地よい風"
+    },
+    hotel: {
+      vi: "Pilgrimage Village Boutique Resort & Spa (5 Sao - Kiến Trúc Làng Cổ)",
+      en: "Pilgrimage Village Boutique Resort & Spa (5-Star)",
+      ko: "필그리미지 빌리지 부티크 리조트 (5성급)",
+      ja: "ピルグリメージ・ビレッジ・リゾート＆スパ (5つ星)"
+    },
+    itineraries: [
+      {
+        id: 1,
+        persona_focus: "🏛️ Di Sản Hoàng Cung & Ẩm Thực Cung Đình",
+        title: { vi: "Phương Án 1: Đại Nội Huế, Lăng Tự Đức & Trà Chiều Sông Hương", en: "Option 1: Imperial Citadel, Tu Duc Tomb & Perfume River" },
+        tagline: { vi: "Đắm mình trong chiều sâu văn hóa 99 điểm của kinh thành xưa và ẩm thực cố đô tinh tế", en: "Immerse in royal architecture and Hue gastronomy" },
+        slots: [
+          {
+            time: "08:00 - 11:30",
+            poi_name: { vi: "Hoàng Thành Huế (Đại Nội) & Điện Kiến Trung", en: "Hue Imperial Citadel & Kien Trung Palace" },
+            activity: { vi: "Tham quan Ngọ Môn, Điện Thái Hòa và kiệt tác kiến trúc Điện Kiến Trung vừa phục dựng", en: "Explore Ngo Mon Gate and Kien Trung Palace" },
+            cost_est: "200.000đ",
+            tips: { vi: "Thuê thuyết minh viên hoặc audio guide để nghe trọn vẹn lịch sử 13 đời vua Nguyễn", en: "Use audio guide for historical stories" },
+            img: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=600&q=80"
+          },
+          {
+            time: "12:00 - 13:30",
+            poi_name: { vi: "Bánh Huế Bà Đỏ (Bánh Bèo, Nậm, Lọc, Ram Ít)", en: "Ba Do Authentic Hue Cakes" },
+            activity: { vi: "Thưởng thức mâm bánh cung đình Huế nóng hổi chấm nước mắm tôm chấy ngọt dịu", en: "Royal Hue steamed rice cakes platter" },
+            cost_est: "120.000đ",
+            tips: { vi: "Gọi combo thập cẩm 4 loại bánh để nếm trọn tinh hoa bột lọc Huế", en: "Order the 4-cake combo" },
+            img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80"
+          },
+          {
+            time: "15:00 - 18:00",
+            poi_name: { vi: "Lăng Tự Đức (Khiêm Lăng) & Làng Hương Thủy Xuân", en: "Tu Duc Tomb & Thuy Xuan Incense Village" },
+            activity: { vi: "Dạo bước bên hồ Lưu Khiêm thơ mộng và chụp ảnh cùng những bó hương đa sắc màu", en: "Walk by Luu Khiem Lake & colorful incense village" },
+            cost_est: "150.000đ",
+            tips: { vi: "Ánh nắng chiều xiên qua hồ sen tại Lăng Tự Đức đẹp như tranh thủy mặc", en: "Afternoon light is magical" },
+            img: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80"
+          }
+        ]
+      },
+      {
+        id: 2,
+        persona_focus: "♨️ Khoáng Nóng Chữa Lành & Thiền Định",
+        title: { vi: "Phương Án 2: Chùa Thiên Mụ, Khoáng Nóng Alba & Ca Huế Sông Hương", en: "Option 2: Thien Mu Pagoda & Alba Hot Springs" },
+        tagline: { vi: "Kết hợp thanh lọc tâm trí bên dòng Hương Giang và ngâm khoáng nóng Onsen tự nhiên", en: "Zen pagoda visit & natural thermal hot springs" },
+        slots: [
+          {
+            time: "09:00 - 16:00",
+            poi_name: { vi: "Suối Khoáng Nóng Alba Thanh Tân & Onsen", en: "Alba Thanh Tan Hot Springs" },
+            activity: { vi: "Ngâm mình trong dòng suối khoáng nóng 68°C dưới chân núi Mã Yên và tắm Onsen Nhật Bản", en: "Soak in 68°C natural thermal mineral springs" },
+            cost_est: "450.000đ (Đã tặng trong gói)",
+            tips: { vi: "Đã bao gồm vé tặng tắm khoáng nóng trong gói WanderMatch Huế", en: "Included complimentary in Hue package" },
+            img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80"
+          }
+        ]
+      },
+      {
+        id: 3,
+        persona_focus: "🚲 Đạp Xe Phá Tam Giang & Nhà Vườn",
+        title: { vi: "Phương Án 3: Nhà Vườn An Hiên, Rừng Ngập Mặn Rú Chá & Đầm Chuồn", en: "Option 3: An Hien Garden House & Tam Giang Lagoon" },
+        tagline: { vi: "Ngắm hoàng hôn tím biếc trên hệ đầm phá lớn nhất Đông Nam Á", en: "Purple sunset over Southeast Asia's largest lagoon" },
+        slots: [
+          {
+            time: "15:30 - 18:30",
+            poi_name: { vi: "Rừng Ngập Mặn Rú Chá & Đầm Chuồn (Phá Tam Giang)", en: "Ru Cha Mangrove & Tam Giang Lagoon" },
+            activity: { vi: "Đi thuyền gỗ ngắm hoàng hôn trên đầm Chuồn và thưởng thức bánh khoái cá kình tươi roi rói", en: "Boat ride on Tam Giang Lagoon & local pancake" },
+            cost_est: "180.000đ",
+            tips: { vi: "Bánh khoái cá kình chỉ có duy nhất tại vùng đầm phá Tam Giang", en: "Must-try rabbitfish pancake" },
+            img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80"
+          }
+        ]
+      }
+    ],
+    pois: [
+      {
+        id: "poi-hue-1",
+        category: "SPECIALTY_FOOD",
+        name: { vi: "Bún Bò Huế Mệ Kéo (Gia Truyền 70 Năm)", en: "Me Keo Traditional Hue Beef Noodle Soup" },
+        address: "Số 20 Bạch Đằng, Phường Phú Cát, TP. Huế",
+        hours: "06:00 - 10:30",
+        costDisplay: { vi: "40.000đ - 50.000đ / tô", en: "40,000 - 50,000 VND / bowl" },
+        img: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=800&q=80",
+        description: { vi: "Nồi nước dùng thơm nồng sả ruốc Huế nấu trong chõ gang cổ truyền, thịt ba chỉ giò heo và chả cua béo ngậy.", en: "Authentic 70-year-old Hue lemongrass beef noodle soup." },
+        rating: 4.95,
+        reviewsCount: 640,
+        verdictBadge: "TASTY_FAIR_PRICE",
+        reviews: [{ id: "rev-hue-1", author: "Đặng Minh Quân", rating: 5, date: "2026-10-18", spent: "45.000đ", verdict: "TASTY_FAIR_PRICE", content: "Vị nước dùng thanh mà đậm đà mùi sả ruốc chuẩn Huế xưa, giá cực kỳ bình dân!" }]
+      },
+      {
+        id: "poi-hue-2",
+        category: "ATTRACTION_TICKET",
+        name: { vi: "Quần Thể Di Tích Đại Nội Huế & Điện Kiến Trung", en: "Hue Imperial Citadel Complex" },
+        address: "Đường 23 Tháng 8, Phường Thuận Hòa, TP. Huế",
+        hours: "07:00 - 17:30",
+        costDisplay: { vi: "Vé tham quan: 200.000đ / người lớn", en: "Entrance fee: 200,000 VND" },
+        img: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=800&q=80",
+        description: { vi: "Di sản văn hóa thế giới UNESCO với Tử Cấm Thành uy nghiêm và Điện Kiến Trung lộng lẫy kiến trúc Đông Dương.", en: "UNESCO World Heritage royal citadel." },
+        rating: 4.98,
+        reviewsCount: 1120,
+        verdictBadge: "VERY_WORTH_IT",
+        reviews: [{ id: "rev-hue-2", author: "Phạm Thu Hà", rating: 5, date: "2026-10-17", spent: "200.000đ", verdict: "VERY_WORTH_IT", content: "Điện Kiến Trung mới trùng tu đẹp xuất sắc, góc nào lên hình cũng sang trọng cổ kính." }]
+      },
+      {
+        id: "poi-hue-3",
+        category: "CAFE_SUNSET_CHILL",
+        name: { vi: "Cà Phê Muối 142 Đặng Thái Thân (Gốc Khởi Nguồn)", en: "Original Salt Coffee 142 Dang Thai Than" },
+        address: "142 Đặng Thái Thân, Gần Đại Nội, TP. Huế",
+        hours: "06:30 - 22:00",
+        costDisplay: { vi: "20.000đ - 25.000đ / ly", en: "20,000 - 25,000 VND / cup" },
+        img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80",
+        description: { vi: "Quán cà phê sân vườn yên bình sát tường thành Đại Nội — nơi khai sinh món Cà phê Muối trứ danh khắp Việt Nam.", en: "The original birthplace of Vietnam's famous Salt Coffee." },
+        rating: 4.93,
+        reviewsCount: 790,
+        verdictBadge: "TASTY_FAIR_PRICE",
+        reviews: [{ id: "rev-hue-3", author: "Vũ Hoàng Yến", rating: 5, date: "2026-10-16", spent: "20.000đ", verdict: "TASTY_FAIR_PRICE", content: "Cà phê muối chính gốc chỉ 20k/ly mà lớp kem mặn béo quyện cà phê phin thơm đậm khó quên!" }]
+      }
+    ]
+  },
+
+  quynhon: {
+    name: {
+      vi: "Quy Nhơn (Eo Gió, Kỳ Co & Làng Chài Bình Yên)",
+      en: "Quy Nhon (Eo Gio Cliffs & Peaceful Fishing Villages)",
+      ko: "꾸이년 (에오조 절벽 & 평화로운 어촌)",
+      ja: "クイニョン (エオゾー海岸と穏やかな漁村)"
+    },
+    heroImg: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+    weather: {
+      vi: "27°C • Nắng vàng dịu, biển xanh ngọc bích hai màu và gió đại dương mát rượi",
+      en: "27°C • Golden sunshine, turquoise water & ocean breeze",
+      ko: "27°C • 에메랄드빛 바다와 시원한 바닷바람",
+      ja: "27°C • エメラルドグリーンの海と爽やかな潮風"
+    },
+    hotel: {
+      vi: "Avani Quy Nhon Resort (5 Sao - Bãi Biển Riêng Ghềnh Ráng)",
+      en: "Avani Quy Nhon Resort (5-Star Private Beach)",
+      ko: "아바니 꾸이년 리조트 (5성급 프라이빗 비치)",
+      ja: "アヴァニ・クイニョン・リゾート (5つ星プライベートビーチ)"
+    },
+    itineraries: [
+      {
+        id: 1,
+        persona_focus: "🌊 Biển Đảo Nguyên Sơ & Làng Chài",
+        title: { vi: "Phương Án 1: Cano Đảo Kỳ Co, Eo Gió & Làng Chài Nhơn Lý", en: "Option 1: Ky Co Island, Eo Gio & Nhon Ly Village" },
+        tagline: { vi: "Lặn ngắm san hô tại Maldives Việt Nam và dạo bước trên cung đường đá ven biển Eo Gió", en: "Snorkeling in crystal waters & cliffside walk at Eo Gio" },
+        slots: [
+          {
+            time: "08:00 - 12:30",
+            poi_name: { vi: "Bãi Biển Kỳ Co & Lặn Ngắm San Hô Bãi Dứa", en: "Ky Co Beach & Bai Dua Coral Snorkeling" },
+            activity: { vi: "Đi cano cao tốc từ làng chài Nhơn Lý ra đảo Kỳ Co tắm biển nước trong vắt 2 màu", en: "Speedboat to Ky Co beach & coral snorkeling" },
+            cost_est: "350.000đ",
+            tips: { vi: "Nước biển Kỳ Co buổi sáng trong vắt nhìn thấu đáy cát trắng", en: "Morning water is crystal clear" },
+            img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80"
+          },
+          {
+            time: "15:30 - 18:00",
+            poi_name: { vi: "Thắng Cảnh Eo Gió & Con Đường Đá Ven Biển", en: "Eo Gio Cliffside Walkway" },
+            activity: { vi: "Tản bộ trên lối đi hàng rào đỏ uốn lượn bên vách đá đón gió biển lồng lộng", en: "Scenic walk along dramatic coastal cliffs" },
+            cost_est: "25.000đ",
+            tips: { vi: "Đi tầm 16h00 nắng dịu vàng rực rỡ và không bị nóng", en: "Visit at 4 PM for golden light" },
+            img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80"
+          }
+        ]
+      },
+      {
+        id: 2,
+        persona_focus: "🏛️ Văn Hóa Chăm Pa & Ẩm Thực Xứ Nẫu",
+        title: { vi: "Phương Án 2: Tháp Đôi, Ghềnh Ráng Tiên Sa & Bánh Xèo Tôm Nhảy", en: "Option 2: Twin Towers, Ghenh Rang & Jumping Shrimp Pancakes" },
+        tagline: { vi: "Khám phá kiến trúc Chăm Pa cổ kính ngay lòng phố biển và thiên đường ẩm thực giá rẻ", en: "Ancient Champa architecture & authentic local seafood" },
+        slots: [
+          {
+            time: "09:00 - 11:30",
+            poi_name: { vi: "Tháp Đôi Quy Nhơn & Khu Du Lịch Ghềnh Ráng", en: "Twin Cham Towers & Ghenh Rang" },
+            activity: { vi: "Chiêm ngưỡng cụm tháp Chăm thế kỷ XII và bãi đá trứng Hoàng Hậu độc đáo", en: "12th-century Cham towers & Queen's Egg Stone Beach" },
+            cost_est: "40.000đ",
+            tips: { vi: "Bãi đá trứng có hàng ngàn viên đá tròn nhẵn như trứng chim khổng lồ", en: "Unique smooth boulder beach" },
+            img: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80"
+          }
+        ]
+      },
+      {
+        id: 3,
+        persona_focus: "🏝️ Làng Chài Bãi Xép & Chill Bên Biển",
+        title: { vi: "Phương Án 3: Làng Chài Bãi Xép, Đồi Cát Phương Mai & Surf Bar", en: "Option 3: Bai Xep Fishing Village & Surf Bar" },
+        tagline: { vi: "Một ngày sống chậm tại làng chài được Business Insider vinh danh là viên ngọc ẩn châu Á", en: "Slow living in Asia's hidden coastal gem" },
+        slots: [
+          {
+            time: "17:00 - 21:00",
+            poi_name: { vi: "Surf Bar Quy Nhơn — Cafe Ngay Bờ Cát Biển", en: "Surf Bar Beachfront Cafe" },
+            activity: { vi: "Ngồi dưới ánh đèn vàng lãng mạn ngay trên bãi cát nghe tiếng sóng biển rì rào", en: "Romantic candlelight drinks right on the sand" },
+            cost_est: "55.000đ",
+            tips: { vi: "Nước ép nhiệt đới và cocktail nhẹ giá rất hợp lý 45k-75k", en: "Fairly priced beach drinks" },
+            img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80"
+          }
+        ]
+      }
+    ],
+    pois: [
+      {
+        id: "poi-qn-1",
+        category: "SPECIALTY_FOOD",
+        name: { vi: "Bánh Xèo Tôm Nhảy Gia Vỹ 2", en: "Gia Vy Jumping Shrimp Crispy Pancakes" },
+        address: "Số 14 Diên Hồng, TP. Quy Nhơn",
+        hours: "07:00 - 21:30",
+        costDisplay: { vi: "35.000đ - 45.000đ / đĩa", en: "35,000 - 45,000 VND / plate" },
+        img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+        description: { vi: "Bánh xèo vỏ mỏng giòn rụm đúc cùng tôm đất đầm Thị Nại tươi rói đỏ au, cuốn bánh tráng rau mầm chấm nước mắm đậu phộng.", en: "Crispy rice pancakes topped with fresh lagoon shrimp and sprouts." },
+        rating: 4.94,
+        reviewsCount: 580,
+        verdictBadge: "TASTY_FAIR_PRICE",
+        reviews: [{ id: "rev-qn-1", author: "Lý Hải Đăng", rating: 5, date: "2026-10-19", spent: "80.000đ", verdict: "TASTY_FAIR_PRICE", content: "Tôm tươi ngọt lịm, vỏ bánh giòn tan cuốn rau mầm xoài chua ăn hoài không ngán!" }]
+      },
+      {
+        id: "poi-qn-2",
+        category: "ATTRACTION_TICKET",
+        name: { vi: "Thắng Cảnh Eo Gió & Làng Chài Nhơn Lý", en: "Eo Gio Coastal Cliffs & Nhon Ly Village" },
+        address: "Xã Nhơn Lý, Cách trung tâm Quy Nhơn 20km",
+        hours: "06:00 - 18:30",
+        costDisplay: { vi: "Vé vào cổng: 25.000đ / người", en: "Ticket: 25,000 VND" },
+        img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+        description: { vi: "Eo biển xanh ngắt được ôm trọn bởi hai dãy núi đá hùng vĩ uốn cong hình yên ngựa, đẹp tựa đảo Jeju Hàn Quốc.", en: "Breathtaking saddle-shaped rocky bay embracing turquoise waters." },
+        rating: 4.97,
+        reviewsCount: 920,
+        verdictBadge: "VERY_WORTH_IT",
+        reviews: [{ id: "rev-qn-2", author: "Trương Mỹ Linh", rating: 5, date: "2026-10-18", spent: "25.000đ", verdict: "VERY_WORTH_IT", content: "Giá vé chỉ 25k mà cảnh đẹp ngoạn mục, gió biển thổi mát rượi!" }]
+      }
+    ]
+  },
+
+  phuquoc: {
+    name: {
+      vi: "Phú Quốc (Resort 5 Sao & Hoàng Hôn Nam Đảo)",
+      en: "Phu Quoc (5-Star Luxury Resort & Sunset Town)",
+      ko: "푸꾸옥 (5성급 럭셔리 리조트 & 선셋 타운)",
+      ja: "フーコック島 (5つ星リゾート＆サンセットタウン)"
+    },
+    heroImg: "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1600&q=80",
+    weather: {
+      vi: "29°C • Nắng ấm nhiệt đới rực rỡ, biển êm xanh biếc và hoàng hôn tím",
+      en: "29°C • Warm tropical sunshine & calm turquoise sea",
+      ko: "29°C • 따뜻한 열대 햇살과 잔잔한 바다",
+      ja: "29°C • 暖かい南国の陽射しと穏やかな海"
+    },
+    hotel: {
+      vi: "Salinda Resort Phu Quoc Island (5 Sao - Bãi Trường Luxury)",
+      en: "Salinda Resort Phu Quoc Island (5-Star Luxury)",
+      ko: "살린다 리조트 푸꾸옥 아일랜드 (5성급)",
+      ja: "サリンダ・リゾート・フーコック・アイランド (5つ星)"
+    },
+    itineraries: [
+      {
+        id: 1,
+        persona_focus: "🏖️ Nghỉ Dưỡng 5 Sao & Hoàng Hôn Địa Trung Hải",
+        title: { vi: "Phương Án 1: Bãi Sao, Thị Trấn Hoàng Hôn, Cầu Hôn & Show Pháo Hoa", en: "Option 1: Sao Beach, Sunset Town, Kiss Bridge & Fireworks" },
+        tagline: { vi: "Trải nghiệm kỳ nghỉ 5 sao đỉnh cao (Comfort 99%) với hồ bơi vô cực và pháo hoa biển đêm", en: "Ultimate 5-star tropical luxury & nightly ocean fireworks" },
+        slots: [
+          {
+            time: "09:00 - 13:30",
+            poi_name: { vi: "Cáp Treo Vượt Biển Hòn Thơm & Bãi Sao Cát Trắng", en: "Hon Thom Sea Cable Car & Sao Beach" },
+            activity: { vi: "Đi cáp treo 3 dây vượt biển dài nhất thế giới ngắm toàn cảnh quần đảo An Thới từ trên cao", en: "World's longest over-water cable car over An Thoi archipelago" },
+            cost_est: "650.000đ",
+            tips: { vi: "Ngồi cabin phía hướng Tây để chụp trọn màu nước biển ngọc bích và tàu cá", en: "Sit on the west side of the cabin for best views" },
+            img: "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=600&q=80"
+          },
+          {
+            time: "16:30 - 21:30",
+            poi_name: { vi: "Cầu Hôn (Kiss Bridge), Chợ Đêm Vui Phết & Pháo Hoa", en: "Kiss Bridge, Vui-Fest Night Market & Fireworks" },
+            activity: { vi: "Ngắm mặt trời lặn chính giữa hai nhịp Cầu Hôn và thưởng thức show pháo hoa nghệ thuật trên biển", en: "Sunset at Kiss Bridge & nightly sea fireworks" },
+            cost_est: "250.000đ",
+            tips: { vi: "Khoảnh khắc hoàng hôn đẹp nhất từ 17h30 - 18h15", en: "Best sunset window is 5:30 - 6:15 PM" },
+            img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80"
+          }
+        ]
+      },
+      {
+        id: 2,
+        persona_focus: "🐠 Cano 3 Đảo & Lặn San Hô Nam Đảo",
+        title: { vi: "Phương Án 2: Hòn Móng Tay, Hòn Gầm Ghì & Hòn Mây Rút", en: "Option 2: 3-Island Speedboat & Coral Reef Tour" },
+        tagline: { vi: "Khám phá thiên đường đảo hoang Nam Phú Quốc và thưởng thức hải sản tươi sống", en: "Island hopping & coral reef adventure" },
+        slots: [
+          {
+            time: "08:30 - 15:30",
+            poi_name: { vi: "Tour Cano 3 Đảo: Hòn Móng Tay - Gầm Ghì - Mây Rút", en: "3-Island Speedboat Tour" },
+            activity: { vi: "Lặn ngắm rạn san hô tự nhiên ở độ sâu chỉ 1-2m và chụp ảnh ván SUP trên mặt biển trong vắt", en: "Snorkeling over shallow coral reefs & SUP photo shoot" },
+            cost_est: "550.000đ",
+            tips: { vi: "Kem chống nắng thân thiện rạn san hô được khuyến khích sử dụng", en: "Use reef-safe sunscreen" },
+            img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80"
+          }
+        ]
+      },
+      {
+        id: 3,
+        persona_focus: "🍹 Spa 5 Sao, Beach Club & Ẩm Thực Đảo Ngọc",
+        title: { vi: "Phương Án 3: Salinda Spa, Bún Quậy Kiến Xây & Sunset Sanato", en: "Option 3: 5-Star Spa, Kien Xay Noodle & Beach Club" },
+        tagline: { vi: "Tận hưởng trọn vẹn tiện nghi resort 5 sao, trà chiều thảo mộc và nhạc acoustic bên biển", en: "Pure 5-star relaxation & beachfront live music" },
+        slots: [
+          {
+            time: "10:00 - 12:00",
+            poi_name: { vi: "Bún Quậy Kiến Xây & Gỏi Cá Trích Làng Chài Hàm Ninh", en: "Kien Xay Stirred Noodles & Herring Salad" },
+            activity: { vi: "Thưởng thức tô bún quậy chả tôm cá quết tươi tại chỗ và gỏi cá trích cuốn dừa nạo", en: "Freshly pounded shrimp-fish noodles & coconut herring salad" },
+            cost_est: "150.000đ",
+            tips: { vi: "Tự pha chén muối ớt tắc đường đánh bông sủi bọt đúng chuẩn người Phú Quốc", en: "Whip the kumquat chili salt dip well" },
+            img: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=600&q=80"
+          }
+        ]
+      }
+    ],
+    pois: [
+      {
+        id: "poi-pq-1",
+        category: "SPECIALTY_FOOD",
+        name: { vi: "Bún Quậy Kiến Xây Phú Quốc (Chi Nhánh Chính)", en: "Kien Xay Original Stirred Seafood Noodles" },
+        address: "Số 28 Bạch Đằng, Phường Dương Đông, Phú Quốc",
+        hours: "07:00 - 23:00",
+        costDisplay: { vi: "65.000đ - 85.000đ / tô", en: "65,000 - 85,000 VND / bowl" },
+        img: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=800&q=80",
+        description: { vi: "Sợi bún gạo ép tươi tại chỗ trụng cùng chả tôm, chả cá thu tươi quết quanh thành tô và mực trứng ngọt lịm.", en: "Fresh rice noodles pressed on-site with shrimp paste, fish paste, and baby squid." },
+        rating: 4.93,
+        reviewsCount: 860,
+        verdictBadge: "TASTY_FAIR_PRICE",
+        reviews: [{ id: "rev-pq-1", author: "Nguyễn Khánh Toàn", rating: 5, date: "2026-10-19", spent: "70.000đ", verdict: "TASTY_FAIR_PRICE", content: "Nước dùng ngọt thanh tự nhiên từ tôm cá tươi, chấm muối tắc ớt xanh cực cuốn!" }]
+      },
+      {
+        id: "poi-pq-2",
+        category: "ATTRACTION_TICKET",
+        name: { vi: "Cầu Hôn (Kiss Bridge) & Thị Trấn Hoàng Hôn", en: "Kiss Bridge & Sunset Town Phu Quoc" },
+        address: "An Thới, Nam Đảo Phú Quốc",
+        hours: "07:00 - 22:30",
+        costDisplay: { vi: "Vé Cầu Hôn: 100.000đ / người", en: "Kiss Bridge ticket: 100,000 VND" },
+        img: "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=800&q=80",
+        description: { vi: "Biểu tượng kiến trúc nghệ thuật trên biển Nam Đảo được thiết kế bởi KTS Marco Casamonti (Ý), nơi ngắm hoàng hôn đẹp bậc nhất thế giới.", en: "Iconic over-water architectural masterpiece designed by Marco Casamonti." },
+        rating: 4.96,
+        reviewsCount: 1040,
+        verdictBadge: "VERY_WORTH_IT",
+        reviews: [{ id: "rev-pq-2", author: "Lê Bảo Ngọc", rating: 5, date: "2026-10-20", spent: "100.000đ", verdict: "VERY_WORTH_IT", content: "Kiến trúc Thị trấn Hoàng Hôn đẹp như miền Nam nước Ý, tối có bắn pháo hoa rực rỡ!" }]
+      }
+    ]
   }
 };
 
@@ -1503,9 +1995,17 @@ function applyI18nLabels() {
 // 4. DESTINATION & CUSTOM BUDGET PLANNER ENGINE
 // ============================================================================
 
+function getResolvedDestKey() {
+  if (state.selectedDestination === 'blind') {
+    return (window.cwState && window.cwState.aiMatchedDestKey) || 'mangden';
+  }
+  return state.selectedDestination || 'hochiminh';
+}
+window.getResolvedDestKey = getResolvedDestKey;
+
 function getCurrentDestData() {
-  const destKey = state.selectedDestination === 'blind' ? 'dalat' : state.selectedDestination;
-  return DESTINATION_DATA[destKey] || DESTINATION_DATA['hochiminh'];
+  const destKey = getResolvedDestKey();
+  return DESTINATION_DATA[destKey] || DESTINATION_DATA['dalat'] || DESTINATION_DATA['hochiminh'];
 }
 
 function renderDestinationHero() {
@@ -1586,13 +2086,17 @@ function renderTripSummaryCard() {
   const destName = data.name[state.currentLang] || data.name.vi;
   const hotelName = data.hotel[state.currentLang] || data.hotel.vi;
 
-  const destKey = state.selectedDestination === 'blind' ? 'dalat' : state.selectedDestination;
-  let flightRoute = { origin: "SGN", originCity: "TP. Hồ Chí Minh", dest: "DLI", destCity: "Đà Lạt (Liên Khương)", flightNo: "VN-9920", terminal: "T1 - Sảnh A" };
-  if (destKey === 'hochiminh') {
-    flightRoute = { origin: "HAN", originCity: "Hà Nội (Nội Bài)", dest: "SGN", destCity: "TP. Hồ Chí Minh (Tân Sơn Nhất)", flightNo: "VN-8842", terminal: "T2 - Cổng 04" };
-  } else if (destKey === 'danang') {
-    flightRoute = { origin: "SGN", originCity: "TP. Hồ Chí Minh (SGN)", dest: "DAD", destCity: "Đà Nẵng (Quốc tế)", flightNo: "VN-7718", terminal: "T1 - Cổng 08" };
-  }
+  const destKey = getResolvedDestKey();
+  const flightRoutesMap = {
+    dalat: { origin: "SGN", originCity: "TP. Hồ Chí Minh (SGN)", dest: "DLI", destCity: "Đà Lạt (Liên Khương)", flightNo: "VN-9920", terminal: "T1 - Sảnh A" },
+    mangden: { origin: "SGN", originCity: "TP. Hồ Chí Minh (SGN)", dest: "PXU", destCity: "Pleiku ➔ Limousine Măng Đen", flightNo: "VN-7310", terminal: "T1 - Cổng 06" },
+    hue: { origin: "SGN", originCity: "TP. Hồ Chí Minh (SGN)", dest: "HUI", destCity: "Cố đô Huế (Phú Bài)", flightNo: "VN-1372", terminal: "T1 - Cổng 03" },
+    quynhon: { origin: "SGN", originCity: "TP. Hồ Chí Minh (SGN)", dest: "UIH", destCity: "Quy Nhơn (Phù Cát)", flightNo: "QH-1402", terminal: "T1 - Cổng 05" },
+    phuquoc: { origin: "SGN", originCity: "TP. Hồ Chí Minh (SGN)", dest: "PQC", destCity: "Phú Quốc (Quốc tế Nam Đảo)", flightNo: "VN-1825", terminal: "T1 - Cổng 09" },
+    hochiminh: { origin: "HAN", originCity: "Hà Nội (Nội Bài)", dest: "SGN", destCity: "TP. Hồ Chí Minh (Tân Sơn Nhất)", flightNo: "VN-8842", terminal: "T2 - Cổng 04" },
+    danang: { origin: "SGN", originCity: "TP. Hồ Chí Minh (SGN)", dest: "DAD", destCity: "Đà Nẵng (Quốc tế)", flightNo: "VN-7718", terminal: "T1 - Cổng 08" }
+  };
+  const flightRoute = flightRoutesMap[destKey] || flightRoutesMap.dalat;
 
   let hotelTierDesc = "";
   if (budget < 3500000) {
@@ -2629,6 +3133,537 @@ const DETAILED_DAY_PLANS = {
         }
       ]
     }
+  ],
+
+  mangden: [
+    {
+      day: 1,
+      title: "Ngày 1: Chạm Ngõ Đại Ngàn Măng Đen, Rừng Thông Cổ Thụ & Lẩu Xuyên Tiêu",
+      tagline: "Hạ cánh sân bay Pleiku, xe Limousine đưa thẳng lên cao nguyên 1.200m se lạnh 18°C ngập tràn hương thông non.",
+      slots: [
+        {
+          time: "08:00 - 11:00",
+          type: "EXPERIENCE",
+          typeName: "🚐 Cung Đường Đại Ngàn",
+          poiName: "Sân Bay Pleiku ➔ Cung Đường Thông Cổ Thụ Măng Đen",
+          area: "Quốc lộ 24, Kon Plông, Măng Đen",
+          desc: "Di chuyển bằng Limousine VIP qua đèo Măng Đen mờ sương và check-in đại lộ thông ba lá đẹp như châu Âu.",
+          tip: "Mở hé cửa kính đoạn vào thị trấn để hít thở bầu không khí rừng thông nguyên sinh mát lạnh 18°C.",
+          img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.05
+        },
+        {
+          time: "12:00 - 13:30",
+          type: "FOOD",
+          typeName: "🍗 Đặc Sản Rừng Núi",
+          poiName: "Gà Nướng Cơm Lam Cô Sinh Chính Gốc",
+          area: "Thị trấn Măng Đen, Kon Plông",
+          desc: "Thưởng thức gà bản địa chạy bộ nướng lá tiêu rừng mật ong vàng óng kèm cơm lam ống nứa non dẻo thơm.",
+          tip: "Chấm gà nướng với muối hột giã lá é và ớt hiểm xanh rừng Tây Nguyên.",
+          img: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.06
+        },
+        {
+          time: "15:00 - 17:30",
+          type: "CAFE",
+          typeName: "☕ Cà Phê Rang Củi",
+          poiName: "De Vivre Café & Hồ Đăk Ke Tĩnh Lặng",
+          area: "Đường Hồ Xuân Hương, Măng Đen",
+          desc: "Nhâm nhi ly cà phê Arabica rang củi thủ công trên hiên gỗ nhìn xuống thung lũng thông và dạo quanh hồ Đăk Ke.",
+          tip: "Thời điểm 16h30 sương mù bắt đầu giăng nhẹ trên mặt hồ tạo khung cảnh vô cùng thơ mộng.",
+          img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.03
+        },
+        {
+          time: "18:30 - 20:30",
+          type: "FOOD",
+          typeName: "🍲 Ẩm Thực Đêm Lạnh",
+          poiName: "Lẩu Xuyên Tiêu Măng Đen",
+          area: "Trung tâm Măng Đen",
+          desc: "Sưởi ấm trong tiết trời 15°C với nồi lẩu hai ngăn xuyên tiêu cay nồng và thảo mộc táo đỏ kỷ tử ngọt thanh.",
+          tip: "Nhúng kèm rau rừng tươi và nấm hương Măng Đen vừa hái trong ngày.",
+          img: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.07
+        }
+      ]
+    },
+    {
+      day: 2,
+      title: "Ngày 2: Săn Mây Đỉnh Ngọc Lễ, Thác Pa Sỹ & Làng Cộng Đồng Kon Pring",
+      tagline: "Đón biển mây trắng xóa lúc bình minh, trekking thác rừng nguyên sinh và giao lưu văn hóa bản địa Mơ Nâm.",
+      slots: [
+        {
+          time: "05:45 - 08:30",
+          type: "EXPERIENCE",
+          typeName: "☁️ Săn Biển Mây Sớm",
+          poiName: "Đồi Săn Mây Đường Trần Nhân Tông & Khu 37 Hộ",
+          area: "Khu 37 Hộ, Măng Đen",
+          desc: "Ngắm biển mây cuồn cuộn tràn qua các triền đồi thông khi mặt trời vừa ló rạng và ăn sáng bánh canh cá lóc.",
+          tip: "Bánh canh cá lóc A Kay nấu trong nồi đất sôi sùng sục giúp ấm người ngay lập tức.",
+          img: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.04
+        },
+        {
+          time: "09:30 - 12:00",
+          type: "ATTRACTION",
+          typeName: "🌊 Thác Rừng Nguyên Sinh",
+          poiName: "Khu Du Lịch Sinh Thái Thác Pa Sỹ & Chùa Khánh Lâm",
+          area: "Xã Măng Cành, Kon Plông",
+          desc: "Đi bộ dưới tán rừng già hàng trăm năm tuổi xuống chân thác Pa Sỹ cao 45m và viếng chùa Khánh Lâm thanh tịnh.",
+          tip: "Mang giày thể thao đế bám tốt để đi bậc đá rêu phong mát lạnh.",
+          img: "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.04
+        },
+        {
+          time: "14:30 - 17:30",
+          type: "ATTRACTION",
+          typeName: "🏡 Bản Làng & Nông Trại",
+          poiName: "Làng Văn Hóa Kon Pring & Nông Trại Hữu Cơ Ê Ban Farm",
+          area: "Măng Đen, Kon Plông",
+          desc: "Khám phá nhà rông của đồng bào Mơ Nâm, hái dâu tây và cam sành hữu cơ chín mọng trên sườn đồi.",
+          tip: "Mua mật ong rừng và măng khô Măng Đen chính gốc của bà con bản địa về làm quà.",
+          img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.06
+        }
+      ]
+    },
+    {
+      day: 3,
+      title: "Ngày 3: Hồ Đam Bri, Mua Đặc Sản Rừng & Khởi Hành Về Lại",
+      tagline: "Thư giãn trọn buổi sáng giữa rừng thông, mua sâm dây Ngọc Linh và tạm biệt cao nguyên xanh.",
+      slots: [
+        {
+          time: "08:00 - 11:00",
+          type: "CAFE",
+          typeName: "🌲 Tĩnh Tâm Rừng Thông",
+          poiName: "Bạch Dương Café & Chợ Phiên Măng Đen",
+          area: "Trung tâm Măng Đen",
+          desc: "Thưởng thức trà sâm dây ấm nóng và chọn mua tiêu rừng, chuối hột rừng, thịt heo gác bếp Tây Nguyên.",
+          tip: "Tiêu rừng Măng Đen có hương thơm sả chanh tự nhiên rất đặc biệt.",
+          img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.05
+        },
+        {
+          time: "13:00 - 16:00",
+          type: "EXPERIENCE",
+          typeName: "✈️ Tiễn Sân Bay Pleiku",
+          poiName: "Limousine Măng Đen ➔ Sân Bay Pleiku (PXU)",
+          area: "Pleiku, Gia Lai",
+          desc: "Xe đưa quý khách về lại sân bay Pleiku làm thủ tục bay về, khép lại hành trình chữa lành 100%.",
+          tip: "Hành lý ký gửi 20kg đã bao gồm sẵn để thoải mái mang đặc sản về.",
+          img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.04
+        }
+      ]
+    },
+    {
+      day: 4,
+      title: "Ngày 4: Trekking Đỉnh Ngọc Lễ & Suối Đá Cổ Thụ",
+      tagline: "Dành cho gói 4N3Đ khám phá sâu thiên nhiên hoang sơ bậc nhất Kon Plông.",
+      slots: [
+        {
+          time: "08:00 - 15:00",
+          type: "EXPERIENCE",
+          typeName: "🥾 Trekking Đỉnh Cao",
+          poiName: "Cung Trekking Đỉnh Ngọc Lễ (1.720m)",
+          area: "Măng Đen",
+          desc: "Chinh phục nóc nhà Măng Đen ngắm toàn cảnh đại ngàn xanh thẳm từ độ cao 1.720m.",
+          tip: "Có hướng dẫn viên bản địa đi kèm chuẩn bị bữa trưa dã ngoại trong rừng.",
+          img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.08
+        }
+      ]
+    }
+  ],
+
+  hue: [
+    {
+      day: 1,
+      title: "Ngày 1: Kinh Thành Đại Nội Huế, Cà Phê Muối Gốc & Du Thuyền Sông Hương",
+      tagline: "Bước vào không gian di sản UNESCO uy nghiêm, thưởng thức bún bò Mệ Kéo và nghe ca Huế trên dòng Hương Giang.",
+      slots: [
+        {
+          time: "08:30 - 11:30",
+          type: "ATTRACTION",
+          typeName: "🏛️ Di Sản Thế Giới UNESCO",
+          poiName: "Hoàng Thành Huế (Đại Nội) & Điện Kiến Trung",
+          area: "Đường 23 Tháng 8, Thuận Hòa, TP. Huế",
+          desc: "Tham quan Ngọ Môn, Điện Thái Hòa, Thế Miếu và lầu Điện Kiến Trung nguy nga vừa được phục dựng hoàn mỹ.",
+          tip: "Mặc trang phục nhã nhặn hoặc cổ phục Việt để có bộ ảnh kỷ niệm tuyệt đẹp tại hành lang Tử Cấm Thành.",
+          img: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.05
+        },
+        {
+          time: "12:00 - 13:30",
+          type: "FOOD",
+          typeName: "🍜 Tinh Hoa Bánh Huế",
+          poiName: "Bánh Bèo Nậm Lọc Bà Đỏ & Cơm Hến Hoa Đông",
+          area: "Số 8 Nguyễn Bỉnh Khiêm, TP. Huế",
+          desc: "Thưởng thức khay bánh bèo chén tôm chấy, bánh nậm lá dong, bánh bột lọc nhân tôm thịt và bánh ram ít giòn dẻo.",
+          tip: "Tráng miệng bằng chè hạt sen bọc nhãn lồng thanh mát đặc sản cung đình.",
+          img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.05
+        },
+        {
+          time: "15:00 - 17:30",
+          type: "CAFE",
+          typeName: "☕ Cà Phê Muối & Chùa Cổ",
+          poiName: "Cà Phê Muối 142 Đặng Thái Thân & Chùa Thiên Mụ",
+          area: "Kim Long, TP. Huế",
+          desc: "Thưởng thức ly cà phê muối tại quán khai sinh đầu tiên ở Huế rồi ngắm hoàng hôn buông xuống tháp Phước Duyên bên sông Hương.",
+          tip: "Đứng ở bến thuyền trước cổng chùa Thiên Mụ lúc 17h15 ngắm mặt trời đỏ rực lặn xuống dòng sông.",
+          img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.03
+        },
+        {
+          time: "19:00 - 21:00",
+          type: "EXPERIENCE",
+          typeName: "🎶 Nhã Nhạc & Thả Hoa Đăng",
+          poiName: "Thuyền Rồng Nghe Ca Huế Trên Sông Hương",
+          area: "Bến Tòa Khâm, Lê Lợi, TP. Huế",
+          desc: "Lắng nghe những làn điệu Nam Ai, Nam Bình sâu lắng giữa dòng sông Hương lung linh ánh đèn cầu Trường Tiền.",
+          tip: "Tự tay thả chiếc hoa đăng giấy cầu bình an và may mắn cho gia đình.",
+          img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.05
+        }
+      ]
+    },
+    {
+      day: 2,
+      title: "Ngày 2: Lăng Tự Đức, Làng Hương Thủy Xuân & Ngâm Khoáng Nóng Alba",
+      tagline: "Hành trình kết hợp kiến trúc lăng tẩm thơ mộng và trị liệu suối khoáng nóng Onsen tự nhiên.",
+      slots: [
+        {
+          time: "08:00 - 11:30",
+          type: "ATTRACTION",
+          typeName: "🏯 Tuyệt Tác Lăng Tẩm",
+          poiName: "Lăng Tự Đức (Khiêm Lăng), Lăng Khải Định & Làng Hương Thủy Xuân",
+          area: "Đường Huyền Trân Công Chúa, TP. Huế",
+          desc: "Chiêm ngưỡng sự đối lập thú vị giữa vẻ thơ mộng sơn thủy hữu tình của Lăng Tự Đức và nghệ thuật khảm sành sứ đỉnh cao tại Lăng Khải Định.",
+          tip: "Ghé làng hương Thủy Xuân ngay trên trục đường để chụp ảnh cùng những đóa hương xòe rực rỡ.",
+          img: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.07
+        },
+        {
+          time: "13:30 - 17:30",
+          type: "EXPERIENCE",
+          typeName: "♨️ Tắm Khoáng Nóng Onsen",
+          poiName: "Khu Nghỉ Dưỡng Suối Khoáng Nóng Alba Thanh Tân",
+          area: "Phong Sơn, Phong Điền, Huế",
+          desc: "Ngâm mình thư giãn trong dòng suối khoáng nóng tự nhiên chảy ra từ chân núi Trường Sơn giúp phục hồi cơ thể.",
+          tip: "Gói WanderMatch Huế đã tặng kèm vé ngâm suối khoáng nóng cho quý khách.",
+          img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.06
+        }
+      ]
+    },
+    {
+      day: 3,
+      title: "Ngày 3: Bún Bò Mệ Kéo, Chợ Đông Ba & Tiễn Sân Bay Phú Bài",
+      tagline: "Thưởng thức bữa sáng đậm chất Huế, mua mè xửng Thiên Hương, trà cung đình và khởi hành về lại.",
+      slots: [
+        {
+          time: "07:30 - 10:30",
+          type: "FOOD",
+          typeName: "🍜 Bữa Sáng Gia Truyền & Mua Quà",
+          poiName: "Bún Bò Mệ Kéo & Chợ Đông Ba Huế",
+          area: "Đường Trần Hưng Đạo, TP. Huế",
+          desc: "Ăn sáng bún bò Huế chính gốc bên bờ sông và mua đặc sản tôm chua Trọng Tín, mè xửng giòn, dầu tràm Huế.",
+          tip: "Khu đình chính chợ Đông Ba niêm yết giá rõ ràng cho du khách.",
+          img: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.06
+        },
+        {
+          time: "14:00 - 16:00",
+          type: "EXPERIENCE",
+          typeName: "✈️ Tiễn Sân Bay Phú Bài",
+          poiName: "Pilgrimage Village Resort ➔ Sân Bay Quốc Tế Phú Bài (HUI)",
+          area: "Hương Thủy, Thừa Thiên Huế",
+          desc: "Xe riêng tiễn quý khách ra nhà ga T2 mới sân bay Phú Bài mang kiến trúc cung đình Huế độc đáo.",
+          tip: "Nhà ga T2 Phú Bài có góc check-in mái chồng diêm rất đẹp.",
+          img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.03
+        }
+      ]
+    },
+    {
+      day: 4,
+      title: "Ngày 4: Phá Tam Giang, Rừng Rú Chá & Hoàng Hôn Đầm Chuồn",
+      tagline: "Mở rộng hành trình 4N3Đ về miền đầm phá mênh mông.",
+      slots: [
+        {
+          time: "14:30 - 18:30",
+          type: "EXPERIENCE",
+          typeName: "🛶 Du Ngoạn Đầm Phá",
+          poiName: "Rừng Ngập Mặn Rú Chá & Nhà Chồ Đầm Chuồn",
+          area: "Phú Vang, Thừa Thiên Huế",
+          desc: "Đi thuyền gỗ ra nhà chồ giữa đầm phá thưởng thức hải sản nước lợ tươi ngọt và ngắm hoàng hôn tím.",
+          tip: "Đừng bỏ lỡ món bánh khoái cá kình giòn rụm đặc trưng vùng đầm Chuồn.",
+          img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.07
+        }
+      ]
+    }
+  ],
+
+  quynhon: [
+    {
+      day: 1,
+      title: "Ngày 1: Phố Biển Quy Nhơn, Tháp Đôi Chăm Pa & Đại Tiệc Hải Sản Xuân Diệu",
+      tagline: "Nhận phòng resort 5 sao hướng biển, khám phá di sản Chăm Pa và thưởng thức bánh xèo tôm nhảy trứ danh.",
+      slots: [
+        {
+          time: "09:30 - 12:30",
+          type: "FOOD",
+          typeName: "🦐 Đặc Sản Xứ Nẫu",
+          poiName: "Sân Bay Phù Cát ➔ Bánh Xèo Tôm Nhảy Gia Vỹ 2",
+          area: "14 Diên Hồng, TP. Quy Nhơn",
+          desc: "Xe đón từ sân bay Phù Cát về trung tâm thành phố thưởng thức đĩa bánh xèo tôm đất tươi nhảy tanh tách giòn rụm.",
+          tip: "Cuốn bánh xèo với bánh tráng mỏng, rau mầm cải cay và xoài xanh thái sợi chấm nước mắm đậu phộng.",
+          img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.05
+        },
+        {
+          time: "15:00 - 17:30",
+          type: "ATTRACTION",
+          typeName: "🏖️ Ghềnh Đá & Bãi Biển",
+          poiName: "Ghềnh Ráng Tiên Sa, Bãi Trứng Hoàng Hậu & Tháp Đôi",
+          area: "Phường Ghềnh Ráng, TP. Quy Nhơn",
+          desc: "Tham quan cụm Tháp Đôi kiến trúc Chăm Pa cổ kính và dạo bước trên bãi đá trứng tròn nhẵn bên bờ biển xanh biếc.",
+          tip: "Từ đồi Thi Nhân nhìn xuống toàn cảnh đường cong bãi biển Quy Nhơn hình vầng trăng khuyết tuyệt đẹp.",
+          img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.04
+        },
+        {
+          time: "18:30 - 21:00",
+          type: "FOOD",
+          typeName: "🦀 Phố Hải Sản & Surf Bar",
+          poiName: "Phố Ẩm Thực Ngô Văn Sở & Surf Bar Bờ Biển",
+          area: "Đường Xuân Diệu, TP. Quy Nhơn",
+          desc: "Thưởng thức ốc biển, ghẹ hấp sả, nhum nướng mỡ hành giá niêm yết bình dân và uống nước dừa mát lạnh ngay trên bãi cát Surf Bar.",
+          tip: "Các quán ốc đường Ngô Văn Sở và Ngọc Hân Công Chúa đều có bảng giá rõ ràng từng đĩa 30k-60k.",
+          img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.07
+        }
+      ]
+    },
+    {
+      day: 2,
+      title: "Ngày 2: Cano Đảo Kỳ Co Nước 2 Màu, Lặn San Hô Bãi Dứa & Eo Gió",
+      tagline: "Trọn ngày khám phá cung đường biển đảo đẹp nhất miền Trung: Cầu vượt biển Thị Nại — Kỳ Co — Eo Gió.",
+      slots: [
+        {
+          time: "08:00 - 12:00",
+          type: "ATTRACTION",
+          typeName: "🚤 Thiên Đường Đảo Kỳ Co",
+          poiName: "Cano Làng Chài Nhơn Lý ➔ Bãi Kỳ Co & Lặn San Hô Bãi Dứa",
+          area: "Xã đảo Nhơn Lý, Quy Nhơn",
+          desc: "Đi cano lướt sóng 15 phút ra bãi biển Kỳ Co cát trắng mịn nước xanh ngọc bích và lặn ngắm rạn san hô tự nhiên tại Bãi Dứa.",
+          tip: "Chụp ảnh tại hồ bơi tự nhiên trong vắt nằm giữa các ghềnh đá ở cuối bãi Kỳ Co.",
+          img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.10
+        },
+        {
+          time: "12:15 - 14:00",
+          type: "FOOD",
+          typeName: "🦞 Bữa Trưa Hải Sản Làng Chài",
+          poiName: "Hải Sản Tươi Sống Làng Chài Nhơn Lý (7 Món)",
+          area: "Làng chài Nhơn Lý",
+          desc: "Thưởng thức hàu nướng phô mai, tôm hấp nước dừa, mực lá hấp gừng, cháo hải sản và bánh xèo mực vừa đánh bắt.",
+          tip: "Sau bữa trưa có võng mát dưới hiên nhà làng chài để nghỉ ngơi tránh nắng trưa.",
+          img: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.07
+        },
+        {
+          time: "15:30 - 18:00",
+          type: "ATTRACTION",
+          typeName: "🌅 Tuyệt Tác Eo Gió",
+          poiName: "Thắng Cảnh Eo Gió & Con Đường Bích Họa Nhơn Lý",
+          area: "Xã Nhơn Lý, Quy Nhơn",
+          desc: "Dạo bước trên cung đường bậc đá lưng chừng núi ôm trọn eo biển xanh thẳm và ngắm hoàng hôn buông xuống đại dương.",
+          tip: "Con hẻm đá xanh dẫn ra biển trong làng chài Nhơn Lý lên ảnh đẹp như phim Hàn Quốc.",
+          img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.03
+        }
+      ]
+    },
+    {
+      day: 3,
+      title: "Ngày 3: Bún Chả Cá Ngọc Liên, Mua Bánh Ít Lá Gai & Tiễn Sân Bay",
+      tagline: "Thưởng thức bữa sáng đặc sản Quy Nhơn, nghỉ ngơi tại bãi biển riêng Avani Resort và bay về.",
+      slots: [
+        {
+          time: "07:30 - 10:00",
+          type: "FOOD",
+          typeName: "🍜 Bữa Sáng Đặc Sản",
+          poiName: "Bún Chả Cá & Bún Sứa Ngọc Liên",
+          area: "379 Nguyễn Huệ, TP. Quy Nhơn",
+          desc: "Tô bún chả cá thu mỏng dai ngọt lịm kết hợp sứa biển giòn sần sật trong làn nước dùng hầm xương cá trong veo.",
+          tip: "Mua thêm chả cá Quy Nhơn chính hiệu và bánh ít lá gai Bà Dư về làm quà.",
+          img: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.05
+        },
+        {
+          time: "13:30 - 15:30",
+          type: "EXPERIENCE",
+          typeName: "✈️ Tiễn Sân Bay Phù Cát",
+          poiName: "Avani Quy Nhon Resort ➔ Sân Bay Phù Cát (UIH)",
+          area: "Phù Cát, Bình Định",
+          desc: "Xe riêng đón quý khách tại sảnh resort đưa thẳng ra sân bay Phù Cát làm thủ tục chuyến bay về.",
+          tip: "Trên đường ra sân bay xe đi ngang Tháp Bánh Ít có thể dừng chụp ảnh kỷ niệm.",
+          img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.03
+        }
+      ]
+    },
+    {
+      day: 4,
+      title: "Ngày 4: Đảo Cù Lao Xanh — Hòn Ngọc Biển Đông",
+      tagline: "Lịch trình mở rộng 4N3Đ khám phá đảo tiền tiêu Cù Lao Xanh.",
+      slots: [
+        {
+          time: "07:30 - 16:00",
+          type: "ATTRACTION",
+          typeName: "🏝️ Đảo Cù Lao Xanh",
+          poiName: "Hải Đăng Cù Lao Xanh & Bãi Đá Thảo Nguyên",
+          area: "Xã đảo Nhơn Châu, Quy Nhơn",
+          desc: "Chinh phục ngọn hải đăng hơn 100 năm tuổi và lặn biển ngắm rạn san hô nguyên sơ.",
+          tip: "Nước biển Cù Lao Xanh trong đến mức đứng trên bờ vẫn thấy từng đàn cá bơi lội.",
+          img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.09
+        }
+      ]
+    }
+  ],
+
+  phuquoc: [
+    {
+      day: 1,
+      title: "Ngày 1: Nhận Phòng Resort 5 Sao Salinda, Bún Quậy Kiến Xây & Sunset Beach Club",
+      tagline: "Tận hưởng dịch vụ nghỉ dưỡng 5 sao đỉnh cao bên bờ biển Bãi Trường và ngắm hoàng hôn nhiệt đới.",
+      slots: [
+        {
+          time: "10:30 - 13:00",
+          type: "FOOD",
+          typeName: "🍜 Đặc Sản Đảo Ngọc",
+          poiName: "Sân Bay Phú Quốc ➔ Bún Quậy Kiến Xây Chính Gốc",
+          area: "28 Bạch Đằng, Dương Đông, Phú Quốc",
+          desc: "Xe riêng đón tại sân bay đưa đi thưởng thức tô bún tươi ép nóng tại chỗ cùng chả tôm, chả cá thu tươi và mực trứng.",
+          tip: "Đừng quên tự pha chén nước chấm muối đường tắc ớt xay đánh bông đặc trưng.",
+          img: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.04
+        },
+        {
+          time: "14:00 - 17:30",
+          type: "EXPERIENCE",
+          typeName: "🏖️ Nghỉ Dưỡng 5 Sao & Hồ Bơi Vô Cực",
+          poiName: "Salinda Resort Phu Quoc Island (Hồ Bơi Điện Phân Muối & Bãi Biển Riêng)",
+          area: "Bãi Trường, Dương Tơ, Phú Quốc",
+          desc: "Nhận phòng Deluxe hướng biển, thưởng thức trà chiều chào mừng và thư giãn tại hồ bơi vô cực sát bờ cát vàng.",
+          tip: "Bãi Trường là nơi mặt trời lặn thẳng xuống mặt biển đẹp nhất đảo Phú Quốc.",
+          img: "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.05
+        },
+        {
+          time: "18:30 - 21:30",
+          type: "FOOD",
+          typeName: "🦞 Gỏi Cá Trích & Hải Sản Hàm Ninh",
+          poiName: "Nhà Hàng Ra Khơi & Chợ Đêm Phú Quốc",
+          area: "Đường 30 Tháng 4, Dương Đông",
+          desc: "Thưởng thức gỏi cá trích cuốn bánh tráng dừa nạo rau rừng, ghẹ Hàm Ninh hấp tươi ngọt và kem cuộn nhiệt đới.",
+          tip: "Gỏi cá trích cuốn cùng đọt bứa, lá bằng lăng rừng chấm nước mắm Phú Quốc 40 độ đạm đậu phộng rang.",
+          img: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.08
+        }
+      ]
+    },
+    {
+      day: 2,
+      title: "Ngày 2: Cáp Treo Vượt Biển Hòn Thơm, Bãi Sao & Pháo Hoa Thị Trấn Hoàng Hôn",
+      tagline: "Bay trên đại dương xanh ngọc bích, dạo bước Cầu Hôn (Kiss Bridge) và mãn nhãn với pháo hoa biển đêm.",
+      slots: [
+        {
+          time: "08:30 - 13:30",
+          type: "ATTRACTION",
+          typeName: "🚠 Cáp Treo Vượt Biển Dài Nhất Thế Giới",
+          poiName: "Sun World Hon Thom Nature Park & Công Viên Nước Aquatopia",
+          area: "An Thới, Nam Đảo Phú Quốc",
+          desc: "Trải nghiệm tuyến cáp treo vượt biển gần 8km ngắm toàn cảnh quần đảo An Thới và tắm biển dưới rặng dừa Hòn Thơm.",
+          tip: "Vé cáp treo đã bao gồm trọn gói vui chơi công viên nước Aquatopia hiện đại.",
+          img: "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.11
+        },
+        {
+          time: "14:30 - 16:30",
+          type: "CAFE",
+          typeName: "🏝️ Bãi Biển Cát Trắng Kem",
+          poiName: "Bãi Sao Phú Quốc — Cát Trắng Mịn & Rặng Dừa Nghiêng",
+          area: "Ấp Bãi Sao, An Thới",
+          desc: "Tắm biển tại bãi biển có dải cát trắng mịn như kem và chụp ảnh bên những cây dừa vươn mình ra làn nước trong vắt.",
+          tip: "Sóng ở Bãi Sao rất êm đềm, cực kỳ lý tưởng để bơi lội và chèo thuyền kayak.",
+          img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.03
+        },
+        {
+          time: "17:00 - 21:45",
+          type: "EXPERIENCE",
+          typeName: "🎆 Cầu Hôn & Show Pháo Hoa Biển",
+          poiName: "Thị Trấn Hoàng Hôn (Sunset Town), Cầu Hôn & Chợ Đêm Vui Phết",
+          area: "An Thới, Nam Đảo Phú Quốc",
+          desc: "Dạo bước giữa những con dốc kiến trúc Địa Trung Hải rực rỡ, đón hoàng hôn trên Cầu Hôn và xem pháo hoa nghệ thuật lúc 21h30.",
+          tip: "Các gian hàng tại chợ đêm Vui Phết (VUI-Fest Bazaar) đều niêm yết giá công khai và có biểu diễn đường phố sôi động.",
+          img: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.07
+        }
+      ]
+    },
+    {
+      day: 3,
+      title: "Ngày 3: Buffet Sáng Rượu Vang Sủi 5 Sao, Mua Ngọc Trai / Hồ Tiêu & Tiễn Sân Bay",
+      tagline: "Thưởng thức bữa sáng thượng lưu có tiếng đàn piano sống tại Salinda Resort trước khi ra sân bay.",
+      slots: [
+        {
+          time: "07:30 - 10:30",
+          type: "FOOD",
+          typeName: "🥂 Buffet Sáng 5 Sao Có Piano Live",
+          poiName: "Thực Đơn Buffet Sáng Thượng Lưu Salinda Resort",
+          area: "Salinda Resort, Bãi Trường",
+          desc: "Thưởng thức hơn 100 món Á - Âu cùng rượu vang sủi Sparkling Wine trong tiếng đàn dương cầm trực tiếp.",
+          tip: "Đây là một trong những bữa sáng resort 5 sao được du khách quốc tế đánh giá cao nhất Phú Quốc.",
+          img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.04
+        },
+        {
+          time: "13:30 - 15:30",
+          type: "EXPERIENCE",
+          typeName: "✈️ Tiễn Sân Bay Phú Quốc",
+          poiName: "Salinda Resort ➔ Sân Bay Quốc Tế Phú Quốc (PQC)",
+          area: "Dương Tơ, Phú Quốc",
+          desc: "Xe riêng của resort đưa tiễn quý khách ra sân bay Phú Quốc (chỉ cách 10 phút di chuyển) hoàn tất kỳ nghỉ 5 sao.",
+          tip: "Lưu ý nước mắm Phú Quốc độ đạm cao cần đóng thùng chuyên dụng theo quy định hãng bay.",
+          img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.03
+        }
+      ]
+    },
+    {
+      day: 4,
+      title: "Ngày 4: Tour Cano 3 Đảo Hoang Sơ (Hòn Móng Tay — Gầm Ghì — Mây Rút)",
+      tagline: "Lịch trình mở rộng 4N3Đ dành cho tín đồ yêu biển đảo và lặn ngắm san hô.",
+      slots: [
+        {
+          time: "08:30 - 16:00",
+          type: "ATTRACTION",
+          typeName: "🐠 Lặn Ngắm San Hô 3 Đảo",
+          poiName: "Quần Đảo An Thới: Hòn Móng Tay - Hòn Gầm Ghì - Hòn Mây Rút",
+          area: "Nam Đảo Phú Quốc",
+          desc: "Lặn ngắm vương quốc san hô rực rỡ sắc màu và chụp ảnh flycam trên chiếc ván SUP giữa làn nước xanh ngọc.",
+          tip: "Đã bao gồm đội ngũ quay chụp ảnh flycam và bữa trưa hải sản trên đảo.",
+          img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80",
+          costRatio: 0.10
+        }
+      ]
+    }
   ]
 };
 
@@ -2643,9 +3678,9 @@ function renderDetailedDayItinerary() {
   const destName = data.name[state.currentLang] || data.name.vi;
   const hotelName = data.hotel[state.currentLang] || data.hotel.vi;
 
-  const destKey = state.selectedDestination === 'blind' ? 'dalat' : state.selectedDestination;
+  const destKey = getResolvedDestKey();
   const daysCount = state.selectedDuration === '2d1n' ? 2 : state.selectedDuration === '4d3n' ? 4 : 3;
-  const fullPlans = (DETAILED_DAY_PLANS[destKey] || DETAILED_DAY_PLANS['hochiminh']).slice(0, daysCount);
+  const fullPlans = (DETAILED_DAY_PLANS[destKey] || DETAILED_DAY_PLANS['dalat'] || DETAILED_DAY_PLANS['hochiminh']).slice(0, daysCount);
 
   // Tính chi phí phòng khách sạn phân bổ mỗi ngày
   const dailyHotelCost = Math.round((budget * 0.4) / Math.max(1, daysCount - 1));
@@ -2885,9 +3920,9 @@ function copyFullItineraryToClipboard() {
   text += `🏨 Khách sạn đối tác: ${getCurrentDestData().hotel.vi}\n`;
   text += `==========================================\n\n`;
 
-  const destKey = state.selectedDestination === 'blind' ? 'dalat' : state.selectedDestination;
+  const destKey = getResolvedDestKey();
   const daysCount = state.selectedDuration === '2d1n' ? 2 : state.selectedDuration === '4d3n' ? 4 : 3;
-  const plans = (DETAILED_DAY_PLANS[destKey] || DETAILED_DAY_PLANS['hochiminh']).slice(0, daysCount);
+  const plans = (DETAILED_DAY_PLANS[destKey] || DETAILED_DAY_PLANS['dalat']).slice(0, daysCount);
 
   plans.forEach(dayPlan => {
     text += `📅 ${dayPlan.title.toUpperCase()}\n`;
@@ -3001,7 +4036,7 @@ function goToPaymentWithBudget() {
 }
 
 function handleGeneratePlan() {
-  const destSelect = document.getElementById('planner-dest-select')?.value || 'hochiminh';
+  const destSelect = document.getElementById('planner-dest-select')?.value || 'blind';
   const budgetRaw = document.getElementById('planner-budget-input')?.value || '5000000';
   const pax = Number(document.getElementById('planner-pax-select')?.value || '2');
   const dur = document.getElementById('planner-dur-select')?.value || '3d2n';
@@ -3010,6 +4045,15 @@ function handleGeneratePlan() {
   state.selectedBudget = Math.max(1000000, Number(budgetRaw));
   state.selectedPax = pax;
   state.selectedDuration = dur;
+
+  const cwBudgetEl = document.getElementById('cw-budget');
+  if (cwBudgetEl) cwBudgetEl.value = state.selectedBudget;
+  const cwGroupEl = document.getElementById('cw-group-size');
+  if (cwGroupEl && [1, 2, 3, 4].includes(pax)) cwGroupEl.value = String(pax);
+
+  if (destSelect === 'blind' && typeof window.handleLivePersonaChange === 'function') {
+    window.handleLivePersonaChange(true);
+  }
 
   updateQuickBudgetButtons(state.selectedBudget);
   updateVietQrDisplay();
@@ -3027,7 +4071,9 @@ function handleGeneratePlan() {
   if (typeof renderAntiTrapSpots === 'function') renderAntiTrapSpots();
   if (typeof initGroupBooking === 'function') initGroupBooking();
 
-  showToast('success', `🎉 AI đã tối ưu chuyến đi ${getCurrentDestData().name.vi} với ngân sách ${state.selectedBudget.toLocaleString('vi-VN')}đ!`);
+  const resolvedData = getCurrentDestData();
+  const modeLabel = destSelect === 'blind' ? `Blind AI Match → ${resolvedData.name.vi}` : resolvedData.name.vi;
+  showToast('success', `🎉 AI đã phân tích & lập lộ trình chi tiết: ${modeLabel} (${state.selectedBudget.toLocaleString('vi-VN')}đ)!`);
 }
 
 function setQuickBudget(amount) {
@@ -4001,12 +5047,23 @@ function renderEscrowLedger() {
 function switchView(viewName) {
   state.currentTab = viewName;
 
+  if (viewName === 'b2b' && typeof window.switchTab === 'function') {
+    window.switchTab('b2b');
+    return;
+  }
+
   const views = ['concierge', 'quiz', 'vietqr', 'scratch', 'b2b'];
   views.forEach(v => {
     const el = document.getElementById(`view-${v}`);
     const navBtn = document.getElementById(`nav-btn-${v}`);
     if (el) {
-      if (v === viewName) {
+      if (viewName === 'concierge' || viewName === 'quiz') {
+        if (v === 'concierge' || v === 'quiz') {
+          el.classList.remove('hidden');
+        } else {
+          el.classList.add('hidden');
+        }
+      } else if (v === viewName) {
         el.classList.remove('hidden');
       } else {
         el.classList.add('hidden');
@@ -4100,6 +5157,46 @@ const PACKING_DATA = {
     { item: "Thuốc chống say xe đèo dốc", reason: "Đoạn đường đèo Prenn / Mimosa nhiều cua gắt" },
     { item: "Bình giữ nhiệt mini", reason: "Đựng trà atisô nóng giữ ấm cơ thể" }
   ],
+  mangden: [
+    { item: "Áo phao nhẹ & Khăn choàng cổ", reason: "Nhiệt độ Măng Đen về đêm xuống 14-16°C kèm sương rừng" },
+    { item: "Giày trekking / Sneaker bám đường", reason: "Đi bộ xuyên rừng thông cổ thụ & bậc đá Thác Pa Sỹ" },
+    { item: "Xịt chống côn trùng thảo mộc", reason: "Bảo vệ da khi dạo rừng nguyên sinh & vườn nông trại" },
+    { item: "Bình giữ nhiệt cá nhân", reason: "Giữ cà phê Arabica nóng khi săn mây đèo Violắk lúc 5h30 sáng" },
+    { item: "CCCD bản gốc", reason: "Làm thủ tục bay Pleiku & check-in De Vivre Homestay" },
+    { item: "Sạc dự phòng dung lượng cao", reason: "Quay chụp thiên nhiên hoang sơ cả ngày trong rừng" },
+    { item: "Kem dưỡng ẩm & Son dưỡng môi", reason: "Độ ẩm vùng cao nguyên Kon Plông se lạnh" },
+    { item: "Áo khoác gió chống thấm", reason: "Chống sương mù dày đặc vào sáng sớm" }
+  ],
+  hue: [
+    { item: "Trang phục thanh lịch, kín đáo (Áo dài/Cổ phục)", reason: "Tham quan Đại Nội, Chùa Thiên Mụ và các Lăng Tẩm" },
+    { item: "Giày bệt / Sneaker đế êm", reason: "Đi bộ nhiều trong khuôn viên Hoàng Thành rộng lớn" },
+    { item: "Ô gấp gọn che nắng mưa", reason: "Thời tiết cố đô đôi khi có mưa phùn lãng mạn" },
+    { item: "Kem chống nắng & Nón rộng vành", reason: "Bảo vệ da khi chụp ảnh ngoài trời tại Lăng Khải Định" },
+    { item: "CCCD bản gốc", reason: "Thủ tục bay Phú Bài & nhận phòng Azerai La Residence" },
+    { item: "Đồ bơi & Áo choàng", reason: "Thư giãn tại hồ bơi nước mặn ven sông Hương & suối khoáng" },
+    { item: "Sạc dự phòng & Thẻ nhớ trống", reason: "Ghi lại hàng trăm góc ảnh kiến trúc di sản UNESCO" },
+    { item: "Áo khoác mỏng buổi tối", reason: "Gió mát khi nghe Ca Huế trên thuyền rồng sông Hương" }
+  ],
+  quynhon: [
+    { item: "Đồ bơi, Kính bơi & Áo khoác đi biển", reason: "Tắm biển Kỳ Co làn nước trong vắt 2 màu & lặn ngắm san hô" },
+    { item: "Kem chống nắng kháng nước SPF 50+", reason: "Nắng gió biển Eo Gió & Hòn Khô rất rực rỡ" },
+    { item: "Túi chống nước điện thoại", reason: "Chụp ảnh khi đi cano cao tốc và lội con đường giữa biển" },
+    { item: "Mũ rộng vành có dây quai", reason: "Gió biển tại Eo Gió và Đồi Cát Phương Mai khá mạnh" },
+    { item: "Dép sandal / Giày đi biển êm chân", reason: "Dễ dàng di chuyển trên ghềnh đá và bãi cát" },
+    { item: "CCCD bản gốc", reason: "Làm thủ tục bay Phù Cát & check-in Anantara / FLC Resort" },
+    { item: "Kính râm phân cực (Polarized)", reason: "Chống chói mắt khi ngắm biển trời Quy Nhơn" },
+    { item: "Lô hội / Xịt khoáng làm dịu da", reason: "Cấp ẩm tức thì sau ngày dài tắm biển" }
+  ],
+  phuquoc: [
+    { item: "2-3 Bộ đồ bơi & Trang phục Resort sang trọng", reason: "Tắm biển Bãi Kem, đi cáp treo Hòn Thơm & ăn tối Fine Dining" },
+    { item: "Kem chống nắng Reef-Safe SPF 50+", reason: "Bảo vệ da và thân thiện rạn san hô quần đảo An Thới" },
+    { item: "Kính râm & Nón cói thời trang", reason: "Phụ kiện check-in Cầu Hôn (Kiss Bridge) lúc hoàng hôn" },
+    { item: "Túi chống nước & GoPro/Điện thoại", reason: "Quay video lặn ngắm san hô tại Hòn Móng Tay - Mây Rút" },
+    { item: "Thuốc chống say sóng nhẹ", reason: "Phòng ngừa khi đi cano vượt sóng ra các đảo nhỏ" },
+    { item: "CCCD / Hộ chiếu bản gốc", reason: "Bay thẳng Phú Quốc & nhận phòng Regent / JW Marriott 5 sao" },
+    { item: "Dép lê đi biển & Giày lịch sự", reason: "Linh hoạt giữa dạo bãi cát trắng và tiệc tối tại Lounge" },
+    { item: "Sạc dự phòng 20.000mAh", reason: "Xem show Kiss of The Sea & pháo hoa đêm không lo hết pin" }
+  ],
   hochiminh: [
     { item: "Trang phục năng động, thoáng mát", reason: "Nắng ấm nhiệt đới đặc trưng Sài Gòn" },
     { item: "Ô gấp gọn chống mưa rào", reason: "Mưa chợt đến rồi chợt đi vào buổi chiều" },
@@ -4126,7 +5223,7 @@ function renderPackingChecklist() {
   const container = document.getElementById('packing-checklist-grid');
   if (!container) return;
 
-  const destKey = state.selectedDestination === 'blind' ? 'dalat' : state.selectedDestination;
+  const destKey = getResolvedDestKey();
   const items = PACKING_DATA[destKey] || PACKING_DATA['dalat'];
 
   let savedChecked = [];
@@ -4152,7 +5249,7 @@ function renderPackingChecklist() {
 }
 
 function togglePackingItem(idx) {
-  const destKey = state.selectedDestination === 'blind' ? 'dalat' : state.selectedDestination;
+  const destKey = getResolvedDestKey();
   let savedChecked = [];
   try {
     const raw = localStorage.getItem('wandermatch_packing_' + destKey);
@@ -4522,6 +5619,34 @@ const ANTI_TRAP_DATA = {
     { name: "Quán Kem Bơ Thanh Thảo (Nguyễn Văn Trỗi)", price: "25.000đ - 30.000đ / ly", reason: "Bơ sáp dẻo quánh xay mịn kèm viên kem dừa thơm ngậy danh tiếng." },
     { name: "Chợ Đêm Ẩm Thực Góc Phố Không Cò Mồi", price: "15.000đ - 40.000đ / món", reason: "Sữa đậu nành nóng & bánh ngọt sưởi ấm đêm lạnh giá niêm yết chuẩn." }
   ],
+  mangden: [
+    { name: "Gà Nướng Cơm Lam Cô Sinh (Bản gốc)", price: "220.000đ - 280.000đ / con", reason: "Gà bản thả đồi nướng củi rừng thơm lừng, cơm lam ống tre non dẻo ngọt." },
+    { name: "Lẩu Xuyên Tiêu Măng Đen Lữ Quán", price: "250.000đ - 350.000đ / nồi", reason: "Nước lẩu hầm kỷ tử táo đỏ cay nồng ấm bụng giữa tiết trời 15°C." },
+    { name: "Bánh Canh Cá Lóc Akay (Nồi đất)", price: "40.000đ - 55.000đ / thố", reason: "Đựng trong nồi đất sôi sùng sục giữ nhiệt, cá lóc đồng chắc thịt." },
+    { name: "Tiệm Cà Phê Bạch Dương / Eva Măng Đen", price: "35.000đ - 55.000đ / ly", reason: "Hạt Arabica Kon Plông rang mộc tại chỗ, giá niêm yết chuẩn bản địa." },
+    { name: "Heo Quay Măng Đen Chợ Phiên", price: "150.000đ - 200.000đ / phần", reason: "Heo rẫy quay lá mắc mật giòn bì, không chặt chém khách du lịch." }
+  ],
+  hue: [
+    { name: "Bún Bò Huế Mệ Kéo (Bạch Đằng)", price: "45.000đ - 60.000đ / tô", reason: "Gánh bún bò hơn 70 năm tuổi với nước dùng ruốc sả thanh đậm trứ danh." },
+    { name: "Quán Hạnh - Bánh Bèo Nậm Lọc (Phó Đức Chính)", price: "60.000đ - 100.000đ / combo", reason: "Đầy đủ các món bánh cung đình Huế giá niêm yết rõ ràng, phục vụ nhanh." },
+    { name: "Cơm Hến Hoa Đông (Vĩ Dạ)", price: "20.000đ - 30.000đ / tô", reason: "Quán cơm hến bản địa lâu đời giữa cồn Hến, chuẩn vị cay nồng cố đô." },
+    { name: "Chè Hẻm Hùng Vương (29 Hùng Vương)", price: "15.000đ - 25.000đ / ly", reason: "Hơn 20 loại chè Huế truyền thống (chè bột lọc heo quay, chè hạt sen)." },
+    { name: "Tiệm Cà Phê Muối 142 Đặng Thái Thân", price: "20.000đ - 30.000đ / ly", reason: "Cha đẻ món cà phê muối Huế béo mặn dịu nhẹ, giá cực kỳ bình dân." }
+  ],
+  quynhon: [
+    { name: "Bánh Xèo Tôm Nhảy Gia Vỹ 2 (Diên Hồng)", price: "40.000đ - 60.000đ / dĩa", reason: "Tôm đất đầm Thị Nại tươi nhảy tanh tách, vỏ bánh giòn rụm." },
+    { name: "Bún Chả Cá Ngọc Liên (Nguyễn Huệ)", price: "40.000đ - 55.000đ / tô", reason: "Chả cá thu quết tay dai ngọt, nước lèo ninh xương cá thanh trong." },
+    { name: "Hải Sản Cây Dừa / phố Xuân Diệu", price: "180.000đ - 280.000đ / người", reason: "Hải sản cân ký minh bạch trước mặt khách, chế biến tươi ngon." },
+    { name: "Bánh Hỏi Cháo Lòng Hồng Thanh", price: "35.000đ - 50.000đ / phần", reason: "Đặc sản ăn sáng trứ danh của người dân Quy Nhơn bình dị." },
+    { name: "Surf Bar Bãi Biển Quy Nhơn", price: "45.000đ - 85.000đ / đồ uống", reason: "Ngồi ghế lười trên bãi cát nghe sóng biển, bảng giá công khai minh bạch." }
+  ],
+  phuquoc: [
+    { name: "Bún Quậy Kiến Xây (Bạch Đằng, Dương Đông)", price: "65.000đ - 95.000đ / tô", reason: "Chả tôm cá quết tươi tại chỗ, tự pha nước chấm muối ớt tắc độc đáo." },
+    { name: "Nhà Hàng Ra Khơi (131 đường 30/4)", price: "250.000đ - 400.000đ / người", reason: "Gỏi cá trích tươi cuốn bánh tráng dừa và hải sản cân đúng ký 100%." },
+    { name: "Bún Kèn Út Lượm (Đường 30/4)", price: "45.000đ - 55.000đ / tô", reason: "Món ăn sáng bản địa nấu từ cá nhàu và nước cốt dừa béo thơm." },
+    { name: "Làng Chài Hàm Ninh (Bè Hải Sản Thuận Kiều 2)", price: "300.000đ - 450.000đ / kg ghẹ", reason: "Ghẹ Hàm Ninh chắc gạch ngọt thịt, niêm yết giá rõ ràng không cò mồi." },
+    { name: "Chuồn Chuồn Bistro & Skybar", price: "80.000đ - 150.000đ / đồ uống", reason: "Ngắm toàn cảnh thị trấn Dương Đông và biển Phú Quốc từ đỉnh đồi." }
+  ],
   hochiminh: [
     { name: "Cơm Tấm Ba Ghiền (Đặng Văn Ngữ)", price: "85.000đ - 110.000đ / dĩa", reason: "Miếng sườn khổng lồ nướng than hoa đạt Michelin Bib Gourmand." },
     { name: "Ốc Đào (Hẻm 212B Nguyễn Trãi)", price: "120.000đ - 180.000đ / người", reason: "Ốc hương sốt bơ tỏi bánh mì nức tiếng Sài Gòn, hải sản tươi sống." },
@@ -4542,7 +5667,7 @@ function renderAntiTrapSpots() {
   const container = document.getElementById('anti-trap-spots-list');
   if (!container) return;
 
-  const destKey = state.selectedDestination === 'blind' ? 'dalat' : state.selectedDestination;
+  const destKey = getResolvedDestKey();
   const spots = ANTI_TRAP_DATA[destKey] || ANTI_TRAP_DATA['dalat'];
 
   container.innerHTML = spots.map(s => `
@@ -4789,6 +5914,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (slider && label) {
       slider.addEventListener('input', (e) => {
         label.textContent = `${e.target.value}%`;
+        const mapCw = {
+          healing: 'cw-vec-healing',
+          foodie: 'cw-vec-culture',
+          adventure: 'cw-vec-nature',
+          resort: 'cw-vec-comfort'
+        };
+        const cwInput = document.getElementById(mapCw[axis]);
+        if (cwInput) {
+          cwInput.value = e.target.value;
+        }
+        if (typeof window.handleLivePersonaChange === 'function') {
+          window.handleLivePersonaChange();
+        }
       });
     }
   });
