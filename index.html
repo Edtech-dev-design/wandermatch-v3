@@ -4314,6 +4314,7 @@
       const winner = scoredList.find(it => !it.detail.blacklisted) || scoredList[0];
       if (winner) {
         window.cwState.aiSuggestedDestKey = winner.destKey;
+        window.cwState.aiMatchedDestKey = winner.destKey;
       }
 
       // 1. Cập nhật thanh trạng thái AI ở đầu trang
