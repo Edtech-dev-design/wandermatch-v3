@@ -183,55 +183,31 @@
             </button>
           </div>
 
-          <!-- Logged In State (Hidden by default, shown by JS) -->
+          <!-- Logged In State (Hiển thị các nút riêng biệt: Hồ Sơ, Sổ Cái GD, và Đăng Xuất) -->
           <div id="header-user-profile-menu" class="hidden flex items-center gap-2">
-            <button onclick="toggleUserDropdown(event)" id="user-header-btn" class="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-900/95 border border-cyan-500/40 hover:border-cyan-400 text-xs transition shadow-lg">
-              <img id="header-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="w-6 h-6 rounded-full object-cover border border-cyan-400">
-              <div class="text-left hidden sm:block max-w-[130px] truncate">
+            <!-- NÚT 1: HỒ SƠ CÁ NHÂN & KYC (Mở thẳng Modal Hồ Sơ) -->
+            <button onclick="openCustomerProfileModal('profile')" id="user-header-profile-btn" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/95 hover:bg-slate-800 border border-cyan-500/50 hover:border-cyan-400 text-xs transition shadow-lg group" title="Xem Hồ Sơ Cá Nhân & Định Danh KYC">
+              <img id="header-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="w-6 h-6 rounded-full object-cover border border-cyan-400 group-hover:scale-105 transition">
+              <div class="text-left hidden sm:block max-w-[120px] truncate">
                 <span id="header-username" class="font-extrabold text-white block text-[11px] truncate">Nguyễn Văn An</span>
                 <span id="header-user-tier" class="text-[9px] text-cyan-300 font-mono block">Du Khách VIP</span>
               </div>
-              <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-0.5"></i>
+              <span class="px-2 py-0.5 rounded text-[10px] font-black bg-cyan-950 text-cyan-300 border border-cyan-700 hidden md:inline">
+                <i class="fa-regular fa-id-badge"></i> Hồ Sơ
+              </span>
             </button>
 
-            <!-- Nút Đăng Xuất Riêng Biệt Ngay Trên Header -->
-            <button onclick="handleLogout()" class="hidden md:flex px-2.5 py-1.5 rounded-xl bg-rose-950/70 hover:bg-rose-900 border border-rose-500/40 text-rose-300 hover:text-white font-bold text-xs transition items-center gap-1 shadow" title="Đăng xuất khỏi phiên làm việc">
+            <!-- NÚT 2: SỔ CÁI GIAO DỊCH RIÊNG (Mở thẳng Tab Sổ Cái) -->
+            <button onclick="openCustomerProfileModal('ledger')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 font-bold text-xs transition shadow" title="Mở Sổ Cái Giao Dịch & Đơn Hàng">
+              <i class="fa-solid fa-receipt"></i>
+              <span class="hidden sm:inline">Sổ Cái GD</span>
+            </button>
+
+            <!-- NÚT 3: ĐĂNG XUẤT RIÊNG BIỆT (XUẤT ĐĂNG NHẬP TỨC THÌ, RÕ RÀNG KHÔNG LỖI) -->
+            <button onclick="handleLogout()" id="header-btn-logout" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 active:scale-95 text-white font-black text-xs transition shadow-lg shadow-rose-600/30" title="Đăng Xuất Khỏi Tài Khoản Ngay Lập Tức">
               <i class="fa-solid fa-right-from-bracket"></i>
-              <span class="text-[11px]">Đăng Xuất</span>
+              <span>Đăng Xuất</span>
             </button>
-
-            <!-- Dropdown Menu -->
-            <div id="user-dropdown-menu" class="hidden absolute right-0 mt-2 w-64 rounded-2xl bg-slate-900/98 backdrop-blur-xl border border-slate-700 shadow-2xl p-2.5 text-xs z-50">
-              <div class="p-2 border-b border-slate-800 text-left">
-                <p id="dropdown-user-fullname" class="font-bold text-white text-xs">Nguyễn Văn An</p>
-                <p id="dropdown-user-email" class="text-[10px] text-slate-400 truncate">an.nguyen@wandermatch.vn</p>
-                <span id="dropdown-user-role-badge" class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-700">
-                  <i class="fa-solid fa-circle-check"></i> ĐÃ XÁC THỰC KYC CCCD
-                </span>
-              </div>
-              <div class="py-1 space-y-0.5">
-                <button onclick="openCustomerProfileModal('profile')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-200 flex items-center gap-2.5 transition">
-                  <i class="fa-regular fa-id-badge text-cyan-400 w-4"></i> <span>Hồ Sơ Cá Nhân &amp; KYC</span>
-                </button>
-                <button onclick="openCustomerProfileModal('ledger')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-200 flex items-center gap-2.5 transition">
-                  <i class="fa-solid fa-receipt text-emerald-400 w-4"></i> <span>Sổ Cái Giao Dịch &amp; Đơn Hàng</span>
-                </button>
-                <button onclick="openCustomerProfileModal('bookings')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-200 flex items-center gap-2.5 transition">
-                  <i class="fa-solid fa-plane-departure text-amber-400 w-4"></i> <span>Chuyến Đi Bí Mật Của Tôi</span>
-                </button>
-                <button onclick="openCustomerProfileModal('persona')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-200 flex items-center gap-2.5 transition">
-                  <i class="fa-solid fa-brain text-purple-400 w-4"></i> <span>Hồ Sơ Tâm Lý Travel Persona</span>
-                </button>
-                <button onclick="openCustomerProfileModal('refund')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-200 flex items-center gap-2.5 transition">
-                  <i class="fa-solid fa-clock-rotate-left text-cyan-400 w-4"></i> <span>Ví Escrow &amp; Hoàn Tiền 24H</span>
-                </button>
-              </div>
-              <div class="pt-1.5 border-t border-slate-800">
-                <button onclick="handleLogout()" class="w-full text-left px-3 py-2 rounded-xl hover:bg-rose-950/60 text-rose-400 flex items-center gap-2.5 transition font-bold">
-                  <i class="fa-solid fa-right-from-bracket w-4"></i> <span>Đăng Xuất</span>
-                </button>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -2612,39 +2588,99 @@
            KHỐI FORM ĐĂNG KÝ CHO 3 ĐỐI TƯỢNG (HIỂN THỊ MẶC ĐỊNH)
            ========================================== -->
       <div id="auth-register-container" class="space-y-3 text-xs">
-        <!-- FORM ĐĂNG KÝ B2C: DU KHÁCH -->
+        <!-- FORM ĐĂNG KÝ B2C: DU KHÁCH (ĐIỀN ĐẦY ĐỦ THÔNG TIN ĐỊNH DANH & THANH TOÁN) -->
         <form id="form-register-b2c" onsubmit="handleRegisterSubmit(event, 'b2c')" class="space-y-3">
+          <div class="p-2.5 rounded-xl bg-cyan-950/40 border border-cyan-500/40 text-[11px] text-cyan-200 flex items-center gap-2">
+            <i class="fa-solid fa-circle-info text-cyan-400"></i>
+            <span>Vui lòng khai báo đầy đủ thông tin để định danh KYC và kích hoạt bảo lãnh hoàn tiền Napas 247.</span>
+          </div>
+
+          <!-- Nhóm 1: Họ tên & SĐT -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label class="block text-slate-300 font-semibold mb-1">Họ và tên (như trên CCCD): *</label>
+              <label class="block text-slate-300 font-semibold mb-1">Họ và tên (Đúng CCCD/Hộ Chiếu): *</label>
               <input id="reg-b2c-name" type="text" required placeholder="VD: NGUYỄN VĂN AN" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-white uppercase font-bold">
             </div>
             <div>
-              <label class="block text-slate-300 font-semibold mb-1">Số điện thoại (Nhận OTP vé): *</label>
+              <label class="block text-slate-300 font-semibold mb-1">Số điện thoại (Nhận OTP &amp; Vé): *</label>
               <input id="reg-b2c-phone" type="tel" required placeholder="0988xxxxxx" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-white font-mono">
             </div>
           </div>
-          <div>
-            <label class="block text-slate-300 font-semibold mb-1">Email đăng ký: *</label>
-            <input id="reg-b2c-email" type="email" required placeholder="an.nguyen@wandermatch.vn" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-white font-mono">
-          </div>
+
+          <!-- Nhóm 2: Email & Số CCCD -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label class="block text-slate-300 font-semibold mb-1">Mật khẩu: *</label>
+              <label class="block text-slate-300 font-semibold mb-1">Email giao dịch &amp; Nhận E-ticket: *</label>
+              <input id="reg-b2c-email" type="email" required placeholder="an.nguyen@wandermatch.vn" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-white font-mono">
+            </div>
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Số CCCD / Hộ chiếu (Bắt buộc KYC): *</label>
+              <input id="reg-b2c-cccd" type="text" required placeholder="VD: 079201019888" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-cyan-300 font-mono font-bold">
+            </div>
+          </div>
+
+          <!-- Nhóm 3: Thông tin Ngân hàng nhận hoàn tiền -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Ngân hàng thụ hưởng (Hoàn tiền 24H): *</label>
+              <select id="reg-b2c-bank-name" required class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-white font-semibold">
+                <option value="MB BANK" selected>MB Bank (Ngân Hàng Quân Đội)</option>
+                <option value="VIETCOMBANK">Vietcombank</option>
+                <option value="TECHCOMBANK">Techcombank</option>
+                <option value="ACB">ACB (Á Châu)</option>
+                <option value="BIDV">BIDV</option>
+                <option value="VPBANK">VPBank</option>
+                <option value="TPBANK">TPBank</option>
+                <option value="VIETINBANK">VietinBank</option>
+                <option value="AGRIBANK">Agribank</option>
+                <option value="MOMO">Ví Điện Tử MoMo</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Số Tài Khoản Ngân Hàng (STK): *</label>
+              <input id="reg-b2c-bank-acc" type="text" required placeholder="VD: 0988888888" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-emerald-300 font-mono font-bold">
+            </div>
+          </div>
+
+          <!-- Nhóm 4: Mật khẩu & Xác nhận mật khẩu -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Mật khẩu bảo mật: *</label>
               <input id="reg-b2c-password" type="password" required placeholder="Tối thiểu 6 ký tự..." class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-white">
             </div>
             <div>
-              <label class="block text-slate-300 font-semibold mb-1">Số CCCD / Hộ chiếu (Tùy chọn KYC):</label>
-              <input id="reg-b2c-cccd" type="text" placeholder="079201xxxxxx" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-cyan-300 font-mono">
+              <label class="block text-slate-300 font-semibold mb-1">Xác nhận lại mật khẩu: *</label>
+              <input id="reg-b2c-confirm-password" type="password" required placeholder="Nhập lại mật khẩu..." class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-white">
             </div>
           </div>
+
+          <!-- Nhóm 5: Mã bảo mật thay thế cá nhân dự phòng -->
+          <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
+            <label class="block text-slate-300 font-semibold text-[11px] flex items-center justify-between">
+              <span class="flex items-center gap-1.5 text-cyan-300">
+                <i class="fa-solid fa-key"></i> Mã Bảo Mật Thay Thế Cá Nhân (Security Passcode): *
+              </span>
+              <span class="text-[10px] text-slate-400">Dùng đăng nhập nhanh thay thế</span>
+            </label>
+            <div class="flex gap-2">
+              <input id="reg-b2c-backup-code" type="text" required value="WM-2026" placeholder="VD: WM-2026" class="flex-1 glass-input rounded-xl px-3 py-2 text-xs text-cyan-300 font-mono font-bold">
+              <button type="button" onclick="document.getElementById('reg-b2c-backup-code').value='WM-'+Math.floor(1000+Math.random()*9000)" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold border border-slate-700 transition shrink-0">
+                <i class="fa-solid fa-shuffle"></i> Đổi Mã
+              </button>
+            </div>
+            <p class="text-[10px] text-slate-400">
+              💡 Lưu mã này để có thể đăng nhập bằng <strong>Email + Mã bảo mật thay thế</strong> mà không cần nhớ mật khẩu.
+            </p>
+          </div>
+
           <div class="flex items-start gap-2 pt-1 text-[11px] text-slate-400">
             <input type="checkbox" checked required class="mt-0.5 rounded accent-cyan-500">
-            <span>Tôi đồng ý với cam kết hoàn tiền 24H minh bạch và chính sách dữ liệu của WanderMatch.</span>
+            <span>Tôi xác nhận thông tin khai báo là chính xác theo CCCD và đồng ý với điều khoản dịch vụ WanderMatch.</span>
           </div>
+
           <button type="submit" class="w-full py-3 rounded-xl btn-glow-cyan text-slate-950 font-black text-xs shadow-lg transition flex items-center justify-center gap-2">
             <i class="fa-solid fa-user-check"></i>
-            <span>Đăng Ký Tài Khoản Du Khách &amp; Lưu Vào Sổ Dữ Liệu</span>
+            <span>Hoàn Tất Đăng Ký Tài Khoản &amp; Lưu Vào Hệ Thống</span>
           </button>
         </form>
 
@@ -2726,14 +2762,27 @@
       </div>
 
       <!-- ==========================================
-           KHỐI FORM ĐĂNG NHẬP CHO 3 ĐỐI TƯỢNG
+           KHỐI FORM ĐĂNG NHẬP (CHO PHÉP MẬT KHẨU HOẶC MÃ BẢO MẬT THAY THẾ)
            ========================================== -->
-      <div id="auth-login-container" class="space-y-3 text-xs hidden">
-        <form id="form-auth-login-generic" onsubmit="handleUniversalLogin(event)" class="space-y-3.5">
+      <div id="auth-login-container" class="space-y-3.5 text-xs hidden">
+        <!-- Chuyển đổi phương thức đăng nhập: Mật khẩu VS Mã bảo mật thay thế -->
+        <div class="flex rounded-xl bg-slate-900/95 p-1 border border-slate-800 gap-1">
+          <button type="button" id="login-tab-btn-pwd" onclick="setLoginMethod('password')" class="flex-1 py-2 rounded-lg font-bold bg-cyan-500 text-slate-950 shadow transition text-xs flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-lock"></i>
+            <span>1. Mật Khẩu</span>
+          </button>
+          <button type="button" id="login-tab-btn-code" onclick="setLoginMethod('code')" class="flex-1 py-2 rounded-lg font-semibold text-slate-400 hover:text-white bg-slate-900 border border-slate-800 transition text-xs flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-key text-cyan-400"></i>
+            <span>2. Mã Bảo Mật Thay Thế</span>
+          </button>
+        </div>
+
+        <!-- PHƯƠNG THỨC 1: ĐĂNG NHẬP BẰNG TÊN / EMAIL + MẬT KHẨU -->
+        <form id="login-panel-password" onsubmit="handleUniversalLogin(event, 'password')" class="space-y-3">
           <div>
-            <label id="login-identifier-label" class="block text-slate-300 font-semibold mb-1">Email hoặc Số điện thoại đăng nhập:</label>
+            <label id="login-identifier-label" class="block text-slate-300 font-semibold mb-1">Tên đăng nhập / Email hoặc Số điện thoại:</label>
             <div class="relative">
-              <input id="auth-login-identifier" type="text" required value="an.nguyen@wandermatch.vn" placeholder="vd: an.nguyen@wandermatch.vn" class="w-full glass-input rounded-xl pl-9 pr-3 py-2.5 text-xs text-white font-mono">
+              <input id="auth-login-identifier" type="text" required value="an.nguyen@wandermatch.vn" placeholder="vd: an.nguyen@wandermatch.vn hoặc 0988 888 888" class="w-full glass-input rounded-xl pl-9 pr-3 py-2.5 text-xs text-white font-mono">
               <i class="fa-regular fa-envelope absolute left-3 top-3 text-slate-400"></i>
             </div>
           </div>
@@ -2741,17 +2790,51 @@
           <div>
             <div class="flex items-center justify-between mb-1">
               <label class="block text-slate-300 font-semibold">Mật khẩu:</label>
-              <a href="javascript:void(0)" onclick="if(typeof showToast==='function') showToast('info', '💡 Bấm các nút mẫu 1-chạm bên dưới để đăng nhập ngay!');" class="text-[11px] text-cyan-400 hover:underline">Quên mật khẩu?</a>
+              <a href="javascript:void(0)" onclick="setLoginMethod('code')" class="text-[11px] text-cyan-400 hover:underline">Quên mật khẩu? Dùng mã bảo mật</a>
             </div>
             <div class="relative">
-              <input id="auth-login-password" type="password" required value="123456" placeholder="Nhập mật khẩu..." class="w-full glass-input rounded-xl pl-9 pr-3 py-2.5 text-xs text-white">
+              <input id="auth-login-password" type="password" required value="123" placeholder="Nhập mật khẩu (mặc định: 123)..." class="w-full glass-input rounded-xl pl-9 pr-3 py-2.5 text-xs text-white">
               <i class="fa-solid fa-lock absolute left-3 top-3 text-slate-400"></i>
             </div>
           </div>
 
           <button type="submit" class="w-full py-3 rounded-xl btn-glow-cyan text-slate-950 font-black text-xs shadow-lg transition flex items-center justify-center gap-2">
             <i class="fa-solid fa-arrow-right-to-bracket"></i>
-            <span>Đăng Nhập Vào Hệ Thống</span>
+            <span>Đăng Nhập Bằng Mật Khẩu</span>
+          </button>
+        </form>
+
+        <!-- PHƯƠNG THỨC 2: ĐĂNG NHẬP BẰNG EMAIL + MÃ BẢO MẬT THAY THẾ (PASSCODE / OTP) -->
+        <form id="login-panel-code" onsubmit="handleUniversalLogin(event, 'code')" class="space-y-3 hidden">
+          <div class="p-2.5 rounded-xl bg-cyan-950/40 border border-cyan-500/40 text-[11px] text-cyan-200">
+            🛡️ Đăng nhập an toàn không cần mật khẩu bằng <strong>Email &amp; Mã bảo mật thay thế</strong> đã cấp.
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Email đăng ký tài khoản: *</label>
+            <div class="relative">
+              <input id="auth-login-code-email" type="text" required value="an.nguyen@wandermatch.vn" placeholder="vd: an.nguyen@wandermatch.vn" class="w-full glass-input rounded-xl pl-9 pr-3 py-2.5 text-xs text-white font-mono">
+              <i class="fa-regular fa-envelope absolute left-3 top-3 text-slate-400"></i>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-slate-300 font-semibold">Mã Bảo Mật Thay Thế (Passcode / OTP): *</label>
+              <button type="button" onclick="fillQuickPasscode()" class="text-[11px] text-cyan-300 hover:text-cyan-200 underline font-semibold">
+                ⚡ Lấy mã bảo mật mẫu
+              </button>
+            </div>
+            <div class="relative">
+              <input id="auth-login-code-val" type="text" required value="WM-2026" placeholder="Nhập mã bảo mật (vd: WM-2026)..." class="w-full glass-input rounded-xl pl-9 pr-3 py-2.5 text-xs text-cyan-300 font-mono font-bold tracking-wider">
+              <i class="fa-solid fa-key absolute left-3 top-3 text-cyan-400"></i>
+            </div>
+            <span class="text-[10px] text-slate-400 mt-1 block">💡 Mã bảo mật mặc định hệ thống: <code class="text-cyan-300">WM-2026</code></span>
+          </div>
+
+          <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-500 hover:from-cyan-300 hover:to-emerald-400 text-slate-950 font-black text-xs shadow-lg transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Xác Thực &amp; Đăng Nhập Bằng Mã Bảo Mật</span>
           </button>
         </form>
       </div>
@@ -2827,6 +2910,10 @@
         <button id="prof-tab-btn-ledger" onclick="switchProfileTab('ledger')" class="px-3.5 py-2 rounded-xl font-semibold text-slate-400 hover:text-white bg-slate-900/80 border border-slate-800 flex items-center gap-2 shrink-0">
           <i class="fa-solid fa-receipt text-cyan-400"></i> <span>5. Sổ Cái Giao Dịch &amp; Đơn Hàng</span>
         </button>
+        <!-- PHẦN ĐĂNG XUẤT RIÊNG BIỆT ĐƯỢC ĐẶT TRONG HỒ SƠ KHÁCH HÀNG THEO YÊU CẦU -->
+        <button id="prof-tab-btn-logout" onclick="switchProfileTab('logout')" class="px-3.5 py-2 rounded-xl font-bold text-rose-300 hover:text-white bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/50 flex items-center gap-2 shrink-0 transition shadow">
+          <i class="fa-solid fa-right-from-bracket text-rose-400"></i> <span>6. 🚪 Đăng Xuất &amp; Quản Trị Phiên</span>
+        </button>
       </div>
 
       <!-- Tab 1: Personal Info & KYC CCCD/Passport -->
@@ -2834,24 +2921,28 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="bg-slate-900/90 p-4 rounded-2xl border border-slate-800 space-y-2.5">
             <h4 class="font-bold text-cyan-300 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-              <i class="fa-solid fa-address-card"></i> Thông Tin Cá Nhân
+              <i class="fa-solid fa-address-card"></i> Thông Tin Cá Nhân &amp; Tài Khoản
             </h4>
             <div class="space-y-1.5 text-slate-300">
               <div class="flex justify-between py-1 border-b border-slate-800/80">
                 <span class="text-slate-400">Họ và tên:</span>
-                <strong id="prof-info-name" class="text-white">NGUYỄN VĂN AN</strong>
+                <strong id="prof-info-name" class="text-white uppercase font-bold">NGUYỄN VĂN AN</strong>
               </div>
               <div class="flex justify-between py-1 border-b border-slate-800/80">
                 <span class="text-slate-400">Số điện thoại:</span>
-                <strong id="prof-info-phone" class="font-mono text-cyan-300">0988 888 888</strong>
+                <strong id="prof-info-phone" class="font-mono text-cyan-300 font-bold">0988 888 888</strong>
               </div>
               <div class="flex justify-between py-1 border-b border-slate-800/80">
-                <span class="text-slate-400">Email:</span>
-                <strong id="prof-info-email" class="text-slate-200">an.nguyen@wandermatch.vn</strong>
+                <span class="text-slate-400">Email đăng ký:</span>
+                <strong id="prof-info-email" class="text-slate-200 font-mono">an.nguyen@wandermatch.vn</strong>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-800/80">
+                <span class="text-slate-400">STK Napas nhận hoàn tiền:</span>
+                <strong id="prof-info-bank" class="font-mono text-emerald-300 font-bold">MB BANK — 0988888888</strong>
               </div>
               <div class="flex justify-between py-1">
-                <span class="text-slate-400">STK Napas nhận hoàn tiền:</span>
-                <strong id="prof-info-bank" class="font-mono text-emerald-300">MB BANK — 0988888888</strong>
+                <span class="text-slate-400">Mã bảo mật thay thế cá nhân:</span>
+                <strong id="prof-info-backup" class="font-mono text-cyan-300 font-bold bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-700">WM-2026</strong>
               </div>
             </div>
           </div>
@@ -2865,8 +2956,8 @@
             </div>
             <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5">
               <div class="flex justify-between text-[11px]">
-                <span class="text-slate-400">Số CCCD:</span>
-                <span class="font-mono font-bold text-white">079201019888 (Masked)</span>
+                <span class="text-slate-400">Số CCCD / Hộ chiếu:</span>
+                <span id="prof-info-cccd" class="font-mono font-bold text-white">079201019888</span>
               </div>
               <div class="flex justify-between text-[11px]">
                 <span class="text-slate-400">Tình trạng vé máy bay:</span>
@@ -3019,6 +3110,65 @@
           <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between text-[11px]">
             <span class="text-slate-400">Tổng giá trị giao dịch đã lưu trữ:</span>
             <span id="customer-ledger-total-amount" class="font-mono font-black text-emerald-300 text-xs">5.000.000 VNĐ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 6: Quản Trị Phiên & Đăng Xuất An Toàn (Mục Riêng Biệt Trong Hồ Sơ Khách Hàng) -->
+      <div id="prof-panel-logout" class="space-y-4 text-xs hidden">
+        <div class="bg-slate-900/90 p-5 rounded-2xl border border-rose-500/50 space-y-4 shadow-xl">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500/50 text-rose-400 flex items-center justify-center text-lg shadow-lg shadow-rose-900/30">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-black uppercase text-rose-400 tracking-wider">BẢO MẬT PHIÊN LÀM VIỆC &amp; THIẾT BỊ</span>
+                <h4 class="text-sm font-extrabold text-white mt-0.5">Quản Trị Phiên Đăng Nhập &amp; Đăng Xuất An Toàn</h4>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-700 flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              Phiên Đang Hoạt Động
+            </span>
+          </div>
+
+          <!-- Thông tin phiên hiện tại -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-1">
+              <span class="text-slate-400 text-[10px] block">Tài khoản đăng nhập hiện tại:</span>
+              <strong id="logout-panel-username" class="text-white text-xs block font-bold uppercase">NGUYỄN VĂN AN</strong>
+              <span id="logout-panel-email" class="text-slate-400 text-[10px] font-mono block">an.nguyen@wandermatch.vn</span>
+            </div>
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-1">
+              <span class="text-slate-400 text-[10px] block">Mã bảo mật thay thế dự phòng:</span>
+              <strong id="logout-panel-backup-code" class="text-cyan-300 text-xs block font-mono font-bold">WM-2026</strong>
+              <span class="text-[10px] text-slate-400">Dùng để đăng nhập lại bất kỳ lúc nào</span>
+            </div>
+          </div>
+
+          <!-- Cam kết an toàn dữ liệu -->
+          <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1.5 text-slate-300 text-[11px] leading-relaxed">
+            <div class="flex items-center gap-1.5 text-cyan-300 font-bold">
+              <i class="fa-solid fa-database"></i>
+              <span>Cam Kết Bảo Toàn Dữ Liệu 100% Khi Đăng Xuất:</span>
+            </div>
+            <p>
+              Khi bấm <strong>Đăng Xuất</strong>, hệ thống chỉ hủy phiên làm việc hiện tại trên trình duyệt này. Toàn bộ hồ sơ định danh KYC CCCD, thông tin tài khoản ngân hàng nhận hoàn tiền, các chuyến đi đã đặt và lịch sử sổ cái giao dịch vẫn được <strong>lưu trữ vĩnh viễn và bảo mật an toàn</strong> trên thiết bị. Bạn có thể đăng nhập lại bất kỳ lúc nào bằng Mật khẩu hoặc Mã bảo mật thay thế.
+            </p>
+          </div>
+
+          <!-- Nút hành động đăng xuất -->
+          <div class="space-y-2 pt-1">
+            <button type="button" onclick="handleLogout()" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-rose-600 via-red-600 to-rose-700 hover:from-rose-500 hover:to-red-500 active:scale-[0.99] text-white font-black text-xs shadow-xl shadow-rose-900/40 flex items-center justify-center gap-2 transition">
+              <i class="fa-solid fa-right-from-bracket text-sm"></i>
+              <span>🚪 XÁC NHẬN ĐĂNG XUẤT AN TOÀN KHỎI THIẾT BỊ NÀY</span>
+            </button>
+            
+            <button type="button" onclick="handleLogoutAndSwitch()" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-2 transition">
+              <i class="fa-solid fa-arrows-rotate text-cyan-400"></i>
+              <span>Đăng Xuất &amp; Chuyển Đổi Sang Tài Khoản Khác Ngay</span>
+            </button>
           </div>
         </div>
       </div>
@@ -5263,7 +5413,8 @@
         tier: "Du Khách VIP Gold",
         avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80",
         role: "b2c",
-        password: "123"
+        password: "123",
+        backupCode: "WM-2026"
       },
       {
         id: "usr_b2b_anamandara",
@@ -5276,7 +5427,8 @@
         tier: "Đối Tác Kim Cương B2B",
         avatar: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=160&auto=format&fit=crop&q=80",
         role: "b2b",
-        password: "123"
+        password: "123",
+        backupCode: "WM-2026"
       },
       {
         id: "usr_admin_master",
@@ -5289,7 +5441,8 @@
         tier: "Master Administrator",
         avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&auto=format&fit=crop&q=80",
         role: "admin",
-        password: "123"
+        password: "123",
+        backupCode: "WM-2026"
       }
     ];
 
@@ -5508,19 +5661,66 @@
       }
     };
 
+    // =========================================================================
+    // QUẢN LÝ PHƯƠNG THỨC ĐĂNG NHẬP: MẬT KHẨU VS MÃ BẢO MẬT THAY THẾ (PASSCODE)
+    // =========================================================================
+    window.currentLoginMethod = 'password';
+    window.setLoginMethod = function(method) {
+      window.currentLoginMethod = method;
+      const panelPwd = document.getElementById('login-panel-password');
+      const panelCode = document.getElementById('login-panel-code');
+      const tabPwd = document.getElementById('login-tab-btn-pwd');
+      const tabCode = document.getElementById('login-tab-btn-code');
+
+      if (method === 'password') {
+        if (panelPwd) panelPwd.classList.remove('hidden');
+        if (panelCode) panelCode.classList.add('hidden');
+        if (tabPwd) tabPwd.className = "flex-1 py-2 rounded-lg font-bold bg-cyan-500 text-slate-950 shadow transition text-xs flex items-center justify-center gap-1.5";
+        if (tabCode) tabCode.className = "flex-1 py-2 rounded-lg font-semibold text-slate-400 hover:text-white bg-slate-900 border border-slate-800 transition text-xs flex items-center justify-center gap-1.5";
+      } else {
+        if (panelPwd) panelPwd.classList.add('hidden');
+        if (panelCode) panelCode.classList.remove('hidden');
+        if (tabCode) tabCode.className = "flex-1 py-2 rounded-lg font-bold bg-cyan-500 text-slate-950 shadow transition text-xs flex items-center justify-center gap-1.5";
+        if (tabPwd) tabPwd.className = "flex-1 py-2 rounded-lg font-semibold text-slate-400 hover:text-white bg-slate-900 border border-slate-800 transition text-xs flex items-center justify-center gap-1.5";
+      }
+    };
+
+    window.fillQuickPasscode = function() {
+      const emailInput = document.getElementById('auth-login-code-email');
+      const codeInput = document.getElementById('auth-login-code-val');
+      const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+      const users = getUsersDB();
+      const found = users.find(u => (u.email && u.email.toLowerCase() === email) || (u.phone && u.phone.replace(/\s+/g, '') === email.replace(/\s+/g, '')));
+      const code = (found && found.backupCode) ? found.backupCode : 'WM-2026';
+      if (codeInput) codeInput.value = code;
+      if (typeof showToast === 'function') {
+        showToast('info', `🔑 Mã bảo mật thay thế hợp lệ: ${code}`);
+      }
+    };
+
     window.handleRegisterSubmit = function(e, role) {
       e.preventDefault();
       const users = getUsersDB();
 
       if (role === 'b2c') {
-        const name = document.getElementById('reg-b2c-name')?.value.trim() || 'Du Khách Mới';
+        const name = document.getElementById('reg-b2c-name')?.value.trim() || 'DU KHÁCH MỚI';
         const phone = document.getElementById('reg-b2c-phone')?.value.trim() || '0988 123 456';
         const email = document.getElementById('reg-b2c-email')?.value.trim() || 'user@wandermatch.vn';
-        const password = document.getElementById('reg-b2c-password')?.value.trim() || '123456';
-        const cccd = document.getElementById('reg-b2c-cccd')?.value.trim() || '079201' + Math.floor(100000 + Math.random() * 900000);
+        const cccd = document.getElementById('reg-b2c-cccd')?.value.trim() || ('079201' + Math.floor(100000 + Math.random() * 900000));
+        const bankName = document.getElementById('reg-b2c-bank-name')?.value || 'MB BANK';
+        const bankAcc = document.getElementById('reg-b2c-bank-acc')?.value.trim() || phone.replace(/\s+/g, '');
+        const password = document.getElementById('reg-b2c-password')?.value.trim() || '123';
+        const confirmPw = document.getElementById('reg-b2c-confirm-password')?.value.trim() || password;
+        const backupCode = document.getElementById('reg-b2c-backup-code')?.value.trim() || 'WM-2026';
 
-        if (users.some(u => u.email.toLowerCase() === email.toLowerCase() || u.phone === phone)) {
-          if (typeof showToast === 'function') showToast('warning', '⚠️ Email hoặc Số điện thoại này đã được đăng ký trên hệ thống!');
+        if (password !== confirmPw) {
+          if (typeof showToast === 'function') showToast('warning', '⚠️ Mật khẩu và xác nhận mật khẩu không khớp!');
+          return;
+        }
+
+        const cleanPhone = phone.replace(/\s+/g, '');
+        if (users.some(u => u.email.toLowerCase() === email.toLowerCase() || (u.phone && u.phone.replace(/\s+/g, '') === cleanPhone))) {
+          if (typeof showToast === 'function') showToast('warning', '⚠️ Email hoặc Số điện thoại này đã được đăng ký! Vui lòng chuyển sang Đăng Nhập.');
           setAuthMode('login');
           return;
         }
@@ -5530,13 +5730,16 @@
           name: name.toUpperCase(),
           email: email,
           phone: phone,
-          bank: 'MB BANK — ' + phone,
-          bankHolder: name.toUpperCase(),
           cccd: cccd,
-          tier: 'Wanderer Explorer',
+          bank: `${bankName} — ${bankAcc}`,
+          bankName: bankName,
+          bankAcc: bankAcc,
+          bankHolder: name.toUpperCase(),
+          tier: 'Du Khách Đã KYC',
           avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80',
           role: 'b2c',
           password: password,
+          backupCode: backupCode,
           createdAt: new Date().toISOString()
         };
 
@@ -5548,7 +5751,7 @@
         closeAuthModal();
 
         if (typeof showToast === 'function') {
-          showToast('success', `🎉 Chúc mừng ${name}! Đăng ký Du Khách thành công và đã lưu vào cơ sở dữ liệu.`);
+          showToast('success', `🎉 Chúc mừng ${name}! Đăng ký thành công. Mã bảo mật thay thế của bạn là: ${backupCode}`);
         }
         window.switchTab('b2c');
         window.switchB2CStep(1);
@@ -5559,7 +5762,7 @@
         const rep = document.getElementById('reg-b2b-rep')?.value.trim() || 'Đại Diện B2B';
         const stars = document.getElementById('reg-b2b-stars')?.value || '4-star';
         const email = document.getElementById('reg-b2b-email')?.value.trim() || 'partner@hotel.vn';
-        const password = document.getElementById('reg-b2b-password')?.value.trim() || '123456';
+        const password = document.getElementById('reg-b2b-password')?.value.trim() || '123';
 
         const newUser = {
           id: 'usr_b2b_' + Date.now(),
@@ -5576,6 +5779,7 @@
           avatar: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=160&auto=format&fit=crop&q=80',
           role: 'b2b',
           password: password,
+          backupCode: 'WM-2026',
           createdAt: new Date().toISOString()
         };
 
@@ -5594,7 +5798,7 @@
       } else if (role === 'admin') {
         const name = document.getElementById('reg-admin-name')?.value.trim() || 'Admin Điều Hành';
         const email = document.getElementById('reg-admin-email')?.value.trim() || 'admin@wandermatch.vn';
-        const password = document.getElementById('reg-admin-password')?.value.trim() || '123456';
+        const password = document.getElementById('reg-admin-password')?.value.trim() || '123';
         const key = document.getElementById('reg-admin-key')?.value.trim();
 
         if (key !== 'WM2026ADMIN') {
@@ -5614,6 +5818,7 @@
           avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&auto=format&fit=crop&q=80',
           role: 'admin',
           password: password,
+          backupCode: 'WM2026ADMIN',
           createdAt: new Date().toISOString()
         };
 
@@ -5631,38 +5836,127 @@
       }
     };
 
-    window.handleUniversalLogin = function(e) {
-      e.preventDefault();
-      const identifier = document.getElementById('auth-login-identifier')?.value.trim().toLowerCase() || '';
-      const password = document.getElementById('auth-login-password')?.value.trim() || '';
+    window.handleUniversalLogin = function(e, method) {
+      if (e) e.preventDefault();
       const users = getUsersDB();
+      const cleanStr = s => (s || '').toString().toLowerCase().replace(/\s+/g, '');
+      let matched = null;
 
-      let matchedUser = users.find(u => 
-        (u.email.toLowerCase() === identifier || u.phone === identifier || (u.taxCode && u.taxCode === identifier))
-      );
+      // 1. Nếu người dùng chọn đăng nhập bằng Mã Bảo Mật Thay Thế
+      if (method === 'code' || window.currentLoginMethod === 'code') {
+        const emailInput = document.getElementById('auth-login-code-email');
+        const codeInput = document.getElementById('auth-login-code-val');
+        const rawEmail = (emailInput ? emailInput.value : '').trim();
+        const rawCode = (codeInput ? codeInput.value : '').trim().toUpperCase();
 
-      if (!matchedUser) {
-        if (identifier.includes('partner') || identifier.includes('hotel')) {
-          matchedUser = users.find(u => u.role === 'b2b') || DEFAULT_USERS_DB[1];
-        } else if (identifier.includes('admin')) {
-          matchedUser = users.find(u => u.role === 'admin') || DEFAULT_USERS_DB[2];
-        } else {
-          matchedUser = users.find(u => u.role === 'b2c') || DEFAULT_USERS_DB[0];
+        if (!rawEmail) {
+          if (typeof showToast === 'function') showToast('warning', '⚠️ Vui lòng nhập Email đăng nhập!');
+          return;
+        }
+        if (!rawCode) {
+          if (typeof showToast === 'function') showToast('warning', '⚠️ Vui lòng nhập Mã bảo mật thay thế!');
+          return;
+        }
+
+        const searchKey = cleanStr(rawEmail);
+        matched = users.find(u => cleanStr(u.email) === searchKey || cleanStr(u.phone) === searchKey);
+
+        // Kiểm tra tính hợp lệ của mã bảo mật thay thế
+        const isValidCode = (matched && (matched.backupCode || '').toUpperCase() === rawCode) ||
+                            rawCode === 'WM-2026' ||
+                            rawCode === 'WM2026ADMIN' ||
+                            rawCode.startsWith('WM-');
+
+        if (!isValidCode) {
+          if (typeof showToast === 'function') showToast('warning', '⚠️ Mã bảo mật thay thế không đúng! Vui lòng thử lại với mã: WM-2026');
+          return;
+        }
+
+        // Nếu mã đúng nhưng chưa có tài khoản trong DB -> tự động tạo hồ sơ du khách ngay
+        if (!matched) {
+          matched = {
+            id: 'usr_auto_' + Date.now(),
+            name: rawEmail.includes('@') ? rawEmail.split('@')[0].toUpperCase() : 'DU KHÁCH MỚI',
+            email: rawEmail,
+            phone: '0988 888 888',
+            bank: 'MB BANK — 0988888888',
+            bankHolder: rawEmail.toUpperCase(),
+            cccd: '079201' + Math.floor(100000 + Math.random() * 900000),
+            tier: 'Du Khách Đã KYC',
+            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80',
+            role: 'b2c',
+            password: '123',
+            backupCode: rawCode,
+            createdAt: new Date().toISOString()
+          };
+          users.push(matched);
+          saveUsersDB(users);
+        }
+
+      } else {
+        // 2. Đăng nhập truyền thống bằng Tên / Email / SĐT + Mật khẩu
+        const idInput = document.getElementById('auth-login-identifier');
+        const pwInput = document.getElementById('auth-login-password');
+        const rawId = (idInput ? idInput.value : '').trim();
+        const rawPw = (pwInput ? pwInput.value : '').trim();
+
+        if (!rawId) {
+          if (typeof showToast === 'function') showToast('warning', '⚠️ Vui lòng nhập Email, Tên hoặc Số điện thoại đăng nhập!');
+          return;
+        }
+
+        const searchKey = cleanStr(rawId);
+
+        // Tìm kiếm linh hoạt
+        matched = users.find(u => {
+          return cleanStr(u.email) === searchKey ||
+                 cleanStr(u.phone) === searchKey ||
+                 cleanStr(u.taxCode) === searchKey ||
+                 cleanStr(u.name) === searchKey ||
+                 cleanStr(u.id) === searchKey;
+        });
+
+        // Hỗ trợ từ khóa đặc biệt
+        if (!matched) {
+          if (searchKey.includes('admin')) {
+            matched = users.find(u => u.role === 'admin') || DEFAULT_USERS_DB[2];
+          } else if (searchKey.includes('partner') || searchKey.includes('hotel') || searchKey.includes('resort')) {
+            matched = users.find(u => u.role === 'b2b') || DEFAULT_USERS_DB[1];
+          } else {
+            // Tự động khởi tạo và lưu ngay tài khoản du khách từ thông tin nhập để khách đăng nhập thông suốt
+            matched = {
+              id: 'usr_auto_' + Date.now(),
+              name: rawId.includes('@') ? rawId.split('@')[0].toUpperCase() : ('DU KHÁCH ' + (rawId.length > 4 ? rawId.slice(-4) : rawId)),
+              email: rawId.includes('@') ? rawId : (rawId.replace(/\s+/g, '') + '@wandermatch.vn'),
+              phone: rawId.match(/^[0-9+ ]+$/) ? rawId : '0988 888 888',
+              bank: 'MB BANK — ' + rawId,
+              bankHolder: rawId.toUpperCase(),
+              cccd: '079201' + Math.floor(100000 + Math.random() * 900000),
+              tier: 'Du Khách Đã KYC',
+              avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80',
+              role: 'b2c',
+              password: rawPw || '123',
+              backupCode: 'WM-2026',
+              createdAt: new Date().toISOString()
+            };
+            users.push(matched);
+            saveUsersDB(users);
+          }
         }
       }
 
-      window.currentUser = matchedUser;
-      localStorage.setItem('wm_user_session', JSON.stringify(matchedUser));
+      window.currentUser = matched;
+      localStorage.setItem('wm_user_session', JSON.stringify(matched));
       renderUserHeader();
       closeAuthModal();
 
       if (typeof showToast === 'function') {
-        showToast('success', `👋 Chào mừng ${matchedUser.name} đã đăng nhập thành công!`);
+        showToast('success', `👋 Đăng nhập thành công! Chào mừng ${matched.name} (${matched.tier || 'Thành viên'}).`);
       }
 
-      if (matchedUser.role === 'b2b') {
+      if (matched.role === 'b2b') {
         window.switchTab('b2b');
-      } else if (matchedUser.role === 'admin') {
+      } else if (matched.role === 'admin') {
         window.switchTab('admin');
       } else {
         window.switchTab('b2c');
@@ -5692,19 +5986,25 @@
     };
 
     window.handleLogout = function() {
-      if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi tài khoản WanderMatch? Dữ liệu người dùng và sổ cái giao dịch vẫn được lưu trữ an toàn trong máy.')) {
-        window.currentUser = null;
-        localStorage.removeItem('wm_user_session');
-        renderUserHeader();
-        const drop = document.getElementById('user-dropdown-menu');
-        if (drop) drop.classList.add('hidden');
-        closeCustomerProfileModal();
-        if (typeof showToast === 'function') {
-          showToast('info', '👋 Đã đăng xuất an toàn. Bạn có thể bấm Đăng Ký hoặc Đăng Nhập bất kỳ lúc nào.');
-        }
-        window.switchTab('b2c');
-        window.switchB2CStep(1);
+      // Đăng xuất tức thì, KHÔNG dùng confirm làm nghẽn giao diện người dùng
+      window.currentUser = null;
+      localStorage.removeItem('wm_user_session');
+      renderUserHeader();
+      closeCustomerProfileModal();
+      closeAuthModal();
+
+      if (typeof showToast === 'function') {
+        showToast('info', '🚪 Đã đăng xuất an toàn! Dữ liệu tài khoản & sổ cái vẫn được lưu trữ vĩnh viễn trên máy.');
       }
+      window.switchTab('b2c');
+      window.switchB2CStep(1);
+    };
+
+    window.handleLogoutAndSwitch = function() {
+      handleLogout();
+      setTimeout(() => {
+        openAuthModal('login');
+      }, 150);
     };
 
     window.toggleUserDropdown = function(e) {
@@ -5843,14 +6143,26 @@
       const infoPhone = document.getElementById('prof-info-phone');
       const infoEmail = document.getElementById('prof-info-email');
       const infoBank = document.getElementById('prof-info-bank');
+      const infoCccd = document.getElementById('prof-info-cccd');
+      const infoBackup = document.getElementById('prof-info-backup');
+      const logoutUsername = document.getElementById('logout-panel-username');
+      const logoutEmail = document.getElementById('logout-panel-email');
+      const logoutBackup = document.getElementById('logout-panel-backup-code');
 
       if (nameTitle) nameTitle.textContent = window.currentUser.name;
       if (emailSub) emailSub.textContent = `${window.currentUser.email} • ${window.currentUser.tier || 'Thành viên'}`;
       if (avatarLarge && window.currentUser.avatar) avatarLarge.src = window.currentUser.avatar;
       if (infoName) infoName.textContent = window.currentUser.name;
-      if (infoPhone) infoPhone.textContent = window.currentUser.phone;
+      if (infoPhone) infoPhone.textContent = window.currentUser.phone || '0988 888 888';
       if (infoEmail) infoEmail.textContent = window.currentUser.email;
       if (infoBank) infoBank.textContent = window.currentUser.bank || 'MB BANK — 0988888888';
+      if (infoCccd) infoCccd.textContent = window.currentUser.cccd || '079201019888';
+      if (infoBackup) infoBackup.textContent = window.currentUser.backupCode || 'WM-2026';
+
+      // Cập nhật thông tin trong Tab Đăng Xuất & Quản Trị Phiên riêng biệt
+      if (logoutUsername) logoutUsername.textContent = window.currentUser.name;
+      if (logoutEmail) logoutEmail.textContent = `${window.currentUser.email} • SĐT: ${window.currentUser.phone || '0988 888 888'}`;
+      if (logoutBackup) logoutBackup.textContent = window.currentUser.backupCode || 'WM-2026';
 
       const modal = document.getElementById('customer-profile-modal');
       if (modal) modal.classList.remove('hidden');
@@ -5863,15 +6175,27 @@
     };
 
     window.switchProfileTab = function(tabName) {
-      const tabs = ['profile', 'bookings', 'persona', 'refund', 'ledger'];
+      const tabs = ['profile', 'bookings', 'persona', 'refund', 'ledger', 'logout'];
       tabs.forEach(t => {
         const btn = document.getElementById(`prof-tab-btn-${t}`);
         const panel = document.getElementById(`prof-panel-${t}`);
         if (t === tabName) {
-          if (btn) btn.className = "px-3.5 py-2 rounded-xl font-bold bg-cyan-500 text-slate-950 shadow flex items-center gap-2 shrink-0";
+          if (btn) {
+            if (t === 'logout') {
+              btn.className = "px-3.5 py-2 rounded-xl font-bold bg-rose-600 text-white shadow-lg shadow-rose-900/40 flex items-center gap-2 shrink-0";
+            } else {
+              btn.className = "px-3.5 py-2 rounded-xl font-bold bg-cyan-500 text-slate-950 shadow flex items-center gap-2 shrink-0";
+            }
+          }
           if (panel) panel.classList.remove('hidden');
         } else {
-          if (btn) btn.className = "px-3.5 py-2 rounded-xl font-semibold text-slate-400 hover:text-white bg-slate-900/80 border border-slate-800 flex items-center gap-2 shrink-0";
+          if (btn) {
+            if (t === 'logout') {
+              btn.className = "px-3.5 py-2 rounded-xl font-bold text-rose-300 hover:text-white bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/50 flex items-center gap-2 shrink-0 transition";
+            } else {
+              btn.className = "px-3.5 py-2 rounded-xl font-semibold text-slate-400 hover:text-white bg-slate-900/80 border border-slate-800 flex items-center gap-2 shrink-0";
+            }
+          }
           if (panel) panel.classList.add('hidden');
         }
       });
