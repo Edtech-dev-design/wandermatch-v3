@@ -364,8 +364,8 @@
                     <input id="portal-reg-pin" type="text" maxlength="6" placeholder="VD: 888888" class="w-full glass-input rounded-xl px-3 py-2 text-xs font-mono text-center text-cyan-300 border border-slate-700 focus:border-cyan-400">
                   </div>
                   <div>
-                    <label class="block text-slate-300 font-bold mb-1">Số CCCD (Tùy chọn):</label>
-                    <input id="portal-reg-cccd" type="text" placeholder="Để trống hoặc điền sau" class="w-full glass-input rounded-xl px-3 py-2 text-xs font-mono text-cyan-300 border border-slate-700 focus:border-cyan-400">
+                    <label class="block text-slate-300 font-bold mb-1">Mã giới thiệu (Tùy chọn):</label>
+                    <input id="portal-reg-referral" type="text" placeholder="Để trống hoặc điền mã giới thiệu" class="w-full glass-input rounded-xl px-3 py-2 text-xs font-mono text-cyan-300 border border-slate-700 focus:border-cyan-400">
                   </div>
                 </div>
 
@@ -6673,6 +6673,7 @@
     };
 
     window.setPortalAuthMethod = function(method = 'password') {
+      window.currentLoginMethod = method;
       const btnPwd = document.getElementById('portal-auth-btn-pwd');
       const btnPin = document.getElementById('portal-auth-btn-pin');
       const boxPwd = document.getElementById('portal-auth-box-pwd');
@@ -7057,15 +7058,19 @@
       if (e && e.preventDefault) e.preventDefault();
       const identifierInput = document.getElementById('portal-login-identifier');
       const pwdInput = document.getElementById('portal-login-password');
+      const pinInput = document.getElementById('portal-login-pin');
       const roleSelect = document.getElementById('portal-login-role');
 
       const email = identifierInput ? identifierInput.value.trim().toLowerCase() : '';
-      const password = pwdInput ? pwdInput.value : '';
+      let password = pwdInput ? pwdInput.value : '';
+      if (!password && pinInput && pinInput.value) {
+        password = pinInput.value.trim();
+      }
       const role = roleSelect ? roleSelect.value : 'b2c';
 
       if (!email || !password) {
         if (typeof showToast === 'function') {
-          showToast('warning', '⚠️ Vui lòng nhập đầy đủ Email và Mật khẩu đăng nhập.');
+          showToast('warning', '⚠️ Vui lòng nhập đầy đủ Email / Tên đăng nhập và Mật khẩu / PIN.');
         }
         if (!email && identifierInput) identifierInput.focus();
         else if (pwdInput) pwdInput.focus();
@@ -7159,6 +7164,8 @@
                        document.getElementById('reg-b2b-password')?.value ||
                        document.getElementById('reg-admin-password')?.value || '';
 
+      const pin = document.getElementById('portal-reg-pin')?.value?.trim() || '888888';
+      const cccd = document.getElementById('portal-reg-cccd')?.value?.trim() || '079090001234';
       const role = document.getElementById('portal-reg-role')?.value || 'b2c';
 
       if (!email || !password || !name) {
@@ -7186,6 +7193,8 @@
               full_name: name,
               phone: phone || '0988 888 888',
               role: role,
+              pin: pin,
+              cccd: cccd,
               tier: role === 'admin' ? 'Quản Trị Viên' : (role === 'b2b' ? 'Đối Tác Cung Ứng' : 'Du Khách Đã KYC')
             }
           }
@@ -7201,14 +7210,20 @@
         }
 
         // Lưu bản ghi vào bảng customer_profiles
-        await window.supabase.from('customer_profiles').insert({
-          id: data.user.id,
-          email: email,
-          full_name: name,
-          phone: phone || '0988 888 888',
-          role: role,
-          created_at: new Date().toISOString()
-        });
+        try {
+          if (window.supabase && typeof window.supabase.from === 'function') {
+            await window.supabase.from('customer_profiles').insert({
+              id: data.user.id,
+              email: email,
+              full_name: name,
+              phone: phone || '0988 888 888',
+              role: role,
+              created_at: new Date().toISOString()
+            });
+          }
+        } catch (subErr) {
+          console.warn('Sync customer_profiles notice:', subErr);
+        }
 
         const newUser = {
           id: data.user.id,
@@ -7216,6 +7231,8 @@
           email: email,
           phone: phone || '0988 888 888',
           role: role,
+          pin: pin,
+          cccd: cccd,
           tier: role === 'admin' ? 'Quản Trị Viên' : (role === 'b2b' ? 'Đối Tác Cung Ứng' : 'Du Khách Đã KYC')
         };
 

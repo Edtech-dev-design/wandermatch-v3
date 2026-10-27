@@ -47,6 +47,7 @@
       id: "usr_admin_001",
       email: "admin@wandermatch.vn",
       password: "admin",
+      pin: "888888",
       full_name: "Nguyễn Doãn Trường Huy (Admin)",
       phone: "0988 888 888",
       role: "admin",
@@ -56,6 +57,7 @@
       id: "usr_partner_002",
       email: "partner@wandermatch.vn",
       password: "123",
+      pin: "888888",
       full_name: "Ana Mandara & Dalat Resort Partner",
       phone: "0912 345 678",
       role: "b2c",
@@ -65,17 +67,41 @@
       id: "usr_traveler_003",
       email: "khachhang@wandermatch.vn",
       password: "123",
+      pin: "888888",
       full_name: "Nguyễn Doãn Trường Huy",
       phone: "0988 999 888",
       role: "b2c",
       tier: "Du Khách VIP Gold"
+    },
+    {
+      id: "usr_traveler_004",
+      email: "an.nguyen@wandermatch.vn",
+      password: "123456",
+      pin: "888888",
+      full_name: "An Nguyễn",
+      phone: "0909 123 456",
+      role: "b2c",
+      tier: "Du Khách Thân Thiết"
     }
   ];
 
   function getLocalUserStore() {
     try {
       const raw = localStorage.getItem("wm_supabase_users_db");
-      if (raw) return JSON.parse(raw);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        let changed = false;
+        VERIFIED_SEEDED_USERS.forEach(su => {
+          if (!parsed.some(u => (u.email && u.email.toLowerCase() === su.email.toLowerCase()) || u.id === su.id)) {
+            parsed.push(su);
+            changed = true;
+          }
+        });
+        if (changed) {
+          localStorage.setItem("wm_supabase_users_db", JSON.stringify(parsed));
+        }
+        return parsed;
+      }
     } catch (e) {}
     localStorage.setItem("wm_supabase_users_db", JSON.stringify(VERIFIED_SEEDED_USERS));
     return VERIFIED_SEEDED_USERS;
@@ -86,7 +112,7 @@
   }
 
   // Wrapper tiêu chuẩn bảo đảm tính độc lập và chống lỗi nhập bừa
-    // Cơ chế phát sự kiện trạng thái đăng nhập thời gian thực
+  // Cơ chế phát sự kiện trạng thái đăng nhập thời gian thực
   const authSubscribers = new Set();
   function notifyAuthSubscribers(event, session) {
     authSubscribers.forEach(cb => {
@@ -105,20 +131,20 @@ const supabaseAdapter = {
 
     auth: {
       async signInWithPassword({ email, password }) {
-        const cleanEmail = (email || '').trim().toLowerCase();
+        const cleanInput = (email || '').trim().toLowerCase();
         const rawPassword = (password || '').trim();
 
-        if (!cleanEmail || !rawPassword) {
+        if (!cleanInput || !rawPassword) {
           return {
             data: { user: null, session: null },
-            error: { message: "Vui lòng nhập đầy đủ Email và Mật khẩu!" }
+            error: { message: "Vui lòng nhập đầy đủ Email / Số điện thoại / Tên đăng nhập và Mật khẩu!" }
           };
         }
 
         // 1. Thử xác thực trực tiếp qua Supabase Cloud nếu kết nối mạng khả dụng
-        if (clientInstance && clientInstance.auth) {
+        if (clientInstance && clientInstance.auth && cleanInput.includes('@')) {
           try {
-            const res = await clientInstance.auth.signInWithPassword({ email: cleanEmail, password: rawPassword });
+            const res = await clientInstance.auth.signInWithPassword({ email: cleanInput, password: rawPassword });
             if (res.data?.session && !res.error) {
               localStorage.setItem("wm_supabase_session", JSON.stringify(res.data.session));
               return res;
@@ -132,24 +158,35 @@ const supabaseAdapter = {
 
         // 2. Kiểm tra chặt chẽ trên kho tài khoản xác thực (STRICT VERIFICATION)
         const users = getLocalUserStore();
-        const matched = users.find(u => u.email.toLowerCase() === cleanEmail);
+        const cleanDigits = cleanInput.replace(/[^0-9]/g, '');
+        const matched = users.find(u => {
+          const uEmail = (u.email || '').toLowerCase();
+          const uPhone = (u.phone || '').replace(/[^0-9]/g, '');
+          const uUsername = uEmail.split('@')[0];
+          return uEmail === cleanInput || 
+                 (cleanDigits && cleanDigits.length >= 8 && uPhone && (uPhone === cleanDigits || uPhone.endsWith(cleanDigits) || cleanDigits.endsWith(uPhone))) ||
+                 uUsername === cleanInput ||
+                 (u.id && u.id.toLowerCase() === cleanInput);
+        });
 
         // BẮT BUỘC: Nếu không tìm thấy -> CHẶN ĐỨNG LẬP TỨC (TRẢ VỀ ERROR)
         if (!matched) {
           return {
             data: { user: null, session: null },
             error: {
-              message: `Tài khoản "${cleanEmail}" không tồn tại trên hệ thống! Vui lòng Đăng Ký tài khoản mới.`
+              message: `Tài khoản "${cleanInput}" không tồn tại trên hệ thống! Vui lòng Đăng Ký tài khoản mới.`
             }
           };
         }
 
-        // BẮT BUỘC: Nếu sai mật khẩu -> CHẶN ĐỨNG LẬP TỨC
-        if (matched.password !== rawPassword) {
+        // BẮT BUỘC: Nếu sai mật khẩu và sai cả PIN -> CHẶN ĐỨNG LẬP TỨC
+        const pwdMatch = matched.password === rawPassword;
+        const pinMatch = matched.pin && matched.pin === rawPassword;
+        if (!pwdMatch && !pinMatch) {
           return {
             data: { user: null, session: null },
             error: {
-              message: "Mật khẩu không chính xác! Vui lòng kiểm tra lại."
+              message: "Mật khẩu hoặc mã PIN không chính xác! Vui lòng kiểm tra lại."
             }
           };
         }
@@ -166,7 +203,11 @@ const supabaseAdapter = {
               full_name: matched.full_name,
               phone: matched.phone,
               role: matched.role,
-              tier: matched.tier
+              tier: matched.tier,
+              cccd: matched.cccd || '',
+              bank_code: matched.bank_code || 'MB',
+              bank_account: matched.bank_account || '0988888888',
+              bank_account_holder: matched.bank_account_holder || matched.full_name
             }
           }
         };
@@ -213,10 +254,15 @@ const supabaseAdapter = {
           id: "usr_" + Date.now(),
           email: cleanEmail,
           password: rawPassword,
+          pin: meta.pin || '888888',
           full_name: meta.full_name || cleanEmail.split('@')[0].toUpperCase(),
           phone: meta.phone || '0988 888 888',
           role: meta.role || 'b2c',
           tier: meta.tier || 'Du Khách Đã KYC',
+          cccd: meta.cccd || '',
+          bank_code: meta.bank_code || 'MB',
+          bank_account: meta.bank_account || '0988888888',
+          bank_account_holder: meta.bank_account_holder || (meta.full_name || cleanEmail.split('@')[0].toUpperCase()),
           created_at: new Date().toISOString()
         };
 

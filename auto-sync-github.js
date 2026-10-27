@@ -37,7 +37,7 @@ function runGitCommand(cmd) {
 }
 
 function syncFrontendMirror() {
-  const files = ['index.html', 'app.js', 'styles.css'];
+  const files = ['index.html', 'app.js', 'styles.css', 'supabaseClient.js'];
   const frontendDir = path.join(ROOT_DIR, 'frontend');
   if (!fs.existsSync(frontendDir)) return;
 
