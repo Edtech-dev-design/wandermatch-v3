@@ -4251,9 +4251,34 @@ window.switchPlannerSection = switchPlannerSection;
 
 // CHỈ KHI NÀO KHÁCH BẤM NÚT "🚀 AI BẮT ĐẦU TẠO LỊCH TRÌNH ĐỘC BẢN" THÌ MỚI DI CHUYỂN & HIỆN KẾT QUẢ
 function triggerAiTripPlanner() {
-  switchPlannerSection('itins');
-  handleGeneratePlan(true);
+  const btn = document.getElementById('btn-trigger-ai-plan');
+  const originalHtml = btn ? btn.innerHTML : '';
+
+  if (btn) {
+    btn.disabled = true;
+    btn.classList.add('opacity-85', 'cursor-wait');
+    btn.innerHTML = `<i class="fa-solid fa-microchip fa-spin text-base text-cyan-300"></i> <span>⚡ AI 4 Tầng Đang Phân Tích &amp; Khớp Lệnh...</span>`;
+  }
+
+  if (typeof switchPlannerSection === 'function') {
+    switchPlannerSection('itins');
+  }
+
+  setTimeout(() => {
+    try {
+      handleGeneratePlan(true);
+    } catch (err) {
+      console.error("AI Planner error:", err);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.classList.remove('opacity-85', 'cursor-wait');
+        btn.innerHTML = originalHtml || `<i class="fa-solid fa-wand-magic-sparkles text-sm"></i> <span>🚀 AI Lập Kế Hoạch Chuyến Đi</span>`;
+      }
+    }
+  }, 300);
 }
+window.triggerAiTripPlanner = triggerAiTripPlanner;
 
 function handleGeneratePlan(shouldScroll = false) {
   const destSelect = document.getElementById('planner-dest-select')?.value || 'blind';
@@ -4323,9 +4348,11 @@ function handleGeneratePlan(shouldScroll = false) {
   // CHỈ CUỘN MÀN HÌNH VÀ BÁO TOAST KHI KHÁCH CHỦ ĐỘNG ẤN NÚT
   if (shouldScroll) {
     showToast('success', `🎉 AI đã xuất xong 3 phương án độc bản cho ${modeLabel} (${state.selectedBudget.toLocaleString('vi-VN')}đ)!`);
-    const itinContainer = document.getElementById('itineraries-container') || document.getElementById('planner-sec-itins');
-    if (itinContainer) {
-      itinContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const targetCard = document.getElementById('generated-trip-card') || document.getElementById('itineraries-container') || document.getElementById('planner-sec-itins');
+    if (targetCard) {
+      targetCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      targetCard.classList.add('ring-2', 'ring-cyan-400');
+      setTimeout(() => targetCard.classList.remove('ring-2', 'ring-cyan-400'), 2500);
     }
   }
 }
@@ -6359,4 +6386,5 @@ window.renderRefundCalculator = renderRefundCalculator;
 window.renderEscrowLedger = renderEscrowLedger;
 window.startPaymentCountdown = startPaymentCountdown;
 window.initScratchCard = initScratchCard;
+window.triggerAiTripPlanner = triggerAiTripPlanner;
 
