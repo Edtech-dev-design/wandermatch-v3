@@ -1,8 +1,10 @@
 {
   "version": 2,
   "framework": null,
-  "buildCommand": "echo 'Static site build complete'",
-  "outputDirectory": ".",
+  "outputDirectory": "frontend",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.js" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -11,8 +13,5 @@
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
       ]
     }
-  ],
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.js" }
   ]
 }

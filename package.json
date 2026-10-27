@@ -1,6 +1,7 @@
 {
   "name": "wandermatch-fullstack",
   "version": "3.0.0",
+  "type": "module",
   "private": true,
   "scripts": {
     "dev:worker": "wrangler dev worker.js --port 8787",
