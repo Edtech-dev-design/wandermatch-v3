@@ -3053,34 +3053,47 @@
   <!-- ============================================================================
        MODAL: XÁC NHẬN ĐĂNG NHẬP SOCIAL (GOOGLE / FACEBOOK)
        ============================================================================ -->
-  <div id="social-auth-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden animate-fadeIn">
-    <div class="glass-panel rounded-3xl max-w-md w-full border border-slate-700/80 shadow-2xl p-6 sm:p-8 space-y-6 text-center relative overflow-hidden bg-slate-900/95">
+  <div id="social-auth-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md hidden animate-fadeIn">
+    <div class="glass-panel rounded-3xl max-w-md w-full border border-slate-700/80 shadow-2xl p-6 sm:p-8 space-y-5 text-center relative overflow-hidden bg-slate-900/95">
       <div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl shadow-xl bg-slate-800 border border-slate-700" id="social-modal-icon-box">
         <i class="fa-brands fa-google text-rose-400" id="social-modal-icon"></i>
       </div>
 
       <div class="space-y-1">
         <h3 class="text-xl font-black text-white" id="social-modal-title">Xác Nhận Đăng Nhập Qua Google</h3>
-        <p class="text-xs text-slate-400" id="social-modal-subtitle">Hệ thống sẽ đồng bộ tài khoản và kích hoạt bảo lãnh hoàn tiền 24H</p>
+        <p class="text-xs text-slate-400" id="social-modal-subtitle">Đồng bộ phiên đăng nhập an toàn với Supabase Auth &amp; PostgreSQL</p>
       </div>
 
-      <div class="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-left flex items-center gap-3">
-        <img id="social-modal-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" class="w-12 h-12 rounded-full object-cover border-2 border-cyan-400">
-        <div class="flex-1 min-w-0">
-          <div class="font-bold text-sm text-white truncate" id="social-modal-name">Hội Viên Khách Hàng</div>
-          <div class="text-xs text-slate-400 truncate" id="social-modal-email">khachhang@wandermatch.vn</div>
-          <span class="inline-flex items-center gap-1 text-[10px] text-emerald-400 font-bold mt-0.5">
-            <i class="fa-solid fa-circle-check"></i> Đã liên kết &amp; bảo mật
+      <div class="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-left space-y-3">
+        <div class="flex items-center gap-3">
+          <img id="social-modal-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" class="w-11 h-11 rounded-full object-cover border-2 border-cyan-400 shrink-0">
+          <div class="flex-1 min-w-0">
+            <span class="text-[10px] font-black uppercase text-cyan-400 tracking-wider" id="social-modal-provider-tag">TÀI KHOẢN GOOGLE AUTH</span>
+            <div class="font-bold text-sm text-white truncate" id="social-modal-name">Người Dùng Google VIP</div>
+          </div>
+          <span class="inline-flex items-center gap-1 text-[10px] text-emerald-400 font-bold bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800">
+            <i class="fa-solid fa-circle-check"></i> Xác Thực
           </span>
+        </div>
+
+        <div class="space-y-2 pt-1 border-t border-slate-800/80 text-xs">
+          <div>
+            <label class="block text-slate-400 text-[11px] mb-1 font-semibold">Địa chỉ Email xác thực:</label>
+            <input id="social-modal-input-email" type="email" class="w-full glass-input rounded-xl px-3 py-2 text-xs text-white border border-slate-700 focus:border-cyan-400" value="user.google@gmail.com">
+          </div>
+          <div>
+            <label class="block text-slate-400 text-[11px] mb-1 font-semibold">Họ và tên hiển thị:</label>
+            <input id="social-modal-input-name" type="text" class="w-full glass-input rounded-xl px-3 py-2 text-xs text-white border border-slate-700 focus:border-cyan-400" value="Khách Hàng Google VIP">
+          </div>
         </div>
       </div>
 
-      <div class="space-y-2 pt-2">
-        <button type="button" onclick="confirmSocialAuth()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-cyan-500/25 transition transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2">
+      <div class="space-y-2 pt-1">
+        <button id="btn-confirm-social-auth" type="button" onclick="confirmSocialAuth()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-cyan-500/25 transition transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer">
           <i class="fa-solid fa-arrow-right-to-bracket"></i>
-          <span>XÁC NHẬN TIẾP TỤC VÀO ỨNG DỤNG</span>
+          <span>XÁC NHẬN ĐĂNG NHẬP &amp; VÀO HỆ THỐNG</span>
         </button>
-        <button type="button" onclick="closeSocialAuthModal()" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition">
+        <button type="button" onclick="closeSocialAuthModal()" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition cursor-pointer">
           Hủy Bỏ
         </button>
       </div>
@@ -5539,6 +5552,17 @@
         found.customerReview = `${rating}/5 ★ - "${review}"`;
       }
       window.handleLivePersonaChange(true);
+      // Đồng bộ vào cơ sở dữ liệu Supabase feedback
+      try {
+        if (window.supabase && window.supabase.from) {
+          window.supabase.from('feedback').insert({
+            booking_code: bookingCode,
+            rating: rating,
+            review: review,
+            created_at: new Date().toISOString()
+          });
+        }
+      } catch (e) {}
       refreshCloudAdminSummary();
       if (typeof showToast === 'function') {
         showToast('success', `🌟 Đã lưu đánh giá vào AI Memory! Hệ thống tự động cộng +15 điểm ưu tiên cho nhóm địa điểm tương ứng.`);
@@ -6797,24 +6821,29 @@
       const title = document.getElementById('social-modal-title');
       const subtitle = document.getElementById('social-modal-subtitle');
       const icon = document.getElementById('social-modal-icon');
-      const name = document.getElementById('social-modal-name');
-      const email = document.getElementById('social-modal-email');
+      const tag = document.getElementById('social-modal-provider-tag');
       const avatar = document.getElementById('social-modal-avatar');
+      const emailInput = document.getElementById('social-modal-input-email');
+      const nameInput = document.getElementById('social-modal-input-name');
+
+      const curUser = window.currentUser || {};
 
       if (provider === 'facebook') {
         if (title) title.textContent = "Xác Nhận Đăng Nhập Qua Facebook";
-        if (subtitle) subtitle.textContent = "Liên kết tài khoản Facebook an toàn và kích hoạt bảo lãnh hoàn tiền 24H";
+        if (subtitle) subtitle.textContent = "Đồng bộ tài khoản Facebook an toàn và kết nối cơ sở dữ liệu Supabase";
         if (icon) icon.className = "fa-brands fa-facebook text-[#1877F2]";
-        if (name) name.textContent = "Hội Viên Khách Hàng (Facebook)";
-        if (email) email.textContent = "khachhang.fb@gmail.com";
+        if (tag) tag.textContent = "TÀI KHOẢN FACEBOOK AUTH";
         if (avatar) avatar.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80";
+        if (emailInput) emailInput.value = curUser.email && curUser.email.includes('facebook') ? curUser.email : (curUser.email || "user.facebook@gmail.com");
+        if (nameInput) nameInput.value = curUser.full_name || curUser.name || "Khách Hàng Facebook";
       } else {
         if (title) title.textContent = "Xác Nhận Đăng Nhập Qua Google";
-        if (subtitle) subtitle.textContent = "Đồng bộ tài khoản Google và lưu trữ dữ liệu an toàn vào Supabase";
+        if (subtitle) subtitle.textContent = "Đồng bộ tài khoản Google an toàn và kết nối cơ sở dữ liệu Supabase";
         if (icon) icon.className = "fa-brands fa-google text-rose-500";
-        if (name) name.textContent = "Hội Viên Khách Hàng (Google VIP)";
-        if (email) email.textContent = "khachhang@wandermatch.vn";
+        if (tag) tag.textContent = "TÀI KHOẢN GOOGLE AUTH";
         if (avatar) avatar.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80";
+        if (emailInput) emailInput.value = curUser.email && !curUser.email.includes('facebook') ? curUser.email : (curUser.email || "user.google@gmail.com");
+        if (nameInput) nameInput.value = curUser.full_name || curUser.name || "Khách Hàng Google VIP";
       }
 
       if (modal) modal.classList.remove('hidden');
@@ -6825,42 +6854,60 @@
       if (modal) modal.classList.add('hidden');
     };
 
-    window.confirmSocialAuth = function() {
-      closeSocialAuthModal();
-      const isFb = window.currentSocialProvider === 'facebook';
-      const user = {
-        id: 'usr_' + (isFb ? 'fb_' : 'gg_') + Date.now(),
-        name: isFb ? 'NGUYỄN DOÃN TRƯỜNG HUY (FACEBOOK)' : 'NGUYỄN DOÃN TRƯỜNG HUY (GOOGLE VIP)',
-        email: isFb ? 'khachhang.fb@gmail.com' : 'khachhang@wandermatch.vn',
-        phone: '0988 888 888',
-        cccd: '079090001234',
-        bankName: 'MB BANK',
-        bankAcc: '0988888888',
-        bank: 'MB BANK — 0988888888',
-        role: 'b2c',
-        tier: 'Hội Viên Kim Cương',
-        avatar: isFb ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80' : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-        backupCode: '888888',
-        provider: window.currentSocialProvider,
-        createdAt: new Date().toISOString()
-      };
+    window.confirmSocialAuth = async function() {
+      const provider = window.currentSocialProvider || 'google';
+      const emailInput = document.getElementById('social-modal-input-email');
+      const nameInput = document.getElementById('social-modal-input-name');
+      const btn = document.getElementById('btn-confirm-social-auth');
 
-      const users = getUsersDB();
-      users.push(user);
-      saveUsersDB(users);
-      window.currentUser = user;
-      localStorage.setItem('wm_user_session', JSON.stringify(user));
-      renderUserHeader();
-      syncCustomerToSupabase(user);
+      const cleanEmail = (emailInput?.value || '').trim() || (provider === 'facebook' ? 'user.facebook@gmail.com' : 'user.google@gmail.com');
+      const cleanName = (nameInput?.value || '').trim() || (provider === 'facebook' ? 'Khách Hàng Facebook' : 'Khách Hàng Google VIP');
 
-      if (typeof showToast === 'function') {
-        showToast('success', '🎉 Đã đăng nhập thành công qua ' + (isFb ? 'Facebook' : 'Google') + '! Đang mở khảo sát sở thích...');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Đang Xác Thực Supabase...</span>`;
       }
 
-      // Hỏi sở thích du lịch ngay sau khi đăng nhập
-      setTimeout(() => {
-        openPreferencesModal();
-      }, 350);
+      try {
+        const { data, error } = await window.supabase.auth.signInWithOAuth({
+          provider,
+          options: {
+            email: cleanEmail,
+            fullName: cleanName
+          }
+        });
+
+        if (error) {
+          if (typeof showToast === 'function') showToast('error', error.message || 'Lỗi đăng nhập OAuth!');
+          return;
+        }
+
+        closeSocialAuthModal();
+        const portalModal = document.getElementById('customer-portal-modal');
+        if (portalModal) portalModal.classList.add('hidden');
+
+        if (typeof showToast === 'function') {
+          showToast('success', `🎉 Đăng nhập ${provider.toUpperCase()} thành công! Chào mừng ${cleanName}`);
+        }
+
+        // Đồng bộ UI
+        if (typeof renderUserHeader === 'function') renderUserHeader();
+        if (typeof syncUserHeaderUI === 'function') syncUserHeaderUI(data.user);
+        if (typeof syncProfileInputs === 'function') syncProfileInputs(data.user);
+
+        // Mở khảo sát sở thích hoặc chuyển vào Step 1
+        setTimeout(() => {
+          openPreferencesModal();
+        }, 350);
+      } catch (err) {
+        console.error("Social Auth error:", err);
+        if (typeof showToast === 'function') showToast('error', 'Lỗi xác thực: ' + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-arrow-right-to-bracket"></i> <span>XÁC NHẬN ĐĂNG NHẬP &amp; VÀO HỆ THỐNG</span>`;
+        }
+      }
     };
 
     window.openPreferencesModal = function() {
