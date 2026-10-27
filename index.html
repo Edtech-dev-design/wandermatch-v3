@@ -260,7 +260,7 @@
 
                 <div>
                   <label class="block text-slate-300 font-bold mb-1">Họ và tên đầy đủ (Viết hoa có dấu):</label>
-                  <input id="portal-reg-name" type="text" placeholder="Ví dụ: NGUYỄN VĂN AN" class="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs font-bold uppercase text-white border border-slate-700 focus:border-cyan-400">
+                  <input id="portal-reg-name" type="text" placeholder="Ví dụ: NGUYỄN HOÀNG LONG" class="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs font-bold uppercase text-white border border-slate-700 focus:border-cyan-400">
                 </div>
 
                 <div>
@@ -294,41 +294,34 @@
                 </div>
               </div>
 
-              <!-- Cột 2: Thông tin thụ hưởng hoàn tiền & Bảo mật -->
+              <!-- Cột 2: Thiết Lập Mật Khẩu & Bảo Mật (ĐĂNG KÝ KHÔNG CẦN NHẬP TÀI KHOẢN NGÂN HÀNG) -->
               <div class="space-y-3.5 bg-slate-950/70 p-4 sm:p-5 rounded-2xl border border-slate-800">
-                <div class="flex items-center gap-2 pb-2 border-b border-slate-800 text-emerald-300 font-black text-xs uppercase tracking-wider">
-                  <i class="fa-solid fa-building-columns text-sm"></i>
-                  <span>2. Tài Khoản Hoàn Tiền &amp; Mật Mã</span>
+                <div class="flex items-center gap-2 pb-2 border-b border-slate-800 text-cyan-300 font-black text-xs uppercase tracking-wider">
+                  <i class="fa-solid fa-lock text-sm"></i>
+                  <span>2. Thiết Lập Mật Khẩu &amp; Bảo Mật</span>
                 </div>
 
                 <div>
-                  <label class="block text-slate-300 font-bold mb-1">Ngân hàng thụ hưởng hoàn tiền 24H:</label>
-                  <select id="portal-reg-bank" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs font-bold text-emerald-300 bg-slate-900 border border-slate-700">
-                    <option value="MB BANK">MB BANK — Ngân Hàng Quân Đội</option>
-                    <option value="VIETCOMBANK">VIETCOMBANK — Ngoại Thương Việt Nam</option>
-                    <option value="TECHCOMBANK">TECHCOMBANK — Kỹ Thương Việt Nam</option>
-                    <option value="ACB">ACB — Á Châu</option>
-                    <option value="VPBANK">VPBANK — Việt Nam Thịnh Vượng</option>
-                    <option value="BIDV">BIDV — Đầu Tư &amp; Phát Triển</option>
-                    <option value="VIETINBANK">VIETINBANK — Công Thương Việt Nam</option>
-                    <option value="TPBANK">TPBANK — Tiên Phong</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label class="block text-slate-300 font-bold mb-1">Số tài khoản nhận tiền hoàn 24H:</label>
-                  <input id="portal-reg-bank-acc" type="text" placeholder="Ví dụ: 0988888888 (STK chính chủ)" class="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-emerald-300 border border-slate-700 focus:border-emerald-400">
+                  <label class="block text-slate-300 font-bold mb-1">Mật khẩu đăng nhập: *</label>
+                  <input id="portal-reg-password" type="password" placeholder="Tối thiểu 6 ký tự..." class="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-white border border-slate-700 focus:border-cyan-400">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label class="block text-slate-300 font-bold mb-1">Mật khẩu đăng nhập:</label>
-                    <input id="portal-reg-password" type="password" placeholder="Tối thiểu 6 ký tự..." class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-white border border-slate-700 focus:border-cyan-400">
+                    <label class="block text-slate-300 font-bold mb-1">Mã PIN dự phòng (6 số):</label>
+                    <input id="portal-reg-pin" type="text" maxlength="6" placeholder="VD: 888888" class="w-full glass-input rounded-xl px-3 py-2 text-xs font-mono text-center text-cyan-300 border border-slate-700 focus:border-cyan-400">
                   </div>
                   <div>
-                    <label class="block text-slate-300 font-bold mb-1">Mã PIN thay thế (6 số):</label>
-                    <input id="portal-reg-pin" type="text" maxlength="6" placeholder="VD: 888888" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs font-mono text-center text-cyan-300 border border-slate-700 focus:border-cyan-400">
+                    <label class="block text-slate-300 font-bold mb-1">Số CCCD (Tùy chọn):</label>
+                    <input id="portal-reg-cccd" type="text" placeholder="Để trống hoặc điền sau" class="w-full glass-input rounded-xl px-3 py-2 text-xs font-mono text-cyan-300 border border-slate-700 focus:border-cyan-400">
                   </div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-[11px] text-slate-400 space-y-1">
+                  <div class="text-emerald-400 font-bold flex items-center gap-1.5">
+                    <i class="fa-solid fa-shield-check"></i> Đăng Ký Nhanh &amp; Bảo Mật
+                  </div>
+                  <p>Hệ thống không yêu cầu thông tin ngân hàng khi đăng ký tài khoản. Khách hàng chỉ cần nhập STK khi nhận hoàn tiền hoặc quét mã thanh toán.</p>
                 </div>
 
                 <!-- Mặc định vai trò Khách Du Lịch (B2C) -->
@@ -406,9 +399,20 @@
           <i class="fa-solid fa-compass text-cyan-400 text-sm"></i>
           <span>Khám Phá Chuyến Đi</span>
         </a>
-        <button type="button" onclick="openRefundPolicyModal()" class="px-4 py-2 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 text-xs font-black flex items-center gap-2 transition shadow cursor-pointer" title="Cam kết bảo lãnh hoàn tiền trong 24 giờ minh bạch">
+        <button type="button" onclick="openRefundPolicyModal()" class="px-3.5 py-2 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 text-xs font-black flex items-center gap-1.5 transition shadow cursor-pointer" title="Cam kết bảo lãnh hoàn tiền trong 24 giờ minh bạch">
           <i class="fa-solid fa-shield-halved text-emerald-400"></i>
           <span>Cam Kết Hoàn Tiền 24H</span>
+        </button>
+        <!-- NÚT MINI GAME NHẬN ƯU ĐÃI (TÁCH RIÊNG KHỎI HOÀN TIỀN) -->
+        <button type="button" onclick="openMiniGameModal()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 hover:from-amber-300 hover:to-orange-300 text-slate-950 text-xs font-black flex items-center gap-1.5 shadow-lg shadow-amber-500/20 transition transform hover:scale-[1.02] cursor-pointer" title="Chơi Mini Game Nhận Voucher 200K - 500K">
+          <i class="fa-solid fa-gift text-sm"></i>
+          <span>Mini Game Ưu Đãi</span>
+          <span class="px-1.5 py-0.2 rounded text-[9px] font-black bg-slate-950 text-amber-300">HOT</span>
+        </button>
+        <!-- NÚT CẨM NANG DU LỊCH (MINI WIDGET GỌN GÀNG) -->
+        <button type="button" onclick="openTravelGuideModal()" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-cyan-500/40 text-cyan-300 text-xs font-bold flex items-center gap-1.5 transition shadow cursor-pointer" title="Mẹo Bản Địa & Chống Chặt Chém">
+          <i class="fa-solid fa-book-open text-cyan-400"></i>
+          <span>Cẩm Nang Du Lịch</span>
         </button>
       </nav>
 
@@ -434,7 +438,7 @@
             <button onclick="openCustomerProfileModal('profile')" id="user-header-profile-btn" class="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 hover:from-slate-800 hover:to-slate-700 border-2 border-cyan-500/60 hover:border-cyan-400 text-xs transition shadow-xl group cursor-pointer" title="Mở Bảng Hồ Sơ Khách Hàng &amp; Đăng Xuất An Toàn">
               <img id="header-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="w-7 h-7 rounded-full object-cover border-2 border-cyan-400 group-hover:scale-105 transition shadow">
               <div class="text-left hidden sm:block max-w-[130px] truncate">
-                <span id="header-username" class="font-black text-white block text-xs truncate">NGUYỄN VĂN AN VIP</span>
+                <span id="header-username" class="font-black text-white block text-xs truncate">HỘI VIÊN DU LỊCH</span>
                 <span id="header-user-tier" class="text-[10px] text-cyan-300 font-mono block">HỘI VIÊN KIM CƯƠNG</span>
               </div>
               <span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-cyan-950 text-cyan-300 border border-cyan-700 flex items-center gap-1 shadow">
@@ -502,114 +506,161 @@
          ========================================================================== -->
         <section id="view-concierge" class="space-y-6 animate-fadeIn">
       
-      <!-- Interactive Trip Planner Input Control Box -->
-      <div class="glass-panel rounded-3xl p-6 lg:p-8 border border-cyan-500/40 shadow-2xl relative overflow-hidden">
-        <div class="absolute -top-24 -right-24 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <!-- Interactive Trip Planner Input Control Box (DU LỊCH MÙ - BLIND BOOKING ENGINE) -->
+      <div class="glass-panel rounded-3xl p-6 lg:p-8 border-2 border-cyan-500/50 shadow-2xl relative overflow-hidden bg-slate-950/80">
+        <div class="absolute -top-24 -right-24 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
         <div class="max-w-3xl mb-6">
-          <span class="px-3 py-1 rounded-full text-xs font-black bg-cyan-500 text-slate-950 shadow tracking-wider uppercase" data-i18n="planner_hero_tag">
-            TRỢ LÝ AI LẬP KẾ HOẠCH DU LỊCH THEO NGÂN SÁCH &amp; ĐỊA ĐIỂM
-          </span>
-          <h2 class="text-2xl lg:text-3xl font-extrabold text-white mt-2" data-i18n="planner_title">
-            Nhập Địa Điểm &amp; Số Tiền Để Ra Ngay Chuyến Đi Độc Bản
+          <div class="flex items-center gap-2 mb-2">
+            <span class="px-3 py-1 rounded-full text-xs font-black bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 shadow tracking-wider uppercase">
+              🎲 ĐỘNG CƠ DU LỊCH MÙ AI (BLIND BOOKING ENGINE)
+            </span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+              🔒 ĐIỂM ĐẾN BÍ MẬT 100%
+            </span>
+          </div>
+          <h2 class="text-2xl lg:text-3xl font-black text-white tracking-tight">
+            Chỉ Cần Chọn Điểm Đi &amp; Ngân Sách — AI Tối Ưu Hóa Trọn Gói Combo Bí Mật
           </h2>
-          <p class="text-xs lg:text-sm text-slate-300 mt-1 leading-relaxed" data-i18n="planner_subtitle">
-            Chọn điểm xuất phát, điểm đến và ngân sách mong muốn. Bấm nút để AI tự động tính toán khách sạn 4-5 sao, xe đưa đón, ẩm thực và sinh ra 3 lịch trình chi tiết độc bản không trùng lặp.
+          <p class="text-xs lg:text-sm text-slate-300 mt-1 leading-relaxed">
+            Đây là mô hình Du Lịch Mù hoàn toàn: bạn chỉ cần chọn Điểm Khởi Hành và nhập Ngân Sách cố định. Thuật toán Knapsack &amp; Vector Similarity sẽ tự động quét vé máy bay khứ hồi, khách sạn 4-5 sao, xe đưa đón và ẩm thực vừa khít số tiền mà không tiết lộ trước điểm đến.
           </p>
         </div>
 
-        <!-- Planner Form Controls: Điểm Đi, Điểm Đến, Ngân Sách Thực Tế & Thời Gian -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-          
-          <!-- 1. Departure Origin Select (Điểm Đi / Điểm Khởi Hành) -->
-          <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
-              <i class="fa-solid fa-location-crosshairs text-cyan-400"></i>
-              <span>1. Điểm Đi (Khởi Hành):</span>
-            </label>
-            <select id="planner-origin-select" onchange="updateTripPlannerPreview()" class="w-full glass-input rounded-xl px-3 py-3 text-xs font-bold text-white cursor-pointer bg-slate-900 border border-cyan-500/40">
-              <option value="hochiminh" selected>🏙️ TP. Hồ Chí Minh (Sân Bay Tân Sơn Nhất - SGN)</option>
-              <option value="hanoi">🏛️ Hà Nội (Sân Bay Nội Bài - HAN)</option>
-              <option value="danang">🌉 Đà Nẵng (Sân Bay Đà Nẵng - DAD)</option>
-              <option value="cantho">🌾 Cần Thơ (Sân Bay Trà Nóc - VCA)</option>
-              <option value="haiphong">⚓ Hải Phòng (Sân Bay Cát Bi - HPH)</option>
-            </select>
-          </div>
+        <!-- FORM NHẬP THUẬN MẮT & KHOA HỌC: 4 HÀNG RÕ RÀNG -->
+        <div class="space-y-4">
 
-          <!-- 2. Destination Select (Điểm Đến Hoặc Du Lịch Mù) -->
-          <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
-              <i class="fa-solid fa-map-location-dot text-amber-400"></i>
-              <span>2. Điểm Đến Hoặc Bản Đồ Mù:</span>
-            </label>
-            <select id="planner-dest-select" onchange="updateTripPlannerPreview()" class="w-full glass-input rounded-xl px-3 py-3 text-xs font-bold text-white cursor-pointer bg-slate-900 border border-cyan-500/40">
-              <option value="blind" selected>🎲 Du Lịch Mù / Ẩn Trình AI (AI Giấu Điểm Đến Đến Giờ G)</option>
-              <option value="mangden">🏔️ Măng Đen — Kon Tum (Rừng Thông &amp; Chữa Lành)</option>
-              <option value="dalat">🌲 Đà Lạt — Lâm Đồng (Sương Mù &amp; Cafe Chill)</option>
-              <option value="hue">🏛️ Cố Đô Huế (Di Sản Cung Đình &amp; Thiền)</option>
-              <option value="quynhon">🌊 Quy Nhơn — Bình Định (Kỳ Co Eo Gió)</option>
-              <option value="phuquoc">🏖️ Phú Quốc (Resort 5 Sao &amp; Sunset)</option>
-              <option value="danang">🌉 Đà Nẵng &amp; Hội An (Biển Mỹ Khê &amp; Phố Cổ)</option>
-            </select>
-          </div>
-
-          <!-- 3. Budget Input & Quick Presets Thực Tế -->
-          <div class="space-y-1.5">
-            <div class="flex items-center justify-between">
-              <label class="block text-xs font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1">
-                <i class="fa-solid fa-wallet text-emerald-400"></i>
-                <span>3. Ngân Sách Dự Kiến:</span>
+          <!-- HÀNG 1: ĐIỂM ĐI & NGÂN SÁCH CỐ ĐỊNH (TỰ NHẬP - CHỈ NHẬN SỐ CHẴN VÀ TRÒN TRĂM) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- 1. Điểm Đi (Khởi Hành) -->
+            <div class="space-y-1.5 bg-slate-900/90 p-4 rounded-2xl border border-cyan-500/30">
+              <label class="block text-xs font-black text-cyan-300 uppercase tracking-wider flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                  <i class="fa-solid fa-plane-departure text-cyan-400"></i>
+                  <span>1. Điểm Khởi Hành (Điểm Đi):</span>
+                </span>
+                <span class="text-[10px] text-slate-400 font-normal">Chỉ cần chọn điểm xuất phát</span>
               </label>
-            </div>
-            <div class="relative">
-              <input id="planner-budget-input" type="number" value="3200000" oninput="handleLiveBudgetInput(this.value)" class="w-full glass-input rounded-xl px-3 py-3 font-mono font-black text-emerald-400 text-sm bg-slate-900 border border-cyan-500/40">
-              <span class="absolute right-3 top-3 text-xs font-black text-slate-400">VNĐ</span>
+              <select id="planner-origin-select" onchange="validateAndPreviewBlindTrip()" class="w-full glass-input rounded-xl px-3.5 py-3 text-xs font-bold text-white cursor-pointer bg-slate-950 border border-cyan-500/40 focus:border-cyan-400">
+                <option value="hochiminh" selected>🏙️ TP. Hồ Chí Minh (Sân Bay Tân Sơn Nhất - SGN)</option>
+                <option value="hanoi">🏛️ Thủ Đô Hà Nội (Sân Bay Nội Bài - HAN)</option>
+                <option value="danang">🌉 Đà Nẵng (Sân Bay Quốc Tế Đà Nẵng - DAD)</option>
+                <option value="cantho">🌾 Cần Thơ (Sân Bay Trà Nóc - VCA)</option>
+                <option value="haiphong">⚓ Hải Phòng (Sân Bay Cát Bi - HPH)</option>
+              </select>
             </div>
 
-            <!-- Quick Preset Chips Thực Tế -->
-            <div class="flex flex-wrap gap-1 pt-0.5">
-              <button id="quick-budget-1850000" type="button" onclick="setQuickBudget(1850000)" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-semibold border border-slate-700 transition">
-                1.85 Tr
-              </button>
-              <button id="quick-budget-3200000" type="button" onclick="setQuickBudget(3200000)" class="px-2 py-0.5 rounded-lg bg-cyan-950 text-cyan-300 text-[10px] font-bold border border-cyan-800 transition">
-                3.2 Tr
-              </button>
-              <button id="quick-budget-5000000" type="button" onclick="setQuickBudget(5000000)" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-semibold border border-slate-700 transition">
-                5 Tr
-              </button>
-              <button id="quick-budget-8500000" type="button" onclick="setQuickBudget(8500000)" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-semibold border border-slate-700 transition">
-                8.5 Tr
-              </button>
+            <!-- 2. Ngân Sách Cố Định (Khách Tự Nhập - Chỉ Số Chẵn & Tròn Trăm) -->
+            <div class="space-y-1.5 bg-slate-900/90 p-4 rounded-2xl border border-cyan-500/30">
+              <div class="flex items-center justify-between">
+                <label class="block text-xs font-black text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <i class="fa-solid fa-wallet text-emerald-400"></i>
+                  <span>2. Ngân Sách Cố Định (VNĐ):</span>
+                </label>
+                <span id="budget-validation-badge" class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-500/50">
+                  ✓ HỢP LỆ (SỐ CHẴN &amp; TRÒN TRĂM)
+                </span>
+              </div>
+              
+              <div class="relative">
+                <input id="planner-budget-input" type="number" step="100000" min="1000000" value="4800000" oninput="handleStrictBudgetValidation(this.value)" class="w-full glass-input rounded-xl px-4 py-3 font-mono font-black text-emerald-400 text-base bg-slate-950 border border-emerald-500/40 focus:border-emerald-300">
+                <span class="absolute right-4 top-3.5 text-xs font-black text-slate-400">VNĐ</span>
+              </div>
+
+              <div id="budget-error-hint" class="text-[11px] text-slate-400 flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-info text-cyan-400"></i>
+                <span>Tự nhập ngân sách mong muốn. Quy tắc: <strong>Chỉ chấp nhận số chẵn và tròn trăm</strong> (VD: 3.000.000đ, 3.200.000đ, 4.800.000đ).</span>
+              </div>
             </div>
+
           </div>
 
-          <!-- 4. Pax, Duration & Action Button -->
-          <div class="space-y-1.5">
-            <div class="grid grid-cols-2 gap-1.5">
-              <div>
-                <label class="block text-[11px] font-bold text-slate-300 mb-1">Số Khách:</label>
-                <select id="planner-pax-select" onchange="updateTripPlannerPreview()" class="w-full glass-input rounded-xl px-2.5 py-2 text-xs font-semibold text-white bg-slate-900">
-                  <option value="1">1 Người (Solo)</option>
-                  <option value="2" selected>2 Người (Cặp đôi/Bạn)</option>
-                  <option value="4">Nhóm 4 Người</option>
-                  <option value="6">Gia đình (5-6)</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-[11px] font-bold text-slate-300 mb-1">Thời Gian:</label>
-                <select id="planner-dur-select" onchange="updateTripPlannerPreview()" class="w-full glass-input rounded-xl px-2.5 py-2 text-xs font-semibold text-white bg-slate-900">
-                  <option value="2d1n">2N1Đ (Cuối tuần)</option>
-                  <option value="3d2n" selected>3N2Đ (Tiêu chuẩn)</option>
-                  <option value="4d3n">4N3Đ (Dài ngày)</option>
-                </select>
-              </div>
+          <!-- HÀNG 2: SỐ KHÁCH & THỜI GIAN (BỐ TRÍ THUẬN MẮT CẠNH NHAU) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- 3. Số Lượng Khách -->
+            <div class="space-y-1.5 bg-slate-900/80 p-3.5 rounded-2xl border border-slate-800">
+              <label class="block text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-user-group text-cyan-400"></i>
+                <span>3. Số Lượng Khách (Pax):</span>
+              </label>
+              <select id="planner-pax-select" onchange="validateAndPreviewBlindTrip()" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs font-bold text-white bg-slate-950 border border-slate-700">
+                <option value="1">1 Người (Solo Explorer - Độc Hành)</option>
+                <option value="2" selected>2 Người (Cặp Đôi / Bạn Thân — Phổ Biến Nhất)</option>
+                <option value="3">3 Người (Nhóm Bạn Nhỏ)</option>
+                <option value="4">4 Người (Nhóm Bạn / Double Date)</option>
+                <option value="6">Gia Đình (5 - 6 Khách)</option>
+              </select>
             </div>
 
-            <!-- Submit CTA -->
-            <button id="btn-trigger-ai-plan" onclick="triggerAiTripPlanner()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-orange-400 to-cyan-400 hover:from-amber-300 hover:to-cyan-300 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-cyan-500/25 transition transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 mt-1 cursor-pointer">
-              <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
-              <span>🚀 AI Lập Kế Hoạch Chuyến Đi</span>
+            <!-- 4. Thời Gian Chuyến Đi -->
+            <div class="space-y-1.5 bg-slate-900/80 p-3.5 rounded-2xl border border-slate-800">
+              <label class="block text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-calendar-days text-amber-400"></i>
+                <span>4. Thời Gian Rảnh (Số Ngày / Đêm):</span>
+              </label>
+              <select id="planner-dur-select" onchange="validateAndPreviewBlindTrip()" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs font-bold text-white bg-slate-950 border border-slate-700">
+                <option value="2d1n">2 Ngày 1 Đêm (Kỳ Nghỉ Cuối Tuần Nhanh Gọn)</option>
+                <option value="3d2n" selected>3 Ngày 2 Đêm (Tiêu Chuẩn Hoàn Hảo - Khuyên Dùng)</option>
+                <option value="4d3n">4 Ngày 3 Đêm (Trải Nghiệm Thư Thái Trọn Vẹn)</option>
+              </select>
+            </div>
+
+          </div>
+
+          <!-- HÀNG 3: PHONG CÁCH DU LỊCH & TRẢI NGHIỆM ẨM THỰC -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- 5. Phong Cách Du Lịch (Travel Archetype) -->
+            <div class="space-y-1.5 bg-slate-900/80 p-3.5 rounded-2xl border border-slate-800">
+              <label class="block text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-compass text-rose-400"></i>
+                <span>5. Phong Cách Trải Nghiệm Ưu Tiên:</span>
+              </label>
+              <select id="planner-style-select" onchange="validateAndPreviewBlindTrip()" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs font-bold text-white bg-slate-950 border border-slate-700">
+                <option value="healing" selected>🌿 Nghỉ Dưỡng Chữa Lành &amp; Tĩnh Dưỡng (Healing &amp; Spa)</option>
+                <option value="nature">🌲 Thiên Nhiên Hoang Sơ &amp; Rừng Núi Sương Mù</option>
+                <option value="beach">🌊 Biển Xanh Nắng Ấm &amp; Hoàng Hôn Đại Dương</option>
+                <option value="culture">🏛️ Văn Hóa Cố Đô, Lịch Sử &amp; Di Sản Trầm Mặc</option>
+                <option value="adventure">⚡ Phiêu Lưu Mới Lạ &amp; Khám Phá Địa Bàn Mới</option>
+              </select>
+            </div>
+
+            <!-- 6. Trải Nghiệm Ẩm Thực -->
+            <div class="space-y-1.5 bg-slate-900/80 p-3.5 rounded-2xl border border-slate-800">
+              <label class="block text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-utensils text-emerald-400"></i>
+                <span>6. Trải Nghiệm Ẩm Thực Mong Muốn:</span>
+              </label>
+              <select id="planner-dining-select" onchange="validateAndPreviewBlindTrip()" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs font-bold text-white bg-slate-950 border border-slate-700">
+                <option value="street_food" selected>🍜 Ẩm Thực Đường Phố &amp; Món Ngon Bản Địa Niêm Yết</option>
+                <option value="seafood">🦞 Hải Sản Tươi Sống Đánh Bắt Trong Ngày Tại Làng Chài</option>
+                <option value="fine_dining">🍷 Bữa Tối Lãng Mạn &amp; Ẩm Thực Cao Cấp (Fine Dining)</option>
+                <option value="vegetarian">🥗 Ẩm Thực Chay Thanh Tịnh &amp; Đồ Ăn Healthy Hữu Cơ</option>
+                <option value="cafe_view">☕ Cà Phê Ngắm Cảnh Thung Lũng &amp; Trà Thảo Mộc Thư Giãn</option>
+              </select>
+            </div>
+
+          </div>
+
+          <!-- HÀNG 4: GHI CHÚ TRẢI NGHIỆM CHUYẾN ĐI TRƯỚC (ĐỂ TRỐNG TÙY CHỌN) -->
+          <div class="space-y-1.5 bg-slate-900/70 p-3.5 rounded-2xl border border-slate-800">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-clock-rotate-left text-indigo-400"></i>
+                <span>7. Ghi Chú Trải Nghiệm Chuyến Đi Trước (Để Trống Tùy Chọn):</span>
+              </label>
+              <span class="text-[10px] text-slate-400 italic">Không bắt buộc — Khách có thể để trống</span>
+            </div>
+            <textarea id="planner-prev-notes" rows="2" placeholder="Ví dụ: Chuyến đi trước mình đã từng đi Đà Lạt rồi, lần này muốn đổi gió nơi yên tĩnh hơn; hoặc dặn AI lưu ý không thích bay giờ quá sớm... (để trống nếu không có yêu cầu đặc biệt)" class="w-full glass-input rounded-xl px-3.5 py-2 text-xs text-white bg-slate-950 border border-slate-800 focus:border-cyan-400 resize-none"></textarea>
+          </div>
+
+          <!-- NÚT CTA LẬP KẾ HOẠCH BẰNG THUẬT TOÁN KNAPSACK & VECTOR AI -->
+          <div class="pt-2">
+            <button id="btn-trigger-ai-plan" type="button" onclick="triggerAiTripPlanner()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-orange-400 to-cyan-400 hover:from-amber-300 hover:to-cyan-300 text-slate-950 font-black text-sm shadow-2xl shadow-cyan-500/30 transition transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-wand-magic-sparkles text-base"></i>
+              <span id="btn-plan-text">🚀 BẮT ĐẦU QUÉT &amp; TỐI ƯU HÓA GÓI DU LỊCH MÙ (KNAPSACK ENGINE)</span>
             </button>
           </div>
 
@@ -617,7 +668,97 @@
 
       </div>
 
-      <!-- BỘ THANH ĐIỀU HƯỚNG CHUẨN HÓA QUY TRÌNH GỢI Ý (STANDARDIZED DISCOVERY NAVIGATION) -->
+      <!-- ============================================================================
+           DANH MỤC TIỆN ÍCH & TIÊU CHUẨN DỊCH VỤ CAM KẾT CÓ TRONG GÓI
+           ============================================================================ -->
+      <div class="glass-panel rounded-3xl p-5 lg:p-6 border border-cyan-500/30 bg-slate-950/60">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-cyan-400 text-base"></i>
+            <h4 class="text-sm font-black text-white uppercase tracking-wider">DANH MỤC TIỆN ÍCH &amp; TIÊU CHUẨN DỊCH VỤ CAM KẾT TRONG GÓI</h4>
+          </div>
+          <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+            TRỌN GÓI 100% • KHÔNG PHỤ PHÍ
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+          
+          <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <div class="flex items-center gap-2 text-cyan-300 font-bold">
+              <i class="fa-solid fa-plane text-sm"></i>
+              <span>1. Vé Máy Bay Khứ Hồi</span>
+            </div>
+            <ul class="space-y-1 text-slate-300 text-[11px]">
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Hãng bay chính hãng (VNA / Bamboo / Vietjet)</li>
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Bao gồm 20kg ký gửi + 7kg xách tay</li>
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Khóa giờ bay đẹp (Không bay đêm Red-Eye)</li>
+            </ul>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <div class="flex items-center gap-2 text-amber-300 font-bold">
+              <i class="fa-solid fa-hotel text-sm"></i>
+              <span>2. Lưu Trú Khách Sạn 4 - 5 Sao</span>
+            </div>
+            <ul class="space-y-1 text-slate-300 text-[11px]">
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Resort / Khách sạn chuẩn 4-5 sao trung tâm</li>
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Điểm đánh giá thực tế từ khách &ge; 8.5/10</li>
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Miễn phí bữa sáng Buffet chuẩn quốc tế</li>
+            </ul>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <div class="flex items-center gap-2 text-emerald-300 font-bold">
+              <i class="fa-solid fa-van-shuttle text-sm"></i>
+              <span>3. Xe Trung Chuyển Sân Bay 2 Chiều</span>
+            </div>
+            <ul class="space-y-1 text-slate-300 text-[11px]">
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Xe riêng hoặc Limousine cao cấp đón tiễn sân bay</li>
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Đưa đón tận sảnh khách sạn không cần chờ đợi</li>
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Tài xế lịch sự, hỗ trợ mang vác hành lý</li>
+            </ul>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <div class="flex items-center gap-2 text-rose-300 font-bold">
+              <i class="fa-solid fa-bowl-food text-sm"></i>
+              <span>4. Trải Nghiệm Ẩm Thực &amp; Quà Tặng</span>
+            </div>
+            <ul class="space-y-1 text-slate-300 text-[11px]">
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Tặng Voucher ăn uống bản địa 200.000đ/khách</li>
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Cẩm nang quán ăn ngon chống bẫy chặt chém</li>
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Thức uống welcome drink khi check-in</li>
+            </ul>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <div class="flex items-center gap-2 text-purple-300 font-bold">
+              <i class="fa-solid fa-shield-halved text-sm"></i>
+              <span>5. Bảo Hiểm &amp; Quỹ Bảo Chứng SLA</span>
+            </div>
+            <ul class="space-y-1 text-slate-300 text-[11px]">
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Bảo hiểm du lịch toàn diện mức 100 triệu đồng</li>
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Ký quỹ 20M: Nâng hạng 5 sao ngay nếu overbooking</li>
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Cam kết bồi hoàn 200% nếu giá trị thực tế thấp hơn</li>
+            </ul>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <div class="flex items-center gap-2 text-sky-300 font-bold">
+              <i class="fa-solid fa-headset text-sm"></i>
+              <span>6. Trợ Lý AI Concierge &amp; Hoàn 24H</span>
+            </div>
+            <ul class="space-y-1 text-slate-300 text-[11px]">
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Hỗ trợ chỉ đường, dự báo thời tiết 24/7 qua AI</li>
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Đường dây hotline SOS khẩn cấp trong chuyến đi</li>
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Hoàn tiền tự động qua Napas 247 khi hủy hợp lệ</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+<!-- BỘ THANH ĐIỀU HƯỚNG CHUẨN HÓA QUY TRÌNH GỢI Ý (STANDARDIZED DISCOVERY NAVIGATION) -->
       <div id="planner-subnav-bar" class="glass-panel p-2.5 rounded-2xl border border-cyan-500/30 flex flex-wrap items-center justify-between gap-3 sticky top-[68px] z-30 shadow-xl bg-slate-950/90 backdrop-blur-md">
         <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <button id="planner-tab-btn-itins" type="button" onclick="switchPlannerSection('itins')" class="planner-tab-btn active px-4 py-2.5 rounded-xl text-xs font-black transition flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 shadow-md">
@@ -1270,7 +1411,7 @@
 
               <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs space-y-1">
                 <div class="text-slate-400" data-i18n="ocr_verified_name">Họ và tên chuẩn hóa (IN HOA KHÔNG DẤU):</div>
-                <div id="ocr-preview-holder-name" class="text-sm font-black text-cyan-300 tracking-wider font-mono">NGUYEN VAN AN</div>
+                <div id="ocr-preview-holder-name" class="text-sm font-black text-cyan-300 tracking-wider font-mono">KHACH HANG DU LICH</div>
                 <div class="text-[11px] text-slate-400">Mã hóa AES-GCM 256-bit • Chỉ dùng để xuất vé bay &amp; nhận phòng</div>
               </div>
             </div>
@@ -1326,7 +1467,7 @@
                     <i class="fa-solid fa-circle-check"></i> ACTIVE_VERIFIED (Napas 247)
                   </div>
                   <div class="text-slate-300 text-[11px] mt-0.5">
-                    Chủ tài khoản: <strong>NGUYEN VAN AN</strong> (Trùng khớp 100% với CCCD)
+                    Chủ tài khoản: <strong>KHACH HANG DU LICH</strong> (Trùng khớp 100% với CCCD)
                   </div>
                 </div>
                 <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px] border border-emerald-500/40">
@@ -1367,7 +1508,7 @@
               </div>
               <div>
                 <label class="block text-slate-300 font-bold mb-1">Họ và tên trên CCCD (Tự động đồng bộ sang STK):</label>
-                <input id="cw-fullname" type="text" required value="Nguyễn Văn An" oninput="handleCccdHolderSync('cccd')" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs font-bold text-white">
+                <input id="cw-fullname" type="text" required value="Hội Viên Khách Hàng" oninput="handleCccdHolderSync('cccd')" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs font-bold text-white">
               </div>
               <div>
                 <label class="block text-slate-300 font-bold mb-1">Số CCCD 12 số (Mã hóa AES-GCM 256-bit):</label>
@@ -1397,7 +1538,7 @@
                     <i class="fa-solid fa-circle-check"></i> Đã khớp định danh Napas 247
                   </span>
                 </div>
-                <input id="cw-bank-holder" type="text" required value="NGUYEN VAN AN" oninput="handleCccdHolderSync('bank')" class="w-full glass-input rounded-xl px-3 py-2.5 font-mono font-bold text-emerald-300 uppercase">
+                <input id="cw-bank-holder" type="text" required value="KHACH HANG DU LICH" oninput="handleCccdHolderSync('bank')" class="w-full glass-input rounded-xl px-3 py-2.5 font-mono font-bold text-emerald-300 uppercase">
               </div>
               <div class="grid grid-cols-2 gap-2">
                 <div>
@@ -1575,6 +1716,63 @@
             </div>
 
             <!-- Nút Giả Lập Webhook -->
+            
+            <!-- ======================================================================
+                 XÁC NHẬN CHUYỂN KHOẢN & TẢI BIÊN LAI (BẢO LÃNH KÝ QUỸ ESCROW)
+                 ====================================================================== -->
+            <div class="glass-card rounded-2xl p-5 border border-cyan-500/40 bg-slate-950/80 space-y-4 mt-5">
+              <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
+                <div class="flex items-center gap-2 text-cyan-300 font-extrabold text-xs uppercase tracking-wider">
+                  <i class="fa-solid fa-receipt text-sm"></i>
+                  <span>Xác Nhận Đã Chuyển Khoản &amp; Tải Lên Biên Lai</span>
+                </div>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-950 text-cyan-300 border border-cyan-800">
+                  ĐỐI SOÁT TỰ ĐỘNG
+                </span>
+              </div>
+
+              <!-- Upload Drag & Drop Box -->
+              <div>
+                <label class="block text-slate-300 font-bold mb-1.5 text-xs">Ảnh chụp màn hình chuyển khoản (Biên lai / Bill):</label>
+                <input type="file" id="payment-receipt-file-input" accept="image/*" onchange="handlePaymentReceiptFileSelect(event)" class="hidden">
+                <div id="payment-receipt-dropzone" onclick="document.getElementById('payment-receipt-file-input').click()" class="border-2 border-dashed border-cyan-500/50 hover:border-cyan-400 p-4 rounded-xl text-center cursor-pointer bg-slate-900/60 transition group">
+                  <i class="fa-solid fa-cloud-arrow-up text-2xl text-cyan-400 group-hover:scale-110 transition"></i>
+                  <p class="text-xs text-slate-200 font-bold mt-1">Bấm để tải ảnh biên lai hoặc chụp màn hình bill</p>
+                  <p class="text-[10px] text-slate-400">Chấp nhận định dạng JPG, PNG (Tối đa 5MB)</p>
+                </div>
+
+                <!-- Preview container -->
+                <div id="payment-receipt-preview-box" class="hidden mt-2 p-2.5 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <img id="payment-receipt-preview-img" src="" alt="Biên lai" class="w-12 h-12 object-cover rounded-lg border border-slate-700">
+                    <div>
+                      <span id="payment-receipt-filename" class="text-xs font-bold text-white block truncate max-w-[200px]">bien_lai.png</span>
+                      <span class="text-[10px] text-emerald-400 flex items-center gap-1 font-bold"><i class="fa-solid fa-circle-check"></i> Đã đính kèm ảnh biên lai</span>
+                    </div>
+                  </div>
+                  <button type="button" onclick="clearPaymentReceiptFile()" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-1"><i class="fa-solid fa-trash"></i> Xóa</button>
+                </div>
+              </div>
+
+              <!-- Sender Info -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label class="block text-slate-400 mb-1 font-semibold">Tên người chuyển (Khớp với tài khoản):</label>
+                  <input type="text" id="payment-sender-name" placeholder="Ví dụ: NGUYỄN HOÀNG LONG" class="w-full glass-input rounded-xl px-3 py-2 text-xs font-bold uppercase text-white bg-slate-900 border border-slate-700">
+                </div>
+                <div>
+                  <label class="block text-slate-400 mb-1 font-semibold">Số TK / Ngân hàng người gửi:</label>
+                  <input type="text" id="payment-sender-acc" placeholder="Ví dụ: 0988xxxx (MBBank)..." class="w-full glass-input rounded-xl px-3 py-2 text-xs font-mono text-cyan-300 bg-slate-900 border border-slate-700">
+                </div>
+              </div>
+
+              <!-- Confirm Button -->
+              <button id="btn-confirm-transfer-receipt" type="button" onclick="confirmPaymentWithProof()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 hover:from-emerald-300 hover:to-cyan-300 text-slate-950 font-black text-xs shadow-xl transition flex items-center justify-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-shield-check text-sm"></i>
+                <span>XÁC NHẬN ĐÃ CHUYỂN KHOẢN &amp; KHÓA QUỸ ESCROW</span>
+              </button>
+            </div>
+
             <button id="btn-simulate-webhook" onclick="simulateVietQrPayment()" class="mt-5 w-full py-3.5 rounded-xl btn-glow-cyan text-slate-950 font-black text-xs shadow-xl transition flex items-center justify-center gap-2">
               <i class="fa-solid fa-mobile-screen-button"></i>
               <span data-i18n="btn_sim_paid">📲 Giả Lập Khách Quét QR Thành Công (Webhook < 2s)</span>
@@ -1897,7 +2095,7 @@
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-950/90 p-4 rounded-2xl border border-slate-800 text-xs">
                 <div>
                   <span class="text-[10px] text-slate-400 uppercase block">Hành khách / Định danh Napas</span>
-                  <strong id="bp-passenger-name" class="text-white text-sm font-black block mt-0.5">NGUYEN VAN AN</strong>
+                  <strong id="bp-passenger-name" class="text-white text-sm font-black block mt-0.5">KHACH HANG DU LICH</strong>
                   <span class="text-[10px] text-emerald-400 font-mono">eKYC AES-256 VERIFIED</span>
                 </div>
                 <div>
@@ -2041,9 +2239,122 @@
       <div id="b2c-subview-step3-lounge" class="glass-panel rounded-3xl p-6 lg:p-10 border border-slate-800 space-y-6">
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
           <div>
-            <span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">
-              BƯỚC 3: PHÒNG CHỜ MYSTERY HINT &amp; BẢO HIỂM HOÀN TIỀN 3 KHUNG GIỜ
+            <!-- ======================================================================
+             DỊCH VỤ PHÒNG CHỜ VIP & ĐÓN TIẾP LÊN XE (VIP WAITING LOUNGE)
+             ====================================================================== -->
+        <div class="glass-panel rounded-3xl p-6 border-2 border-amber-500/40 bg-slate-950/90 space-y-4 mb-6">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-300 flex items-center justify-center text-lg border border-amber-500/40">
+                <i class="fa-solid fa-couch"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-black uppercase text-amber-400 tracking-wider">TIỆN ÍCH ĐẶC QUYỀN TRƯỚC GIỜ KHỞI HÀNH</span>
+                <h3 class="text-base lg:text-lg font-black text-white">Dịch Vụ Phòng Chờ VIP &amp; Đón Tiếp Khách Sạn / Nhà Xe</h3>
+              </div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+              MIỄN PHÍ TRỌN GÓI CHO KHÁCH DU LỊCH MÙ
             </span>
+          </div>
+
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Trong thời gian chờ đợi mở khóa giờ G, quý khách được tận hưởng không gian tiếp đón cao cấp từ các đối tác lữ hành, khách sạn và nhà xe:
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+            
+            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-1.5">
+              <div class="text-amber-300 font-bold flex items-center gap-2">
+                <i class="fa-solid fa-mug-saucer text-sm"></i>
+                <span>Ẩm Thực &amp; Thức Uống</span>
+              </div>
+              <p class="text-slate-300 text-[11px] leading-relaxed">
+                Buffet đồ ăn nhẹ, bánh ngọt Pháp, trái cây tươi nhiệt đới, cà phê Arabica hảo hạng và nước ép hoa quả phục vụ không giới hạn.
+              </p>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-1.5">
+              <div class="text-cyan-300 font-bold flex items-center gap-2">
+                <i class="fa-solid fa-bell-concierge text-sm"></i>
+                <span>Lễ Tân Đón Tiếp VIP</span>
+              </div>
+              <p class="text-slate-300 text-[11px] leading-relaxed">
+                Nhân viên khách sạn &amp; nhà xe túc trực hỗ trợ check-in riêng, gắn thẻ hành lý ưu tiên, không cần xếp hàng đông đúc.
+              </p>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-1.5">
+              <div class="text-emerald-300 font-bold flex items-center gap-2">
+                <i class="fa-solid fa-wifi text-sm"></i>
+                <span>Thư Giãn &amp; Kết Nối</span>
+              </div>
+              <p class="text-slate-300 text-[11px] leading-relaxed">
+                Ghế sofa êm ái, cổng sạc siêu tốc đa năng, mạng Wifi cáp quang tốc độ 150Mbps mượt mà để làm việc hoặc giải trí.
+              </p>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-1.5">
+              <div class="text-rose-300 font-bold flex items-center gap-2">
+                <i class="fa-solid fa-van-shuttle text-sm"></i>
+                <span>Xe Riêng Đón Tận Nơi</span>
+              </div>
+              <p class="text-slate-300 text-[11px] leading-relaxed">
+                Đưa tiễn trực tiếp ra chân cầu thang máy bay hoặc xe Limousine giường nằm cao cấp, tài xế hỗ trợ nâng vác hành lý 100%.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ======================================================================
+             PHƯƠNG THỨC HOÀN TIỀN: TỰ ĐỘNG STK TỪ THANH TOÁN HOẶC NHẬP QR CODE
+             ====================================================================== -->
+        <div class="glass-panel rounded-3xl p-5 border border-cyan-500/40 bg-slate-950/90 space-y-3 mb-6">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+            <div class="flex items-center gap-2 text-cyan-300 font-black text-xs uppercase tracking-wider">
+              <i class="fa-solid fa-money-bill-transfer text-emerald-400"></i>
+              <span>Phương Thức Nhận Tiền Hoàn Tự Động (Napas 247 Hoàn Tiền Trong 2 Giây)</span>
+            </div>
+            <span class="text-[10px] text-emerald-400 font-mono font-bold">BẢO LÃNH 24/7</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            
+            <!-- Tùy Chọn 1: Tự động lấy STK từ bước thanh toán / hồ sơ -->
+            <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white flex items-center gap-1.5">
+                  <i class="fa-solid fa-bolt text-amber-400"></i> Cách 1: Tự Động Trích Xuất STK Đã Thanh Toán
+                </span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-cyan-950 text-cyan-300 border border-cyan-800">KHUYÊN DÙNG</span>
+              </div>
+              <p class="text-slate-400 text-[11px]">Hệ thống sẽ tự động chuyển khoản về đúng STK ngân hàng bạn vừa thực hiện quét mã VietQR:</p>
+              <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 font-mono text-cyan-300 text-xs flex justify-between items-center">
+                <span id="refund-auto-bank-info">MBBank - 0988xxxx (Chính chủ Napas 247)</span>
+                <span class="text-emerald-400 font-bold text-[10px]"><i class="fa-solid fa-circle-check"></i> Đã đồng bộ</span>
+              </div>
+            </div>
+
+            <!-- Tùy Chọn 2: Tải lên mã QR ngân hàng cá nhân của khách -->
+            <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+              <span class="font-bold text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-qrcode text-emerald-400"></i> Cách 2: Tải Lên Mã QR Ngân Hàng Cá Nhân Của Bạn
+              </span>
+              <p class="text-slate-400 text-[11px]">Hoặc bạn có thể tải ảnh mã QR VietQR tài khoản ngân hàng cá nhân để nhận tiền hoàn:</p>
+              <label class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950 border border-dashed border-cyan-500/50 hover:border-cyan-400 cursor-pointer text-xs transition">
+                <span id="refund-qr-file-label" class="text-cyan-300 font-semibold truncate"><i class="fa-solid fa-image mr-1.5"></i> Chọn ảnh mã QR cá nhân</span>
+                <input type="file" id="refund-qr-file-input" accept="image/*" class="hidden" onchange="const lbl=document.getElementById('refund-qr-file-label'); if(lbl && this.files[0]) lbl.innerHTML='<i class='fa-solid fa-circle-check text-emerald-400 mr-1'></i> ' + this.files[0].name;">
+                <span class="px-2.5 py-1 rounded bg-cyan-950 text-cyan-300 text-[10px] font-bold border border-cyan-800 ml-2 shrink-0">Tải QR</span>
+              </label>
+            </div>
+
+          </div>
+        </div>
+
+        <span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">
+          BƯỚC 3: PHÒNG CHỜ MYSTERY HINT &amp; BẢO HIỂM HOÀN TIỀN 3 KHUNG GIỜ
+        </span>
             <h3 class="text-xl lg:text-2xl font-extrabold text-white mt-2" data-i18n="refund_calc_title">
               Bộ Máy Tính Phí Hoàn Tiền Tự Động Theo Khung Giờ &amp; Bất Khả Kháng
             </h3>
@@ -2144,7 +2455,7 @@
           <div id="cw-refund-api-output" class="p-4 rounded-2xl bg-slate-950 border border-cyan-500/40 text-xs space-y-2 mt-3">
             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
               <span class="font-bold text-cyan-300">Sẵn sàng kiểm toán hoàn tiền tự động (Escrow Smart Refund)</span>
-              <span class="font-mono font-black text-emerald-400">STK Nhận Hoàn: MB - 0388998899 (NGUYEN VAN AN)</span>
+              <span class="font-mono font-black text-emerald-400">STK Nhận Hoàn: MB - 0388998899 (KHACH HANG DU LICH)</span>
             </div>
             <p class="text-slate-400 text-[11px]">Hãy chọn 1 trong 3 khung giờ phía trên hoặc bấm nút thực hiện lệnh hoàn tiền tự động bên dưới để kiểm tra giải ngân Napas 247.</p>
           </div>
@@ -2833,7 +3144,7 @@
       <div class="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-left flex items-center gap-3">
         <img id="social-modal-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" class="w-12 h-12 rounded-full object-cover border-2 border-cyan-400">
         <div class="flex-1 min-w-0">
-          <div class="font-bold text-sm text-white truncate" id="social-modal-name">Nguyễn Văn An</div>
+          <div class="font-bold text-sm text-white truncate" id="social-modal-name">Hội Viên Khách Hàng</div>
           <div class="text-xs text-slate-400 truncate" id="social-modal-email">an.nguyen.travel@gmail.com</div>
           <span class="inline-flex items-center gap-1 text-[10px] text-emerald-400 font-bold mt-0.5">
             <i class="fa-solid fa-circle-check"></i> Đã liên kết &amp; bảo mật
@@ -2995,7 +3306,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
           <div>
             <label class="block text-slate-400 mb-1">Tên hiển thị của bạn:</label>
-            <input id="review-author-input" type="text" value="Nguyễn Văn An (Khách Đã Xác Thực)" placeholder="Nhập tên của bạn..." class="w-full glass-input rounded-xl px-3 py-2 text-xs font-semibold">
+            <input id="review-author-input" type="text" value="Hội Viên Khách Hàng (Khách Đã Xác Thực)" placeholder="Nhập tên của bạn..." class="w-full glass-input rounded-xl px-3 py-2 text-xs font-semibold">
           </div>
           <div>
             <label class="block text-slate-400 mb-1" data-i18n="modal_spent_label">Chi phí thực tế bạn đã chi (VNĐ):</label>
@@ -3462,7 +3773,7 @@
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h3 id="profile-fullname-title" class="text-xl font-black text-white">Nguyễn Văn An</h3>
+              <h3 id="profile-fullname-title" class="text-xl font-black text-white">Hội Viên Khách Hàng</h3>
               <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-cyan-950 text-cyan-300 border border-cyan-700">WANDERER GOLD</span>
             </div>
             <p id="profile-email-subtitle" class="text-xs text-slate-400 mt-0.5">an.nguyen@wandermatch.vn • Thành viên từ 10/2026</p>
@@ -4366,7 +4677,7 @@
       localAdminBookings: [
         {
           bookingCode: "WM88219",
-          customerName: "Nguyễn Văn An",
+          customerName: "Hội Viên Khách Hàng",
           bankInfo: "MB - ***8899",
           cityName: "Đà Lạt",
           hotelConfirmationCode: "SLA-DL-88219",
@@ -4726,11 +5037,11 @@
     async function createCloudBlindBooking(e) {
       if (e) e.preventDefault();
       const email = document.getElementById('cw-email')?.value.trim() || 'nguyenvanan@wandermatch.vn';
-      const fullName = document.getElementById('cw-fullname')?.value.trim() || 'Nguyễn Văn An';
+      const fullName = document.getElementById('cw-fullname')?.value.trim() || 'Hội Viên Khách Hàng';
       const cccd = document.getElementById('cw-cccd')?.value.trim() || '079095012345';
       const bankCode = document.getElementById('cw-bank-code')?.value || 'MB';
       const bankAccount = document.getElementById('cw-bank-account')?.value.trim() || '0388998899';
-      const bankAccountHolder = document.getElementById('cw-bank-holder')?.value.trim() || 'NGUYEN VAN AN';
+      const bankAccountHolder = document.getElementById('cw-bank-holder')?.value.trim() || 'KHACH HANG DU LICH';
       const budgetVnd = Math.max(1000000, Number(document.getElementById('cw-budget-vnd')?.value || 5000000));
       const groupSize = Math.max(1, Number(document.getElementById('cw-group-size')?.value || 2));
 
@@ -5046,7 +5357,7 @@
       const uPrice = document.getElementById('receipt-user-paid-price');
       const sHigh = document.getElementById('receipt-savings-highlight');
 
-      const fullNameInput = document.getElementById('cw-fullname')?.value || 'NGUYEN VAN AN';
+      const fullNameInput = document.getElementById('cw-fullname')?.value || 'KHACH HANG DU LICH';
       const savePercent = Math.round(((data.retailValue - data.budgetPaid) / (data.retailValue || 1)) * 100);
 
       if (bpTitle) bpTitle.textContent = `${data.cityName.toUpperCase()} (${data.comboTitle})`;
@@ -5082,7 +5393,7 @@
     function downloadBoardingPassTicket() {
       const bookingCode = window.cwState.activeBookingCode || 'WM99081234';
       const rev = window.cwState.lastRevealedBooking || AntiF12Vault.unsealBooking(bookingCode);
-      const passenger = normalizeVNName(document.getElementById('cw-fullname')?.value || 'NGUYEN VAN AN');
+      const passenger = normalizeVNName(document.getElementById('cw-fullname')?.value || 'KHACH HANG DU LICH');
 
       const c = document.createElement('canvas');
       c.width = 1080;
@@ -5243,7 +5554,7 @@
       };
       const bankCode = document.getElementById('cw-bank-code')?.value || 'MB';
       const bankAcc = document.getElementById('cw-bank-account')?.value || '0388998899';
-      const holder = normalizeVNName(document.getElementById('cw-bank-holder')?.value || 'NGUYEN VAN AN');
+      const holder = normalizeVNName(document.getElementById('cw-bank-holder')?.value || 'KHACH HANG DU LICH');
 
       btn.disabled = true;
       let remainingSec = 5;
@@ -6156,11 +6467,11 @@
     const DEFAULT_PROFILES = {
       traveler: {
         id: "usr_an_nguyen_01",
-        name: "Nguyễn Văn An",
+        name: "Hội Viên Khách Hàng",
         email: "an.nguyen@wandermatch.vn",
         phone: "0988 888 888",
         bank: "MB BANK — 0988888888",
-        bankHolder: "NGUYEN VAN AN",
+        bankHolder: "KHACH HANG DU LICH",
         cccd: "079201019888",
         tier: "Wanderer Gold",
         avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80",
@@ -6207,11 +6518,11 @@
     const DEFAULT_USERS_DB = [
       {
         id: "usr_traveler_01",
-        name: "Nguyễn Văn An",
+        name: "Hội Viên Khách Hàng",
         email: "an.nguyen@wandermatch.vn",
         phone: "0988 888 888",
         bank: "MB BANK — 0988888888",
-        bankHolder: "NGUYEN VAN AN",
+        bankHolder: "KHACH HANG DU LICH",
         cccd: "079201019888",
         tier: "Du Khách VIP Gold",
         avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80",
@@ -6421,14 +6732,14 @@
         if (title) title.textContent = "Xác Nhận Đăng Nhập Qua Facebook";
         if (subtitle) subtitle.textContent = "Liên kết tài khoản Facebook an toàn và kích hoạt bảo lãnh hoàn tiền 24H";
         if (icon) icon.className = "fa-brands fa-facebook text-[#1877F2]";
-        if (name) name.textContent = "Nguyễn Văn An (Facebook)";
+        if (name) name.textContent = "Hội Viên Khách Hàng (Facebook)";
         if (email) email.textContent = "an.nguyen.fb@facebook.com";
         if (avatar) avatar.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80";
       } else {
         if (title) title.textContent = "Xác Nhận Đăng Nhập Qua Google";
         if (subtitle) subtitle.textContent = "Đồng bộ tài khoản Google và lưu trữ dữ liệu an toàn vào Supabase";
         if (icon) icon.className = "fa-brands fa-google text-rose-500";
-        if (name) name.textContent = "Nguyễn Văn An (Google VIP)";
+        if (name) name.textContent = "Hội Viên Khách Hàng (Google VIP)";
         if (email) email.textContent = "an.nguyen.travel@gmail.com";
         if (avatar) avatar.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80";
       }
@@ -6553,7 +6864,7 @@
       } else {
         demoUser = {
           id: 'usr_vip_demo',
-          name: 'NGUYỄN VĂN AN VIP',
+          name: 'HỘI VIÊN DU LỊCH',
           email: 'an.nguyen.vip@wandermatch.vn',
           phone: '0988 888 888',
           cccd: '079090001234',
@@ -7777,5 +8088,123 @@
       }, 400);
     });
   </script>
+
+  <!-- ============================================================================
+       MODAL: MINI GAME VÒNG QUAY MAY MẮN NHẬN VOUCHER ƯU ĐÃI (TÁCH BIỆT HOÀN TOÀN)
+       ============================================================================ -->
+  <div id="minigame-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden animate-fadeIn">
+    <div class="relative w-full max-w-md p-6 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 rounded-3xl border-2 border-amber-500/50 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2">
+          <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg border border-amber-500/40">
+            <i class="fa-solid fa-dice"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-black uppercase text-amber-400 tracking-wider">MINI GAME MAY MẮN</span>
+            <h3 class="text-base font-black text-white">Vòng Quay Nhận Voucher Du Lịch</h3>
+          </div>
+        </div>
+        <button type="button" onclick="closeMiniGameModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="text-center space-y-2 py-2">
+        <p class="text-xs text-slate-300">
+          Quay vòng quay may mắn để nhận <strong>Voucher giảm giá 200.000đ - 500.000đ</strong> áp dụng trực tiếp vào ngân sách chuyến đi của bạn!
+        </p>
+
+        <!-- Interactive Lucky Wheel Simulation -->
+        <div class="relative w-56 h-56 mx-auto my-3 flex items-center justify-center">
+          <div id="minigame-wheel" class="w-full h-full rounded-full border-4 border-amber-400/80 shadow-2xl flex items-center justify-center transition-transform duration-[3000ms] ease-out" style="background: conic-gradient(#06b6d4 0deg 72deg, #10b981 72deg 144deg, #f59e0b 144deg 216deg, #8b5cf6 216deg 288deg, #ec4899 288deg 360deg);">
+            <div class="w-20 h-20 rounded-full bg-slate-950 border-2 border-white flex flex-col items-center justify-center shadow-lg">
+              <i class="fa-solid fa-gift text-amber-400 text-lg"></i>
+              <span class="text-[9px] font-black text-white">WANDER</span>
+            </div>
+          </div>
+          <!-- Pointer -->
+          <div class="absolute -top-2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[18px] border-t-rose-500 z-10 filter drop-shadow"></div>
+        </div>
+
+        <div id="minigame-result-box" class="hidden p-3 rounded-xl bg-amber-950/40 border border-amber-500/50 text-xs space-y-1">
+          <span class="text-amber-300 font-black block">🎉 CHÚC MỪNG BẠN!</span>
+          <p id="minigame-result-text" class="text-white font-bold text-sm">Bạn đã trúng Voucher 200.000đ!</p>
+          <span class="text-[10px] text-slate-400 block">Đã tự động cộng vào mã thanh toán chuyến đi của bạn.</span>
+        </div>
+      </div>
+
+      <button id="btn-spin-wheel" type="button" onclick="spinLuckyWheel()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-xs shadow-xl transition flex items-center justify-center gap-2 cursor-pointer">
+        <i class="fa-solid fa-rotate text-sm"></i>
+        <span>QUAY NGAY (MIỄN PHÍ 100%)</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================================
+       MODAL: CẨM NANG DU LỊCH & MẸO BẢN ĐỊA (MINI WIDGET GỌN GÀNG)
+       ============================================================================ -->
+  <div id="travel-guide-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden animate-fadeIn">
+    <div class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 bg-slate-950 rounded-3xl border-2 border-cyan-500/40 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-lg border border-cyan-500/40">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-black uppercase text-cyan-400 tracking-wider">CẨM NANG BẢN ĐỊA WANDERMATCH</span>
+            <h3 class="text-base font-black text-white">Hướng Dẫn Du Lịch &amp; Mẹo Chống "Bẫy Chặt Chém"</h3>
+          </div>
+        </div>
+        <button type="button" onclick="closeTravelGuideModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3.5 text-xs">
+        <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-1.5">
+          <h4 class="font-bold text-emerald-300 flex items-center gap-2">
+            <i class="fa-solid fa-shield-halved"></i> 1. Nguyên Tắc Ẩm Thực Chống Chặt Chém
+          </h4>
+          <p class="text-slate-300 leading-relaxed text-[11px]">
+            Luôn yêu cầu xem menu có niêm yết giá rõ ràng trước khi gọi món. Với hải sản tươi sống tính theo kg, hãy yêu cầu cân trực tiếp trước mặt và thỏa thuận chi phí chế biến (nếu có) trước khi đầu bếp làm.
+          </p>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-1.5">
+          <h4 class="font-bold text-cyan-300 flex items-center gap-2">
+            <i class="fa-solid fa-suitcase-rolling"></i> 2. Chuẩn Bị Hành Lý Thông Minh
+          </h4>
+          <p class="text-slate-300 leading-relaxed text-[11px]">
+            Gói du lịch mù đã bao gồm 20kg ký gửi + 7kg xách tay. Hãy nhớ mang theo CCCD / Hộ chiếu bản gốc còn hạn. Trước giờ khởi hành 24h, AI sẽ gửi thông báo gợi ý trang phục phù hợp với thời tiết điểm đến bí mật.
+          </p>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-1.5">
+          <h4 class="font-bold text-amber-300 flex items-center gap-2">
+            <i class="fa-solid fa-car-side"></i> 3. Di Chuyển &amp; Xe Trung Chuyển Sân Bay
+          </h4>
+          <p class="text-slate-300 leading-relaxed text-[11px]">
+            Xe riêng hoặc Limousine của đối tác lữ hành sẽ cầm biển đón bạn ngay tại sảnh đến của sân bay. Tuyệt đối không nhận lời mời đi xe taxi ngoài không rõ nguồn gốc.
+          </p>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-1.5">
+          <h4 class="font-bold text-rose-300 flex items-center gap-2">
+            <i class="fa-solid fa-phone-volume"></i> 4. Hotline Hỗ Trợ Khẩn Cấp 24/7
+          </h4>
+          <p class="text-slate-300 leading-relaxed text-[11px]">
+            Trong suốt chuyến đi, nếu gặp bất kỳ sự cố nào về phòng ở, overbooking hay tài xế, hãy gọi ngay đường dây nóng khẩn cấp 1900.8888 hoặc bấm nút SOS trong ứng dụng để kích hoạt bảo lãnh khách sạn 5 sao.
+          </p>
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <button type="button" onclick="closeTravelGuideModal()" class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition">
+          Đã Hiểu &amp; Đóng Cẩm Nang
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

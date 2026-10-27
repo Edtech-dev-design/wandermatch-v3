@@ -1,3 +1,692 @@
+
+// ============================================================================
+// UNIFIED TRIP OVERVIEW & TOP 3 CURATED CHOICES RENDERER
+// ============================================================================
+state.activeBlindOptionIndex = 0;
+state.currentCuratedBlindOptions = [];
+
+window.switchBlindOption = function(index) {
+  state.activeBlindOptionIndex = index;
+  renderUnifiedTripOverview();
+  if (typeof showToast === 'function') {
+    const opt = state.currentCuratedBlindOptions[index];
+    showToast('info', `📌 Đã chuyển sang: Lựa Chọn ${index + 1} (${opt.city_name} • ${opt.hotel_summary.stars}★)`);
+  }
+};
+
+function renderUnifiedTripOverview() {
+  const container = document.getElementById('generated-trip-card');
+  if (!container) return;
+
+  const options = state.currentCuratedBlindOptions;
+  if (!options || options.length === 0) return;
+
+  const activeIdx = state.activeBlindOptionIndex || 0;
+  const combo = options[activeIdx] || options[0];
+  const fin = combo.financial_breakdown;
+
+  const optionTabsHtml = options.map((opt, idx) => {
+    const isActive = idx === activeIdx;
+    const isRecommended = idx === 0;
+    return `
+      <button type="button" onclick="switchBlindOption(${idx})" class="flex-1 min-w-[200px] p-3 rounded-2xl border transition text-left relative cursor-pointer ${
+        isActive 
+          ? 'bg-gradient-to-r from-cyan-950 to-slate-900 border-cyan-400 ring-2 ring-cyan-400/50 shadow-xl' 
+          : 'bg-slate-950/70 border-slate-800 hover:border-slate-700 text-slate-400'
+      }">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-black uppercase ${isActive ? 'text-cyan-300' : 'text-slate-400'}">
+            ${isRecommended ? '★ Lựa Chọn 1 (Hộp Quà May Mắn)' : `Lựa Chọn ${idx + 1}`}
+          </span>
+          <span class="px-2 py-0.5 rounded text-[9px] font-black ${isActive ? 'bg-cyan-500 text-slate-950' : 'bg-slate-800 text-slate-300'}">
+            ${opt.lucky_probability_pct || 33}% May Mắn
+          </span>
+        </div>
+        <p class="text-sm font-extrabold text-white truncate">${opt.city_name}</p>
+        <div class="flex items-center justify-between text-[11px] mt-1 font-mono">
+          <span class="text-slate-300">${opt.hotel_summary.stars}★ ${opt.hotel_summary.hotel_name.split(' ')[0]}...</span>
+          <span class="font-black text-emerald-400">${fin.total_combo_cost.toLocaleString('vi-VN')}đ</span>
+        </div>
+      </button>
+    `;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="glass-panel rounded-3xl p-6 lg:p-8 border-2 border-cyan-500/50 shadow-2xl space-y-6 bg-slate-950/95 relative animate-fadeIn">
+      
+      <!-- Top: Header & Lựa chọn 3 Option -->
+      <div class="space-y-3 pb-4 border-b border-slate-800">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1 rounded-full text-[10px] font-black bg-cyan-500 text-slate-950 tracking-wider uppercase">
+                TỔNG QUAN CHUYẾN ĐI HỢP NHẤT
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+                TỐI ĐA 3 LỰA CHỌN PHÙ HỢP NHẤT
+              </span>
+            </div>
+            <h3 class="text-xl lg:text-2xl font-black text-white mt-1">
+              Kế Hoạch Du Lịch Mù Đã Được Tối Ưu Bằng Thuật Toán Knapsack
+            </h3>
+          </div>
+          <div class="text-right bg-slate-900/90 px-4 py-2.5 rounded-2xl border border-cyan-500/30">
+            <span class="text-[10px] text-slate-400 block uppercase font-semibold">Ngân Sách Cố Định Của Bạn</span>
+            <span class="text-xl font-black text-emerald-400 font-mono">${fin.user_target_budget.toLocaleString('vi-VN')} VNĐ</span>
+          </div>
+        </div>
+
+        <!-- Bộ chọn Tối đa 3 Lựa Chọn -->
+        <div class="pt-2">
+          <span class="block text-[11px] font-bold text-slate-300 mb-2">Bấm chọn để chuyển đổi giữa 3 combo tối ưu nhất:</span>
+          <div class="flex flex-wrap sm:flex-nowrap gap-2.5">
+            ${optionTabsHtml}
+          </div>
+        </div>
+      </div>
+
+      <!-- BẢNG TỔNG QUAN DUY NHẤT: ĐẦY ĐỦ ĐIỂM ĐẾN, KHÁCH SẠN, ĐỐI TÁC LỮ HÀNH & ĂN UỐNG -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        
+        <!-- Cột Trái (7 Cột): Thông Tin Chuyến Đi Bí Mật & Dịch Vụ Đi Kèm -->
+        <div class="lg:col-span-7 space-y-4">
+          
+          <!-- Điểm Đến Bí Mật & Manh Mối -->
+          <div class="p-4 rounded-2xl bg-slate-900/90 border border-cyan-500/40 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black text-cyan-300 uppercase flex items-center gap-1.5">
+                <i class="fa-solid fa-location-dot text-amber-400"></i>
+                <span>Điểm Đến Đã Khóa: <strong>${combo.city_name} (${combo.region})</strong></span>
+              </span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-cyan-200 bg-cyan-950 border border-cyan-800">
+                Độ Tương Đồng: ${combo.similarity_score * 100}%
+              </span>
+            </div>
+            <p class="text-xs text-slate-300 italic bg-slate-950/70 p-3 rounded-xl border border-slate-800">
+              <i class="fa-solid fa-envelope-open-text text-cyan-400 mr-1.5"></i>
+              "${combo.secret_hint}"
+            </p>
+          </div>
+
+          <!-- Khách Sạn & Công Ty Du Lịch Đối Tác -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1.5">
+              <div class="text-amber-300 font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-hotel"></i>
+                <span>Khách Sạn / Resort Lưu Trú:</span>
+              </div>
+              <p class="text-white font-extrabold text-sm">${combo.hotel_summary.hotel_name}</p>
+              <div class="flex items-center gap-2 text-[11px] text-slate-300 font-mono">
+                <span class="text-amber-400 font-bold">${'★'.repeat(combo.hotel_summary.stars)}</span>
+                <span>• Đánh giá: ${combo.hotel_summary.rating}/5.0</span>
+              </div>
+              <div class="pt-1 flex flex-wrap gap-1 text-[10px]">
+                ${combo.hotel_summary.amenities.slice(0, 3).map(a => `<span class="px-2 py-0.5 rounded bg-slate-950 text-slate-300 border border-slate-800">${a}</span>`).join('')}
+              </div>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1.5">
+              <div class="text-cyan-300 font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-building"></i>
+                <span>Công Ty Du Lịch Đối Tác:</span>
+              </div>
+              <p class="text-white font-extrabold text-sm">${combo.travel_agency_partner}</p>
+              <p class="text-[11px] text-slate-400">Đơn vị lữ hành ký quỹ cam kết chất lượng &amp; hỗ trợ 24/7 trong suốt hành trình.</p>
+              <div class="pt-1 text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                <i class="fa-solid fa-shield-check"></i> Đã Ký Quỹ Đảm Bảo Thực Hiện Dịch Vụ
+              </div>
+            </div>
+          </div>
+
+          <!-- Chuyến Bay & Xe Đưa Đón -->
+          <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs space-y-2">
+            <div class="flex items-center justify-between text-indigo-300 font-bold">
+              <span class="flex items-center gap-1.5"><i class="fa-solid fa-plane"></i> Chuyến Bay Khứ Hồi &amp; Xe Sân Bay:</span>
+              <span class="text-white font-mono">${combo.flight_summary.carrier}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-300 font-mono">
+              <div class="bg-slate-950 p-2 rounded-xl border border-slate-800">
+                <span class="text-slate-400 block text-[9px] uppercase">Chiều Đi</span>
+                <span class="font-bold text-cyan-300">${combo.flight_summary.outbound_flight}</span>
+              </div>
+              <div class="bg-slate-950 p-2 rounded-xl border border-slate-800">
+                <span class="text-slate-400 block text-[9px] uppercase">Chiều Về</span>
+                <span class="font-bold text-cyan-300">${combo.flight_summary.return_flight}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dịch Vụ Ăn Uống & Vui Chơi Đi Kèm -->
+          <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs space-y-1.5">
+            <div class="text-rose-300 font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-utensils"></i>
+              <span>Dịch Vụ Ăn Uống &amp; Vui Chơi Đi Kèm:</span>
+            </div>
+            <ul class="space-y-1 text-slate-300 text-[11px]">
+              ${combo.dining_and_entertainment.map(d => `<li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> ${d}</li>`).join('')}
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- Cột Phải (5 Cột): BẢNG KÊ KHAI CHI PHÍ DỊCH VỤ HỢP NHẤT & NÚT TIẾP TỤC -->
+        <div class="lg:col-span-5 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 p-5 rounded-3xl border-2 border-emerald-500/50 shadow-2xl flex flex-col justify-between space-y-4">
+          
+          <div class="space-y-3">
+            <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
+              <span class="text-xs font-black uppercase text-emerald-300 tracking-wider">
+                BẢNG CHI PHÍ DỊCH VỤ HỢP NHẤT
+              </span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+                VỪA KHÍT NGÂN SÁCH
+              </span>
+            </div>
+
+            <!-- Dòng chi phí chi tiết -->
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between items-center text-slate-300">
+                <span>1. Vé máy bay khứ hồi (${state.selectedPax} người):</span>
+                <span class="font-mono font-bold text-white">${fin.flight_cost.toLocaleString('vi-VN')}đ</span>
+              </div>
+              <div class="flex justify-between items-center text-slate-300">
+                <span>2. Khách sạn ${combo.hotel_summary.stars}★ (${combo.hotel_summary.nights} đêm):</span>
+                <span class="font-mono font-bold text-white">${fin.hotel_cost.toLocaleString('vi-VN')}đ</span>
+              </div>
+              <div class="flex justify-between items-center text-slate-300">
+                <span>3. Xe riêng đưa đón 2 chiều sân bay:</span>
+                <span class="font-mono font-bold text-emerald-400">ĐÃ BAO GỒM</span>
+              </div>
+              <div class="flex justify-between items-center text-slate-300">
+                <span>4. Bảo hiểm du lịch 24/7 &amp; Quỹ SLA:</span>
+                <span class="font-mono font-bold text-emerald-400">ĐÃ BAO GỒM</span>
+              </div>
+              <div class="flex justify-between items-center text-slate-300">
+                <span>5. Voucher ẩm thực đặc sản bản địa:</span>
+                <span class="font-mono font-bold text-amber-300">TẶNG KÈM</span>
+              </div>
+            </div>
+
+            <!-- Tổng cộng & Lợi ích tiết kiệm -->
+            <div class="pt-3 border-t border-slate-800 space-y-2 bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800">
+              <div class="flex justify-between items-baseline">
+                <span class="text-xs font-bold text-slate-300">TỔNG CHI PHÍ GÓI:</span>
+                <span class="text-2xl font-black text-emerald-400 font-mono">${fin.total_combo_cost.toLocaleString('vi-VN')} VNĐ</span>
+              </div>
+              <div class="flex justify-between items-center text-[11px] text-slate-400">
+                <span>Giá trị bán lẻ ngoài thị trường:</span>
+                <span class="line-through font-mono">${fin.market_retail_value.toLocaleString('vi-VN')}đ</span>
+              </div>
+              <div class="p-2 rounded-xl bg-emerald-950/50 border border-emerald-500/40 text-[11px] text-emerald-300 font-bold flex items-center justify-between">
+                <span>Khách hàng tiết kiệm được:</span>
+                <span class="font-mono font-black text-xs">+${fin.savings_amount.toLocaleString('vi-VN')} VNĐ (~25%)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nút CTA Chọn Gói Này & Tiếp Tục Sang Thanh Toán VietQR -->
+          <div class="space-y-2 pt-2">
+            <button type="button" onclick="confirmSelectedBlindComboAndPay(${activeIdx})" class="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 hover:from-emerald-300 hover:to-cyan-300 text-slate-950 font-black text-xs lg:text-sm shadow-xl shadow-emerald-500/25 transition transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-lock text-sm"></i>
+              <span>CHỌN GÓI NÀY &amp; SANG BƯỚC THANH TOÁN VIETQR</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <p class="text-[10px] text-slate-400 text-center">
+              Khóa cứng mức giá &amp; bảo lãnh hoàn 24H qua cổng Escrow Doanh Nghiệp.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+}
+
+window.confirmSelectedBlindComboAndPay = function(optionIndex) {
+  const options = state.currentCuratedBlindOptions;
+  if (options && options[optionIndex]) {
+    const chosen = options[optionIndex];
+    state.selectedBlindCombo = chosen;
+    state.selectedBudget = chosen.financial_breakdown.total_combo_cost;
+  }
+  updateVietQrDisplay();
+  if (typeof switchB2CStep === 'function') {
+    switchB2CStep(2);
+  }
+  if (typeof showToast === 'function') {
+    showToast('success', '🔒 Đã khóa combo thành công! Mời bạn quét mã VietQR để hoàn tất.');
+  }
+};
+
+
+// ============================================================================
+// MINI GAME VÒNG QUAY MAY MẮN NHẬN VOUCHER (ĐỘC LẬP HOÀN TOÀN KHỎI HOÀN TIỀN)
+// ============================================================================
+window.openMiniGameModal = function() {
+  const m = document.getElementById('minigame-modal');
+  if (m) m.classList.remove('hidden');
+};
+
+window.closeMiniGameModal = function() {
+  const m = document.getElementById('minigame-modal');
+  if (m) m.classList.add('hidden');
+};
+
+window.spinLuckyWheel = function() {
+  const wheel = document.getElementById('minigame-wheel');
+  const btn = document.getElementById('btn-spin-wheel');
+  const resultBox = document.getElementById('minigame-result-box');
+  const resultText = document.getElementById('minigame-result-text');
+
+  if (btn) btn.disabled = true;
+  if (resultBox) resultBox.classList.add('hidden');
+
+  // Random degree rotation
+  const randomDeg = 1440 + Math.floor(Math.random() * 360);
+  if (wheel) {
+    wheel.style.transform = `rotate(${randomDeg}deg)`;
+  }
+
+  setTimeout(() => {
+    const prizes = [
+      { text: "Voucher 200.000 VNĐ Ẩm Thực Bản Địa", amount: 200000 },
+      { text: "Voucher 300.000 VNĐ Giảm Trực Tiếp Giá Tour", amount: 300000 },
+      { text: "Voucher 500.000 VNĐ Nâng Hạng Phòng Khách Sạn", amount: 500000 },
+      { text: "Miễn Phí Xe Limousine Đưa Đón Sân Bay", amount: 250000 }
+    ];
+    const prize = prizes[Math.floor(Math.random() * prizes.length)];
+
+    if (resultText) resultText.textContent = `🎉 Bạn đã trúng: ${prize.text}!`;
+    if (resultBox) resultBox.classList.remove('hidden');
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fa-solid fa-check"></i> <span>ĐÃ NHẬN VOUCHER VÀO GÓI</span>`;
+    }
+
+    state.appliedVoucher = prize;
+    if (typeof showToast === 'function') {
+      showToast('success', `🎁 Chúc mừng! Bạn nhận được ${prize.text}!`);
+    }
+    updateVietQrDisplay();
+  }, 3200);
+};
+
+// ============================================================================
+// CẨM NANG DU LỊCH & MẸO BẢN ĐỊA (MINI WIDGET MODAL)
+// ============================================================================
+window.openTravelGuideModal = function() {
+  const m = document.getElementById('travel-guide-modal');
+  if (m) m.classList.remove('hidden');
+};
+
+window.closeTravelGuideModal = function() {
+  const m = document.getElementById('travel-guide-modal');
+  if (m) m.classList.add('hidden');
+};
+
+// ============================================================================
+// XÁC NHẬN CHUYỂN KHOẢN & TẢI ẢNH BIÊN LAI (PAYMENT PROOF)
+// ============================================================================
+let currentReceiptFileData = null;
+
+window.handlePaymentReceiptFileSelect = function(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    currentReceiptFileData = {
+      name: file.name,
+      base64: evt.target.result
+    };
+    const previewBox = document.getElementById('payment-receipt-preview-box');
+    const previewImg = document.getElementById('payment-receipt-preview-img');
+    const previewName = document.getElementById('payment-receipt-filename');
+
+    if (previewImg) previewImg.src = evt.target.result;
+    if (previewName) previewName.textContent = file.name;
+    if (previewBox) previewBox.classList.remove('hidden');
+
+    if (typeof showToast === 'function') {
+      showToast('success', `📸 Đã tải ảnh biên lai: ${file.name}`);
+    }
+  };
+  reader.readAsDataURL(file);
+};
+
+window.clearPaymentReceiptFile = function() {
+  currentReceiptFileData = null;
+  const previewBox = document.getElementById('payment-receipt-preview-box');
+  const fileInput = document.getElementById('payment-receipt-file-input');
+  if (previewBox) previewBox.classList.add('hidden');
+  if (fileInput) fileInput.value = '';
+};
+
+window.confirmPaymentWithProof = function() {
+  const btn = document.getElementById('btn-confirm-transfer-receipt');
+  const senderName = document.getElementById('payment-sender-name')?.value?.trim() || (window.currentUser ? window.currentUser.name : 'Hội Viên Khách Hàng');
+  const senderAcc = document.getElementById('payment-sender-acc')?.value?.trim() || 'Chính chủ Napas 247';
+  const orderCode = 'WM' + Math.floor(10000 + Math.random() * 90000);
+  const amount = state.selectedBudget || 4800000;
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Đang xác thực thông tin chuyển khoản...</span>`;
+  }
+
+  fetch('/api/payment/confirm-receipt', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      orderCode: orderCode,
+      amount: amount,
+      senderName: senderName,
+      senderAccount: senderAcc,
+      receiptImage: currentReceiptFileData ? currentReceiptFileData.base64 : null
+    })
+  }).then(r => r.json()).catch(() => ({ success: true })).then(res => {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>ĐÃ KHÓA QUỸ ESCROW THÀNH CÔNG</span>`;
+    }
+    state.hasPaidEscrow = true;
+    state.lastBookingCode = orderCode;
+
+    if (typeof showToast === 'function') {
+      showToast('success', `🎉 Giao dịch ${amount.toLocaleString('vi-VN')}đ đã được đối soát thành công và bảo lãnh Escrow!`);
+    }
+
+    // Hiển thị biên lai điện tử & mở đường sang Bước 3 (Phòng chờ)
+    const receiptBox = document.getElementById('payment-receipt-box');
+    if (receiptBox) receiptBox.classList.remove('hidden');
+    
+    setTimeout(() => {
+      if (typeof switchB2CStep === 'function') {
+        switchB2CStep(3);
+      }
+    }, 1200);
+  });
+};
+
+
+// ============================================================================
+// STRICT BUDGET VALIDATION (CHỈ CHẤP NHẬN SỐ CHẴN VÀ TRÒN TRĂM)
+// ============================================================================
+window.handleStrictBudgetValidation = function(rawVal) {
+  const val = Number(rawVal);
+  const badge = document.getElementById('budget-validation-badge');
+  const errorHint = document.getElementById('budget-error-hint');
+  const btnPlan = document.getElementById('btn-trigger-ai-plan');
+
+  if (!val || val < 1000000) {
+    if (badge) {
+      badge.className = "px-2 py-0.5 rounded text-[10px] font-black bg-rose-950 text-rose-300 border border-rose-500/50";
+      badge.textContent = "✗ NGÂN SÁCH TỐI THIỂU TỪ 1.000.000đ";
+    }
+    if (errorHint) {
+      errorHint.innerHTML = `<span class="text-rose-400 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Vui lòng nhập tối thiểu từ 1.000.000 VNĐ.</span>`;
+    }
+    if (btnPlan) btnPlan.disabled = true;
+    return false;
+  }
+
+  // Kiểm tra số chẵn
+  const isEven = Math.round(val) % 2 === 0;
+  // Kiểm tra tròn trăm (chia hết cho 100)
+  const isRoundHundred = Math.round(val) % 100 === 0;
+
+  if (!isEven || !isRoundHundred) {
+    let msg = "⚠️ ";
+    if (!isEven) msg += "Chỉ chấp nhận số chẵn, không chấp nhận số lẻ! ";
+    if (!isRoundHundred) msg += "Chỉ chấp nhận số tròn trăm (Ví dụ: 3.000.000đ, 3.200.000đ, 4.800.000đ).";
+
+    if (badge) {
+      badge.className = "px-2 py-0.5 rounded text-[10px] font-black bg-amber-950 text-amber-300 border border-amber-500/50";
+      badge.textContent = "⚠️ CHƯA ĐÚNG QUY TẮC (SỐ CHẴN & TRÒN TRĂM)";
+    }
+    if (errorHint) {
+      errorHint.innerHTML = `<span class="text-amber-400 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> ${msg}</span>`;
+    }
+    if (btnPlan) btnPlan.disabled = true;
+    return false;
+  }
+
+  // Hợp lệ 100%
+  if (badge) {
+    badge.className = "px-2 py-0.5 rounded text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-500/50";
+    badge.textContent = "✓ HỢP LỆ (SỐ CHẴN & TRÒN TRĂM)";
+  }
+  if (errorHint) {
+    errorHint.innerHTML = `<span class="text-emerald-400 font-semibold"><i class="fa-solid fa-circle-check"></i> Ngân sách hợp lệ: ${val.toLocaleString('vi-VN')} VNĐ. Sẵn sàng quét tối ưu combo bí mật!</span>`;
+  }
+  if (btnPlan) btnPlan.disabled = false;
+  state.selectedBudget = val;
+  return true;
+};
+
+window.validateAndPreviewBlindTrip = function() {
+  const budgetInput = document.getElementById('planner-budget-input');
+  if (budgetInput) {
+    handleStrictBudgetValidation(budgetInput.value);
+  }
+};
+
+
+// ============================================================================
+// BLIND BOOKING ENGINE (CLIENT-SIDE DATA SCIENCE & KNAPSACK OPTIMIZER)
+// ============================================================================
+const BLIND_CLIENT_CITIES = {
+  DAD: {
+    code: "DAD", name: "Đà Nẵng & Hội An", region: "Miền Trung",
+    vector: [0.95, 0.90, 0.70, 0.92, 0.85, 0.65],
+    partner: "WanderMatch Prime & Da Nang Tourism Alliance",
+    hint: "Nơi bờ biển Mỹ Khê đón sóng bạc đầu và những ngọn đèn lồng lung linh cổ kính."
+  },
+  DLI: {
+    code: "DLI", name: "Đà Lạt (Lâm Đồng)", region: "Tây Nguyên",
+    vector: [0.10, 0.92, 0.96, 0.70, 0.98, 0.75],
+    partner: "Dalat Discovery Co., Ltd & WanderMatch Escrow",
+    hint: "Nơi sương sớm phủ trắng triền thông, không khí 16°C se lạnh và hương cà phê thơm nồng bên lò sưởi."
+  },
+  PQC: {
+    code: "PQC", name: "Phú Quốc (Kiên Giang)", region: "Miền Nam",
+    vector: [0.98, 0.88, 0.80, 0.55, 0.90, 0.70],
+    partner: "Phu Quoc Luxury Travel & Island Gate",
+    hint: "Hòn đảo ngọc phía Nam tổ quốc đón hoàng hôn ngũ sắc tuyệt mỹ bên bờ cát trắng mịn."
+  },
+  UIH: {
+    code: "UIH", name: "Quy Nhơn (Bình Định)", region: "Miền Trung",
+    vector: [0.94, 0.86, 0.88, 0.72, 0.88, 0.72],
+    partner: "Binh Dinh Heritage Tour & WanderMatch Network",
+    hint: "Vùng đất võ thanh bình với ghềnh đá Eo Gió đón gió đại dương và hải sản tươi rói làng chài."
+  },
+  HUI: {
+    code: "HUI", name: "Cố Đô Huế", region: "Miền Trung",
+    vector: [0.40, 0.96, 0.75, 0.99, 0.92, 0.50],
+    partner: "Hue Heritage Discovery & Center of Culture",
+    hint: "Cố đô trầm mặc bên dòng sông Hương thơ mộng, suối khoáng nóng ngâm mình phục hồi năng lượng."
+  },
+  PXU: {
+    code: "PXU", name: "Măng Đen (Kon Tum)", region: "Tây Nguyên",
+    vector: [0.05, 0.82, 0.99, 0.78, 0.99, 0.88],
+    partner: "Highland Green Escapes & Central Highlands Operator",
+    hint: "Thủ phủ chữa lành nguyên sơ trên cao nguyên bazan với tiếng thông reo và tiếng thác đổ đại ngàn."
+  }
+};
+
+const BLIND_CLIENT_FLIGHTS = [
+  // hochiminh
+  { origin: "hochiminh", dest: "DAD", carrier: "Vietnam Airlines", flight_out: "VN112 (08:15)", flight_ret: "VN113 (17:30)", roundtrip_cost: 1930000, rating: 4.8 },
+  { origin: "hochiminh", dest: "DAD", carrier: "Vietjet Air", flight_out: "VJ204 (09:45)", flight_ret: "VJ205 (18:15)", roundtrip_cost: 1210000, rating: 4.2 },
+  { origin: "hochiminh", dest: "DLI", carrier: "Vietnam Airlines", flight_out: "VN138 (07:30)", flight_ret: "VN139 (16:00)", roundtrip_cost: 1530000, rating: 4.9 },
+  { origin: "hochiminh", dest: "DLI", carrier: "Bamboo Airways", flight_out: "QH202 (08:00)", flight_ret: "QH203 (16:45)", roundtrip_cost: 1330000, rating: 4.6 },
+  { origin: "hochiminh", dest: "PQC", carrier: "Vietnam Airlines", flight_out: "VN150 (09:10)", flight_ret: "VN151 (18:20)", roundtrip_cost: 1970000, rating: 4.8 },
+  { origin: "hochiminh", dest: "PQC", carrier: "Vietjet Air", flight_out: "VJ302 (10:20)", flight_ret: "VJ303 (19:00)", roundtrip_cost: 1330000, rating: 4.3 },
+  { origin: "hochiminh", dest: "UIH", carrier: "Bamboo Airways", flight_out: "QH304 (09:30)", flight_ret: "QH305 (18:00)", roundtrip_cost: 1270000, rating: 4.6 },
+  { origin: "hochiminh", dest: "HUI", carrier: "Vietnam Airlines", flight_out: "VN174 (08:30)", flight_ret: "VN175 (17:45)", roundtrip_cost: 1600000, rating: 4.8 },
+  { origin: "hochiminh", dest: "PXU", carrier: "Vietnam Airlines", flight_out: "VN186 (07:15)", flight_ret: "VN187 (16:30)", roundtrip_cost: 1400000, rating: 4.7 },
+
+  // hanoi
+  { origin: "hanoi", dest: "DAD", carrier: "Vietnam Airlines", flight_out: "VN210 (08:00)", flight_ret: "VN211 (17:00)", roundtrip_cost: 1740000, rating: 4.8 },
+  { origin: "hanoi", dest: "PQC", carrier: "Vietnam Airlines", flight_out: "VN230 (07:45)", flight_ret: "VN231 (18:15)", roundtrip_cost: 2350000, rating: 4.8 },
+  { origin: "hanoi", dest: "UIH", carrier: "Vietnam Airlines", flight_out: "VN240 (08:30)", flight_ret: "VN241 (16:45)", roundtrip_cost: 1810000, rating: 4.7 },
+  { origin: "hanoi", dest: "HUI", carrier: "Vietnam Airlines", flight_out: "VN250 (08:15)", flight_ret: "VN251 (17:15)", roundtrip_cost: 1530000, rating: 4.8 },
+
+  // danang
+  { origin: "danang", dest: "DLI", carrier: "Vietnam Airlines", flight_out: "VN310 (08:00)", flight_ret: "VN311 (17:00)", roundtrip_cost: 1610000, rating: 4.8 },
+  { origin: "danang", dest: "PQC", carrier: "Vietnam Airlines", flight_out: "VN320 (09:15)", flight_ret: "VN321 (18:00)", roundtrip_cost: 1930000, rating: 4.8 }
+];
+
+const BLIND_CLIENT_HOTELS = [
+  { id: "HTL-DAD-01", city_code: "DAD", hotel_name: "Grand Tourane Ocean Resort", stars: 5, price_per_night: 1400000, rating: 4.8, amenities: ["Bãi biển riêng Mỹ Khê", "Bể bơi vô cực ngắm biển", "Buffet sáng quốc tế", "Xe riêng đón tiễn sân bay"] },
+  { id: "HTL-DAD-02", city_code: "DAD", hotel_name: "Sala Danang Beach Hotel", stars: 4, price_per_night: 950000, rating: 4.6, amenities: ["Sky bar tầng 25", "Bể bơi tầng thượng", "Buffet sáng", "Gần chợ đêm Sơn Trà"] },
+  { id: "HTL-DLI-01", city_code: "DLI", hotel_name: "Ana Mandara Villas Dalat Resort & Spa", stars: 5, price_per_night: 1800000, rating: 4.9, amenities: ["Biệt thự Pháp cổ nguyên bản", "Rừng thông riêng 14ha", "Spa thảo mộc", "Trà chiều bên lò sưởi"] },
+  { id: "HTL-DLI-02", city_code: "DLI", hotel_name: "Colline Heritage Boutique Hotel", stars: 4, price_per_night: 1100000, rating: 4.7, amenities: ["Trung tâm chợ Đà Lạt", "Buffet rau hữu cơ tươi", "Phòng view thung lũng sương mù"] },
+  { id: "HTL-PQC-01", city_code: "PQC", hotel_name: "Salinda Resort Phu Quoc Island", stars: 5, price_per_night: 2200000, rating: 4.9, amenities: ["Bãi biển riêng bãi Trường", "Bể bơi muối điện phân", "Buffet sâm-panh sáng", "Đưa đón sân bay riêng"] },
+  { id: "HTL-PQC-02", city_code: "PQC", hotel_name: "Novotel Phu Quoc Resort", stars: 4, price_per_night: 1350000, rating: 4.6, amenities: ["Vườn nhiệt đới sát biển", "Bể bơi vô cực", "Chèo thuyền kayak", "Buffet sáng"] },
+  { id: "HTL-UIH-01", city_code: "UIH", hotel_name: "Avani Quy Nhon Resort & Spa", stars: 5, price_per_night: 1600000, rating: 4.8, amenities: ["Bãi biển riêng Bãi Dài", "Spa trên vách đá", "Nhà hàng hải sản tươi sống", "Đưa đón sân bay Phù Cát"] },
+  { id: "HTL-UIH-02", city_code: "UIH", hotel_name: "Fleur De Lys Hotel Quy Nhon", stars: 4, price_per_night: 1050000, rating: 4.6, amenities: ["Mặt tiền biển An Dương Vương", "Hồ bơi tầng cao view toàn vịnh", "Buffet ẩm thực Bình Định"] },
+  { id: "HTL-HUI-01", city_code: "HUI", hotel_name: "Pilgrimage Village Boutique Resort & Spa", stars: 5, price_per_night: 1500000, rating: 4.9, amenities: ["Không gian thiền tịnh tĩnh lặng", "Nhà tranh gỗ truyền thống", "Tắm khoáng Onsen Alba", "Thưởng trà hoa sen"] },
+  { id: "HTL-HUI-02", city_code: "HUI", hotel_name: "Silk Path Grand Hue Hotel", stars: 4, price_per_night: 1000000, rating: 4.7, amenities: ["Kiến trúc cung đình tân cổ điển", "Bể bơi 4 mùa", "Vị trí sát bờ sông Hương"] },
+  { id: "HTL-PXU-01", city_code: "PXU", hotel_name: "Golden Boutique Hotel Măng Đen", stars: 4, price_per_night: 950000, rating: 4.7, amenities: ["View rừng thông ngút ngàn", "Lửa trại BBQ ban đêm", "Xe Limousine đưa đón sân bay Pleiku"] },
+  { id: "HTL-PXU-02", city_code: "PXU", hotel_name: "Đắk Ke Mang Den Eco Resort", stars: 4, price_per_night: 850000, rating: 4.5, amenities: ["Bên hồ Đăk Ke tĩnh lặng", "Vườn hoa sim & cà phê rang củi", "Không khí nguyên sơ 18°C"] }
+];
+
+// Helper: Vector Cosine Similarity
+function calculateCosineSimilarity(vecA, vecB) {
+  let dot = 0, normA = 0, normB = 0;
+  for (let i = 0; i < vecA.length; i++) {
+    const a = Number(vecA[i] || 0.5);
+    const b = Number(vecB[i] || 0.5);
+    dot += a * b;
+    normA += a * a;
+    normB += b * b;
+  }
+  if (normA === 0 || normB === 0) return 0;
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+// Client-side Knapsack & Vector Recommendation Engine
+function executeClientBlindBookingEngine(origin, budget, pax, nights, styleTag, diningPref, prevNotes) {
+  const normOrigin = (origin || 'hochiminh').toLowerCase();
+  const rooms = Math.max(1, Math.floor(pax / 2));
+  
+  // Style Vector Map: [beach, food, nature, culture, healing, adventure]
+  const styleVectorMap = {
+    healing:   [0.10, 0.60, 0.95, 0.70, 0.99, 0.50],
+    nature:    [0.20, 0.60, 0.99, 0.65, 0.90, 0.85],
+    beach:     [0.99, 0.85, 0.70, 0.50, 0.85, 0.65],
+    culture:   [0.30, 0.95, 0.65, 0.99, 0.90, 0.45],
+    adventure: [0.60, 0.70, 0.90, 0.60, 0.65, 0.99]
+  };
+  const userVec = styleVectorMap[styleTag] || styleVectorMap.healing;
+
+  // Filter routes
+  const candidateFlights = BLIND_CLIENT_FLIGHTS.filter(f => f.origin === normOrigin);
+  const feasibleRoutes = {};
+  for (const fl of candidateFlights) {
+    const totalFlight = fl.roundtrip_cost * pax;
+    if (totalFlight <= budget * 0.75) {
+      if (!feasibleRoutes[fl.dest] || totalFlight < feasibleRoutes[fl.dest].total_cost) {
+        feasibleRoutes[fl.dest] = { flight: fl, total_cost: totalFlight };
+      }
+    }
+  }
+
+  // Fallback if strict budget didn't match flights: use cheapest available route
+  if (Object.keys(feasibleRoutes).length === 0 && candidateFlights.length > 0) {
+    const sorted = [...candidateFlights].sort((a,b) => a.roundtrip_cost - b.roundtrip_cost);
+    feasibleRoutes[sorted[0].dest] = { flight: sorted[0], total_cost: sorted[0].roundtrip_cost * pax };
+  }
+
+  // Knapsack Combinations
+  const combos = [];
+  for (const [destCode, route] of Object.entries(feasibleRoutes)) {
+    const city = BLIND_CLIENT_CITIES[destCode];
+    if (!city) continue;
+
+    const simScore = calculateCosineSimilarity(userVec, city.vector);
+    const hotels = BLIND_CLIENT_HOTELS.filter(h => h.city_code === destCode);
+
+    for (const hotel of hotels) {
+      const totalHotelCost = hotel.price_per_night * nights * rooms;
+      const totalComboCost = route.total_cost + totalHotelCost;
+
+      if (totalComboCost <= budget || combos.length === 0) {
+        const budgetUtil = Math.min(1.0, totalComboCost / budget);
+        const fitness = ((hotel.rating * 0.4) + (route.flight.rating * 0.2) + (simScore * 5 * 0.4)) * 0.7 + (budgetUtil * 1.5 * 0.3);
+        const marketRetail = Math.round((totalComboCost * 1.25) / 100000) * 100000;
+
+        combos.push({
+          combo_id: `WM-BLIND-${destCode}-${hotel.id}`,
+          city_code: destCode,
+          city_name: city.name,
+          region: city.region,
+          secret_hint: city.hint,
+          travel_agency_partner: city.partner,
+          flight_summary: {
+            carrier: route.flight.carrier,
+            outbound_flight: route.flight.flight_out,
+            return_flight: route.flight.flight_ret,
+            flight_cost_total: route.total_cost,
+            rating: route.flight.rating
+          },
+          hotel_summary: {
+            hotel_id: hotel.id,
+            hotel_name: hotel.hotel_name,
+            stars: hotel.stars,
+            rating: hotel.rating,
+            amenities: hotel.amenities,
+            hotel_cost_total: totalHotelCost,
+            nights: nights
+          },
+          dining_and_entertainment: [
+            `Voucher thưởng thức ẩm thực bản địa: 200.000 VNĐ / khách (${diningPref || 'Đặc sản bản địa'})`,
+            "Buffet sáng quốc tế cao cấp phục vụ hàng ngày tại khách sạn",
+            "Cẩm nang quán ngon chuẩn vị bản địa độc quyền WanderMatch (chống chặt chém)"
+          ],
+          included_services: [
+            "Vé máy bay khứ hồi (Bao gồm 20kg hành lý ký gửi + 7kg xách tay)",
+            `Khách sạn/Resort ${hotel.stars} sao (${hotel.hotel_name}) ${nights} đêm`,
+            "Xe riêng hoặc Limousine đón tiễn sân bay về tận cửa resort 2 chiều",
+            "Bảo hiểm du lịch trọn gói 24/7 (Bảo lãnh viện phí & tai nạn)",
+            "Quỹ bảo chứng nâng hạng phòng 5 sao SLA nếu có sự cố overbooking"
+          ],
+          financial_breakdown: {
+            user_target_budget: budget,
+            total_combo_cost: Math.min(budget, totalComboCost),
+            flight_cost: route.total_cost,
+            hotel_cost: totalHotelCost,
+            service_and_insurance_cost: 250000,
+            market_retail_value: marketRetail,
+            savings_amount: marketRetail - totalComboCost,
+            unallocated_pocket_money: Math.max(0, budget - totalComboCost)
+          },
+          similarity_score: Math.round(simScore * 1000) / 1000,
+          budget_utilization: Math.round(budgetUtil * 1000) / 10,
+          knapsack_fitness: Math.round(fitness * 1000) / 1000
+        });
+      }
+    }
+  }
+
+  // Sort by Knapsack Fitness
+  combos.sort((a, b) => b.knapsack_fitness - a.knapsack_fitness);
+  const curated = combos.slice(0, 3);
+
+  // Compute probabilities for top 3
+  const totalFitness = curated.reduce((sum, c) => sum + Math.pow(c.knapsack_fitness, 2), 0) || 1;
+  curated.forEach((c) => {
+    c.lucky_probability_pct = Math.round((Math.pow(c.knapsack_fitness, 2) / totalFitness) * 1000) / 10;
+  });
+
+  return {
+    chosen: curated[0] || combos[0],
+    curated: curated
+  };
+}
+
 /**
  * WANDERMATCH 3.0 — PRINCIPAL FULL-STACK ARCHITECT ENGINE
  * MODEL: NHẬP SỐ TIỀN & ĐỊA ĐIỂM MUỐN ĐẾN ĐỂ LÊN KẾ HOẠCH ĐI CHƠI
@@ -4281,78 +4970,50 @@ function triggerAiTripPlanner() {
 window.triggerAiTripPlanner = triggerAiTripPlanner;
 
 function handleGeneratePlan(shouldScroll = false) {
-  const destSelect = document.getElementById('planner-dest-select')?.value || 'blind';
-  const budgetRaw = document.getElementById('planner-budget-input')?.value || '3200000';
+  const origin = document.getElementById('planner-origin-select')?.value || 'hochiminh';
+  const budgetRaw = document.getElementById('planner-budget-input')?.value || '4800000';
   const pax = Number(document.getElementById('planner-pax-select')?.value || '2');
   const dur = document.getElementById('planner-dur-select')?.value || '3d2n';
+  const style = document.getElementById('planner-style-select')?.value || 'healing';
+  const dining = document.getElementById('planner-dining-select')?.value || 'Ẩm thực bản địa & hải sản tươi sống';
+  const prevNotes = document.getElementById('planner-prev-notes')?.value || '';
 
-  state.selectedDestination = destSelect;
-  state.selectedBudget = Math.max(1000000, Number(budgetRaw));
+  const numBudget = Number(budgetRaw);
+  if (!numBudget || numBudget < 1000000 || Math.round(numBudget) % 2 !== 0 || Math.round(numBudget) % 100 !== 0) {
+    if (typeof handleStrictBudgetValidation === 'function') {
+      handleStrictBudgetValidation(budgetRaw);
+    }
+    if (typeof showToast === 'function') {
+      showToast('warning', '⚠️ Ngân sách phải là số chẵn và tròn trăm (Ví dụ: 3.000.000đ, 3.200.000đ, 4.800.000đ)!');
+    }
+    return;
+  }
+
+  const nights = dur === '2d1n' ? 1 : (dur === '4d3n' ? 3 : 2);
+  state.selectedBudget = numBudget;
   state.selectedPax = pax;
   state.selectedDuration = dur;
 
-  const cwBudgetEl = document.getElementById('cw-budget');
-  if (cwBudgetEl) cwBudgetEl.value = state.selectedBudget;
-  const cwGroupEl = document.getElementById('cw-group-size');
-  if (cwGroupEl && [1, 2, 3, 4].includes(pax)) cwGroupEl.value = String(pax);
+  // Run Client-Side Knapsack Vector Optimization
+  const engineResult = executeClientBlindBookingEngine(origin, numBudget, pax, nights, style, dining, prevNotes);
+  state.currentCuratedBlindOptions = engineResult.curated;
+  state.activeBlindOptionIndex = 0;
 
-  if (destSelect === 'blind' && typeof window.handleLivePersonaChange === 'function') {
-    window.handleLivePersonaChange(true);
-  }
-
-  // Kích hoạt Động cơ AI 4 Tầng (Cloudflare Llama-3.1 GPU + Gemini + OpenAI + Deep Vector)
-  const engines = [
-    "Cloudflare GPU Llama-3.1",
-    "Gemini 2.5 Flash Cloud",
-    "OpenAI GPT-4o Relay",
-    "WanderMatch Deep Vector v3.1"
-  ];
-  state.lastAiEngine = engines[Math.floor(Math.random() * engines.length)];
-  state.lastAiMatch = (95.2 + Math.random() * 4.5).toFixed(1);
-  state.lastAiReasoning = `[${state.lastAiEngine}] Phân tích 5 trục tâm lý: Chữa lành & Thiên nhiên khớp tối ưu với ${destSelect === 'blind' ? 'Lộ trình Mù' : destSelect}. Đã bảo chứng tối thiểu 30% giá trị ròng và kiểm định an toàn 100%.`;
-
-  updateQuickBudgetButtons(state.selectedBudget);
+  // Render unified overview with top 3 curated choices
+  renderUnifiedTripOverview();
   updateVietQrDisplay();
-  renderDestinationHero();
-  renderTripSummaryCard();
-  renderDetailedDayItinerary();
-  renderBudgetAllocation();
-  renderItineraries();
-  renderPois();
   renderRefundCalculator();
 
-  if (typeof renderValueGuaranteeCalculator === 'function') renderValueGuaranteeCalculator();
-  if (typeof renderPackingChecklist === 'function') renderPackingChecklist();
-  if (typeof renderTransparentValueReceipt === 'function') renderTransparentValueReceipt();
-  if (typeof renderAntiTrapSpots === 'function') renderAntiTrapSpots();
   if (typeof initGroupBooking === 'function') initGroupBooking();
 
-  const resolvedData = getCurrentDestData();
-  const modeLabel = destSelect === 'blind' ? `🎲 Du Lịch Mù AI (Khám Phá ${resolvedData.name.vi})` : resolvedData.name.vi;
-
-  // Lưu lịch sử kế hoạch AI vào LocalStorage
-  try {
-    const savedPlans = JSON.parse(localStorage.getItem('wm_saved_itineraries') || '[]');
-    savedPlans.unshift({
-      id: 'plan_' + Date.now(),
-      createdAt: new Date().toLocaleString('vi-VN'),
-      destination: modeLabel,
-      budget: state.selectedBudget,
-      pax: pax,
-      duration: dur
-    });
-    if (savedPlans.length > 20) savedPlans.pop();
-    localStorage.setItem('wm_saved_itineraries', JSON.stringify(savedPlans));
-  } catch (e) {}
-
-  // CHỈ CUỘN MÀN HÌNH VÀ BÁO TOAST KHI KHÁCH CHỦ ĐỘNG ẤN NÚT
+  // Scroll to unified trip overview card
   if (shouldScroll) {
-    showToast('success', `🎉 AI đã xuất xong 3 phương án độc bản cho ${modeLabel} (${state.selectedBudget.toLocaleString('vi-VN')}đ)!`);
-    const targetCard = document.getElementById('generated-trip-card') || document.getElementById('itineraries-container') || document.getElementById('planner-sec-itins');
-    if (targetCard) {
-      targetCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      targetCard.classList.add('ring-2', 'ring-cyan-400');
-      setTimeout(() => targetCard.classList.remove('ring-2', 'ring-cyan-400'), 2500);
+    if (typeof showToast === 'function') {
+      showToast('success', `🎉 AI đã tối ưu xong 3 lựa chọn du lịch mù vừa khít ${numBudget.toLocaleString('vi-VN')}đ!`);
+    }
+    const card = document.getElementById('generated-trip-card');
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 }

@@ -23,7 +23,7 @@ let DB = {
       type: "VIETQR_ESCROW_INFLOW",
       direction: "IN",
       amount: "5.000.000đ",
-      sender: "NGUYEN VAN AN (MBBank)",
+      sender: "HOI VIEN KHACH HANG (Napas 247)",
       receiver: "CONG TY CP CONG NGHE DU LICH WANDERMATCH",
       status: "HELD_IN_ESCROW",
       time: "2026-10-20 10:14:22"
@@ -96,48 +96,426 @@ const server = http.createServer(async (req, res) => {
   // BACKEND API ROUTES
   // ==========================================================================
 
-  // 1. AI Trip Planner: Input Destination & Custom Budget
+  // ==========================================================================
+  // BLIND BOOKING ENGINE & DATA SCIENCE MOCK REPOSITORIES
+  // ==========================================================================
+  const BLIND_FEATURE_KEYS = ['beach', 'food', 'nature', 'culture', 'healing', 'adventure'];
+
+  const BLIND_CITIES = {
+    DAD: {
+      city_code: "DAD",
+      city_name: "Đà Nẵng & Hội An",
+      region: "Miền Trung",
+      description: "Thành phố biển đáng sống, bờ biển Mỹ Khê và di sản phố cổ đèn lồng Hội An",
+      vector: [0.95, 0.90, 0.70, 0.92, 0.85, 0.65],
+      travel_agency_partner: "WanderMatch Prime & Da Nang Tourism Alliance",
+      secret_hint: "Nơi những cây cầu nối nhịp đại dương và phố cổ rêu phong trầm mặc dưới ánh đèn lồng."
+    },
+    DLI: {
+      city_code: "DLI",
+      city_name: "Đà Lạt (Lâm Đồng)",
+      region: "Tây Nguyên",
+      description: "Xứ sở ngàn hoa trong sương sớm, se lạnh 16°C và hương thông thơm ngát",
+      vector: [0.10, 0.92, 0.96, 0.70, 0.98, 0.75],
+      travel_agency_partner: "Dalat Discovery Co., Ltd & WanderMatch Escrow",
+      secret_hint: "Nơi đồi thông reo trong sương sớm, se lạnh 16°C và hương cà phê ấm nồng bên sườn thung lũng."
+    },
+    PQC: {
+      city_code: "PQC",
+      city_name: "Phú Quốc (Kiên Giang)",
+      region: "Miền Nam",
+      description: "Đảo ngọc nhiệt đới, hoàng hôn biển bãi Trường và thiên đường nghỉ dưỡng 5 sao",
+      vector: [0.98, 0.88, 0.80, 0.55, 0.90, 0.70],
+      travel_agency_partner: "Phu Quoc Luxury Travel & Island Gate",
+      secret_hint: "Hòn đảo ngọc phía Nam tổ quốc đón hoàng hôn ngũ sắc tuyệt mỹ và những khu resort biệt lập."
+    },
+    UIH: {
+      city_code: "UIH",
+      city_name: "Quy Nhơn (Bình Định)",
+      region: "Miền Trung",
+      description: "Ghềnh ráng biển xanh, bãi Kỳ Co - Eo Gió hoang sơ và ẩm thực làng chài",
+      vector: [0.94, 0.86, 0.88, 0.72, 0.88, 0.72],
+      travel_agency_partner: "Binh Dinh Heritage Tour & WanderMatch Network",
+      secret_hint: "Vùng đất võ thanh bình với vách đá Eo Gió đón sóng đại dương và hải sản tươi rói."
+    },
+    HUI: {
+      city_code: "HUI",
+      city_name: "Cố Đô Huế (Thừa Thiên Huế)",
+      region: "Miền Trung",
+      description: "Cố đô di sản nghìn năm, dòng sông Hương thơ mộng và suối khoáng nóng Alba",
+      vector: [0.40, 0.96, 0.75, 0.99, 0.92, 0.50],
+      travel_agency_partner: "Hue Heritage Discovery & Center of Culture",
+      secret_hint: "Cố đô trầm mặc bên dòng sông Hương, tắm khoáng nóng phục hồi và nhã nhạc cung đình thanh nhã."
+    },
+    PXU: {
+      city_code: "PXU",
+      city_name: "Măng Đen & Pleiku (Kon Tum)",
+      region: "Tây Nguyên",
+      description: "Thủ phủ chữa lành giữa đại ngàn nguyên sơ, rừng thông bạt ngàn và khí hậu se lạnh",
+      vector: [0.05, 0.82, 0.99, 0.78, 0.99, 0.88],
+      travel_agency_partner: "Highland Green Escapes & Central Highlands Operator",
+      secret_hint: "Thủ phủ chữa lành nguyên sơ trên cao nguyên bazan, rặng thông non ngút ngàn và tiếng thác đổ."
+    }
+  };
+
+  const BLIND_FLIGHTS = [
+    // SGN (TP.HCM)
+    { flight_no: "VN112", origin: "hochiminh", destination: "DAD", carrier: "Vietnam Airlines", price_oneway: 950000, depart_time: "08:15", rating: 4.8 },
+    { flight_no: "VN113", origin: "DAD", destination: "hochiminh", carrier: "Vietnam Airlines", price_oneway: 980000, depart_time: "17:30", rating: 4.8 },
+    { flight_no: "VJ204", origin: "hochiminh", destination: "DAD", carrier: "Vietjet Air", price_oneway: 590000, depart_time: "09:45", rating: 4.2 },
+    { flight_no: "VJ205", origin: "DAD", destination: "hochiminh", carrier: "Vietjet Air", price_oneway: 620000, depart_time: "18:15", rating: 4.2 },
+
+    { flight_no: "VN138", origin: "hochiminh", destination: "DLI", carrier: "Vietnam Airlines", price_oneway: 750000, depart_time: "07:30", rating: 4.9 },
+    { flight_no: "VN139", origin: "DLI", destination: "hochiminh", carrier: "Vietnam Airlines", price_oneway: 780000, depart_time: "16:00", rating: 4.9 },
+    { flight_no: "QH202", origin: "hochiminh", destination: "DLI", carrier: "Bamboo Airways", price_oneway: 650000, depart_time: "08:00", rating: 4.6 },
+    { flight_no: "QH203", origin: "DLI", destination: "hochiminh", carrier: "Bamboo Airways", price_oneway: 680000, depart_time: "16:45", rating: 4.6 },
+
+    { flight_no: "VN150", origin: "hochiminh", destination: "PQC", carrier: "Vietnam Airlines", price_oneway: 980000, depart_time: "09:10", rating: 4.8 },
+    { flight_no: "VN151", origin: "PQC", destination: "hochiminh", carrier: "Vietnam Airlines", price_oneway: 990000, depart_time: "18:20", rating: 4.8 },
+    { flight_no: "VJ302", origin: "hochiminh", destination: "PQC", carrier: "Vietjet Air", price_oneway: 650000, depart_time: "10:20", rating: 4.3 },
+    { flight_no: "VJ303", origin: "PQC", destination: "hochiminh", carrier: "Vietjet Air", price_oneway: 680000, depart_time: "19:00", rating: 4.3 },
+
+    { flight_no: "VN162", origin: "hochiminh", destination: "UIH", carrier: "Vietnam Airlines", price_oneway: 720000, depart_time: "08:45", rating: 4.7 },
+    { flight_no: "VN163", origin: "UIH", destination: "hochiminh", carrier: "Vietnam Airlines", price_oneway: 750000, depart_time: "17:15", rating: 4.7 },
+    { flight_no: "QH304", origin: "hochiminh", destination: "UIH", carrier: "Bamboo Airways", price_oneway: 620000, depart_time: "09:30", rating: 4.6 },
+    { flight_no: "QH305", origin: "UIH", destination: "hochiminh", carrier: "Bamboo Airways", price_oneway: 650000, depart_time: "18:00", rating: 4.6 },
+
+    { flight_no: "VN174", origin: "hochiminh", destination: "HUI", carrier: "Vietnam Airlines", price_oneway: 780000, depart_time: "08:30", rating: 4.8 },
+    { flight_no: "VN175", origin: "HUI", destination: "hochiminh", carrier: "Vietnam Airlines", price_oneway: 820000, depart_time: "17:45", rating: 4.8 },
+
+    { flight_no: "VN186", origin: "hochiminh", destination: "PXU", carrier: "Vietnam Airlines", price_oneway: 680000, depart_time: "07:15", rating: 4.7 },
+    { flight_no: "VN187", origin: "PXU", destination: "hochiminh", carrier: "Vietnam Airlines", price_oneway: 720000, depart_time: "16:30", rating: 4.7 },
+
+    // HAN (Hà Nội)
+    { flight_no: "VN210", origin: "hanoi", destination: "DAD", carrier: "Vietnam Airlines", price_oneway: 850000, depart_time: "08:00", rating: 4.8 },
+    { flight_no: "VN211", origin: "DAD", destination: "hanoi", carrier: "Vietnam Airlines", price_oneway: 890000, depart_time: "17:00", rating: 4.8 },
+    { flight_no: "VN230", origin: "hanoi", destination: "PQC", carrier: "Vietnam Airlines", price_oneway: 1150000, depart_time: "07:45", rating: 4.8 },
+    { flight_no: "VN231", origin: "PQC", destination: "hanoi", carrier: "Vietnam Airlines", price_oneway: 1200000, depart_time: "18:15", rating: 4.8 },
+    { flight_no: "VN240", origin: "hanoi", destination: "UIH", carrier: "Vietnam Airlines", price_oneway: 890000, depart_time: "08:30", rating: 4.7 },
+    { flight_no: "VN241", origin: "UIH", destination: "hanoi", carrier: "Vietnam Airlines", price_oneway: 920000, depart_time: "16:45", rating: 4.7 },
+    { flight_no: "VN250", origin: "hanoi", destination: "HUI", carrier: "Vietnam Airlines", price_oneway: 750000, depart_time: "08:15", rating: 4.8 },
+    { flight_no: "VN251", origin: "HUI", destination: "hanoi", carrier: "Vietnam Airlines", price_oneway: 780000, depart_time: "17:15", rating: 4.8 },
+
+    // DAD (Đà Nẵng)
+    { flight_no: "VN310", origin: "danang", destination: "DLI", carrier: "Vietnam Airlines", price_oneway: 790000, depart_time: "08:00", rating: 4.8 },
+    { flight_no: "VN311", origin: "DLI", destination: "danang", carrier: "Vietnam Airlines", price_oneway: 820000, depart_time: "17:00", rating: 4.8 },
+    { flight_no: "VN320", origin: "danang", destination: "PQC", carrier: "Vietnam Airlines", price_oneway: 950000, depart_time: "09:15", rating: 4.8 },
+    { flight_no: "VN321", origin: "PQC", destination: "danang", carrier: "Vietnam Airlines", price_oneway: 980000, depart_time: "18:00", rating: 4.8 }
+  ];
+
+  const BLIND_HOTELS = [
+    { id: "HTL-DAD-01", city_code: "DAD", hotel_name: "Grand Tourane Ocean Resort", stars: 5, price_per_night: 1400000, rating: 4.8, amenities: ["Bãi biển riêng", "Bể bơi vô cực", "Buffet sáng quốc tế", "Xe đón sân bay"] },
+    { id: "HTL-DAD-02", city_code: "DAD", hotel_name: "Sala Danang Beach Hotel", stars: 4, price_per_night: 950000, rating: 4.6, amenities: ["Sky bar", "Bể bơi tầng thượng", "Buffet sáng", "Gần chợ đêm Sơn Trà"] },
+    { id: "HTL-DLI-01", city_code: "DLI", hotel_name: "Ana Mandara Villas Dalat Resort & Spa", stars: 5, price_per_night: 1800000, rating: 4.9, amenities: ["Biệt thự Pháp cổ", "Rừng thông riêng", "Spa thảo mộc", "Trà chiều bên lò sưởi"] },
+    { id: "HTL-DLI-02", city_code: "DLI", hotel_name: "Colline Heritage Boutique Hotel", stars: 4, price_per_night: 1100000, rating: 4.7, amenities: ["Trung tâm chợ Đà Lạt", "Buffet rau hữu cơ", "Phòng view thung lũng"] },
+    { id: "HTL-PQC-01", city_code: "PQC", hotel_name: "Salinda Resort Phu Quoc Island", stars: 5, price_per_night: 2200000, rating: 4.9, amenities: ["Bãi biển hoàng hôn", "Bể bơi lọc muối điện phân", "Buffet sâm-panh", "Đưa đón riêng"] },
+    { id: "HTL-PQC-02", city_code: "PQC", hotel_name: "Novotel Phu Quoc Resort", stars: 4, price_per_night: 1350000, rating: 4.6, amenities: ["Vườn nhiệt đới", "Bể bơi sát biển", "Chèo kayak", "Buffet sáng"] },
+    { id: "HTL-UIH-01", city_code: "UIH", hotel_name: "Avani Quy Nhon Resort & Spa", stars: 5, price_per_night: 1600000, rating: 4.8, amenities: ["Bãi biển Bãi Dài", "Spa vách đá", "Nhà hàng hải sản tươi", "Đưa đón sân bay Phù Cát"] },
+    { id: "HTL-UIH-02", city_code: "UIH", hotel_name: "Fleur De Lys Hotel Quy Nhon", stars: 4, price_per_night: 1050000, rating: 4.6, amenities: ["Mặt tiền biển An Dương Vương", "Hồ bơi tầng cao", "Buffet ẩm thực Bình Định"] },
+    { id: "HTL-HUI-01", city_code: "HUI", hotel_name: "Pilgrimage Village Boutique Resort & Spa", stars: 5, price_per_night: 1500000, rating: 4.9, amenities: ["Không gian thiền định", "Nhà tranh gỗ truyền thống", "Tắm suối khoáng nóng", "Thưởng trà sen"] },
+    { id: "HTL-HUI-02", city_code: "HUI", hotel_name: "Silk Path Grand Hue Hotel", stars: 4, price_per_night: 1000000, rating: 4.7, amenities: ["Kiến trúc cung đình tân cổ điển", "Bể bơi 4 mùa", "Vị trí sát bờ sông Hương"] },
+    { id: "HTL-PXU-01", city_code: "PXU", hotel_name: "Golden Boutique Hotel Măng Đen", stars: 4, price_per_night: 950000, rating: 4.7, amenities: ["View rừng thông ngút ngàn", "Lửa trại BBQ ban đêm", "Xe Limousine đưa đón sân bay Pleiku"] },
+    { id: "HTL-PXU-02", city_code: "PXU", hotel_name: "Đắk Ke Mang Den Eco Resort", stars: 4, price_per_night: 850000, rating: 4.5, amenities: ["Bên hồ Đăk Ke", "Vườn hoa sim & cà phê rang củi", "Không khí nguyên sơ 18°C"] }
+  ];
+
+  function jsCosineSim(vecA = [], vecB = []) {
+    let dot = 0, normA = 0, normB = 0;
+    for (let i = 0; i < vecA.length; i++) {
+      const a = Number(vecA[i] || 0.5);
+      const b = Number(vecB[i] || 0.5);
+      dot += a * b;
+      normA += a * a;
+      normB += b * b;
+    }
+    if (normA === 0 || normB === 0) return 0;
+    return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+  }
+
+  function jsFilterBudgetRoutes(origin, totalBudget, pax = 2, maxRatio = 0.75) {
+    const feasible = {};
+    const normOrigin = (origin || 'hochiminh').toLowerCase();
+    const outbound = BLIND_FLIGHTS.filter(f => f.origin.toLowerCase() === normOrigin);
+
+    for (const outFl of outbound) {
+      const dest = outFl.destination;
+      const returnFl = BLIND_FLIGHTS.find(f => f.origin === dest && f.destination.toLowerCase() === normOrigin);
+      if (!returnFl) continue;
+
+      const roundtripPerPax = outFl.price_oneway + returnFl.price_oneway;
+      const totalFlightCost = roundtripPerPax * pax;
+
+      if (totalFlightCost <= totalBudget * maxRatio) {
+        if (!feasible[dest] || totalFlightCost < feasible[dest].total_flight_cost) {
+          feasible[dest] = {
+            city_code: dest,
+            outbound: outFl,
+            return: returnFl,
+            roundtrip_cost_per_pax: roundtripPerPax,
+            total_flight_cost: totalFlightCost
+          };
+        }
+      }
+    }
+    return feasible;
+  }
+
+  function jsRankCities(userVec, cityCodes) {
+    return cityCodes.map(code => {
+      const city = BLIND_CITIES[code];
+      const sim = city ? jsCosineSim(userVec, city.vector) : 0.5;
+      return { code, sim: Math.round(sim * 1000) / 1000 };
+    }).sort((a, b) => b.sim - a.sim);
+  }
+
+  function jsOptimizeKnapsack(feasibleRoutes, rankedCities, totalBudget, nights = 2, rooms = 1) {
+    const validCombos = [];
+    const simMap = {};
+    rankedCities.forEach(r => { simMap[r.code] = r.sim; });
+
+    for (const [cityCode, route] of Object.entries(feasibleRoutes)) {
+      const simScore = simMap[cityCode] || 0.75;
+      const cityMeta = BLIND_CITIES[cityCode];
+      if (!cityMeta) continue;
+
+      const flightCost = route.total_flight_cost;
+      const flightRating = (route.outbound.rating + route.return.rating) / 2;
+      const hotels = BLIND_HOTELS.filter(h => h.city_code === cityCode);
+
+      for (const hotel of hotels) {
+        const hotelCost = hotel.price_per_night * nights * rooms;
+        const totalComboCost = flightCost + hotelCost;
+
+        if (totalComboCost <= totalBudget) {
+          const budgetUtil = totalComboCost / totalBudget;
+          const compositeQuality = (hotel.rating * 0.40) + (flightRating * 0.20) + (simScore * 5.0 * 0.40);
+          const knapsackFitness = (compositeQuality * 0.70) + (budgetUtil * 1.5 * 0.30);
+          const marketRetail = Math.round((totalComboCost * 1.25) / 100000) * 100000;
+
+          validCombos.push({
+            combo_id: `COMBO-${cityCode}-${hotel.id}`,
+            city_code: cityCode,
+            city_name: cityMeta.city_name,
+            region: cityMeta.region,
+            secret_hint: cityMeta.secret_hint,
+            travel_agency_partner: cityMeta.travel_agency_partner,
+            flight_summary: {
+              carrier: route.outbound.carrier,
+              outbound_flight: `${route.outbound.flight_no} (${route.outbound.depart_time})`,
+              return_flight: `${route.return.flight_no} (${route.return.depart_time})`,
+              flight_cost_total: flightCost,
+              rating: flightRating
+            },
+            hotel_summary: {
+              hotel_id: hotel.id,
+              hotel_name: hotel.hotel_name,
+              stars: hotel.stars,
+              rating: hotel.rating,
+              amenities: hotel.amenities,
+              hotel_cost_total: hotelCost,
+              nights: nights
+            },
+            dining_and_entertainment: [
+              "Voucher thưởng thức ẩm thực bản địa: 200.000 VNĐ / khách",
+              "Bữa sáng Buffet tiêu chuẩn quốc tế tại khách sạn",
+              "Cẩm nang hướng dẫn quán ăn địa phương chuẩn vị (chống bẫy chặt chém)"
+            ],
+            included_services: [
+              "Vé máy bay khứ hồi (Bao gồm 20kg hành lý ký gửi + 7kg xách tay)",
+              `Phòng nghỉ ${hotel.stars} sao (${hotel.hotel_name}) ${nights} đêm`,
+              "Xe riêng / Limousine đón tiễn sân bay về khách sạn 2 chiều",
+              "Bảo hiểm du lịch toàn diện 24/7 (Bảo lãnh viện phí & tai nạn)",
+              "Quỹ bảo chứng nâng hạng phòng 5 sao SLA nếu có sự cố overbooking"
+            ],
+            financial_breakdown: {
+              user_target_budget: totalBudget,
+              total_combo_cost: totalComboCost,
+              flight_cost: flightCost,
+              hotel_cost: hotelCost,
+              service_and_insurance_cost: 250000,
+              market_retail_value: marketRetail,
+              savings_amount: marketRetail - totalComboCost,
+              unallocated_pocket_money: totalBudget - totalComboCost
+            },
+            similarity_score: simScore,
+            budget_utilization: Math.round(budgetUtil * 1000) / 10,
+            knapsack_fitness: Math.round(knapsackFitness * 1000) / 1000
+          });
+        }
+      }
+    }
+    return validCombos.sort((a, b) => b.knapsack_fitness - a.knapsack_fitness);
+  }
+
+  function jsSelectWeightedRandom(combos, topK = 3) {
+    const curated = combos.slice(0, topK);
+    const weights = curated.map(c => Math.pow(c.knapsack_fitness, 2));
+    const totalW = weights.reduce((sum, w) => sum + w, 0);
+
+    curated.forEach((c, idx) => {
+      c.lucky_probability_pct = Math.round((weights[idx] / totalW) * 1000) / 10;
+    });
+
+    let rand = Math.random() * totalW;
+    let chosen = curated[0];
+    for (let i = 0; i < curated.length; i++) {
+      if (rand < weights[i]) {
+        chosen = curated[i];
+        break;
+      }
+      rand -= weights[i];
+    }
+    return { chosen, curated };
+  }
+
+  // ==========================================================================
+  // 1. BLIND BOOKING ENGINE (CHỈ ĐIỂN ĐIỂM ĐI, NGÂN SÁCH CHẴN & TRÒN TRĂM)
+  // ==========================================================================
   if (pathname === '/api/planner/generate' && req.method === 'POST') {
     const body = await parseBody(req);
-    const destination = body.destination || 'hochiminh';
-    const budget = Math.max(1000000, Number(body.budget) || 5000000);
+    const origin = body.origin || 'hochiminh';
+    const numBudget = Number(body.budget);
     const pax = Number(body.pax) || 2;
     const duration = body.duration || '3d2n';
+    const nights = duration === '2d1n' ? 1 : (duration === '4d3n' ? 3 : 2);
+    const styleTags = body.styles || ['healing', 'nature', 'food'];
+    const diningPref = body.dining || 'Ẩm thực bản địa & hải sản tươi sống';
+    const previousTripNotes = body.previousNotes || '';
 
-    const allocation = {
-      accommodation: { pct: 40, amount: Math.round(budget * 0.4) },
-      foodAndDining: { pct: 30, amount: Math.round(budget * 0.3) },
-      attractionTickets: { pct: 20, amount: Math.round(budget * 0.2) },
-      contingencyTransit: { pct: 10, amount: Math.round(budget * 0.1) }
-    };
+    // STRICT VALIDATION: Chỉ nhận số chẵn, tròn trăm và >= 1.000.000đ
+    if (!numBudget || numBudget < 1000000) {
+      return sendJson(res, 400, {
+        success: false,
+        error: "Ngân sách tối thiểu từ 1.000.000 VNĐ trở lên."
+      });
+    }
+
+    if (Math.round(numBudget) % 2 !== 0) {
+      return sendJson(res, 400, {
+        success: false,
+        error: "Chỉ chấp nhận số chẵn (Ví dụ: 3.000.000đ, 3.200.000đ, 4.000.000đ). Không chấp nhận số lẻ!"
+      });
+    }
+
+    if (Math.round(numBudget) % 100 !== 0) {
+      return sendJson(res, 400, {
+        success: false,
+        error: "Chỉ chấp nhận số tròn trăm (Ví dụ: 2.500.000đ, 3.200.000đ). Không chấp nhận số lẻ!"
+      });
+    }
+
+    // Build user preference vector
+    const userVec = BLIND_FEATURE_KEYS.map(k => styleTags.includes(k) ? 0.95 : 0.35);
+
+    // Thuật toán 1: Lọc tuyến bay
+    const feasibleRoutes = jsFilterBudgetRoutes(origin, numBudget, pax);
+    const cityCodes = Object.keys(feasibleRoutes);
+
+    if (cityCodes.length === 0) {
+      return sendJson(res, 200, {
+        success: false,
+        error: `Không tìm thấy tuyến bay khứ hồi nào từ điểm khởi hành này nằm trong ngân sách ${numBudget.toLocaleString('vi-VN')}đ cho ${pax} người. Vui lòng tăng ngân sách!`
+      });
+    }
+
+    // Thuật toán 2: Cosine Similarity
+    const rankedCities = jsRankCities(userVec, cityCodes);
+
+    // Thuật toán 3: Knapsack Optimization
+    const combos = jsOptimizeKnapsack(feasibleRoutes, rankedCities, numBudget, nights, Math.max(1, Math.floor(pax / 2)));
+
+    if (combos.length === 0) {
+      return sendJson(res, 200, {
+        success: false,
+        error: `Không thể kết hợp gói combo Vé máy bay + Khách sạn 4-5 sao vừa khít ngân sách ${numBudget.toLocaleString('vi-VN')}đ. Vui lòng tăng nhẹ ngân sách!`
+      });
+    }
+
+    // Thuật toán 4: Weighted Random (Hộp Quà May Mắn & Top 3 Lựa Chọn)
+    const { chosen, curated } = jsSelectWeightedRandom(combos, 3);
 
     return sendJson(res, 200, {
       success: true,
-      destinationSelected: destination,
-      totalBudget: budget,
-      travelersCount: pax,
-      duration: duration,
-      budgetPerPax: Math.round(budget / pax),
-      allocationBreakdown: allocation,
-      itinerariesGenerated: 3,
-      message: "AI has successfully generated 3 personalized time-slotted itineraries matching your destination and budget."
+      ai_engine_used: "WanderMatch Knapsack Vector AI (Cloudflare Workers Fallback Enabled)",
+      input_criteria: {
+        origin: origin,
+        budget: numBudget,
+        pax: pax,
+        duration: duration,
+        nights: nights,
+        dining_preference: diningPref,
+        previous_trip_notes: previousTripNotes
+      },
+      mystery_lucky_box: chosen,
+      top_3_curated_options: curated,
+      unified_overview: {
+        destination_name: chosen.city_name,
+        region: chosen.region,
+        secret_hint: chosen.secret_hint,
+        hotel_name: chosen.hotel_summary.hotel_name,
+        hotel_stars: chosen.hotel_summary.stars,
+        hotel_rating: chosen.hotel_summary.rating,
+        travel_agency_partner: chosen.travel_agency_partner,
+        dining_and_entertainment: chosen.dining_and_entertainment,
+        included_services: chosen.included_services,
+        financial_breakdown: chosen.financial_breakdown
+      },
+      utilities_catalog: [
+        { category: "Hàng Không", items: ["Vé máy bay khứ hồi chính hãng", "Hành lý ký gửi 20kg + 7kg xách tay", "Không bay giờ đêm (Red-eye lock)"] },
+        { category: "Lưu Trú", items: [`Khách sạn/Resort ${chosen.hotel_summary.stars} sao (${chosen.hotel_summary.hotel_name})`, "Buffet sáng mỗi ngày", "Review khách thực tế >= 8.5/10"] },
+        { category: "Trung Chuyển", items: ["Xe đón tiễn sân bay về tận cửa resort 2 chiều"] },
+        { category: "Ẩm Thực & Trải Nghiệm", items: [`Voucher ẩm thực bản địa 200.000đ/khách (${diningPref})`, "Cẩm nang địa phương chống chặt chém"] },
+        { category: "Bảo Lãnh & Tài Chính", items: ["Bảo hiểm du lịch trọn gói 24/7", "Quỹ ký quỹ SLA nâng hạng 5 sao nếu overbooking", "Bảo lãnh hoàn tiền tự động 24H qua Napas 247"] }
+      ]
+    });
+  }
+
+  // 1B. Payment Confirmation with Receipt Upload
+  if (pathname === '/api/payment/confirm-receipt' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const orderCode = body.orderCode || 'WM' + Math.floor(10000 + Math.random() * 90000);
+    const amount = Number(body.amount) || 5000000;
+    const senderName = (body.senderName || 'Hội Viên Khách Hàng').trim();
+    const senderBank = body.senderBank || 'MBBank';
+    const senderAccount = body.senderAccount || 'Chính chủ';
+    const receiptImage = body.receiptImage || null;
+
+    const newLedger = {
+      txId: `TX-BILL-${Date.now().toString().slice(-5)}`,
+      tripCode: orderCode,
+      type: "VIETQR_ESCROW_INFLOW",
+      direction: "IN",
+      amount: `${amount.toLocaleString('vi-VN')}đ`,
+      sender: `${senderName.toUpperCase()} (${senderBank} - ${senderAccount})`,
+      receiver: "CONG TY CP CONG NGHE DU LICH WANDERMATCH",
+      status: "HELD_IN_ESCROW",
+      hasReceiptProof: !!receiptImage,
+      time: new Date().toISOString()
+    };
+    DB.escrowLedgers.unshift(newLedger);
+
+    return sendJson(res, 200, {
+      message: "Biên lai thanh toán và thông tin chuyển khoản đã được tiếp nhận. Quỹ Tạm Giữ Escrow đã kích hoạt!",
+      transactionId: newLedger.txId,
+      orderCode: orderCode,
+      amountLocked: amount,
+      status: "HELD_IN_ESCROW"
     });
   }
 
   // 2. NAPAS 247 Instant Account Holder Lookup
   if (pathname === '/api/napas/lookup' && req.method === 'POST') {
     const body = await parseBody(req);
-    const { bankCode, accountNumber } = body;
-    
+    const { bankCode, accountNumber, accountHolderName } = body;
+    const resolvedName = (accountHolderName || 'KHACH HANG HOI VIEN').toUpperCase();
+
     return sendJson(res, 200, {
-      success: true,
       napasRef: `NAPAS247-${Date.now()}`,
       bankCode: bankCode || 'MB',
       accountNumber: accountNumber || '0388998899',
-      accountHolderName: 'NGUYEN VAN AN',
+      accountHolderName: resolvedName,
       isExactMatch: true,
       verificationStatus: 'ACTIVE_VERIFIED',
-      message: 'Account owner 100% matches national ID name.'
+      message: 'Account owner verified via Napas 247 network.'
     });
   }
 
@@ -148,7 +526,6 @@ const server = http.createServer(async (req, res) => {
     const orderCode = body.orderCode || 'WM99081234';
 
     return sendJson(res, 200, {
-      success: true,
       corporateLegalEntity: "CONG TY CP CONG NGHE DU LICH WANDERMATCH",
       corporateAccountNumber: "990812348888",
       corporateBankCode: "MB",
@@ -164,6 +541,7 @@ const server = http.createServer(async (req, res) => {
     const body = await parseBody(req);
     const orderCode = body.orderCode || 'WM99081234';
     const amount = Number(body.amount) || 5000000;
+    const senderName = body.senderName || 'HOI VIEN KHACH HANG';
 
     const newLedger = {
       txId: `TX-QR-${Date.now().toString().slice(-5)}`,
@@ -171,7 +549,7 @@ const server = http.createServer(async (req, res) => {
       type: "VIETQR_ESCROW_INFLOW",
       direction: "IN",
       amount: `${amount.toLocaleString('vi-VN')}đ`,
-      sender: "NGUYEN VAN AN (MBBank)",
+      sender: `${senderName.toUpperCase()} (Napas 247)`,
       receiver: "CONG TY CP CONG NGHE DU LICH WANDERMATCH",
       status: "HELD_IN_ESCROW",
       time: new Date().toISOString()
@@ -179,13 +557,13 @@ const server = http.createServer(async (req, res) => {
     DB.escrowLedgers.unshift(newLedger);
 
     return sendJson(res, 200, {
-      success: true,
       webhookProcessedAt: new Date().toISOString(),
       transactionId: newLedger.txId,
       escrowStatus: "HELD_IN_COMPANY_ESCROW",
       message: "Payment successfully received and locked in company escrow."
     });
   }
+
 
   // 5. Time-Tiered Refund Calculator (Accepts Custom Budget)
   if (pathname === '/api/cancellation/calculate' && req.method === 'POST') {
@@ -217,7 +595,6 @@ const server = http.createServer(async (req, res) => {
     const refundAmount = (tripPrice * refundPct) / 100;
 
     return sendJson(res, 200, {
-      success: true,
       appliedTier: tier,
       originalPrice: tripPrice,
       feePercentage: feePct,
@@ -242,7 +619,6 @@ const server = http.createServer(async (req, res) => {
     };
 
     return sendJson(res, 200, {
-      success: true,
       status: "HARD_COMMITTED",
       pmsCode: pmsCode || 'PMS-DL-8892',
       slaGuaranteeDeposit: DB.slaDepositBalance,
@@ -269,7 +645,6 @@ const server = http.createServer(async (req, res) => {
     DB.escrowLedgers.unshift(ledger);
 
     return sendJson(res, 200, {
-      success: true,
       penaltyDeducted: penalty,
       newSlaBalance: DB.slaDepositBalance,
       guestAction: "AUTOMATIC_5_STAR_HOTEL_UPGRADE_EXECUTED",
@@ -280,7 +655,6 @@ const server = http.createServer(async (req, res) => {
   // 8. Get Escrow Ledgers
   if (pathname === '/api/escrow/ledgers' && req.method === 'GET') {
     return sendJson(res, 200, {
-      success: true,
       ledgers: DB.escrowLedgers
     });
   }
@@ -294,7 +668,6 @@ const server = http.createServer(async (req, res) => {
       updatedAt: new Date().toISOString()
     };
     return sendJson(res, 200, {
-      success: true,
       message: 'Hồ sơ khách hàng đã được lưu trữ an toàn vào hệ thống Supabase & máy chủ!',
       profile: DB.customerProfiles[userEmail]
     });
@@ -304,7 +677,6 @@ const server = http.createServer(async (req, res) => {
     const email = ((parsedUrl.query && parsedUrl.query.email) || '').toLowerCase();
     const profile = email ? DB.customerProfiles[email] : null;
     return sendJson(res, 200, {
-      success: true,
       profile: profile || null,
       totalStored: Object.keys(DB.customerProfiles).length
     });
@@ -313,7 +685,6 @@ const server = http.createServer(async (req, res) => {
   // 9. GitHub Auto-Sync Status & Manual Trigger
   if (pathname === '/api/github/status' && req.method === 'GET') {
     return sendJson(res, 200, {
-      success: true,
       syncStatus: autoSync.getSyncStatus()
     });
   }
@@ -321,7 +692,6 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/github/sync' && req.method === 'POST') {
     const syncRes = await autoSync.performGitSync('Manual-Modal-Trigger');
     return sendJson(res, 200, {
-      success: true,
       syncStatus: syncRes
     });
   }
@@ -339,7 +709,6 @@ const server = http.createServer(async (req, res) => {
     const wholesaleNetCost = Math.round(budget * 0.75);
 
     return sendJson(res, 200, {
-      success: true,
       budgetSelected: budget,
       retailValueFloorMin: retailFloor,
       retailValueFloorRatio: "120%",
@@ -375,7 +744,6 @@ const server = http.createServer(async (req, res) => {
     }
 
     return sendJson(res, 200, {
-      success: true,
       groupCode: groupCode,
       totalBudget: totalBudget,
       amountPerMember: perMember,
@@ -407,7 +775,6 @@ const server = http.createServer(async (req, res) => {
     DB.escrowLedgers.unshift(ledger);
 
     return sendJson(res, 200, {
-      success: true,
       groupCode: groupCode,
       memberIndex: memberIndex,
       paidAt: new Date().toISOString(),
@@ -447,7 +814,6 @@ Người làm đơn,
 ${fullName}`;
 
     return sendJson(res, 200, {
-      success: true,
       subject: `[ĐƠN XIN NGHỈ PHÉP] - ${fullName} (${startDate} - ${endDate})`,
       content: letterContent
     });
@@ -473,7 +839,6 @@ ${fullName}`;
     DB.escrowLedgers.unshift(ledger);
 
     return sendJson(res, 200, {
-      success: true,
       slaClaimId: `SLA-CLAIM-${Date.now().toString().slice(-4)}`,
       resolutionMinutes: 15,
       backupHotelAssigned: "Sheraton / Grand Mercure 5-Sao Dự Phòng Ngay Liền Kề",
@@ -488,7 +853,6 @@ ${fullName}`;
   // 15. Unit Economics Calculator
   if (pathname === '/api/pragmatic/unit-economics' && req.method === 'GET') {
     return sendJson(res, 200, {
-      success: true,
       unitEconomics: [
         { metric: "1. Giá trị Bán lẻ ngoài thị trường (Retail Price)", amount: "6.200.000đ", percentage: "124%", explanation: "Giá nếu khách tự lên OTA đặt vé khứ hồi (3,2tr) + KS 4 sao (3,0tr)." },
         { metric: "2. Giá trọn gói Khách trả qua QR WanderMatch", amount: "5.000.000đ", percentage: "100%", explanation: "Khách hàng lãi ngay 1.200.000đ so với tự đi đặt lẻ, lại không tốn công lên lịch." },
@@ -616,12 +980,12 @@ ${fullName}`;
   if (pathname === '/api/create-booking' && req.method === 'POST') {
     const body = await parseBody(req);
     const {
-      email = "nguyenvanan@wandermatch.vn",
-      fullName = "Nguyễn Văn An",
+      email = "khachhang@wandermatch.vn",
+      fullName = "Hội Viên Khách Hàng",
       cccd = "079095012345",
       bankCode = "MB",
-      bankAccount = "0388998899",
-      bankAccountHolder = "NGUYEN VAN AN",
+      bankAccount = "0988888888",
+      bankAccountHolder = "",
       personaVector = { healing: 90, nature: 85, solitude: 80, comfort: 90, culture: 75 },
       comfortLocks = {},
       blacklistedCities = [],
@@ -629,9 +993,10 @@ ${fullName}`;
       groupSize = 1
     } = body;
 
-    if (normalizeVNNameLocal(fullName) !== normalizeVNNameLocal(bankAccountHolder)) {
+    const resolvedHolder = bankAccountHolder || fullName;
+    if (bankAccountHolder && normalizeVNNameLocal(fullName) !== normalizeVNNameLocal(bankAccountHolder)) {
       return sendJson(res, 400, {
-        error: `Từ chối giao dịch: Tên trên CCCD (${normalizeVNNameLocal(fullName)}) không khớp với Chủ TK Ngân hàng (${normalizeVNNameLocal(bankAccountHolder)}).`
+        error: `Từ chối giao dịch: Tên người đặt (${normalizeVNNameLocal(fullName)}) không khớp với Chủ TK Ngân hàng (${normalizeVNNameLocal(bankAccountHolder)}).`
       });
     }
 
@@ -680,7 +1045,6 @@ ${fullName}`;
     }));
 
     return sendJson(res, 200, {
-      success: true,
       bookingCode,
       totalBudget,
       weatherTempC: chosenItem.weather_temp_c,
@@ -792,7 +1156,6 @@ ${fullName}`;
 
   if (pathname === '/api/ai-sensitivity-test' && (req.method === 'POST' || req.method === 'GET')) {
     return sendJson(res, 200, {
-      success: true,
       distinctWinnersCount: 3,
       results: [
         { scenarioId: "SCENARIO_1", profileName: "Kịch bản 1: Khách thích Độc hành rừng núi hoang sơ", winnerCity: "Măng Đen", winnerScore: 100 },
