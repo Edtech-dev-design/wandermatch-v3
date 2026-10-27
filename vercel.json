@@ -1,8 +1,7 @@
 {
   "version": 2,
   "framework": null,
-  "installCommand": "echo 'Skip install'",
-  "buildCommand": "echo 'Static build'",
+  "buildCommand": "echo 'Static site build complete'",
   "outputDirectory": ".",
   "headers": [
     {
