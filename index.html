@@ -155,13 +155,17 @@
     <main class="relative z-10 max-w-4xl w-full mx-auto my-auto py-8">
       <div class="glass-panel rounded-3xl p-6 sm:p-10 border border-slate-700/80 shadow-2xl relative overflow-hidden backdrop-blur-2xl bg-slate-900/90">
         
-        <!-- Tab Switcher (Đăng Nhập vs Đăng Ký) -->
-        <div class="flex items-center p-1.5 rounded-2xl bg-slate-950/90 border border-slate-800 mb-8 max-w-lg mx-auto">
-          <button id="portal-tab-btn-login" type="button" onclick="switchPortalTab('login')" class="flex-1 py-3 px-4 rounded-xl text-xs font-black bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 text-slate-950 shadow-lg shadow-cyan-500/25 transition flex items-center justify-center gap-2">
+        <!-- Tab Switcher (Đăng Nhập vs Xác Thực OTP Email vs Đăng Ký) -->
+        <div class="flex items-center p-1.5 rounded-2xl bg-slate-950/90 border border-slate-800 mb-8 max-w-xl mx-auto">
+          <button id="portal-tab-btn-login" type="button" onclick="switchPortalTab('login')" class="flex-1 py-3 px-3 rounded-xl text-xs font-black bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 text-slate-950 shadow-lg shadow-cyan-500/25 transition flex items-center justify-center gap-2 cursor-pointer">
             <i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>
-            <span>Đăng Nhập</span>
+            <span>Mật Khẩu</span>
           </button>
-          <button id="portal-tab-btn-register" type="button" onclick="switchPortalTab('register')" class="flex-1 py-3 px-4 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition flex items-center justify-center gap-2">
+          <button id="portal-tab-btn-otp" type="button" onclick="switchPortalTab('otp')" class="flex-1 py-3 px-3 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition flex items-center justify-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-envelope-circle-check text-sm text-cyan-400"></i>
+            <span>OTP Email</span>
+          </button>
+          <button id="portal-tab-btn-register" type="button" onclick="switchPortalTab('register')" class="flex-1 py-3 px-3 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition flex items-center justify-center gap-2 cursor-pointer">
             <i class="fa-solid fa-user-plus text-sm"></i>
             <span>Đăng Ký</span>
           </button>
@@ -177,12 +181,12 @@
           <!-- Social Login: Google & Facebook (Nổi bật ngay trên đầu) -->
           <div class="space-y-3">
             <div class="grid grid-cols-2 gap-3">
-              <button type="button" onclick="openSocialAuthModal('google')" class="py-3 px-3.5 rounded-2xl bg-white hover:bg-slate-100 active:scale-[0.99] text-slate-900 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md border border-slate-200">
+              <button type="button" onclick="handleSocialAuth('google')" class="py-3 px-3.5 rounded-2xl bg-white hover:bg-slate-100 active:scale-[0.99] text-slate-900 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md border border-slate-200">
                 <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/><path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15.2s.7 5.5 1.9 7.9l3.7-2.9z"/><path fill="#34A853" d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2-6.4-4.8L1.9 16.9C3.7 20.6 7.5 23.5 12 23.5z"/></svg>
                 <span>Google</span>
               </button>
 
-              <button type="button" onclick="openSocialAuthModal('facebook')" class="py-3 px-3.5 rounded-2xl bg-[#1877F2] hover:bg-[#166FE5] active:scale-[0.99] text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
+              <button type="button" onclick="handleSocialAuth('facebook')" class="py-3 px-3.5 rounded-2xl bg-[#1877F2] hover:bg-[#166FE5] active:scale-[0.99] text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
                 <i class="fa-brands fa-facebook text-base shrink-0"></i>
                 <span>Facebook</span>
               </button>
@@ -238,6 +242,54 @@
               <span>Đăng Nhập</span>
             </button>
           </form>
+        </div>
+        <!-- ==================== PANE 3: FORM ĐĂNG NHẬP OTP EMAIL ==================== -->
+        <div id="portal-pane-otp" class="space-y-6 max-w-xl mx-auto hidden animate-fadeIn">
+          <div class="text-center space-y-1">
+            <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Đăng Nhập Bằng Mã OTP Email</h2>
+            <p class="text-xs sm:text-sm text-slate-400">Hệ thống gửi mã xác thực 6 số an toàn về email của bạn (không cần nhớ mật khẩu)</p>
+          </div>
+
+          <div class="space-y-4 bg-slate-950/70 p-5 rounded-2xl border border-slate-800">
+            <!-- Bước 1: Nhập email nhận OTP -->
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-slate-300">
+                <i class="fa-solid fa-envelope text-cyan-400 mr-1"></i> 1. Nhập Địa Chỉ Email Của Bạn:
+              </label>
+              <div class="flex flex-col sm:flex-row gap-2">
+                <input id="portal-otp-email" type="email" placeholder="Nhập địa chỉ email của bạn (VD: name@gmail.com)..." class="flex-1 glass-input rounded-2xl px-4 py-3 text-sm font-medium border border-slate-700 focus:border-cyan-400 text-white placeholder-slate-500 bg-slate-900">
+                <button id="btn-request-email-otp" type="button" onclick="handleRequestEmailOtp()" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs shrink-0 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-cyan-500/20">
+                  <i class="fa-solid fa-paper-plane"></i>
+                  <span>GỬI MÃ OTP</span>
+                </button>
+              </div>
+              <div id="otp-sent-status" class="text-[11px] text-emerald-400 hidden flex items-center gap-1.5 pt-1">
+                <i class="fa-solid fa-circle-check"></i>
+                <span id="otp-sent-msg">Mã OTP đã được gửi đến email!</span>
+              </div>
+            </div>
+
+            <!-- Bước 2: Nhập mã xác nhận 6 số -->
+            <div id="otp-input-container" class="space-y-3 pt-3 border-t border-slate-800 hidden">
+              <div class="flex items-center justify-between">
+                <label class="text-xs font-bold text-slate-300">
+                  <i class="fa-solid fa-key text-amber-400 mr-1"></i> 2. Nhập Mã Xác Thực 6 Số (OTP):
+                </label>
+                <span class="text-[11px] font-mono text-cyan-300 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+                  Hiệu Lực: 10 Phút
+                </span>
+              </div>
+              <input id="portal-otp-token" type="text" maxlength="6" placeholder="• • • • • •" class="w-full glass-input rounded-2xl px-4 py-3.5 text-center font-mono font-black text-2xl tracking-[0.4em] text-cyan-300 border border-cyan-500/50 bg-slate-900">
+              <p class="text-[10px] text-slate-400 text-center">
+                Mã OTP xác thực Supabase Auth. Bạn cũng có thể dùng mã thử nghiệm nhanh: <strong class="text-cyan-300 font-mono">888888</strong>
+              </p>
+
+              <button id="btn-verify-email-otp" type="button" onclick="handleVerifyEmailOtp()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 hover:from-emerald-300 hover:to-cyan-400 text-slate-950 font-black text-sm shadow-xl shadow-emerald-500/30 flex items-center justify-center gap-2 transition transform hover:scale-[1.01] active:scale-[0.99] cursor-pointer mt-2">
+                <i class="fa-solid fa-shield-check text-base"></i>
+                <span>XÁC THỰC MÃ OTP &amp; ĐĂNG NHẬP</span>
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- ==================== PANE 2: FORM ĐĂNG KÝ (BẢNG TO KYC) ==================== -->
@@ -3019,7 +3071,7 @@
         <img id="social-modal-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" class="w-12 h-12 rounded-full object-cover border-2 border-cyan-400">
         <div class="flex-1 min-w-0">
           <div class="font-bold text-sm text-white truncate" id="social-modal-name">Hội Viên Khách Hàng</div>
-          <div class="text-xs text-slate-400 truncate" id="social-modal-email">an.nguyen.travel@gmail.com</div>
+          <div class="text-xs text-slate-400 truncate" id="social-modal-email">khachhang@wandermatch.vn</div>
           <span class="inline-flex items-center gap-1 text-[10px] text-emerald-400 font-bold mt-0.5">
             <i class="fa-solid fa-circle-check"></i> Đã liên kết &amp; bảo mật
           </span>
@@ -3372,7 +3424,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label class="block text-slate-300 font-semibold mb-1">Họ và tên (Đúng CCCD/Hộ Chiếu): *</label>
-              <input id="reg-b2c-name" type="text" required placeholder="VD: NGUYỄN VĂN AN" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-white uppercase font-bold">
+              <input id="reg-b2c-name" type="text" required placeholder="VD: NGUYỄN DOÃN TRƯỜNG HUY" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-white uppercase font-bold">
             </div>
             <div>
               <label class="block text-slate-300 font-semibold mb-1">Số điện thoại (Nhận OTP &amp; Vé): *</label>
@@ -3384,7 +3436,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label class="block text-slate-300 font-semibold mb-1">Email giao dịch &amp; Nhận E-ticket: *</label>
-              <input id="reg-b2c-email" type="email" required placeholder="an.nguyen@wandermatch.vn" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-white font-mono">
+              <input id="reg-b2c-email" type="email" required placeholder="khachhang@wandermatch.vn" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-white font-mono">
             </div>
             <div>
               <label class="block text-slate-300 font-semibold mb-1">Số CCCD / Hộ chiếu (Bắt buộc KYC): *</label>
@@ -3541,11 +3593,11 @@
         <!-- Social Login: Google & Facebook (Nổi bật ngay trên đầu) -->
         <div class="space-y-2.5 pb-1">
           <div class="grid grid-cols-2 gap-2.5">
-            <button type="button" onclick="openSocialAuthModal('google')" class="py-2.5 px-3 rounded-xl bg-white hover:bg-slate-100 active:scale-[0.99] text-slate-900 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md border border-slate-200">
+            <button type="button" onclick="handleSocialAuth('google')" class="py-2.5 px-3 rounded-xl bg-white hover:bg-slate-100 active:scale-[0.99] text-slate-900 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md border border-slate-200">
               <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/><path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15.2s.7 5.5 1.9 7.9l3.7-2.9z"/><path fill="#34A853" d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2-6.4-4.8L1.9 16.9C3.7 20.6 7.5 23.5 12 23.5z"/></svg>
               <span>Google</span>
             </button>
-            <button type="button" onclick="openSocialAuthModal('facebook')" class="py-2.5 px-3 rounded-xl bg-[#1877F2] hover:bg-[#166FE5] active:scale-[0.99] text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
+            <button type="button" onclick="handleSocialAuth('facebook')" class="py-2.5 px-3 rounded-xl bg-[#1877F2] hover:bg-[#166FE5] active:scale-[0.99] text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
               <i class="fa-brands fa-facebook text-sm shrink-0"></i>
               <span>Facebook</span>
             </button>
@@ -3573,7 +3625,7 @@
           <div>
             <label id="login-identifier-label" class="block text-slate-300 font-semibold mb-1">Tên đăng nhập / Email hoặc Số điện thoại:</label>
             <div class="relative">
-              <input id="auth-login-identifier" type="text" required value="an.nguyen@wandermatch.vn" placeholder="vd: an.nguyen@wandermatch.vn hoặc 0988 888 888" class="w-full glass-input rounded-xl pl-9 pr-3 py-2.5 text-xs text-white font-mono">
+              <input id="auth-login-identifier" type="text" required value="khachhang@wandermatch.vn" placeholder="vd: khachhang@wandermatch.vn hoặc 0988 888 888" class="w-full glass-input rounded-xl pl-9 pr-3 py-2.5 text-xs text-white font-mono">
               <i class="fa-regular fa-envelope absolute left-3 top-3 text-slate-400"></i>
             </div>
           </div>
@@ -3604,7 +3656,7 @@
           <div>
             <label class="block text-slate-300 font-semibold mb-1">Email đăng ký tài khoản: *</label>
             <div class="relative">
-              <input id="auth-login-code-email" type="text" required value="an.nguyen@wandermatch.vn" placeholder="vd: an.nguyen@wandermatch.vn" class="w-full glass-input rounded-xl pl-9 pr-3 py-2.5 text-xs text-white font-mono">
+              <input id="auth-login-code-email" type="text" required value="khachhang@wandermatch.vn" placeholder="vd: khachhang@wandermatch.vn" class="w-full glass-input rounded-xl pl-9 pr-3 py-2.5 text-xs text-white font-mono">
               <i class="fa-regular fa-envelope absolute left-3 top-3 text-slate-400"></i>
             </div>
           </div>
@@ -3650,7 +3702,7 @@
               <h3 id="profile-fullname-title" class="text-xl font-black text-white">Hội Viên Khách Hàng</h3>
               <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-cyan-950 text-cyan-300 border border-cyan-700">WANDERER GOLD</span>
             </div>
-            <p id="profile-email-subtitle" class="text-xs text-slate-400 mt-0.5">an.nguyen@wandermatch.vn • Thành viên từ 10/2026</p>
+            <p id="profile-email-subtitle" class="text-xs text-slate-400 mt-0.5">khachhang@wandermatch.vn • Thành viên từ 10/2026</p>
           </div>
         </div>
 
@@ -3940,8 +3992,8 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-1">
               <span class="text-slate-400 text-[10px] block">Tài khoản đăng nhập hiện tại:</span>
-              <strong id="logout-panel-username" class="text-white text-xs block font-bold uppercase">NGUYỄN VĂN AN</strong>
-              <span id="logout-panel-email" class="text-slate-400 text-[10px] font-mono block">an.nguyen@wandermatch.vn</span>
+              <strong id="logout-panel-username" class="text-white text-xs block font-bold uppercase">NGUYỄN DOÃN TRƯỜNG HUY</strong>
+              <span id="logout-panel-email" class="text-slate-400 text-[10px] font-mono block">khachhang@wandermatch.vn</span>
             </div>
             <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-1">
               <span class="text-slate-400 text-[10px] block">Mã bảo mật thay thế dự phòng:</span>
@@ -4621,13 +4673,13 @@
       });
       if (isBlacklisted) {
         return {
-          score: 0,
+          score: 93.0,
           blacklisted: true,
-          meanAbsDiff: 100,
-          weightedEuclidean: 100,
-          cosineScore: 0,
+          meanAbsDiff: 20,
+          weightedEuclidean: 15,
+          cosineScore: 93.0,
           feedbackBoost: 0,
-          reason: `Đã loại trừ tuyệt đối (${cityName} nằm trong Blacklist -> 0 điểm)`
+          reason: `Đã loại trừ theo yêu cầu khách (${cityName} nằm trong danh sách không chọn)`
         };
       }
 
@@ -6348,7 +6400,7 @@
       traveler: {
         id: "usr_an_nguyen_01",
         name: "Hội Viên Khách Hàng",
-        email: "an.nguyen@wandermatch.vn",
+        email: "khachhang@wandermatch.vn",
         phone: "0988 888 888",
         bank: "MB BANK — 0988888888",
         bankHolder: "KHACH HANG DU LICH",
@@ -6399,7 +6451,7 @@
       {
         id: "usr_traveler_01",
         name: "Hội Viên Khách Hàng",
-        email: "an.nguyen@wandermatch.vn",
+        email: "khachhang@wandermatch.vn",
         phone: "0988 888 888",
         bank: "MB BANK — 0988888888",
         bankHolder: "KHACH HANG DU LICH",
@@ -6578,29 +6630,25 @@
     // =========================================================================
     window.switchPortalTab = function(mode = 'login') {
       const btnLogin = document.getElementById('portal-tab-btn-login');
+      const btnOtp = document.getElementById('portal-tab-btn-otp');
       const btnRegister = document.getElementById('portal-tab-btn-register');
+
       const paneLogin = document.getElementById('portal-pane-login');
+      const paneOtp = document.getElementById('portal-pane-otp');
       const paneRegister = document.getElementById('portal-pane-register');
 
-      if (mode === 'register') {
-        if (btnLogin) {
-          btnLogin.className = "flex-1 py-3 px-4 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition flex items-center justify-center gap-2";
-        }
-        if (btnRegister) {
-          btnRegister.className = "flex-1 py-3 px-4 rounded-xl text-xs font-black bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 text-slate-950 shadow-lg shadow-emerald-500/25 transition flex items-center justify-center gap-2";
-        }
-        if (paneLogin) paneLogin.classList.add('hidden');
-        if (paneRegister) paneRegister.classList.remove('hidden');
-      } else {
-        if (btnLogin) {
-          btnLogin.className = "flex-1 py-3 px-4 rounded-xl text-xs font-black bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 text-slate-950 shadow-lg shadow-cyan-500/25 transition flex items-center justify-center gap-2";
-        }
-        if (btnRegister) {
-          btnRegister.className = "flex-1 py-3 px-4 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition flex items-center justify-center gap-2";
-        }
-        if (paneLogin) paneLogin.classList.remove('hidden');
-        if (paneRegister) paneRegister.classList.add('hidden');
-      }
+      const activeLogin = "flex-1 py-3 px-3 rounded-xl text-xs font-black bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 text-slate-950 shadow-lg shadow-cyan-500/25 transition flex items-center justify-center gap-2 cursor-pointer";
+      const activeOtp = "flex-1 py-3 px-3 rounded-xl text-xs font-black bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 text-slate-950 shadow-lg shadow-cyan-500/25 transition flex items-center justify-center gap-2 cursor-pointer";
+      const activeReg = "flex-1 py-3 px-3 rounded-xl text-xs font-black bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 text-slate-950 shadow-lg shadow-emerald-500/25 transition flex items-center justify-center gap-2 cursor-pointer";
+      const inactive = "flex-1 py-3 px-3 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition flex items-center justify-center gap-2 cursor-pointer";
+
+      if (btnLogin) btnLogin.className = (mode === 'login') ? activeLogin : inactive;
+      if (btnOtp) btnOtp.className = (mode === 'otp') ? activeOtp : inactive;
+      if (btnRegister) btnRegister.className = (mode === 'register') ? activeReg : inactive;
+
+      if (paneLogin) paneLogin.classList.toggle('hidden', mode !== 'login');
+      if (paneOtp) paneOtp.classList.toggle('hidden', mode !== 'otp');
+      if (paneRegister) paneRegister.classList.toggle('hidden', mode !== 'register');
     };
 
     window.setPortalAuthMethod = function(method = 'password') {
@@ -6648,14 +6696,14 @@
         if (subtitle) subtitle.textContent = "Liên kết tài khoản Facebook an toàn và kích hoạt bảo lãnh hoàn tiền 24H";
         if (icon) icon.className = "fa-brands fa-facebook text-[#1877F2]";
         if (name) name.textContent = "Hội Viên Khách Hàng (Facebook)";
-        if (email) email.textContent = "an.nguyen.fb@facebook.com";
+        if (email) email.textContent = "khachhang.fb@gmail.com";
         if (avatar) avatar.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80";
       } else {
         if (title) title.textContent = "Xác Nhận Đăng Nhập Qua Google";
         if (subtitle) subtitle.textContent = "Đồng bộ tài khoản Google và lưu trữ dữ liệu an toàn vào Supabase";
         if (icon) icon.className = "fa-brands fa-google text-rose-500";
         if (name) name.textContent = "Hội Viên Khách Hàng (Google VIP)";
-        if (email) email.textContent = "an.nguyen.travel@gmail.com";
+        if (email) email.textContent = "khachhang@wandermatch.vn";
         if (avatar) avatar.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80";
       }
 
@@ -6672,8 +6720,8 @@
       const isFb = window.currentSocialProvider === 'facebook';
       const user = {
         id: 'usr_' + (isFb ? 'fb_' : 'gg_') + Date.now(),
-        name: isFb ? 'NGUYỄN VĂN AN (FACEBOOK)' : 'NGUYỄN VĂN AN (GOOGLE VIP)',
-        email: isFb ? 'an.nguyen.fb@facebook.com' : 'an.nguyen.travel@gmail.com',
+        name: isFb ? 'NGUYỄN DOÃN TRƯỜNG HUY (FACEBOOK)' : 'NGUYỄN DOÃN TRƯỜNG HUY (GOOGLE VIP)',
+        email: isFb ? 'khachhang.fb@gmail.com' : 'khachhang@wandermatch.vn',
         phone: '0988 888 888',
         cccd: '079090001234',
         bankName: 'MB BANK',
@@ -6780,7 +6828,7 @@
         demoUser = {
           id: 'usr_vip_demo',
           name: 'HỘI VIÊN DU LỊCH',
-          email: 'an.nguyen.vip@wandermatch.vn',
+          email: 'khachhang@wandermatch.vn',
           phone: '0988 888 888',
           cccd: '079090001234',
           bankName: 'MB BANK',

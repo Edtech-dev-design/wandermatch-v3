@@ -5,22 +5,45 @@
 
 // 1. KHO DỮ LIỆU CHUYẾN BAY ĐA TUYẾN (FLIGHT API MOCK)
 const FLIGHTS_DB = [
+  // HAN (Hà Nội)
   { flight_id: "VN151", origin: "HAN", city: "Đà Lạt", airline: "Vietnam Airlines", time: "08:30 - 10:15", price: 2100000 },
   { flight_id: "VJ403", origin: "HAN", city: "Đà Lạt", airline: "Vietjet Deluxe", time: "10:20 - 12:05", price: 1650000 },
-  { flight_id: "VN214", origin: "SGN", city: "Đà Lạt", airline: "Vietnam Airlines", time: "07:00 - 08:00", price: 1450000 },
-  { flight_id: "VJ361", origin: "SGN", city: "Đà Lạt", airline: "Vietjet Deluxe", time: "09:15 - 10:15", price: 1150000 },
   { flight_id: "QH121", origin: "HAN", city: "Quy Nhơn", airline: "Bamboo Airways", time: "09:00 - 10:35", price: 1950000 },
   { flight_id: "VN162", origin: "HAN", city: "Quy Nhơn", airline: "Vietnam Airlines", time: "13:45 - 15:20", price: 2250000 },
-  { flight_id: "VN139", origin: "SGN", city: "Quy Nhơn", airline: "Vietnam Airlines", time: "08:15 - 09:25", price: 1380000 },
   { flight_id: "VN181", origin: "HAN", city: "Măng Đen", airline: "Vietnam Airlines (Bay Pleiku + Limousine)", time: "07:45 - 10:30", price: 2050000 },
-  { flight_id: "VN186", origin: "SGN", city: "Măng Đen", airline: "Vietnam Airlines (Bay Pleiku + Limousine)", time: "07:15 - 09:45", price: 1400000 },
   { flight_id: "VN137", origin: "HAN", city: "Huế", airline: "Vietnam Airlines", time: "09:15 - 10:30", price: 1600000 },
   { flight_id: "VJ302", origin: "HAN", city: "Huế", airline: "Vietjet Deluxe", time: "11:15 - 12:30", price: 1350000 },
-  { flight_id: "VN250", origin: "SGN", city: "Huế", airline: "Vietnam Airlines", time: "08:00 - 09:25", price: 1420000 },
   { flight_id: "VJ971", origin: "HAN", city: "Phú Quốc", airline: "Vietjet Deluxe", time: "09:40 - 11:50", price: 2450000 },
-  { flight_id: "VN182", origin: "SGN", city: "Phú Quốc", airline: "Vietnam Airlines", time: "07:30 - 08:35", price: 1550000 },
   { flight_id: "VN123", origin: "HAN", city: "Nha Trang", airline: "Vietnam Airlines", time: "08:15 - 10:05", price: 1980000 },
-  { flight_id: "VJ602", origin: "SGN", city: "Nha Trang", airline: "Vietjet Deluxe", time: "08:00 - 09:05", price: 1250000 }
+  // SGN (TP. Hồ Chí Minh)
+  { flight_id: "VN214", origin: "SGN", city: "Đà Lạt", airline: "Vietnam Airlines", time: "07:00 - 08:00", price: 1450000 },
+  { flight_id: "VJ361", origin: "SGN", city: "Đà Lạt", airline: "Vietjet Deluxe", time: "09:15 - 10:15", price: 1150000 },
+  { flight_id: "VN139", origin: "SGN", city: "Quy Nhơn", airline: "Vietnam Airlines", time: "08:15 - 09:25", price: 1380000 },
+  { flight_id: "VN186", origin: "SGN", city: "Măng Đen", airline: "Vietnam Airlines (Bay Pleiku + Limousine)", time: "07:15 - 09:45", price: 1400000 },
+  { flight_id: "VN250", origin: "SGN", city: "Huế", airline: "Vietnam Airlines", time: "08:00 - 09:25", price: 1420000 },
+  { flight_id: "VN182", origin: "SGN", city: "Phú Quốc", airline: "Vietnam Airlines", time: "07:30 - 08:35", price: 1550000 },
+  { flight_id: "VJ602", origin: "SGN", city: "Nha Trang", airline: "Vietjet Deluxe", time: "08:00 - 09:05", price: 1250000 },
+  // DAD (Đà Nẵng)
+  { flight_id: "VN311", origin: "DAD", city: "Đà Lạt", airline: "Vietnam Airlines", time: "08:10 - 09:20", price: 1350000 },
+  { flight_id: "VN322", origin: "DAD", city: "Măng Đen", airline: "Vietnam Airlines (Bay Pleiku + Limousine)", time: "09:00 - 10:45", price: 1380000 },
+  { flight_id: "VN344", origin: "DAD", city: "Phú Quốc", airline: "Vietnam Airlines", time: "10:15 - 12:00", price: 1650000 },
+  { flight_id: "VJ388", origin: "DAD", city: "Nha Trang", airline: "Vietjet Deluxe", time: "08:45 - 09:50", price: 1280000 },
+  { flight_id: "QH355", origin: "DAD", city: "Quy Nhơn", airline: "Bamboo Airways", time: "07:30 - 08:30", price: 1200000 },
+  { flight_id: "VN301", origin: "DAD", city: "Huế", airline: "Vietnam Airlines (Limousine Hạng Thương Gia)", time: "08:00 - 10:00", price: 650000 },
+  // VCA (Cần Thơ)
+  { flight_id: "VN411", origin: "VCA", city: "Đà Lạt", airline: "Vietnam Airlines", time: "08:00 - 09:00", price: 1400000 },
+  { flight_id: "VN422", origin: "VCA", city: "Quy Nhơn", airline: "Vietnam Airlines", time: "09:15 - 10:30", price: 1480000 },
+  { flight_id: "VN433", origin: "VCA", city: "Huế", airline: "Vietnam Airlines", time: "07:45 - 09:15", price: 1520000 },
+  { flight_id: "VN455", origin: "VCA", city: "Phú Quốc", airline: "Bamboo Airways (Tàu cao tốc / Bay)", time: "08:30 - 09:30", price: 950000 },
+  { flight_id: "VN466", origin: "VCA", city: "Nha Trang", airline: "Vietnam Airlines", time: "10:00 - 11:10", price: 1380000 },
+  { flight_id: "VN477", origin: "VCA", city: "Măng Đen", airline: "Vietnam Airlines (Bay Pleiku + Limousine)", time: "07:30 - 10:15", price: 1550000 },
+  // HPH (Hải Phòng)
+  { flight_id: "VJ511", origin: "HPH", city: "Đà Lạt", airline: "Vietjet Deluxe", time: "08:15 - 10:00", price: 1750000 },
+  { flight_id: "VN522", origin: "HPH", city: "Nha Trang", airline: "Vietnam Airlines", time: "09:00 - 10:45", price: 1950000 },
+  { flight_id: "VJ533", origin: "HPH", city: "Phú Quốc", airline: "Vietjet Deluxe", time: "10:15 - 12:30", price: 2350000 },
+  { flight_id: "VN544", origin: "HPH", city: "Huế", airline: "Vietnam Airlines", time: "08:45 - 10:00", price: 1550000 },
+  { flight_id: "QH555", origin: "HPH", city: "Quy Nhơn", airline: "Bamboo Airways", time: "09:30 - 11:05", price: 1880000 },
+  { flight_id: "VN566", origin: "HPH", city: "Măng Đen", airline: "Vietnam Airlines (Bay Pleiku + Limousine)", time: "07:45 - 10:45", price: 2150000 }
 ];
 
 // 2. KHO DỮ LIỆU KHÁCH SẠN & TRẢI NGHIỆM ĐA PHƯƠNG ÁN (HOTEL & EXPERIENCE API MOCK)
@@ -170,10 +193,18 @@ function executeOTABlindAlgorithms(payload, sessionId = "default") {
   const txtLower = String(customPrompt || "").toLowerCase();
 
   // THUẬT TOÁN 1: Lọc Tuyến Bay Khả Thi theo điểm đi và ngân sách vé
-  let originFlights = FLIGHTS_DB.filter(f => !origin || f.origin === origin);
+  const originMap = {
+    hochiminh: "SGN", sgn: "SGN",
+    hanoi: "HAN", han: "HAN",
+    danang: "DAD", dad: "DAD",
+    cantho: "VCA", vca: "VCA",
+    haiphong: "HPH", hph: "HPH"
+  };
+  const targetOrigin = originMap[String(origin || "hochiminh").toLowerCase()] || origin || "SGN";
+  let originFlights = FLIGHTS_DB.filter(f => f.origin === targetOrigin);
   if (!originFlights.length) originFlights = FLIGHTS_DB;
 
-  let feasibleFlights = originFlights.filter(f => f.price <= budgetVnd * 0.62);
+  let feasibleFlights = originFlights.filter(f => f.price <= budgetVnd * 0.65);
   if (!feasibleFlights.length) feasibleFlights = originFlights;
 
   // THUẬT TOÁN 2 & 3: Cosine Similarity + Bài Toán Cái Túi (Knapsack Vé + Phòng sát ngân sách)
