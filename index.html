@@ -5772,7 +5772,11 @@
       });
     }
 
-    window.switchTab = function(tabId) {
+    window.switchTab = async function(tabId) {
+      if (typeof window.protectRoute === 'function') {
+        const isAllowed = await window.protectRoute(tabId);
+        if (!isAllowed) return;
+      }
       const tabs = ['b2c', 'b2b', 'admin'];
       tabs.forEach(t => {
         const btn = document.getElementById(`role-tab-${t}`);
@@ -6456,11 +6460,11 @@
       }
     };
 
-    // Gắn bí danh alias đảm bảo gọi bằng tên nào cũng hoạt động
-    window.createBlindBooking = window.createCloudBlindBooking;
-    window.simulateRefund = window.simulateCloudRefundScenario;
-    window.triggerRevealFromServer = window.triggerCloudReveal;
-    window.submitUserFeedback = window.submitCloudTripFeedback;
+    // Gắn bí danh alias đảm bảo gọi bằng tên nào cũng hoạt động (Không đè Dual-Core Engine)
+    if (!window.createBlindBooking) window.createBlindBooking = window.createCloudBlindBooking;
+    if (!window.simulateRefund) window.simulateRefund = window.simulateCloudRefundScenario;
+    if (!window.triggerRevealFromServer) window.triggerRevealFromServer = window.triggerCloudReveal;
+    if (!window.submitUserFeedback) window.submitUserFeedback = window.submitCloudTripFeedback;
 
     // ==========================================================================
     // 14. AUTHENTICATION & CUSTOMER PROFILE SYSTEM (COMMERCIAL E-COMMERCE CORE)
@@ -6657,6 +6661,41 @@
       renderUserHeader();
       renderTransactionLedger();
     }
+
+    window.renderUserHeader = function() {
+      const authPortal = document.getElementById('auth-portal-screen');
+      const mainApp = document.getElementById('main-app-container');
+      const userMenu = document.getElementById('header-user-profile-menu');
+      const headerName = document.getElementById('header-username');
+      const headerAvatar = document.getElementById('header-avatar');
+      const headerTier = document.getElementById('header-user-tier');
+
+      if (window.currentUser) {
+        // ĐÃ ĐĂNG NHẬP: ẨN MÀN HÌNH AUTH PORTAL, BẬT MÀN HÌNH CHÍNH APP
+        if (authPortal) authPortal.classList.add('hidden');
+        if (mainApp) mainApp.classList.remove('hidden');
+        if (userMenu) userMenu.classList.remove('hidden');
+        if (headerName) headerName.textContent = window.currentUser.name || 'Hội viên VIP';
+        if (headerAvatar && window.currentUser.avatar) headerAvatar.src = window.currentUser.avatar;
+        if (headerTier) headerTier.textContent = window.currentUser.tier || 'Hội Viên Kim Cương';
+
+        // Tự động chuyển vào vai trò tương ứng (b2c, b2b, admin)
+        if (typeof window.switchTab === 'function') {
+          window.switchTab(window.currentUser.role || 'b2c');
+        }
+
+        // Auto sync with CCCD & Bank holder inputs
+        const cccdInput = document.getElementById('cw-fullname');
+        const bankHolderInput = document.getElementById('cw-bank-holder');
+        if (cccdInput && !cccdInput.value) cccdInput.value = window.currentUser.name || '';
+        if (bankHolderInput && !bankHolderInput.value) bankHolderInput.value = window.currentUser.bankHolder || window.currentUser.name || '';
+      } else {
+        // CHƯA ĐĂNG NHẬP / ĐÃ ĐĂNG XUẤT: BẬT MÀN HÌNH AUTH PORTAL BẢNG TO, ẨN TOÀN BỘ APP
+        if (authPortal) authPortal.classList.remove('hidden');
+        if (mainApp) mainApp.classList.add('hidden');
+        if (userMenu) userMenu.classList.add('hidden');
+      }
+    };
 
     
 
@@ -6998,10 +7037,25 @@
     // =========================================================================
     window.handlePortalRegisterSubmit = async function(e) {
       if (e && e.preventDefault) e.preventDefault();
-      const name = document.getElementById('portal-reg-name')?.value?.trim();
-      const phone = document.getElementById('portal-reg-phone')?.value?.trim();
-      const email = document.getElementById('portal-reg-email')?.value?.trim().toLowerCase();
-      const password = document.getElementById('portal-reg-password')?.value;
+      const name = document.getElementById('portal-reg-name')?.value?.trim() || 
+                   document.getElementById('reg-b2c-name')?.value?.trim() ||
+                   document.getElementById('reg-b2b-name')?.value?.trim() ||
+                   document.getElementById('reg-admin-name')?.value?.trim() || '';
+
+      const phone = document.getElementById('portal-reg-phone')?.value?.trim() || 
+                    document.getElementById('reg-b2c-phone')?.value?.trim() ||
+                    document.getElementById('reg-b2b-phone')?.value?.trim() || '0988 888 888';
+
+      const email = (document.getElementById('portal-reg-email')?.value || 
+                     document.getElementById('reg-b2c-email')?.value ||
+                     document.getElementById('reg-b2b-email')?.value ||
+                     document.getElementById('reg-admin-email')?.value || '').trim().toLowerCase();
+
+      const password = document.getElementById('portal-reg-password')?.value || 
+                       document.getElementById('reg-b2c-password')?.value ||
+                       document.getElementById('reg-b2b-password')?.value ||
+                       document.getElementById('reg-admin-password')?.value || '';
+
       const role = document.getElementById('portal-reg-role')?.value || 'b2c';
 
       if (!email || !password || !name) {

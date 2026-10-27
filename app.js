@@ -868,154 +868,119 @@ window.switchTab = async function(tabName) {
   }
 
   ["b2c", "b2b", "admin"].forEach(t => {
-
-    const p = document.getElementById("tab-" + t);
-
-    if (p) p.style.display = (t === tabName) ? "block" : "none";
-
-    const b = document.getElementById("btn-tab-" + t);
-
-    if (b) {
-
-      b.style.backgroundColor = (t === tabName) ? "#14B8A6" : "rgba(255,255,255,0.08)";
-
-      b.style.color = (t === tabName) ? "#080C14" : "#F8FAFC";
-
+    const p = document.getElementById("tab-" + t) || document.getElementById("view-" + t);
+    if (p) {
+      if (t === tabName) {
+        p.style.display = "block";
+        p.classList?.remove("hidden");
+      } else {
+        p.style.display = "none";
+        p.classList?.add("hidden");
+      }
     }
 
+    const b = document.getElementById("btn-tab-" + t) || document.getElementById("role-tab-" + t);
+    if (b) {
+      if (t === tabName) {
+        b.className = "px-4 py-2 rounded-xl text-xs font-extrabold transition border border-cyan-500/60 bg-cyan-500 text-slate-950 shadow-lg flex items-center gap-2 shrink-0 cursor-pointer";
+        b.style.backgroundColor = "#14B8A6";
+        b.style.color = "#080C14";
+      } else {
+        b.className = "px-4 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/80 transition border border-transparent flex items-center gap-2 shrink-0 cursor-pointer";
+        b.style.backgroundColor = "rgba(255,255,255,0.08)";
+        b.style.color = "#F8FAFC";
+      }
+    }
   });
 
-  if (tabName === "admin") window.renderAdminDashboard();
-
-  if (tabName === "b2b") window.renderB2BPortal();
-
-};
-
-
-
-window.goToStep = function(stepNum) {
-
-  [1, 2, 3, 4].forEach(s => {
-
-    const p = document.getElementById("step-panel-" + s);
-
-    if (p) p.style.display = (s === Number(stepNum)) ? "block" : "none";
-
-    const b = document.getElementById("step-nav-" + s);
-
-    if (b) {
-
-      b.style.borderColor = (s === Number(stepNum)) ? "#14B8A6" : "rgba(255,255,255,0.12)";
-
-      b.style.backgroundColor = (s === Number(stepNum)) ? "rgba(20,184,166,0.2)" : "rgba(15,23,42,0.6)";
-
-    }
-
-  });
-
-  if (Number(stepNum) === 4) setTimeout(() => window.initScratchCard(), 60);
-
-};
-
-
-
-window.collectUserPayload = function() {
-
-  return {
-
-    email: document.getElementById("custEmail")?.value || "khachhang@wandermatch.vn",
-
-    fullName: document.getElementById("custName")?.value || "Nguyễn Doãn Trường Huy",
-
-    cccd: document.getElementById("custCCCD")?.value || "001206012345",
-
-    bankCode: document.getElementById("custBankCode")?.value || "BIDV",
-
-    bankAccount: document.getElementById("custBankAcc")?.value || "2151000889999",
-
-    bankAccountHolder: document.getElementById("custBankHolder")?.value || "NGUYEN DOAN TRUONG HUY",
-
-    budgetVnd: Number(document.getElementById("budgetInput")?.value || 5000000),
-
-    groupSize: Number(document.getElementById("groupSizeInput")?.value || 1),
-
-    customPrompt: document.getElementById("customAIPrompt")?.value || "",
-
-    blacklistedCities: (document.getElementById("blacklistInput")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
-
-    personaVector: {
-
-      healing: Number(document.getElementById("qHealing")?.value || 85),
-
-      nature: Number(document.getElementById("qNature")?.value || 90),
-
-      solitude: Number(document.getElementById("qSolitude")?.value || 80),
-
-      comfort: Number(document.getElementById("qComfort")?.value || 90),
-
-      culture: Number(document.getElementById("qCulture")?.value || 75)
-
-    }
-
-  };
-
-};
-
-
-
-window.updateSliders = function() {
-
-  const p = window.collectUserPayload();
-
-  if (document.getElementById("lblHealing")) document.getElementById("lblHealing").innerText = `Chữa lành: ${p.personaVector.healing}%`;
-
-  if (document.getElementById("lblNature")) document.getElementById("lblNature").innerText = `Thiên nhiên: ${p.personaVector.nature}%`;
-
-  if (document.getElementById("lblSolitude")) document.getElementById("lblSolitude").innerText = `Độc hành: ${p.personaVector.solitude}%`;
-
-  if (document.getElementById("lblComfort")) document.getElementById("lblComfort").innerText = `Nghỉ dưỡng 4-5*: ${p.personaVector.comfort}%`;
-
-  if (document.getElementById("lblCulture")) document.getElementById("lblCulture").innerText = `Văn hóa & Di sản: ${p.personaVector.culture}%`;
-
-  if (document.getElementById("slaRetailGuarantee")) {
-
-    document.getElementById("slaRetailGuarantee").innerText = `Cam kết giá trị thực >= ${window.formatVND(Math.round(p.budgetVnd * p.groupSize * 1.25))} (${p.groupSize} người)`;
-
+  const stepperEl = document.getElementById('top-4step-stepper');
+  const wizardBar = document.getElementById('b2c-4step-wizard-bar');
+  if (tabName === 'b2c') {
+    if (stepperEl) stepperEl.classList.remove('hidden');
+    if (wizardBar) wizardBar.classList.remove('hidden');
+    if (typeof window.switchB2CStep === 'function') window.switchB2CStep(window._currentB2CStep || 1);
+  } else {
+    if (stepperEl) stepperEl.classList.add('hidden');
+    if (wizardBar) wizardBar.classList.add('hidden');
   }
 
+  if (tabName === "admin" && typeof window.renderAdminDashboard === 'function') window.renderAdminDashboard();
+  if (tabName === "b2b" && typeof window.renderB2BPortal === 'function') window.renderB2BPortal();
 };
 
+window.goToStep = function(stepNum) {
+  [1, 2, 3, 4].forEach(s => {
+    const p = document.getElementById("step-panel-" + s);
+    if (p) p.style.display = (s === Number(stepNum)) ? "block" : "none";
+    const b = document.getElementById("step-nav-" + s);
+    if (b) {
+      b.style.borderColor = (s === Number(stepNum)) ? "#14B8A6" : "rgba(255,255,255,0.12)";
+      b.style.backgroundColor = (s === Number(stepNum)) ? "rgba(20,184,166,0.2)" : "rgba(15,23,42,0.6)";
+    }
+  });
+  if (Number(stepNum) === 4) setTimeout(() => window.initScratchCard(), 60);
+};
 
+window.collectUserPayload = function() {
+  const user = window.currentUser || {};
+  return {
+    email: document.getElementById("cw-email")?.value?.trim() || document.getElementById("custEmail")?.value?.trim() || user.email || "khachhang@wandermatch.vn",
+    fullName: document.getElementById("cw-fullname")?.value?.trim() || document.getElementById("custName")?.value?.trim() || user.name || "Khách Hàng Du Lịch",
+    cccd: document.getElementById("cw-cccd")?.value?.trim() || document.getElementById("custCCCD")?.value?.trim() || user.cccd || "001206012345",
+    bankCode: document.getElementById("cw-bank-code")?.value || document.getElementById("custBankCode")?.value || "MB",
+    bankAccount: document.getElementById("cw-bank-account")?.value?.trim() || document.getElementById("custBankAcc")?.value?.trim() || "",
+    bankAccountHolder: document.getElementById("cw-bank-holder")?.value?.trim() || document.getElementById("custBankHolder")?.value?.trim() || user.name || "KHACH HANG DU LICH",
+    budgetVnd: Number(document.getElementById("cw-budget-vnd")?.value || document.getElementById("budgetInput")?.value || 5000000),
+    groupSize: Number(document.getElementById("cw-group-size")?.value || document.getElementById("groupSizeInput")?.value || 1),
+    customPrompt: document.getElementById("customAIPrompt")?.value || "",
+    blacklistedCities: (typeof document !== 'undefined' && document.querySelectorAll ? Array.from(document.querySelectorAll('input[name="cw-blacklist"]:checked')).map(el => el.value) : []).concat((document.getElementById("blacklistInput")?.value || "").split(",").map(s => s.trim()).filter(Boolean)),
+    personaVector: {
+      healing: Number(document.getElementById("cw-vec-healing")?.value || document.getElementById("qHealing")?.value || 85),
+      nature: Number(document.getElementById("cw-vec-nature")?.value || document.getElementById("qNature")?.value || 90),
+      solitude: Number(document.getElementById("cw-vec-solitude")?.value || document.getElementById("qSolitude")?.value || 80),
+      comfort: Number(document.getElementById("cw-vec-comfort")?.value || document.getElementById("qComfort")?.value || 90),
+      culture: Number(document.getElementById("cw-vec-culture")?.value || document.getElementById("qCulture")?.value || 75)
+    }
+  };
+};
+
+window.updateSliders = function() {
+  const p = window.collectUserPayload();
+  const elH = document.getElementById("lblHealing");
+  if (elH) elH.innerText = `Chữa lành: ${p.personaVector.healing}%`;
+  const elN = document.getElementById("lblNature");
+  if (elN) elN.innerText = `Thiên nhiên: ${p.personaVector.nature}%`;
+  const elS = document.getElementById("lblSolitude");
+  if (elS) elS.innerText = `Độc hành: ${p.personaVector.solitude}%`;
+  const elC = document.getElementById("lblComfort");
+  if (elC) elC.innerText = `Nghỉ dưỡng 4-5*: ${p.personaVector.comfort}%`;
+  const elCult = document.getElementById("lblCulture");
+  if (elCult) elCult.innerText = `Văn hóa & Di sản: ${p.personaVector.culture}%`;
+  const elSla = document.getElementById("slaRetailGuarantee");
+  if (elSla) {
+    elSla.innerText = `Cam kết giá trị thực >= ${window.formatVND(Math.round(p.budgetVnd * p.groupSize * 1.25))} (${p.groupSize} người)`;
+  }
+};
 
 window.autoFillBankHolder = function() {
-
-  const name = document.getElementById("custName")?.value || "";
-
-  const holderEl = document.getElementById("custBankHolder");
-
-  if (holderEl) holderEl.value = window.normVN(name);
-
+  const name = document.getElementById("cw-fullname")?.value || document.getElementById("custName")?.value || "";
+  const holderEl = document.getElementById("cw-bank-holder") || document.getElementById("custBankHolder");
+  if (holderEl && name) holderEl.value = window.normVN(name);
 };
 
-
-
 window.createBlindBooking = function() {
-
   const payload = window.collectUserPayload();
 
-  if (window.normVN(payload.fullName) !== window.normVN(payload.bankAccountHolder)) {
-
-    window.showToast(`Từ chối: Tên CCCD (${window.normVN(payload.fullName)}) không khớp Chủ STK (${window.normVN(payload.bankAccountHolder)})!`, "error");
-
-    return;
-
+  // Không bắt buộc tài khoản ngân hàng khi tạo đơn du lịch mù
+  // Chỉ cảnh báo nếu người dùng đã chủ động điền cả hai trường nhưng không khớp
+  if (payload.bankAccount && payload.bankAccountHolder && 
+      window.normVN(payload.fullName) !== window.normVN(payload.bankAccountHolder)) {
+    window.showToast(`Cảnh báo: Tên CCCD (${window.normVN(payload.fullName)}) khác Chủ STK (${window.normVN(payload.bankAccountHolder)})!`, "warning");
   }
 
   const data = window.executeOTABlindAlgorithms(payload, true);
-
   window.WM_STATE.currentBooking = data;
-
-  window.WM_STATE.bookings.unshift({ ...data, customerName: payload.fullName, bankInfo: `${payload.bankCode} - ***${payload.bankAccount.slice(-4)}` });
+  window.WM_STATE.bookings.unshift({ ...data, customerName: payload.fullName, bankInfo: payload.bankAccount ? `${payload.bankCode} - ***${payload.bankAccount.slice(-4)}` : "VietQR Direct" });
   localStorage.setItem("wm_bookings_v3", JSON.stringify(window.WM_STATE.bookings));
 
   // LƯU CÓ CẤU TRÚC VÀO SUPABASE DATABASE (blind_bookings)
@@ -1041,330 +1006,208 @@ window.createBlindBooking = function() {
     });
   }
 
-
-
   window.renderAIRecommendationBox(data);
-
   window.enrichWithAICoPilot(data, payload);
 
+  const elBookingCode = document.getElementById("lblBookingCode") || document.getElementById("cw-active-booking-badge");
+  if (elBookingCode) elBookingCode.innerText = `Mã đơn: ${data.bookingCode}`;
 
+  const elQrSection = document.getElementById("qrPaymentSection") || document.getElementById("view-vietqr");
+  if (elQrSection) {
+    elQrSection.style.display = "block";
+    elQrSection.classList?.remove("hidden");
+  }
 
-  document.getElementById("lblBookingCode").innerText = `Mã đơn: ${data.bookingCode}`;
+  const elQrContainer = document.getElementById("qrCardsContainer") || document.getElementById("group-members-qr-grid");
+  if (elQrContainer) {
+    elQrContainer.innerHTML = data.splitQrs.map(q => `
+      <div class="bg-slate-950 p-3 rounded-xl border border-white/10 text-center space-y-2">
+        <span class="text-xs font-bold text-teal-400">Thành viên #${q.memberIndex}</span>
+        <img src="${q.qrUrl}" alt="VietQR" class="w-40 h-40 mx-auto rounded-lg bg-white p-1" />
+        <p class="text-xs font-bold text-white">${window.formatVND(q.amount)}</p>
+        <p class="text-[11px] text-slate-400">Nội dung CK: <strong>${q.memo}</strong></p>
+      </div>
+    `).join("");
+  }
 
-  document.getElementById("qrPaymentSection").style.display = "block";
+  const singleQrEl = document.getElementById("vietqr-image-element");
+  if (singleQrEl && data.splitQrs && data.splitQrs[0]) {
+    singleQrEl.src = data.splitQrs[0].qrUrl;
+  }
 
-  document.getElementById("qrCardsContainer").innerHTML = data.splitQrs.map(q => `
+  const elWeather = document.getElementById("anonWeatherBox") || document.getElementById("dest-weather-text");
+  if (elWeather) elWeather.innerText = `${data.weatherTempC}°C — ${data.weatherDesc}`;
 
-    <div class="bg-slate-950 p-3 rounded-xl border border-white/10 text-center space-y-2">
+  const elHint = document.getElementById("aiMysteryHintText") || document.getElementById("cw-mystery-hint-text");
+  if (elHint) elHint.innerText = `"${data.mysteryHint}"`;
+  const elHintPanel = document.getElementById("cw-mystery-hint-panel");
+  if (elHintPanel) elHintPanel.classList.remove("hidden");
 
-      <span class="text-xs font-bold text-teal-400">Thành viên #${q.memberIndex}</span>
-
-      <img src="${q.qrUrl}" alt="VietQR" class="w-40 h-40 mx-auto rounded-lg bg-white p-1" />
-
-      <p class="text-xs font-bold text-white">${window.formatVND(q.amount)}</p>
-
-      <p class="text-[11px] text-slate-400">Nội dung CK: <strong>${q.memo}</strong></p>
-
-    </div>
-
-  `).join("");
-
-
-
-  document.getElementById("anonWeatherBox").innerText = `${data.weatherTempC}°C — ${data.weatherDesc}`;
-
-  document.getElementById("aiMysteryHintText").innerText = `"${data.mysteryHint}"`;
-
-  document.getElementById("packingListContainer").innerHTML = (data.packingChecklist || []).map((item, i) => `
-
-    <label class="flex items-center gap-2 cursor-pointer text-xs">
-
-      <input type="checkbox" checked class="accent-teal-400 w-4 h-4" />
-
-      <span>${i + 1}. ${item}</span>
-
-    </label>
-
-  `).join("");
-
-
+  const elPacking = document.getElementById("packingListContainer") || document.getElementById("packing-checklist-grid");
+  if (elPacking) {
+    elPacking.innerHTML = (data.packingChecklist || []).map((item, i) => `
+      <label class="flex items-center gap-2 cursor-pointer text-xs">
+        <input type="checkbox" checked class="accent-teal-400 w-4 h-4" />
+        <span>${i + 1}. ${item}</span>
+      </label>
+    `).join("");
+  }
 
   window.showToast(`Đã chốt Combo mới ${data.bookingCode} (${data.revealPackage.cityName} - đã khóa bí mật) & tạo VietQR!`);
-
 };
-
-
 
 window.simulateRefund = function(scenario) {
-
   const b = window.WM_STATE.currentBooking;
-
-  const totalPaid = b ? b.revealPackage.budgetPaid : Number(document.getElementById("budgetInput")?.value || 5000000);
-
+  const totalPaid = b ? b.revealPackage.budgetPaid : Number(document.getElementById("cw-budget-vnd")?.value || document.getElementById("budgetInput")?.value || 5000000);
   const map = {
-
     EARLY_72H: { title: "Hủy sớm trước 72 giờ khởi hành", fee: 0.10, b2b: 0.00, note: "Hoàn tự động 90% về STK đã liên kết trong 60 giây." },
-
     LATE_24_72H: { title: "Hủy cận ngày (Từ 24h đến 72h)", fee: 0.35, b2b: 0.25, note: "Thu 35% phí hủy (Trích 25% đền bù giữ phòng cam kết cho Công ty Du lịch). Hoàn 65% về STK của bạn." },
-
     FORCE_MAJEURE: { title: "Trường hợp Bất khả kháng (Y tế / Thiên tai)", fee: 0.10, b2b: 0.00, note: "Bảo vệ người tiêu dùng: Miễn phạt hủy muộn sau khi duyệt chứng từ. Hoàn 90% về STK." },
-
     UNDER_24H: { title: "Hủy dưới 24h (Không lý do)", fee: 1.00, b2b: 0.75, note: "Không hoàn tiền vì vé và phòng cam kết SLA đã xuất cứng." }
-
   }[scenario] || { title: "Hủy sớm", fee: 0.1, b2b: 0, note: "" };
 
-
-
   const feeVnd = Math.round(totalPaid * map.fee);
-
   const b2bVnd = Math.round(totalPaid * map.b2b);
-
   const netVnd = totalPaid - feeVnd;
 
-
-
-  document.getElementById("refundResultBox").innerHTML = `
-
-    <p class="font-bold text-amber-300 text-sm">${map.title}</p>
-
-    <p>Tổng tiền Combo đã đóng: <strong>${window.formatVND(totalPaid)}</strong></p>
-
-    <p>Khấu trừ phí: <strong class="text-rose-400">-${window.formatVND(feeVnd)}</strong> (Trích đền bù Công ty Du lịch B2B: <strong>${window.formatVND(b2bVnd)}</strong>)</p>
-
-    <p class="text-sm font-extrabold text-teal-400 pt-1">Số tiền hoàn thực nhận về STK của bạn: ${window.formatVND(netVnd)}</p>
-
-    <p class="text-[11px] text-slate-400 italic">${map.note}</p>
-
-  `;
-
+  const elRefund = document.getElementById("refundResultBox") || document.getElementById("refund-tracking-result");
+  if (elRefund) {
+    elRefund.innerHTML = `
+      <p class="font-bold text-amber-300 text-sm">${map.title}</p>
+      <p>Tổng tiền Combo đã đóng: <strong>${window.formatVND(totalPaid)}</strong></p>
+      <p>Khấu trừ phí: <strong class="text-rose-400">-${window.formatVND(feeVnd)}</strong> (Trích đền bù Công ty Du lịch B2B: <strong>${window.formatVND(b2bVnd)}</strong>)</p>
+      <p class="text-sm font-extrabold text-teal-400 pt-1">Số tiền hoàn thực nhận về STK của bạn: ${window.formatVND(netVnd)}</p>
+      <p class="text-[11px] text-slate-400 italic">${map.note}</p>
+    `;
+    elRefund.classList?.remove("hidden");
+  }
 };
-
-
 
 window.initScratchCard = function() {
-
   const canvas = document.getElementById("scratchCanvas");
-
   if (!canvas) return;
-
   canvas.style.display = "block";
-
   const rect = canvas.parentElement.getBoundingClientRect();
-
   canvas.width = Math.max(320, rect.width || 640);
-
   canvas.height = Math.max(260, rect.height || 320);
-
   const ctx = canvas.getContext("2d");
-
   ctx.globalCompositeOperation = "source-over";
-
   const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-
   grad.addColorStop(0, "#0F172A");
-
   grad.addColorStop(0.5, "#1E293B");
-
   grad.addColorStop(1, "#0F172A");
-
   ctx.fillStyle = grad;
-
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-
   ctx.fillStyle = "#2DD4BF";
-
   ctx.font = "bold 16px Plus Jakarta Sans, sans-serif";
-
   ctx.textAlign = "center";
-
   ctx.fillText("DÙNG CHUỘT CÀO LỚP NHŨ NÀY HOẶC BẤM 'MỞ KHÓA NGAY'", canvas.width / 2, canvas.height / 2);
 
-
-
   window.populateRevealData(false);
-
   let drawing = false;
-
   const scratch = (e) => {
-
     if (!drawing) return;
-
     const r = canvas.getBoundingClientRect();
-
     const cx = e.touches ? e.touches[0].clientX : e.clientX;
-
     const cy = e.touches ? e.touches[0].clientY : e.clientY;
-
     ctx.globalCompositeOperation = "destination-out";
-
     ctx.beginPath();
-
     ctx.arc(cx - r.left, cy - r.top, 38, 0, Math.PI * 2);
-
     ctx.fill();
-
   };
-
   canvas.onmousedown = () => { drawing = true; };
-
   canvas.onmouseup = () => { drawing = false; };
-
   canvas.onmousemove = scratch;
-
   canvas.ontouchstart = () => { drawing = true; };
-
   canvas.ontouchend = () => { drawing = false; };
-
   canvas.ontouchmove = scratch;
-
 };
-
-
 
 window.populateRevealData = function(hideCanvas = true) {
-
   if (!window.WM_STATE.currentBooking) {
-
     window.WM_STATE.currentBooking = window.executeOTABlindAlgorithms(window.collectUserPayload(), true);
-
   }
-
   const b = window.WM_STATE.currentBooking;
-
   const rev = b.revealPackage;
 
-  document.getElementById("revCityName").innerText = rev.cityName;
-
-  document.getElementById("revComboTitle").innerText = rev.comboTitle;
-
-  document.getElementById("revSlaCode").innerText = rev.hotelConfirmationCode;
-
-  document.getElementById("revTransport").innerText = rev.transportInfo;
-
-  document.getElementById("revHotel").innerText = rev.hotelName;
-
-  document.getElementById("revRetailPrice").innerText = window.formatVND(rev.retailValue);
-
-  document.getElementById("revPaidPrice").innerText = window.formatVND(rev.budgetPaid);
-
-  document.getElementById("revSavings").innerText = "+" + window.formatVND(rev.savingsVnd);
-
-  document.getElementById("revFoodGuide").innerHTML = (b.antiTouristTrapGuide || []).map(x => `<li>${x}</li>`).join("");
+  const elCity = document.getElementById("revCityName") || document.getElementById("scratch-revealed-city");
+  if (elCity) elCity.innerText = rev.cityName;
+  const elCombo = document.getElementById("revComboTitle");
+  if (elCombo) elCombo.innerText = rev.comboTitle;
+  const elSla = document.getElementById("revSlaCode") || document.getElementById("scratch-revealed-code");
+  if (elSla) elSla.innerText = rev.hotelConfirmationCode;
+  const elTrans = document.getElementById("revTransport");
+  if (elTrans) elTrans.innerText = rev.transportInfo;
+  const elHotel = document.getElementById("revHotel") || document.getElementById("scratch-revealed-hotel");
+  if (elHotel) elHotel.innerText = rev.hotelName;
+  const elRetail = document.getElementById("revRetailPrice");
+  if (elRetail) elRetail.innerText = window.formatVND(rev.retailValue);
+  const elPaid = document.getElementById("revPaidPrice");
+  if (elPaid) elPaid.innerText = window.formatVND(rev.budgetPaid);
+  const elSavings = document.getElementById("revSavings");
+  if (elSavings) elSavings.innerText = "+" + window.formatVND(rev.savingsVnd);
+  const elFood = document.getElementById("revFoodGuide");
+  if (elFood) elFood.innerHTML = (b.antiTouristTrapGuide || []).map(x => `<li>${x}</li>`).join("");
 
   if (hideCanvas) {
-
     const canvas = document.getElementById("scratchCanvas");
-
     if (canvas) canvas.style.display = "none";
-
     window.showToast(`Mở khóa hộp quà: ${rev.cityName} — ${rev.hotelName}`);
-
   }
-
 };
-
-
 
 window.renderB2BPortal = function() {
-
   const el = document.getElementById("b2bInventoryList");
-
   if (!el) return;
-
   el.innerHTML = window.WM_HOTELS_DB.map(i => `
-
     <div class="bg-slate-900 p-4 rounded-xl border border-white/10 flex flex-wrap justify-between items-center gap-3 text-xs">
-
       <div>
-
         <span class="px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 font-bold">${i.city} — ${i.sla_code}</span>
-
         <h4 class="font-bold text-sm text-white mt-1">${i.combo_title}</h4>
-
         <p class="text-slate-400">${i.hotel_name} (${i.rating}★)</p>
-
       </div>
-
       <div class="text-right">
-
         <p class="text-slate-400">Giá phòng lẻ/đêm: <span class="line-through">${window.formatVND(i.retail_per_night)}</span></p>
-
         <p class="text-teal-400 font-extrabold text-sm">Giá sỉ B2B/đêm: ${window.formatVND(i.price_per_night)}</p>
-
       </div>
-
     </div>
-
   `).join("");
-
 };
-
-
 
 window.renderAdminDashboard = function() {
-
   const el = document.getElementById("adminBookingsTable");
-
   if (!el) return;
-
   const list = window.WM_STATE.bookings;
-
   if (!list.length) {
-
     el.innerHTML = `<p class="text-xs text-slate-400">Chưa có đơn mới. Bấm nút 'Test 3 Lần Bấm Liên Tiếp Không Trùng Lặp' bên trên để kiểm chứng thuật toán.</p>`;
-
     return;
-
   }
-
   el.innerHTML = list.map(b => `
-
     <div class="bg-slate-900 p-4 rounded-xl border border-white/10 text-xs space-y-1">
-
       <div class="flex justify-between">
-
         <strong class="text-amber-400">${b.bookingCode} (${b.comboId}) — Khách: ${b.customerName}</strong>
-
         <span class="text-teal-400 font-bold">${b.revealPackage.cityName} — ${b.revealPackage.hotelName}</span>
-
       </div>
-
       <p class="text-slate-300">${b.aiReasoningLog}</p>
-
     </div>
-
   `).join("");
-
 };
 
-
-
 window.runAISensitivityTest = function() {
-
   const basePayload = window.collectUserPayload();
-
   const runs = [1, 2, 3].map(turn => {
-
     const r = window.executeOTABlindAlgorithms(basePayload, true);
-
     return `<div class="bg-slate-950 p-3 rounded-xl border border-teal-500/30 text-xs space-y-1">
-
       <strong class="text-amber-300 block">Lần Gợi Ý Liên Tiếp #${turn} (Cùng 1 khách hàng)</strong>
-
       <span class="text-teal-400 font-extrabold block">➔ Điểm đến: ${r.revealPackage.cityName} (Mã Combo: ${r.comboId})</span>
-
       <span class="text-white block">Vé & Phòng: ${r.revealPackage.transportInfo} + ${r.revealPackage.hotelName}</span>
-
       <span class="text-slate-400 block">Chi phí Knapsack: ${window.formatVND(r.revealPackage.budgetPaid)} (Đạt ${r.budgetUtilization}% ngân sách)</span>
-
     </div>`;
-
   }).join("");
 
-  document.getElementById("aiSensitivityTestOutput").innerHTML = runs;
-
+  const elSens = document.getElementById("aiSensitivityTestOutput");
+  if (elSens) elSens.innerHTML = runs;
   window.showToast("Đã chạy 3 lần liên tiếp: Hệ thống tự động đổi mới 3 chuyến đi không trùng lặp!");
-
 };
 
 
