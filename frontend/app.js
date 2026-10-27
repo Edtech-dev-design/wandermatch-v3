@@ -861,7 +861,11 @@ window.renderAIRecommendationBox = function(data) {
 
 
 
-window.switchTab = function(tabName) {
+window.switchTab = async function(tabName) {
+  if (typeof window.protectRoute === 'function') {
+    const isAllowed = await window.protectRoute(tabName);
+    if (!isAllowed) return;
+  }
 
   ["b2c", "b2b", "admin"].forEach(t => {
 
@@ -1012,8 +1016,30 @@ window.createBlindBooking = function() {
   window.WM_STATE.currentBooking = data;
 
   window.WM_STATE.bookings.unshift({ ...data, customerName: payload.fullName, bankInfo: `${payload.bankCode} - ***${payload.bankAccount.slice(-4)}` });
-
   localStorage.setItem("wm_bookings_v3", JSON.stringify(window.WM_STATE.bookings));
+
+  // LƯU CÓ CẤU TRÚC VÀO SUPABASE DATABASE (blind_bookings)
+  if (window.supabase && window.supabase.from) {
+    window.supabase.from("blind_bookings").insert({
+      booking_code: data.bookingCode,
+      customer_id: window.currentUser ? window.currentUser.id : null,
+      customer_email: payload.email,
+      customer_name: payload.fullName,
+      group_size: payload.groupSize,
+      total_paid: data.revealPackage.budgetPaid,
+      retail_value: data.revealPackage.retailValue,
+      secret_city_name: data.revealPackage.cityName,
+      combo_title: data.revealPackage.comboTitle,
+      flight_info: data.revealPackage.transportInfo,
+      hotel_info: data.revealPackage.hotelName,
+      status: "PENDING_PAYMENT",
+      created_at: new Date().toISOString()
+    }).then(res => {
+      console.log("🔒 [Supabase Database] Đã lưu đơn hàng vào blind_bookings:", data.bookingCode);
+    }).catch(err => {
+      console.warn("⚠️ Lỗi lưu đơn hàng Supabase:", err);
+    });
+  }
 
 
 
@@ -7383,7 +7409,11 @@ function renderEscrowLedger() {
 // 12. NAVIGATION & VIEW SWITCHING
 // ============================================================================
 
-function switchView(viewName) {
+async function switchView(viewName) {
+  if (typeof window.protectRoute === 'function') {
+    const isAllowed = await window.protectRoute(viewName);
+    if (!isAllowed) return;
+  }
   state.currentTab = viewName;
 
   if (viewName === 'b2b' && typeof window.switchTab === 'function') {

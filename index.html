@@ -4432,6 +4432,8 @@
   <div id="toast-container"></div>
 
   <!-- Application Logic -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabaseClient.js"></script>
   <script src="app.js"></script>
 
   <!-- ============================================================================
@@ -6887,586 +6889,412 @@
       }
     };
 
-    window.handlePortalLoginSubmit = function(e) {
+    window.showLoadingGuard = function(msg = "Đang xác thực bảo mật Supabase...") {
+      const guard = document.getElementById("auth-loading-guard");
+      const msgEl = document.getElementById("auth-loading-msg");
+      if (msgEl) msgEl.innerText = msg;
+      if (guard) {
+        guard.classList.remove("hidden");
+        guard.style.display = "flex";
+      }
+    };
+
+    window.hideLoadingGuard = function() {
+      const guard = document.getElementById("auth-loading-guard");
+      if (guard) {
+        guard.classList.add("hidden");
+        guard.style.display = "none";
+      }
+    };
+
+    // =========================================================================
+    // 1. CODE XỬ LÝ FORM ĐĂNG NHẬP (STRICT SUPABASE AUTH LOGIN)
+    // CHẶN ĐỨNG HOÀN TOÀN TÀI KHOẢN NHẬP BỪA HOẶC SAI MẬT KHẨU
+    // =========================================================================
+    window.handlePortalLoginSubmit = async function(e) {
       if (e && e.preventDefault) e.preventDefault();
       const identifierInput = document.getElementById('portal-login-identifier');
       const pwdInput = document.getElementById('portal-login-password');
-      const pinInput = document.getElementById('portal-login-pin');
       const roleSelect = document.getElementById('portal-login-role');
 
-      const identifier = identifierInput ? identifierInput.value.trim() : '';
+      const email = identifierInput ? identifierInput.value.trim().toLowerCase() : '';
       const password = pwdInput ? pwdInput.value : '';
-      const pin = pinInput ? pinInput.value.trim() : '';
       const role = roleSelect ? roleSelect.value : 'b2c';
 
-      if (!identifier) {
+      if (!email || !password) {
         if (typeof showToast === 'function') {
-          showToast('warning', '⚠️ Vui lòng nhập Email, Số điện thoại hoặc Tên đăng nhập của bạn.');
+          showToast('warning', '⚠️ Vui lòng nhập đầy đủ Email và Mật khẩu đăng nhập.');
         }
-        if (identifierInput) identifierInput.focus();
+        if (!email && identifierInput) identifierInput.focus();
+        else if (pwdInput) pwdInput.focus();
         return;
       }
 
-      const users = getUsersDB();
-      const cleanId = identifier.toLowerCase();
-      let matched = users.find(u => 
-        (u.email && u.email.toLowerCase() === cleanId) || 
-        (u.phone && u.phone === identifier) ||
-        (u.name && u.name.toLowerCase() === cleanId)
-      );
+      window.showLoadingGuard('Đang kiểm tra tài khoản trên Supabase Auth...');
 
-      if (matched) {
-        matched.role = role || matched.role || 'b2c';
-      } else {
-        matched = {
-          id: 'usr_' + Date.now(),
-          name: identifier.split('@')[0].toUpperCase() || 'DU KHÁCH VIP',
-          email: identifier.includes('@') ? identifier : identifier + '@wandermatch.vn',
-          phone: identifier.match(/^[0-9]+$/) ? identifier : '0988 888 888',
-          cccd: '079090001234',
-          bankName: 'MB BANK',
-          bankAcc: '0988888888',
-          bank: 'MB BANK — 0988888888',
-          role: role,
-          tier: role === 'admin' ? 'Quản Trị Viên' : (role === 'b2b' ? 'Đối Tác Cung Ứng' : 'Hội Viên VIP'),
-          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-          backupCode: pin || '888888',
-          createdAt: new Date().toISOString()
+      try {
+        // GỌI HÀM SUPABASE AUTH CHÍNH HÃNG: signInWithPassword
+        const { data, error } = await window.supabase.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+        window.hideLoadingGuard();
+
+        // BẮT BUỘC KIỂM TRA LỖI: NẾU CÓ LỖI -> CHẶN ĐỨNG LẬP TỨC!
+        if (error) {
+          if (typeof showToast === 'function') {
+            showToast('error', `❌ Đăng nhập thất bại: ${error.message || 'Tài khoản hoặc mật khẩu không chính xác'}`);
+          }
+          if (pwdInput) pwdInput.value = '';
+          return; // KHÔNG ĐƯỢC CHUYỂN TRANG
+        }
+
+        // CHỈ KHI error === null (ĐĂNG NHẬP THÀNH CÔNG):
+        const sessionUser = data.user;
+        const meta = sessionUser.user_metadata || {};
+        const matched = {
+          id: sessionUser.id,
+          name: meta.full_name || email.split('@')[0].toUpperCase(),
+          email: sessionUser.email,
+          phone: meta.phone || '0988 888 888',
+          role: role || meta.role || 'b2c',
+          tier: meta.tier || (role === 'admin' ? 'Quản Trị Viên' : (role === 'b2b' ? 'Đối Tác Cung Ứng' : 'Du Khách Đã KYC')),
+          cccd: meta.cccd || '001206012345',
+          bank_code: meta.bank_code || 'MB',
+          bank_account: meta.bank_account || '0988888888',
+          bank_account_holder: meta.bank_account_holder || email.split('@')[0].toUpperCase(),
+          createdAt: sessionUser.created_at || new Date().toISOString()
         };
-        users.push(matched);
-        saveUsersDB(users);
-      }
 
-      window.currentUser = matched;
-      localStorage.setItem('wm_user_session', JSON.stringify(matched));
-      renderUserHeader();
-      syncCustomerToSupabase(matched);
-      if (typeof showToast === 'function') {
-        showToast('success', '🎉 Chào mừng ' + matched.name + ' đã đăng nhập thành công vào WanderMatch 3.0!');
+        window.currentUser = matched;
+        localStorage.setItem('wm_user_session', JSON.stringify(matched));
+        renderUserHeader();
+        if (typeof closeAuthModal === 'function') closeAuthModal();
+
+        if (typeof showToast === 'function') {
+          showToast('success', `🎉 Đăng nhập Supabase thành công! Chào mừng ${matched.name} (${matched.tier}).`);
+        }
+
+        // Chuyển hướng sang trang được cấp quyền
+        if (matched.role === 'b2b') {
+          window.switchTab('b2b');
+        } else if (matched.role === 'admin') {
+          window.switchTab('admin');
+        } else {
+          window.switchTab('b2c');
+        }
+
+      } catch (err) {
+        window.hideLoadingGuard();
+        if (typeof showToast === 'function') {
+          showToast('error', '❌ Lỗi kết nối Supabase Auth: ' + err.message);
+        }
       }
     };
 
-    window.handlePortalRegisterSubmit = function(e) {
+    // =========================================================================
+    // 2. FORM ĐĂNG KÝ (SIGN UP VÀO SUPABASE DATABASE & AUTH)
+    // =========================================================================
+    window.handlePortalRegisterSubmit = async function(e) {
       if (e && e.preventDefault) e.preventDefault();
       const name = document.getElementById('portal-reg-name')?.value?.trim();
       const phone = document.getElementById('portal-reg-phone')?.value?.trim();
-      const email = document.getElementById('portal-reg-email')?.value?.trim();
-      const cccd = document.getElementById('portal-reg-cccd')?.value?.trim();
-      const bankName = document.getElementById('portal-reg-bank')?.value || 'MB BANK';
-      const bankAcc = document.getElementById('portal-reg-bank-acc')?.value?.trim();
+      const email = document.getElementById('portal-reg-email')?.value?.trim().toLowerCase();
       const password = document.getElementById('portal-reg-password')?.value;
-      const pin = document.getElementById('portal-reg-pin')?.value?.trim();
       const role = document.getElementById('portal-reg-role')?.value || 'b2c';
 
-      if (!name) {
-        if (typeof showToast === 'function') showToast('warning', '⚠️ Vui lòng điền đầy đủ Họ và tên.');
-        document.getElementById('portal-reg-name')?.focus();
-        return;
-      }
-      if (!phone) {
-        if (typeof showToast === 'function') showToast('warning', '⚠️ Vui lòng điền Số điện thoại liên hệ.');
-        document.getElementById('portal-reg-phone')?.focus();
-        return;
-      }
-      if (!email) {
-        if (typeof showToast === 'function') showToast('warning', '⚠️ Vui lòng điền Email hợp lệ.');
-        document.getElementById('portal-reg-email')?.focus();
-        return;
-      }
-      if (!password) {
-        if (typeof showToast === 'function') showToast('warning', '⚠️ Vui lòng thiết lập Mật khẩu đăng nhập.');
-        document.getElementById('portal-reg-password')?.focus();
+      if (!email || !password || !name) {
+        if (typeof showToast === 'function') {
+          showToast('warning', '⚠️ Vui lòng nhập đầy đủ Họ tên, Email và Mật khẩu đăng ký.');
+        }
         return;
       }
 
-      const users = getUsersDB();
-      const newUser = {
-        id: 'usr_' + Date.now(),
-        name: name.toUpperCase(),
-        phone: phone,
-        email: email,
-        cccd: cccd || '079090001234',
-        bankName: bankName,
-        bankAcc: bankAcc || '0988888888',
-        bank: bankName + ' — ' + (bankAcc || '0988888888'),
-        password: password,
-        backupCode: pin || '888888',
-        role: role,
-        tier: role === 'admin' ? 'Quản Trị Viên' : (role === 'b2b' ? 'Đối Tác Cung Ứng' : 'Hội Viên Mới'),
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-        createdAt: new Date().toISOString()
-      };
+      if (password.length < 3) {
+        if (typeof showToast === 'function') {
+          showToast('warning', '⚠️ Mật khẩu phải có tối thiểu 3 ký tự!');
+        }
+        return;
+      }
 
-      users.push(newUser);
-      saveUsersDB(users);
-      window.currentUser = newUser;
-      localStorage.setItem('wm_user_session', JSON.stringify(newUser));
-      renderUserHeader();
-      syncCustomerToSupabase(newUser);
+      window.showLoadingGuard('Đang khởi tạo tài khoản và lưu hồ sơ lên Supabase...');
 
-      if (typeof showToast === 'function') {
-        showToast('success', '🎉 Đăng ký thành công tài khoản: ' + newUser.name + '! Đang chuyển vào ứng dụng...');
+      try {
+        const { data, error } = await window.supabase.auth.signUp({
+          email: email,
+          password: password,
+          options: {
+            data: {
+              full_name: name,
+              phone: phone || '0988 888 888',
+              role: role,
+              tier: role === 'admin' ? 'Quản Trị Viên' : (role === 'b2b' ? 'Đối Tác Cung Ứng' : 'Du Khách Đã KYC')
+            }
+          }
+        });
+
+        window.hideLoadingGuard();
+
+        if (error) {
+          if (typeof showToast === 'function') {
+            showToast('error', `❌ Đăng ký thất bại: ${error.message}`);
+          }
+          return;
+        }
+
+        // Lưu bản ghi vào bảng customer_profiles
+        await window.supabase.from('customer_profiles').insert({
+          id: data.user.id,
+          email: email,
+          full_name: name,
+          phone: phone || '0988 888 888',
+          role: role,
+          created_at: new Date().toISOString()
+        });
+
+        const newUser = {
+          id: data.user.id,
+          name: name,
+          email: email,
+          phone: phone || '0988 888 888',
+          role: role,
+          tier: role === 'admin' ? 'Quản Trị Viên' : (role === 'b2b' ? 'Đối Tác Cung Ứng' : 'Du Khách Đã KYC')
+        };
+
+        window.currentUser = newUser;
+        localStorage.setItem('wm_user_session', JSON.stringify(newUser));
+        renderUserHeader();
+        if (typeof closeAuthModal === 'function') closeAuthModal();
+
+        if (typeof showToast === 'function') {
+          showToast('success', `🎉 Đăng ký Supabase thành công! Chào mừng ${name} (${newUser.tier}).`);
+        }
+
+        if (role === 'b2b') window.switchTab('b2b');
+        else if (role === 'admin') window.switchTab('admin');
+        else window.switchTab('b2c');
+
+      } catch (err) {
+        window.hideLoadingGuard();
+        if (typeof showToast === 'function') {
+          showToast('error', '❌ Lỗi kết nối đăng ký Supabase: ' + err.message);
+        }
       }
     };
 
-    function renderUserHeader() {
-      const authPortal = document.getElementById('auth-portal-screen');
-      const mainApp = document.getElementById('main-app-container');
-      const userMenu = document.getElementById('header-user-profile-menu');
-      const headerName = document.getElementById('header-username');
-      const headerAvatar = document.getElementById('header-avatar');
-      const headerTier = document.getElementById('header-user-tier');
-
-      if (window.currentUser) {
-        // ĐÃ ĐĂNG NHẬP: ẨN MÀN HÌNH AUTH, BẬT CHẾ ĐỘ APP
-        if (authPortal) authPortal.classList.add('hidden');
-        if (mainApp) mainApp.classList.remove('hidden');
-        if (userMenu) userMenu.classList.remove('hidden');
-        if (headerName) headerName.textContent = window.currentUser.name;
-        if (headerAvatar && window.currentUser.avatar) headerAvatar.src = window.currentUser.avatar;
-        if (headerTier) headerTier.textContent = window.currentUser.tier || 'Hội Viên Kim Cương';
-
-        // Tự động chuyển vào vai trò tương ứng (b2c, b2b, admin)
-        if (typeof switchTab === 'function') {
-          switchTab(window.currentUser.role || 'b2c');
-        }
-
-        if (typeof handleGeneratePlan === 'function') {
-          handleGeneratePlan(false);
-        }
-
-        // Auto sync with CCCD & Bank holder inputs
-        const cccdInput = document.getElementById('cw-fullname');
-        const bankHolderInput = document.getElementById('cw-bank-holder');
-        if (cccdInput && !cccdInput.value) cccdInput.value = window.currentUser.name;
-        if (bankHolderInput && !bankHolderInput.value) bankHolderInput.value = window.currentUser.bankHolder || window.currentUser.name;
-      } else {
-        // CHƯA ĐĂNG NHẬP / ĐÃ ĐĂNG XUẤT: BẬT MÀN HÌNH AUTH BẢNG TO, ẨN TOÀN BỘ APP
-        if (authPortal) authPortal.classList.remove('hidden');
-        if (mainApp) mainApp.classList.add('hidden');
-        if (userMenu) userMenu.classList.add('hidden');
-      }
-    }
-
-    // =========================================================================
-    // CỔNG XÁC THỰC 3 HƯỚNG: DU KHÁCH, KHÁCH SẠN B2B & QUẢN TRỊ VIÊN ADMIN
-    // =========================================================================
     window.switchAuthRole = function(role) {
       window.currentAuthRole = role;
-      const roles = ['b2c', 'b2b', 'admin'];
-      const descEl = document.getElementById('auth-role-desc');
-      const identifierLabel = document.getElementById('login-identifier-label');
-
-      roles.forEach(r => {
-        const btn = document.getElementById(`auth-role-btn-${r}`);
-        const regForm = document.getElementById(`form-register-${r}`);
-        if (r === role) {
-          if (btn) {
-            btn.className = r === 'b2c' ? "p-2.5 rounded-xl border-2 border-cyan-400 bg-cyan-950/70 text-left transition text-xs space-y-0.5 shadow-lg shadow-cyan-500/20" :
-                            r === 'b2b' ? "p-2.5 rounded-xl border-2 border-amber-400 bg-amber-950/70 text-left transition text-xs space-y-0.5 shadow-lg shadow-amber-500/20" :
-                            "p-2.5 rounded-xl border-2 border-emerald-400 bg-emerald-950/70 text-left transition text-xs space-y-0.5 shadow-lg shadow-emerald-500/20";
-          }
-          if (regForm) regForm.classList.remove('hidden');
-        } else {
-          if (btn) {
-            btn.className = "p-2.5 rounded-xl border border-slate-800 bg-slate-900/80 hover:border-slate-700 text-left transition text-xs space-y-0.5 opacity-70 hover:opacity-100";
-          }
-          if (regForm) regForm.classList.add('hidden');
+      ['b2c', 'b2b', 'admin'].forEach(r => {
+        const btn = document.getElementById('role-tab-' + r);
+        if (btn) {
+          btn.className = (r === role) 
+            ? 'flex-1 py-2 px-3 rounded-xl font-black text-xs transition bg-cyan-500 text-slate-950 shadow-md flex items-center justify-center gap-1.5'
+            : 'flex-1 py-2 px-3 rounded-xl font-bold text-xs transition text-slate-400 hover:text-white flex items-center justify-center gap-1.5';
         }
       });
-
-      if (descEl) {
-        if (role === 'b2c') descEl.textContent = 'Dành cho Khách du lịch (Cá nhân, Cặp đôi, Nhóm)';
-        else if (role === 'b2b') descEl.textContent = 'Dành cho Đối tác Khách sạn, Resort & Hàng không';
-        else descEl.textContent = 'Dành cho Ban Điều Hành & Quản Trị Hệ Thống';
-      }
-
-      if (identifierLabel) {
-        if (role === 'b2c') identifierLabel.textContent = 'Email hoặc Số điện thoại du khách:';
-        else if (role === 'b2b') identifierLabel.textContent = 'Email công vụ hoặc Mã Số Thuế (MST):';
-        else identifierLabel.textContent = 'Email quản trị viên (@wandermatch.vn):';
-      }
     };
 
-    window.openAuthModal = function(mode = 'register', role = 'b2c') {
+    window.openAuthModal = function(mode = 'login', role = 'b2c') {
       const modal = document.getElementById('auth-modal');
-      if (modal) modal.classList.remove('hidden');
-      switchAuthRole(role);
+      if (!modal) return;
+      modal.classList.remove('hidden');
+      modal.style.display = 'flex';
       setAuthMode(mode);
+      switchAuthRole(role);
     };
 
     window.closeAuthModal = function() {
       const modal = document.getElementById('auth-modal');
-      if (modal) modal.classList.add('hidden');
+      if (!modal) return;
+      modal.classList.add('hidden');
+      modal.style.display = 'none';
     };
 
     window.setAuthMode = function(mode) {
       window.currentAuthMode = mode;
-      const regContainer = document.getElementById('auth-register-container');
-      const loginContainer = document.getElementById('auth-login-container');
-      const tabReg = document.getElementById('auth-tab-btn-register');
-      const tabLogin = document.getElementById('auth-tab-btn-login');
+      const tabLogin = document.getElementById('auth-tab-login');
+      const tabRegister = document.getElementById('auth-tab-register');
+      const panelLogin = document.getElementById('auth-panel-login');
+      const panelRegister = document.getElementById('auth-panel-register');
       const title = document.getElementById('auth-modal-title');
 
-      if (mode === 'register') {
-        if (regContainer) regContainer.classList.remove('hidden');
-        if (loginContainer) loginContainer.classList.add('hidden');
-        if (tabReg) tabReg.className = "flex-1 py-2.5 rounded-lg font-black bg-cyan-500 text-slate-950 shadow transition flex items-center justify-center gap-1.5";
-        if (tabLogin) tabLogin.className = "flex-1 py-2.5 rounded-lg font-bold text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5";
-        if (title) title.textContent = "Đăng Ký Tài Khoản Mới";
+      if (mode === 'login') {
+        if (tabLogin) tabLogin.className = 'flex-1 py-2.5 rounded-xl font-black text-xs transition bg-cyan-500 text-slate-950 shadow-lg';
+        if (tabRegister) tabRegister.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs transition text-slate-400 hover:text-white';
+        if (panelLogin) panelLogin.classList.remove('hidden');
+        if (panelRegister) panelRegister.classList.add('hidden');
+        if (title) title.innerText = 'Đăng Nhập Supabase Auth';
       } else {
-        if (regContainer) regContainer.classList.add('hidden');
-        if (loginContainer) loginContainer.classList.remove('hidden');
-        if (tabLogin) tabLogin.className = "flex-1 py-2.5 rounded-lg font-black bg-cyan-500 text-slate-950 shadow transition flex items-center justify-center gap-1.5";
-        if (tabReg) tabReg.className = "flex-1 py-2.5 rounded-lg font-bold text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5";
-        if (title) title.textContent = "Đăng Nhập Hệ Thống";
+        if (tabLogin) tabLogin.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs transition text-slate-400 hover:text-white';
+        if (tabRegister) tabRegister.className = 'flex-1 py-2.5 rounded-xl font-black text-xs transition bg-cyan-500 text-slate-950 shadow-lg';
+        if (panelLogin) panelLogin.classList.add('hidden');
+        if (panelRegister) panelRegister.classList.remove('hidden');
+        if (title) title.innerText = 'Đăng Ký Tài Khoản Mới';
       }
     };
 
-    // =========================================================================
-    // QUẢN LÝ PHƯƠNG THỨC ĐĂNG NHẬP: MẬT KHẨU VS MÃ BẢO MẬT THAY THẾ (PASSCODE)
-    // =========================================================================
-    window.currentLoginMethod = 'password';
     window.setLoginMethod = function(method) {
       window.currentLoginMethod = method;
-      const panelPwd = document.getElementById('login-panel-password');
-      const panelCode = document.getElementById('login-panel-code');
-      const tabPwd = document.getElementById('login-tab-btn-pwd');
-      const tabCode = document.getElementById('login-tab-btn-code');
-
+      const pPwd = document.getElementById('login-panel-password');
+      const pCode = document.getElementById('login-panel-code');
       if (method === 'password') {
-        if (panelPwd) panelPwd.classList.remove('hidden');
-        if (panelCode) panelCode.classList.add('hidden');
-        if (tabPwd) tabPwd.className = "flex-1 py-2 rounded-lg font-bold bg-cyan-500 text-slate-950 shadow transition text-xs flex items-center justify-center gap-1.5";
-        if (tabCode) tabCode.className = "flex-1 py-2 rounded-lg font-semibold text-slate-400 hover:text-white bg-slate-900 border border-slate-800 transition text-xs flex items-center justify-center gap-1.5";
+        if (pPwd) pPwd.classList.remove('hidden');
+        if (pCode) pCode.classList.add('hidden');
       } else {
-        if (panelPwd) panelPwd.classList.add('hidden');
-        if (panelCode) panelCode.classList.remove('hidden');
-        if (tabCode) tabCode.className = "flex-1 py-2 rounded-lg font-bold bg-cyan-500 text-slate-950 shadow transition text-xs flex items-center justify-center gap-1.5";
-        if (tabPwd) tabPwd.className = "flex-1 py-2 rounded-lg font-semibold text-slate-400 hover:text-white bg-slate-900 border border-slate-800 transition text-xs flex items-center justify-center gap-1.5";
+        if (pPwd) pPwd.classList.add('hidden');
+        if (pCode) pCode.classList.remove('hidden');
       }
     };
 
-    window.fillQuickPasscode = function() {
-      const emailInput = document.getElementById('auth-login-code-email');
-      const codeInput = document.getElementById('auth-login-code-val');
-      const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
-      const users = getUsersDB();
-      const found = users.find(u => (u.email && u.email.toLowerCase() === email) || (u.phone && u.phone.replace(/\s+/g, '') === email.replace(/\s+/g, '')));
-      const code = (found && found.backupCode) ? found.backupCode : 'WM-2026';
-      if (codeInput) codeInput.value = code;
-      if (typeof showToast === 'function') {
-        showToast('info', `🔑 Mã bảo mật thay thế hợp lệ: ${code}`);
-      }
+    window.fillQuickPasscode = function(code) {
+      const el = document.getElementById('auth-login-code-val');
+      if (el) el.value = code;
     };
 
     window.handleRegisterSubmit = function(e, role) {
-      e.preventDefault();
-      const users = getUsersDB();
-
-      if (role === 'b2c') {
-        const name = document.getElementById('reg-b2c-name')?.value.trim() || 'DU KHÁCH MỚI';
-        const phone = document.getElementById('reg-b2c-phone')?.value.trim() || '0988 123 456';
-        const email = document.getElementById('reg-b2c-email')?.value.trim() || 'user@wandermatch.vn';
-        const cccd = document.getElementById('reg-b2c-cccd')?.value.trim() || ('079201' + Math.floor(100000 + Math.random() * 900000));
-        const bankName = document.getElementById('reg-b2c-bank-name')?.value || 'MB BANK';
-        const bankAcc = document.getElementById('reg-b2c-bank-acc')?.value.trim() || phone.replace(/\s+/g, '');
-        const password = document.getElementById('reg-b2c-password')?.value.trim() || '123';
-        const confirmPw = document.getElementById('reg-b2c-confirm-password')?.value.trim() || password;
-        const backupCode = document.getElementById('reg-b2c-backup-code')?.value.trim() || 'WM-2026';
-
-        if (password !== confirmPw) {
-          if (typeof showToast === 'function') showToast('warning', '⚠️ Mật khẩu và xác nhận mật khẩu không khớp!');
-          return;
-        }
-
-        const cleanPhone = phone.replace(/\s+/g, '');
-        if (users.some(u => u.email.toLowerCase() === email.toLowerCase() || (u.phone && u.phone.replace(/\s+/g, '') === cleanPhone))) {
-          if (typeof showToast === 'function') showToast('warning', '⚠️ Email hoặc Số điện thoại này đã được đăng ký! Vui lòng chuyển sang Đăng Nhập.');
-          setAuthMode('login');
-          return;
-        }
-
-        const newUser = {
-          id: 'usr_b2c_' + Date.now(),
-          name: name.toUpperCase(),
-          email: email,
-          phone: phone,
-          cccd: cccd,
-          bank: `${bankName} — ${bankAcc}`,
-          bankName: bankName,
-          bankAcc: bankAcc,
-          bankHolder: name.toUpperCase(),
-          tier: 'Du Khách Đã KYC',
-          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80',
-          role: 'b2c',
-          password: password,
-          backupCode: backupCode,
-          createdAt: new Date().toISOString()
-        };
-
-        users.push(newUser);
-        saveUsersDB(users);
-        window.currentUser = newUser;
-        localStorage.setItem('wm_user_session', JSON.stringify(newUser));
-        renderUserHeader();
-        closeAuthModal();
-
-        if (typeof showToast === 'function') {
-          showToast('success', `🎉 Chúc mừng ${name}! Đăng ký thành công. Mã bảo mật thay thế của bạn là: ${backupCode}`);
-        }
-        window.switchTab('b2c');
-        window.switchB2CStep(1);
-
-      } else if (role === 'b2b') {
-        const company = document.getElementById('reg-b2b-company')?.value.trim() || 'Khách Sạn Đối Tác';
-        const tax = document.getElementById('reg-b2b-tax')?.value.trim() || '0312888999';
-        const rep = document.getElementById('reg-b2b-rep')?.value.trim() || 'Đại Diện B2B';
-        const stars = document.getElementById('reg-b2b-stars')?.value || '4-star';
-        const email = document.getElementById('reg-b2b-email')?.value.trim() || 'partner@hotel.vn';
-        const password = document.getElementById('reg-b2b-password')?.value.trim() || '123';
-
-        const newUser = {
-          id: 'usr_b2b_' + Date.now(),
-          name: company,
-          repName: rep,
-          taxCode: tax,
-          tierStandard: stars,
-          email: email,
-          phone: '028 3888 9999',
-          bank: 'VIETCOMBANK — ' + tax,
-          bankHolder: company.toUpperCase(),
-          cccd: tax,
-          tier: 'Đối Tác B2B Tiêu Chuẩn',
-          avatar: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=160&auto=format&fit=crop&q=80',
-          role: 'b2b',
-          password: password,
-          backupCode: 'WM-2026',
-          createdAt: new Date().toISOString()
-        };
-
-        users.push(newUser);
-        saveUsersDB(users);
-        window.currentUser = newUser;
-        localStorage.setItem('wm_user_session', JSON.stringify(newUser));
-        renderUserHeader();
-        closeAuthModal();
-
-        if (typeof showToast === 'function') {
-          showToast('success', `🏨 Chào mừng đối tác ${company}! Tài khoản B2B đã được lưu vào hệ thống.`);
-        }
-        window.switchTab('b2b');
-
-      } else if (role === 'admin') {
-        const name = document.getElementById('reg-admin-name')?.value.trim() || 'Admin Điều Hành';
-        const email = document.getElementById('reg-admin-email')?.value.trim() || 'admin@wandermatch.vn';
-        const password = document.getElementById('reg-admin-password')?.value.trim() || '123';
-        const key = document.getElementById('reg-admin-key')?.value.trim();
-
-        if (key !== 'WM2026ADMIN') {
-          alert('Mã khóa bảo mật điều hành không chính xác! Vui lòng nhập đúng mã: WM2026ADMIN');
-          return;
-        }
-
-        const newUser = {
-          id: 'usr_admin_' + Date.now(),
-          name: name,
-          email: email,
-          phone: '0909 000 999',
-          bank: 'MB BANK — 0988888888 (TK Công Ty)',
-          bankHolder: 'CONG TY TNHH WANDERMATCH VN',
-          cccd: '001090001234',
-          tier: 'System Administrator',
-          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&auto=format&fit=crop&q=80',
-          role: 'admin',
-          password: password,
-          backupCode: 'WM2026ADMIN',
-          createdAt: new Date().toISOString()
-        };
-
-        users.push(newUser);
-        saveUsersDB(users);
-        window.currentUser = newUser;
-        localStorage.setItem('wm_user_session', JSON.stringify(newUser));
-        renderUserHeader();
-        closeAuthModal();
-
-        if (typeof showToast === 'function') {
-          showToast('success', `🛡️ Kích hoạt quyền Quản Trị Viên thành công cho ${name}!`);
-        }
-        window.switchTab('admin');
-      }
+      return window.handlePortalRegisterSubmit(e);
     };
 
-    window.handleUniversalLogin = function(e, method) {
+    window.handleUniversalLogin = async function(e, method) {
       if (e) e.preventDefault();
-      const users = getUsersDB();
-      const cleanStr = s => (s || '').toString().toLowerCase().replace(/\s+/g, '');
-      let matched = null;
+      const idInput = document.getElementById('auth-login-identifier') || document.getElementById('portal-login-identifier');
+      const pwInput = document.getElementById('auth-login-password') || document.getElementById('portal-login-password');
+      const email = idInput ? idInput.value.trim().toLowerCase() : '';
+      const password = pwInput ? pwInput.value : '';
 
-      // 1. Nếu người dùng chọn đăng nhập bằng Mã Bảo Mật Thay Thế
-      if (method === 'code' || window.currentLoginMethod === 'code') {
-        const emailInput = document.getElementById('auth-login-code-email');
-        const codeInput = document.getElementById('auth-login-code-val');
-        const rawEmail = (emailInput ? emailInput.value : '').trim();
-        const rawCode = (codeInput ? codeInput.value : '').trim().toUpperCase();
+      if (!email || !password) {
+        if (typeof showToast === 'function') showToast('warning', '⚠️ Vui lòng nhập đầy đủ Email và Mật khẩu!');
+        return;
+      }
 
-        if (!rawEmail) {
-          if (typeof showToast === 'function') showToast('warning', '⚠️ Vui lòng nhập Email đăng nhập!');
-          return;
-        }
-        if (!rawCode) {
-          if (typeof showToast === 'function') showToast('warning', '⚠️ Vui lòng nhập Mã bảo mật thay thế!');
-          return;
-        }
-
-        const searchKey = cleanStr(rawEmail);
-        matched = users.find(u => cleanStr(u.email) === searchKey || cleanStr(u.phone) === searchKey);
-
-        // Kiểm tra tính hợp lệ của mã bảo mật thay thế
-        const isValidCode = (matched && (matched.backupCode || '').toUpperCase() === rawCode) ||
-                            rawCode === 'WM-2026' ||
-                            rawCode === 'WM2026ADMIN' ||
-                            rawCode.startsWith('WM-');
-
-        if (!isValidCode) {
-          if (typeof showToast === 'function') showToast('warning', '⚠️ Mã bảo mật thay thế không đúng! Vui lòng thử lại với mã: WM-2026');
-          return;
-        }
-
-        // Nếu mã đúng nhưng chưa có tài khoản trong DB -> tự động tạo hồ sơ du khách ngay
-        if (!matched) {
-          matched = {
-            id: 'usr_auto_' + Date.now(),
-            name: rawEmail.includes('@') ? rawEmail.split('@')[0].toUpperCase() : 'DU KHÁCH MỚI',
-            email: rawEmail,
-            phone: '0988 888 888',
-            bank: 'MB BANK — 0988888888',
-            bankHolder: rawEmail.toUpperCase(),
-            cccd: '079201' + Math.floor(100000 + Math.random() * 900000),
-            tier: 'Du Khách Đã KYC',
-            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80',
-            role: 'b2c',
-            password: '123',
-            backupCode: rawCode,
-            createdAt: new Date().toISOString()
-          };
-          users.push(matched);
-          saveUsersDB(users);
-        }
-
-      } else {
-        // 2. Đăng nhập truyền thống bằng Tên / Email / SĐT + Mật khẩu
-        const idInput = document.getElementById('auth-login-identifier');
-        const pwInput = document.getElementById('auth-login-password');
-        const rawId = (idInput ? idInput.value : '').trim();
-        const rawPw = (pwInput ? pwInput.value : '').trim();
-
-        if (!rawId) {
-          if (typeof showToast === 'function') showToast('warning', '⚠️ Vui lòng nhập Email, Tên hoặc Số điện thoại đăng nhập!');
-          return;
-        }
-
-        const searchKey = cleanStr(rawId);
-
-        // Tìm kiếm linh hoạt
-        matched = users.find(u => {
-          return cleanStr(u.email) === searchKey ||
-                 cleanStr(u.phone) === searchKey ||
-                 cleanStr(u.taxCode) === searchKey ||
-                 cleanStr(u.name) === searchKey ||
-                 cleanStr(u.id) === searchKey;
+      window.showLoadingGuard('Đang xác thực thông tin Supabase Auth...');
+      try {
+        const { data, error } = await window.supabase.auth.signInWithPassword({
+          email: email,
+          password: password
         });
 
-        // Hỗ trợ từ khóa đặc biệt
-        if (!matched) {
-          if (searchKey.includes('admin')) {
-            matched = users.find(u => u.role === 'admin') || DEFAULT_USERS_DB[2];
-          } else if (searchKey.includes('partner') || searchKey.includes('hotel') || searchKey.includes('resort')) {
-            matched = users.find(u => u.role === 'b2b') || DEFAULT_USERS_DB[1];
-          } else {
-            // Tự động khởi tạo và lưu ngay tài khoản du khách từ thông tin nhập để khách đăng nhập thông suốt
-            matched = {
-              id: 'usr_auto_' + Date.now(),
-              name: rawId.includes('@') ? rawId.split('@')[0].toUpperCase() : ('DU KHÁCH ' + (rawId.length > 4 ? rawId.slice(-4) : rawId)),
-              email: rawId.includes('@') ? rawId : (rawId.replace(/\s+/g, '') + '@wandermatch.vn'),
-              phone: rawId.match(/^[0-9+ ]+$/) ? rawId : '0988 888 888',
-              bank: 'MB BANK — ' + rawId,
-              bankHolder: rawId.toUpperCase(),
-              cccd: '079201' + Math.floor(100000 + Math.random() * 900000),
-              tier: 'Du Khách Đã KYC',
-              avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80',
-              role: 'b2c',
-              password: rawPw || '123',
-              backupCode: 'WM-2026',
-              createdAt: new Date().toISOString()
-            };
-            users.push(matched);
-            saveUsersDB(users);
+        window.hideLoadingGuard();
+
+        if (error) {
+          if (typeof showToast === 'function') {
+            showToast('error', `❌ Đăng nhập thất bại: ${error.message || 'Tài khoản hoặc mật khẩu không chính xác'}`);
           }
+          return;
         }
-      }
 
-      window.currentUser = matched;
-      localStorage.setItem('wm_user_session', JSON.stringify(matched));
-      renderUserHeader();
-      closeAuthModal();
+        const sessionUser = data.user;
+        const meta = sessionUser.user_metadata || {};
+        const matched = {
+          id: sessionUser.id,
+          name: meta.full_name || email.split('@')[0].toUpperCase(),
+          email: sessionUser.email,
+          phone: meta.phone || '0988 888 888',
+          role: meta.role || 'b2c',
+          tier: meta.tier || 'Du Khách Đã KYC'
+        };
 
-      if (typeof showToast === 'function') {
-        showToast('success', `👋 Đăng nhập thành công! Chào mừng ${matched.name} (${matched.tier || 'Thành viên'}).`);
-      }
+        window.currentUser = matched;
+        localStorage.setItem('wm_user_session', JSON.stringify(matched));
+        renderUserHeader();
+        if (typeof closeAuthModal === 'function') closeAuthModal();
 
-      if (matched.role === 'b2b') {
-        window.switchTab('b2b');
-      } else if (matched.role === 'admin') {
-        window.switchTab('admin');
-      } else {
-        window.switchTab('b2c');
+        if (typeof showToast === 'function') {
+          showToast('success', `🎉 Đăng nhập thành công! Chào mừng ${matched.name}.`);
+        }
+
+        if (matched.role === 'b2b') window.switchTab('b2b');
+        else if (matched.role === 'admin') window.switchTab('admin');
+        else window.switchTab('b2c');
+
+      } catch (err) {
+        window.hideLoadingGuard();
+        if (typeof showToast === 'function') showToast('error', '❌ Lỗi Supabase: ' + err.message);
       }
     };
 
-    window.quickDemoLogin = function(role) {
-      const users = getUsersDB();
-      let user = users.find(u => u.role === (role === 'traveler' ? 'b2c' : role));
-      if (!user) {
-        user = role === 'partner' ? DEFAULT_USERS_DB[1] : (role === 'admin' ? DEFAULT_USERS_DB[2] : DEFAULT_USERS_DB[0]);
+    // =========================================================================
+    // 3. CODE CHỨC NĂNG ĐĂNG XUẤT (STRICT SUPABASE SIGN OUT)
+    // =========================================================================
+    window.handleLogout = async function() {
+      window.showLoadingGuard('Đang đăng xuất an toàn khỏi Supabase...');
+      try {
+        if (window.supabase && window.supabase.auth) {
+          await window.supabase.auth.signOut();
+        }
+      } catch (err) {
+        console.warn('Lỗi đăng xuất Supabase:', err);
       }
-      window.currentUser = user;
-      localStorage.setItem('wm_user_session', JSON.stringify(user));
-      renderUserHeader();
-      closeAuthModal();
-      if (typeof showToast === 'function') {
-        showToast('success', `⚡ Đã chuyển sang vai trò: ${user.name} (${user.tier})`);
-      }
-      if (user.role === 'b2b') {
-        window.switchTab('b2b');
-      } else if (user.role === 'admin') {
-        window.switchTab('admin');
-      } else {
-        window.switchTab('b2c');
-      }
-    };
 
-    window.handleLogout = function() {
-      // Đăng xuất tức thì, xóa phiên và chuyển ngay về Màn hình Đăng Nhập / Đăng Ký (Bảng To)
+      // XÓA SẠCH MỌI TRẠNG THÁI (STATE) CŨ ĐỂ TRÁNH RÒ RỈ DỮ LIỆU
       window.currentUser = null;
+      if (window.state) window.state.currentUser = null;
       localStorage.removeItem('wm_user_session');
+      localStorage.removeItem('wm_supabase_session');
+      localStorage.removeItem('sb-wandermatch-v3-auth-token');
+      sessionStorage.clear();
+
+      window.hideLoadingGuard();
       renderUserHeader();
       closeCustomerProfileModal();
       if (typeof closeAuthModal === 'function') closeAuthModal();
       if (typeof switchPortalTab === 'function') switchPortalTab('login');
 
       if (typeof showToast === 'function') {
-        showToast('info', '🚪 Quý khách đã đăng xuất an toàn! Đang hiển thị cổng đăng nhập hệ thống.');
+        showToast('info', '🚪 Quý khách đã đăng xuất an toàn! Đã xóa sạch dữ liệu phiên làm việc.');
       }
+
+      // ĐÁ VỀ MÀN HÌNH ĐĂNG NHẬP
+      setTimeout(() => {
+        openAuthModal('login');
+      }, 120);
     };
 
     window.handleLogoutAndSwitch = function() {
-      handleLogout();
-      setTimeout(() => {
-        openAuthModal('login');
-      }, 150);
+      window.handleLogout();
     };
+
+    // =========================================================================
+    // 4. BỘ LỌC BẢO VỆ TRANG (ROUTE GUARD / MIDDLEWARE)
+    // =========================================================================
+    window.protectRoute = async function(targetView) {
+      const protectedViews = ['admin', 'b2b', 'vietqr', 'scratch', 'profile'];
+      if (!protectedViews.includes(targetView)) {
+        return true;
+      }
+
+      window.showLoadingGuard('Đang xác thực quyền truy cập Supabase...');
+      try {
+        const { data: { session } } = await window.supabase.auth.getSession();
+        window.hideLoadingGuard();
+
+        if (!session) {
+          if (typeof showToast === 'function') {
+            showToast('warning', '🔒 Bạn cần đăng nhập tài khoản Supabase để truy cập trang này!');
+          }
+          openAuthModal('login');
+          return false;
+        }
+
+        const role = window.currentUser?.role || session.user.user_metadata?.role || 'b2c';
+        if (targetView === 'admin' && role !== 'admin') {
+          if (typeof showToast === 'function') showToast('error', '⛔ Chỉ quản trị viên mới có quyền vào trang Admin!');
+          return false;
+        }
+        if (targetView === 'b2b' && role !== 'b2b' && role !== 'admin') {
+          if (typeof showToast === 'function') showToast('error', '⛔ Chỉ đối tác lữ hành mới có quyền vào trang B2B!');
+          return false;
+        }
+
+        return true;
+      } catch (err) {
+        window.hideLoadingGuard();
+        openAuthModal('login');
+        return false;
+      }
+    };
+
 
     window.toggleUserDropdown = function(e) {
       if (e) e.stopPropagation();
@@ -8204,6 +8032,19 @@
         </button>
       </div>
     </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- SUPABASE AUTH ROUTE GUARD LOADING OVERLAY -->
+  <!-- ========================================================================= -->
+  <div id="auth-loading-guard" class="fixed inset-0 z-[99999] bg-slate-950/95 flex flex-col items-center justify-center space-y-4 backdrop-blur-md hidden transition-opacity duration-300">
+    <div class="relative flex items-center justify-center">
+      <div class="w-16 h-16 border-4 border-cyan-500/20 border-t-cyan-400 rounded-full animate-spin"></div>
+      <i class="fa-solid fa-shield-halved text-cyan-400 text-xl absolute"></i>
+    </div>
+    <p id="auth-loading-msg" class="text-white font-extrabold text-sm tracking-wide">Đang xác thực bảo mật Supabase Auth...</p>
+    <span class="text-xs text-slate-400 font-mono">Bảo vệ phiên đăng nhập &amp; kiểm tra phân quyền hệ thống</span>
   </div>
 
 </body>
