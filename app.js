@@ -3742,7 +3742,7 @@ let ESCROW_LEDGER = [
     type: "VIETQR_ESCROW_INFLOW",
     direction: "IN",
     amount: "5.000.000đ",
-    sender: "NGUYEN VAN AN (MBBank)",
+    sender: (window.currentUser ? window.currentUser.name : "HỘI VIÊN DU LỊCH") + " (VietQR Napas)",
     receiver: "CONG TY CP CONG NGHE DU LICH WANDERMATCH",
     status: "HELD_IN_ESCROW",
     time: "2026-10-20 10:14:22"
@@ -6027,13 +6027,11 @@ function setQuickBudget(amount) {
 function switchPlannerSection(sectionKey) {
   const secMap = {
     itins: document.getElementById('planner-sec-itins'),
-    deals: document.getElementById('planner-sec-deals'),
     pois: document.getElementById('planner-sec-pois'),
     guarantees: document.getElementById('planner-sec-guarantees')
   };
   const btnMap = {
     itins: document.getElementById('planner-tab-btn-itins'),
-    deals: document.getElementById('planner-tab-btn-deals'),
     pois: document.getElementById('planner-tab-btn-pois'),
     guarantees: document.getElementById('planner-tab-btn-guarantees')
   };
@@ -6789,7 +6787,7 @@ function renderRefundCalculator(selectedTier = 'TIER_1') {
         <div class="p-3 bg-cyan-950/40 rounded-xl border border-cyan-800/40 flex items-center justify-between">
           <div class="flex items-center gap-2 text-xs text-cyan-200">
             <i class="fa-solid fa-building-columns text-cyan-400"></i>
-            <span>Tự động chuyển qua Napas 247 tới: <strong>MBBank - 0388998899 (NGUYEN VAN AN)</strong></span>
+            <span>Tự động hoàn qua Napas 247 tới: <strong>STK Khách Hàng (Tự động liên kết từ giao dịch thanh toán hoặc mã QR)</strong></span>
           </div>
           <button onclick="executeRefundSimulation('${selectedTier}', ${refundAmount})" class="px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs shadow-lg transition">
             ⚡ Thực Thi Hoàn Tiền Ngay
@@ -6820,7 +6818,7 @@ function executeRefundSimulation(tier, amount) {
       direction: 'OUT',
       amount: `${amount.toLocaleString('vi-VN')}đ`,
       sender: "WANDERMATCH ESCROW",
-      receiver: "NGUYEN VAN AN (MBBank - 0388998899)",
+      receiver: (window.currentUser ? window.currentUser.name : "HỘI VIÊN KHÁCH HÀNG") + " (Napas 247)",
       status: "REFUNDED_TO_USER",
       time: new Date().toLocaleString()
     });
@@ -6841,7 +6839,7 @@ function simulateForceMajeure(level) {
         direction: 'OUT',
         amount: `${price.toLocaleString('vi-VN')}đ`,
         sender: "WANDERMATCH ESCROW",
-        receiver: "NGUYEN VAN AN (MBBank)",
+        receiver: (window.currentUser ? window.currentUser.name : "HỘI VIÊN KHÁCH HÀNG") + " (Napas 247)",
         status: "REFUNDED_TO_USER",
         time: new Date().toLocaleString()
       });
@@ -6859,7 +6857,7 @@ function simulateForceMajeure(level) {
         direction: 'OUT',
         amount: `${refund85.toLocaleString('vi-VN')}đ`,
         sender: "WANDERMATCH ESCROW",
-        receiver: "NGUYEN VAN AN (MBBank)",
+        receiver: (window.currentUser ? window.currentUser.name : "HỘI VIÊN KHÁCH HÀNG") + " (Napas 247)",
         status: "REFUNDED_TO_USER",
         time: new Date().toLocaleString()
       });
@@ -7044,7 +7042,7 @@ function simulateNapasVerification() {
               <i class="fa-solid fa-circle-check"></i> ACTIVE_VERIFIED (Napas 247)
             </div>
             <div class="text-slate-300 text-[11px] mt-0.5">
-              Chủ tài khoản: <strong>NGUYEN VAN AN</strong> (Trùng khớp 100% với CCCD)
+              Chủ tài khoản: <strong>Tài Khoản Khách Hàng</strong> (Tự động liên kết từ giao dịch VietQR hoặc Quét mã QR hoàn tiền)
             </div>
           </div>
           <span class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px] border border-emerald-500/40">
@@ -7147,7 +7145,7 @@ function simulateVietQrPayment() {
       type: "VIETQR_ESCROW_INFLOW",
       direction: "IN",
       amount: `${state.selectedBudget.toLocaleString('vi-VN')}đ`,
-      sender: "NGUYEN VAN AN (MBBank)",
+      sender: (window.currentUser ? window.currentUser.name : "HỘI VIÊN DU LỊCH") + " (VietQR Napas)",
       receiver: "CONG TY CP CONG NGHE DU LICH WANDERMATCH",
       status: "HELD_IN_ESCROW",
       time: new Date().toLocaleString()

@@ -710,13 +710,14 @@
 
           <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
             <div class="flex items-center gap-2 text-emerald-300 font-bold">
-              <i class="fa-solid fa-van-shuttle text-sm"></i>
-              <span>3. Xe Trung Chuyển Sân Bay 2 Chiều</span>
+              <i class="fa-solid fa-couch text-sm"></i>
+              <span>3. Dịch Vụ Phòng Chờ Lên Xe &amp; Đưa Đón VIP</span>
             </div>
             <ul class="space-y-1 text-slate-300 text-[11px]">
-              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Xe riêng hoặc Limousine cao cấp đón tiễn sân bay</li>
-              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Đưa đón tận sảnh khách sạn không cần chờ đợi</li>
-              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Tài xế lịch sự, hỗ trợ mang vác hành lý</li>
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Đón tiếp chu đáo tại sảnh khách sạn &amp; nhà xe với nhân viên hỗ trợ</li>
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Phòng chờ VIP tiện nghi: phục vụ bánh ngọt, trái cây, trà &amp; cà phê miễn phí</li>
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Ghế bọc da massage, điều hòa mát mẻ, wifi tốc độ cao, hỗ trợ hành lý</li>
+              <li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i> Xe riêng hoặc Limousine cao cấp đón tiễn tận nơi không cần chờ đợi</li>
             </ul>
           </div>
 
@@ -765,17 +766,13 @@
             <i class="fa-solid fa-wand-magic-sparkles"></i>
             <span>1. Lịch Trình Chi Tiết</span>
           </button>
-          <button id="planner-tab-btn-deals" type="button" onclick="switchPlannerSection('deals')" class="planner-tab-btn px-4 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center gap-2">
-            <i class="fa-solid fa-bolt text-amber-400"></i>
-            <span>2. Chuyến Đi Đề Xuất</span>
-          </button>
           <button id="planner-tab-btn-pois" type="button" onclick="switchPlannerSection('pois')" class="planner-tab-btn px-4 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center gap-2">
             <i class="fa-solid fa-utensils text-emerald-400"></i>
-            <span>3. Ẩm Thực &amp; Trải Nghiệm</span>
+            <span>2. Ẩm Thực &amp; Trải Nghiệm</span>
           </button>
           <button id="planner-tab-btn-guarantees" type="button" onclick="switchPlannerSection('guarantees')" class="planner-tab-btn px-4 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center gap-2">
             <i class="fa-solid fa-shield-halved text-cyan-400"></i>
-            <span>4. Tiện Ích &amp; Tiêu Chuẩn</span>
+            <span>3. Tiện Ích &amp; Tiêu Chuẩn</span>
           </button>
         </div>
         <div class="hidden lg:flex items-center gap-2 text-xs font-mono text-cyan-300 pr-2">
@@ -806,7 +803,7 @@
             </div>
 
             <h2 id="dest-title-text" class="text-2xl lg:text-3xl font-extrabold text-white tracking-tight glow-cyan">
-              Chào mừng quý khách đến với TP. Hồ Chí Minh 🌲
+              🎲 Hành Trình Du Lịch Mù Bí Mật (WanderMatch AI Tuyển Chọn)
             </h2>
 
             <div class="mt-2.5 flex flex-wrap items-center gap-3 text-xs font-semibold text-cyan-200">
@@ -895,129 +892,6 @@
       <!-- ======================================================================
            PHẦN 2: CHUYẾN ĐI ĐỀ XUẤT THỰC TẾ (ĐẶT NHANH)
            ====================================================================== -->
-      <div id="planner-sec-deals" class="space-y-4 hidden animate-fadeIn">
-        <div class="flex flex-wrap items-center justify-between gap-2 p-4 rounded-2xl bg-slate-900/80 border border-amber-500/30">
-          <div class="flex items-center gap-2">
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 uppercase tracking-wider shadow">
-              ⚡ CHUYẾN ĐI TIÊU BIỂU
-            </span>
-            <h3 class="text-sm lg:text-base font-extrabold text-white">
-              Các Hành Trình Trọn Gói Được Yêu Thích Nhất
-            </h3>
-          </div>
-          <span class="text-[11px] text-cyan-300 font-bold flex items-center gap-1">
-            <i class="fa-solid fa-circle-check text-emerald-400"></i> Khách sạn 4-5 sao, xe đưa đón và trải nghiệm bản địa trọn gói
-          </span>
-        </div>
-
-        <!-- 3 Featured Packages Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          
-          <!-- Gói 1: Măng Đen / Núi Rừng -->
-          <div class="p-4 rounded-2xl bg-slate-900/90 border border-cyan-500/40 hover:border-cyan-400 transition shadow-xl space-y-3 flex flex-col justify-between group">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-cyan-950 text-cyan-300 border border-cyan-700">
-                  🏔️ MĂNG ĐEN • 3N2Đ
-                </span>
-                <span class="text-[10px] font-mono text-emerald-400 font-bold">Đánh giá 9.6/10</span>
-              </div>
-              <h4 class="text-sm font-extrabold text-white group-hover:text-cyan-300 transition">
-                Kỳ Nghỉ Dưỡng Rừng Thông &amp; Không Khí Se Lạnh (3N2Đ)
-              </h4>
-              <div class="text-[11px] text-slate-300 space-y-1">
-                <div class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-cyan-400 text-[10px]"></i> Điểm đến: <strong>Măng Đen (Kon Tum)</strong></div>
-                <div class="flex items-center gap-1.5"><i class="fa-solid fa-hotel text-amber-400 text-[10px]"></i> Lưu trú: <strong>Golden Boutique Hotel (4 Sao)</strong></div>
-                <div class="flex items-center gap-1.5"><i class="fa-solid fa-van-shuttle text-emerald-400 text-[10px]"></i> Di chuyển: <strong>Xe Limousine VIP Tuấn Tú đón tận nơi</strong></div>
-              </div>
-            </div>
-
-            <div class="pt-2 border-t border-slate-800 space-y-2">
-              <div class="flex items-baseline justify-between">
-                <div>
-                  <span class="text-[10px] text-slate-400">Trọn gói 1 khách</span>
-                  <div class="text-base font-black text-emerald-400 font-mono">3.200.000 VNĐ</div>
-                </div>
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-700">Giá Trọn Gói</span>
-              </div>
-              <button type="button" onclick="openQuickCheckout('pkg_mangden')" class="w-full py-2.5 rounded-xl btn-glow-cyan text-slate-950 font-black text-xs shadow transition flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-paper-plane"></i>
-                <span>Đặt Chuyến Đi Này</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Gói 2: Phú Quốc / Biển Đảo -->
-          <div class="p-4 rounded-2xl bg-slate-900/90 border border-amber-500/40 hover:border-amber-400 transition shadow-xl space-y-3 flex flex-col justify-between group">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-amber-950 text-amber-300 border border-amber-700">
-                  🏖️ PHÚ QUỐC • 3N2Đ
-                </span>
-                <span class="text-[10px] font-mono text-amber-400 font-bold">Đánh giá 9.8/10</span>
-              </div>
-              <h4 class="text-sm font-extrabold text-white group-hover:text-amber-300 transition">
-                Nghỉ Dưỡng Resort Biển Hoàng Hôn Sunset (3N2Đ)
-              </h4>
-              <div class="text-[11px] text-slate-300 space-y-1">
-                <div class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-cyan-400 text-[10px]"></i> Điểm đến: <strong>Đảo Ngọc Phú Quốc (Kiên Giang)</strong></div>
-                <div class="flex items-center gap-1.5"><i class="fa-solid fa-hotel text-amber-400 text-[10px]"></i> Lưu trú: <strong>Sunset Sanato Resort &amp; Villas (4-5 Sao)</strong></div>
-                <div class="flex items-center gap-1.5"><i class="fa-solid fa-plane text-emerald-400 text-[10px]"></i> Di chuyển: <strong>Vé máy bay khứ hồi Vietnam Airlines / Vietjet</strong></div>
-              </div>
-            </div>
-
-            <div class="pt-2 border-t border-slate-800 space-y-2">
-              <div class="flex items-baseline justify-between">
-                <div>
-                  <span class="text-[10px] text-slate-400">Trọn gói 1 khách</span>
-                  <div class="text-base font-black text-amber-300 font-mono">5.000.000 VNĐ</div>
-                </div>
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-700">Giá Trọn Gói</span>
-              </div>
-              <button type="button" onclick="openQuickCheckout('pkg_phuquoc')" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-xs shadow transition flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-paper-plane"></i>
-                <span>Đặt Chuyến Đi Này</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Gói 3: Đà Lạt / Sương Mù -->
-          <div class="p-4 rounded-2xl bg-slate-900/90 border border-emerald-500/40 hover:border-emerald-400 transition shadow-xl space-y-3 flex flex-col justify-between group">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-700">
-                  🌲 ĐÀ LẠT • 2N1Đ
-                </span>
-                <span class="text-[10px] font-mono text-emerald-400 font-bold">Đánh giá 9.5/10</span>
-              </div>
-              <h4 class="text-sm font-extrabold text-white group-hover:text-emerald-300 transition">
-                Hành Trình Săn Mây &amp; Cafe Thung Lũng Sương (2N1Đ)
-              </h4>
-              <div class="text-[11px] text-slate-300 space-y-1">
-                <div class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-cyan-400 text-[10px]"></i> Điểm đến: <strong>Đà Lạt (Lâm Đồng)</strong></div>
-                <div class="flex items-center gap-1.5"><i class="fa-solid fa-hotel text-amber-400 text-[10px]"></i> Lưu trú: <strong>Ana Mandara Villas Dalat Resort &amp; Spa (5 Sao)</strong></div>
-                <div class="flex items-center gap-1.5"><i class="fa-solid fa-van-shuttle text-emerald-400 text-[10px]"></i> Di chuyển: <strong>Xe Limousine phòng riêng Thành Bưởi đón tận nơi</strong></div>
-              </div>
-            </div>
-
-            <div class="pt-2 border-t border-slate-800 space-y-2">
-              <div class="flex items-baseline justify-between">
-                <div>
-                  <span class="text-[10px] text-slate-400">Trọn gói 1 khách</span>
-                  <div class="text-base font-black text-emerald-300 font-mono">1.850.000 VNĐ</div>
-                </div>
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-700">Giá Trọn Gói</span>
-              </div>
-              <button type="button" onclick="openQuickCheckout('pkg_dalat')" class="w-full py-2.5 rounded-xl btn-glow-emerald text-white font-black text-xs shadow transition flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-paper-plane"></i>
-                <span>Đặt Chuyến Đi Này</span>
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
       <!-- ======================================================================
            PHẦN 3: ẨM THỰC ĐẶC SẢN & ĐIỂM VUI CHƠI KÈM GIÁ VÉ
            ====================================================================== -->
@@ -1504,7 +1378,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label class="block text-slate-300 font-bold mb-1">Email nhận vé &amp; biên lai Escrow:</label>
-                <input id="cw-email" type="email" required value="nguyenvanan@wandermatch.vn" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs font-medium">
+                <input id="cw-email" type="email" required placeholder="VD: yourname@gmail.com" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs font-medium">
               </div>
               <div>
                 <label class="block text-slate-300 font-bold mb-1">Họ và tên trên CCCD (Tự động đồng bộ sang STK):</label>
@@ -5038,7 +4912,7 @@
     // ==========================================================================
     async function createCloudBlindBooking(e) {
       if (e) e.preventDefault();
-      const email = document.getElementById('cw-email')?.value.trim() || 'nguyenvanan@wandermatch.vn';
+      const email = document.getElementById('cw-email')?.value.trim() || (window.currentUser?.email || 'khachhang@wandermatch.vn');
       const fullName = document.getElementById('cw-fullname')?.value.trim() || 'Hội Viên Khách Hàng';
       const cccd = document.getElementById('cw-cccd')?.value.trim() || '079095012345';
       const bankCode = document.getElementById('cw-bank-code')?.value || 'MB';
