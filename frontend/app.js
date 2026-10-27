@@ -473,7 +473,8 @@ window.executeOTABlindAlgorithms = function(payload, recordHistory = true) {
       // Đảm bảo tuyệt đối simScore nằm trong khoảng 94.0% - 99.5%, KHÔNG BAO GIỜ BẰNG 0%
       simScore = Math.min(99.5, Math.max(94.0, Math.round(simScore * 10) / 10));
 
-      const budgetUtilization = Math.min(100, Math.max(92, Math.round((comboCostPerPerson / budgetVnd) * 1000) / 10));
+      const totalComboCost = comboCostPerPerson * groupSize;
+      const budgetUtilization = Math.min(100, Math.max(88, Math.round((totalComboCost / budgetVnd) * 1000) / 10));
       const ratingScore = (hotel.rating / 5.0) * 100;
       const utilityScore = Math.round(((simScore * 0.50) + (ratingScore * 0.30) + (budgetUtilization * 0.20)) * 10) / 10;
 
@@ -863,23 +864,52 @@ window.goToStep = function(stepNum) {
 
 window.collectUserPayload = function() {
   const user = window.currentUser || {};
+  const origin = document.getElementById("planner-origin-select")?.value || "hochiminh";
+  const budgetRaw = document.getElementById("planner-budget-input")?.value || document.getElementById("cw-budget-vnd")?.value || 4800000;
+  const pax = Number(document.getElementById("planner-pax-select")?.value || document.getElementById("cw-group-size")?.value || 2);
+  const dur = document.getElementById("planner-dur-select")?.value || "3d2n";
+  let style = document.getElementById("planner-style-select")?.value || "healing";
+  let dining = document.getElementById("planner-dining-select")?.value || "Ẩm thực bản địa & hải sản tươi sống";
+  const prevNotes = document.getElementById("planner-prev-notes")?.value || "";
+
+  const userPrefs = window.currentSelectedPrefs || user.preferences || {};
+  let focusKeywords = "";
+  if (userPrefs.focus === 'BEACH_SUNSET') {
+    focusKeywords += " biển hoàng hôn bãi biển nắng ấm hải sản tươi sống";
+  } else if (userPrefs.focus === 'MOUNTAIN_CHILL') {
+    focusKeywords += " cao nguyên sương mù rừng thông núi cao";
+  } else if (userPrefs.focus === 'HERITAGE_CULTURE') {
+    focusKeywords += " di sản văn hóa cố đô truyền thống";
+    style = 'culture';
+  } else if (userPrefs.focus === 'FOOD_EXPLORE') {
+    focusKeywords += " ẩm thực bản địa ăn sập chợ đêm";
+    style = 'food';
+  } else if (userPrefs.focus === 'ADVENTURE_NATURE') {
+    focusKeywords += " khám phá mạo hiểm trekking rừng thác";
+    style = 'nature';
+  }
+
   return {
+    origin: origin,
     email: document.getElementById("cw-email")?.value?.trim() || document.getElementById("custEmail")?.value?.trim() || user.email || "khachhang@wandermatch.vn",
     fullName: document.getElementById("cw-fullname")?.value?.trim() || document.getElementById("custName")?.value?.trim() || user.name || "Khách Hàng Du Lịch",
     cccd: document.getElementById("cw-cccd")?.value?.trim() || document.getElementById("custCCCD")?.value?.trim() || user.cccd || "001206012345",
     bankCode: document.getElementById("cw-bank-code")?.value || document.getElementById("custBankCode")?.value || "MB",
     bankAccount: document.getElementById("cw-bank-account")?.value?.trim() || document.getElementById("custBankAcc")?.value?.trim() || "",
     bankAccountHolder: document.getElementById("cw-bank-holder")?.value?.trim() || document.getElementById("custBankHolder")?.value?.trim() || user.name || "KHACH HANG DU LICH",
-    budgetVnd: Number(document.getElementById("cw-budget-vnd")?.value || document.getElementById("budgetInput")?.value || 5000000),
-    groupSize: Number(document.getElementById("cw-group-size")?.value || document.getElementById("groupSizeInput")?.value || 1),
-    customPrompt: document.getElementById("customAIPrompt")?.value || "",
+    budgetVnd: Number(budgetRaw),
+    groupSize: pax,
+    duration: dur,
+    style: style,
+    dining: dining,
+    customPrompt: `${style} ${dining} ${prevNotes} ${focusKeywords}`.trim(),
     blacklistedCities: (typeof document !== 'undefined' && document.querySelectorAll ? Array.from(document.querySelectorAll('input[name="cw-blacklist"]:checked')).map(el => el.value) : []).concat((document.getElementById("blacklistInput")?.value || "").split(",").map(s => s.trim()).filter(Boolean)),
     personaVector: {
-      healing: Number(document.getElementById("cw-vec-healing")?.value || document.getElementById("qHealing")?.value || 85),
-      nature: Number(document.getElementById("cw-vec-nature")?.value || document.getElementById("qNature")?.value || 90),
+      healing: (style === 'healing' || userPrefs.focus === 'MOUNTAIN_CHILL') ? 95 : Number(document.getElementById("cw-vec-healing")?.value || document.getElementById("qHealing")?.value || 85),
+      nature: (style === 'nature' || userPrefs.focus === 'ADVENTURE_NATURE') ? 95 : Number(document.getElementById("cw-vec-nature")?.value || document.getElementById("qNature")?.value || 90),
       solitude: Number(document.getElementById("cw-vec-solitude")?.value || document.getElementById("qSolitude")?.value || 80),
-      comfort: Number(document.getElementById("cw-vec-comfort")?.value || document.getElementById("qComfort")?.value || 90),
-      culture: Number(document.getElementById("cw-vec-culture")?.value || document.getElementById("qCulture")?.value || 75)
+      comfort: (style === 'luxury' || userPrefs.focus === 'BEACH_SUNSET') ? 95 : Number(document.getElementById("cw-vec-comfort")?.value || document.getElementById("qComfort")?.value || 90),
+      culture: (style === 'culture' || userPrefs.focus === 'HERITAGE_CULTURE') ? 95 : Number(document.getElementById("cw-vec-culture")?.value || document.getElementById("qCulture")?.value || 75)
     }
   };
 };
@@ -1153,11 +1183,12 @@ window.runAISensitivityTest = function() {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-
-  window.updateSliders();
-
-  window.previewAIRecommendation();
-
+  if (typeof window.updateSliders === 'function') window.updateSliders();
+  if (typeof window.attachPlannerReactiveListeners === 'function') {
+    window.attachPlannerReactiveListeners();
+  } else if (typeof handleGeneratePlan === 'function') {
+    handleGeneratePlan(false);
+  }
 });
 
 
@@ -1631,6 +1662,9 @@ window.spinLuckyWheel = function() {
 // CẨM NANG DU LỊCH & MẸO BẢN ĐỊA (MINI WIDGET MODAL)
 // ============================================================================
 window.openTravelGuideModal = function() {
+  if (typeof renderAntiTrapSpots === 'function') {
+    renderAntiTrapSpots();
+  }
   const m = document.getElementById('travel-guide-modal');
   if (m) m.classList.remove('hidden');
 };
@@ -6077,9 +6111,6 @@ function handleGeneratePlan(shouldScroll = false) {
   const budgetRaw = document.getElementById('planner-budget-input')?.value || '4800000';
   const pax = Number(document.getElementById('planner-pax-select')?.value || '2');
   const dur = document.getElementById('planner-dur-select')?.value || '3d2n';
-  const style = document.getElementById('planner-style-select')?.value || 'healing';
-  const dining = document.getElementById('planner-dining-select')?.value || 'Ẩm thực bản địa & hải sản tươi sống';
-  const prevNotes = document.getElementById('planner-prev-notes')?.value || '';
 
   const numBudget = Number(budgetRaw);
   if (!numBudget || numBudget < 1000000 || Math.round(numBudget) % 2 !== 0 || Math.round(numBudget) % 100 !== 0) {
@@ -6093,22 +6124,54 @@ function handleGeneratePlan(shouldScroll = false) {
   }
 
   const nights = dur === '2d1n' ? 1 : (dur === '4d3n' ? 3 : 2);
-  state.selectedBudget = numBudget;
-  state.selectedPax = pax;
-  state.selectedDuration = dur;
+  if (typeof state !== 'undefined') {
+    state.selectedBudget = numBudget;
+    state.selectedPax = pax;
+    state.selectedDuration = dur;
+  }
+  if (typeof window.state !== 'undefined') {
+    window.state.selectedBudget = numBudget;
+    window.state.selectedPax = pax;
+    window.state.selectedDuration = dur;
+  }
+
+  let style = document.getElementById('planner-style-select')?.value || 'healing';
+  let dining = document.getElementById('planner-dining-select')?.value || 'Ẩm thực bản địa & hải sản tươi sống';
+  const prevNotes = document.getElementById('planner-prev-notes')?.value || '';
+
+  // Kết hợp sở thích cá nhân nếu có từ khảo sát
+  const userPrefs = window.currentSelectedPrefs || (window.currentUser && window.currentUser.preferences) || {};
+  let focusKeywords = "";
+  if (userPrefs.focus === 'BEACH_SUNSET') {
+    focusKeywords += " biển hoàng hôn bãi biển nắng ấm hải sản tươi sống";
+  } else if (userPrefs.focus === 'MOUNTAIN_CHILL') {
+    focusKeywords += " cao nguyên sương mù rừng thông núi cao";
+  } else if (userPrefs.focus === 'HERITAGE_CULTURE') {
+    focusKeywords += " di sản văn hóa cố đô truyền thống";
+    style = 'culture';
+  } else if (userPrefs.focus === 'FOOD_EXPLORE') {
+    focusKeywords += " ẩm thực bản địa ăn sập chợ đêm";
+    style = 'food';
+  } else if (userPrefs.focus === 'ADVENTURE_NATURE') {
+    focusKeywords += " khám phá mạo hiểm trekking rừng thác";
+    style = 'nature';
+  }
 
   // Run Dual-Core OTA Knapsack + Cosine + Tabu Anti-Repetition Engine
   const payload = {
     origin: origin,
     budgetVnd: numBudget,
     groupSize: pax,
-    customPrompt: `${style} ${dining} ${prevNotes}`.trim(),
+    duration: dur,
+    style: style,
+    dining: dining,
+    customPrompt: `${style} ${dining} ${prevNotes} ${focusKeywords}`.trim(),
     personaVector: {
-      healing: style === 'healing' ? 95 : 85,
-      nature: style === 'nature' ? 95 : 80,
+      healing: (style === 'healing' || userPrefs.focus === 'MOUNTAIN_CHILL') ? 95 : 85,
+      nature: (style === 'nature' || userPrefs.focus === 'ADVENTURE_NATURE') ? 95 : 80,
       solitude: style === 'solitude' ? 95 : 75,
-      comfort: style === 'luxury' ? 95 : 80,
-      culture: style === 'culture' ? 95 : 70
+      comfort: (style === 'luxury' || userPrefs.focus === 'BEACH_SUNSET') ? 95 : 80,
+      culture: (style === 'culture' || userPrefs.focus === 'HERITAGE_CULTURE') ? 95 : 70
     }
   };
 
@@ -6138,6 +6201,54 @@ function handleGeneratePlan(shouldScroll = false) {
     }
   }
 }
+
+// ============================================================================
+// REACTIVE EVENT LISTENERS FOR B2C PLANNER INPUTS
+// ============================================================================
+window.attachPlannerReactiveListeners = function() {
+  const inputIds = [
+    'planner-origin-select',
+    'planner-budget-input',
+    'planner-pax-select',
+    'planner-dur-select',
+    'planner-style-select',
+    'planner-dining-select',
+    'planner-prev-notes'
+  ];
+
+  let debounceTimer = null;
+  const triggerDebouncedPlan = () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      try {
+        if (typeof handleGeneratePlan === 'function') {
+          handleGeneratePlan(false);
+        }
+      } catch (err) {
+        console.warn("Reactive plan recalculation error:", err);
+      }
+    }, 180);
+  };
+
+  inputIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('change', triggerDebouncedPlan);
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+      el.addEventListener('input', triggerDebouncedPlan);
+    }
+  });
+
+  // Tự động kích hoạt thuật toán ngay lần đầu tiên mở trang
+  try {
+    if (typeof handleGeneratePlan === 'function') {
+      handleGeneratePlan(false);
+    }
+  } catch (err) {
+    console.warn("Initial plan auto-trigger error:", err);
+  }
+};
+
 
 // ============================================================================
 // 5. RENDER 3 ITINERARIES
