@@ -5,32 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WanderMatch — Đặt Chuyến Du Lịch Bí Mật & Tối Ưu Ngân Sách</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; background: #070B14; color: #F8FAFC; }
-    .glass { background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    .glass { background: rgba(15, 23, 42, 0.82); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
     button, input, select { pointer-events: auto !important; }
     button { cursor: pointer; }
   </style>
 </head>
 <body class="min-h-screen pb-20">
-  <!-- HEADER -->
   <header class="border-b border-white/10 bg-slate-950/95 sticky top-0 z-40 backdrop-blur-md">
     <div class="max-w-6xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-2.5">
         <div class="w-8 h-8 rounded-xl bg-teal-500 flex items-center justify-center font-extrabold text-slate-950">W</div>
         <span class="font-extrabold text-lg tracking-tight text-white">WANDER<span class="text-teal-400">MATCH</span></span>
       </div>
-
       <nav class="flex flex-wrap items-center gap-2">
-        <button id="btn-tab-b2c" onclick="window.switchTab('b2c')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-teal-500 text-slate-950">Đặt Chuyến Đi</button>
-        <button id="btn-tab-saved" onclick="window.switchTab('saved')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-200 border border-white/10">
-          Chuyến Đi Của Tôi (<span id="lblSavedCount">0</span>)
-        </button>
+        <button id="btn-tab-b2c" onclick="window.switchTab('b2c')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-teal-500 text-slate-950">Khám Phá & Đặt Chuyến</button>
+        <button id="btn-tab-saved" onclick="window.switchTab('saved')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-200 border border-white/10">Chuyến Đi Của Tôi (<span id="lblSavedCount">0</span>)</button>
         <button id="btn-tab-b2b" onclick="window.switchTab('b2b')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-300">Đối Tác Resort</button>
       </nav>
-
-      <!-- KHU VỰC TÀI KHOẢN -->
       <div>
         <div id="authLoggedOutBox" class="flex items-center gap-2">
           <button onclick="window.openAuthModal('login')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white">Đăng Nhập</button>
@@ -47,152 +41,81 @@
     </div>
   </header>
 
-  <!-- MODAL ĐĂNG NHẬP / ĐĂNG KÝ RIÊNG BIỆT -->
   <div id="authModal" style="display:none;" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-white/15 rounded-2xl max-w-md w-full p-6 space-y-4 text-xs shadow-2xl">
       <div class="flex justify-between items-center border-b border-white/10 pb-3">
         <div class="flex gap-2">
           <button id="tabBtnLogin" onclick="window.switchAuthMode('login')" class="px-4 py-2 rounded-xl font-extrabold bg-teal-500 text-slate-950">Đăng Nhập</button>
-          <button id="tabBtnRegister" onclick="window.switchAuthMode('register')" class="px-4 py-2 rounded-xl font-bold bg-white/5 text-slate-300">Đăng Ký Tài Khoản</button>
+          <button id="tabBtnRegister" onclick="window.switchAuthMode('register')" class="px-4 py-2 rounded-xl font-bold bg-white/5 text-slate-300">Đăng Ký Mới</button>
         </div>
         <button onclick="window.closeAuthModal()" class="text-slate-400 hover:text-white font-bold text-base px-2">✕</button>
       </div>
-
       <div id="authErrorBox" style="display:none;" class="p-3 rounded-xl bg-rose-500/20 border border-rose-500/50 text-rose-300 font-semibold"></div>
-
-      <!-- FORM ĐĂNG NHẬP -->
       <form id="formLogin" onsubmit="event.preventDefault(); window.submitLogin();" class="space-y-3">
-        <div>
-          <label class="text-slate-300 font-semibold block mb-1">Email đã đăng ký</label>
-          <input id="loginEmail" type="email" required placeholder="ten-cua-ban@gmail.com" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" />
-        </div>
-        <div>
-          <label class="text-slate-300 font-semibold block mb-1">Mật khẩu</label>
-          <input id="loginPass" type="password" required placeholder="Nhập mật khẩu" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" />
-        </div>
+        <div><label class="text-slate-300 font-semibold block mb-1">Địa chỉ Email</label><input id="loginEmail" type="email" required placeholder="Nhập email đã đăng ký" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" /></div>
+        <div><label class="text-slate-300 font-semibold block mb-1">Mật khẩu</label><input id="loginPass" type="password" required placeholder="Nhập mật khẩu" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" /></div>
         <button type="submit" class="w-full py-3 rounded-xl font-extrabold text-sm bg-teal-500 hover:bg-teal-400 text-slate-950">Đăng Nhập</button>
       </form>
-
-      <!-- FORM ĐĂNG KÝ -->
       <form id="formRegister" style="display:none;" onsubmit="event.preventDefault(); window.submitRegister();" class="space-y-3">
-        <div>
-          <label class="text-slate-300 font-semibold block mb-1">Họ và tên đầy đủ</label>
-          <input id="regName" type="text" required placeholder="Ví dụ: Nguyễn Văn A" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" />
-        </div>
-        <div>
-          <label class="text-slate-300 font-semibold block mb-1">Địa chỉ Email</label>
-          <input id="regEmail" type="email" required placeholder="ten-cua-ban@gmail.com" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" />
-        </div>
+        <div><label class="text-slate-300 font-semibold block mb-1">Họ và tên hành khách</label><input id="regName" type="text" required placeholder="Nhập họ và tên đầy đủ" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" /></div>
+        <div><label class="text-slate-300 font-semibold block mb-1">Địa chỉ Email hợp lệ</label><input id="regEmail" type="email" required placeholder="ví dụ: tenban@gmail.com" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" /></div>
         <div class="grid grid-cols-2 gap-2.5">
-          <div>
-            <label class="text-slate-300 font-semibold block mb-1">Mật khẩu (>= 6 ký tự)</label>
-            <input id="regPass" type="password" required placeholder="Tối thiểu 6 ký tự" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2.5 text-white" />
-          </div>
-          <div>
-            <label class="text-slate-300 font-semibold block mb-1">Nhập lại mật khẩu</label>
-            <input id="regPassConfirm" type="password" required placeholder="Xác nhận lại" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2.5 text-white" />
-          </div>
+          <div><label class="text-slate-300 font-semibold block mb-1">Mật khẩu (>= 6 ký tự)</label><input id="regPass" type="password" required placeholder="Tối thiểu 6 ký tự" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" /></div>
+          <div><label class="text-slate-300 font-semibold block mb-1">Xác nhận mật khẩu</label><input id="regPassConfirm" type="password" required placeholder="Nhập lại mật khẩu" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" /></div>
         </div>
-        <button type="submit" class="w-full py-3 rounded-xl font-extrabold text-sm bg-teal-500 hover:bg-teal-400 text-slate-950">Tạo Tài Khoản</button>
+        <button type="submit" class="w-full py-3 rounded-xl font-extrabold text-sm bg-teal-500 hover:bg-teal-400 text-slate-950">Tạo Tài Khoản Mới</button>
       </form>
     </div>
   </div>
 
-  <!-- TAB 1: LUỒNG ĐẶT CHUYẾN ĐI BÍ MẬT (4 BƯỚC) -->
   <main id="tab-b2c" style="display:block;" class="max-w-6xl mx-auto px-4 mt-6 space-y-6">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-      <button id="step-nav-1" onclick="window.goToStep(1)" class="p-3.5 rounded-2xl border border-teal-400 bg-teal-500/15 text-left">
-        <span class="text-[10px] uppercase text-teal-300 font-bold block">Bước 01</span>
-        <strong class="text-xs text-white">Ngân Sách & Sở Thích</strong>
-      </button>
-      <button id="step-nav-2" onclick="window.goToStep(2)" class="p-3.5 rounded-2xl border border-white/10 bg-slate-900/60 text-left">
-        <span class="text-[10px] uppercase text-slate-400 font-bold block">Bước 02</span>
-        <strong class="text-xs text-white">Hành Khách & VietQR</strong>
-      </button>
-      <button id="step-nav-3" onclick="window.goToStep(3)" class="p-3.5 rounded-2xl border border-white/10 bg-slate-900/60 text-left">
-        <span class="text-[10px] uppercase text-slate-400 font-bold block">Bước 03</span>
-        <strong class="text-xs text-white">Hành Lý & Hoàn Hủy</strong>
-      </button>
-      <button id="step-nav-4" onclick="window.goToStep(4)" class="p-3.5 rounded-2xl border border-white/10 bg-slate-900/60 text-left">
-        <span class="text-[10px] uppercase text-slate-400 font-bold block">Bước 04</span>
-        <strong class="text-xs text-white">Mở Khóa Điểm Đến</strong>
-      </button>
+      <button id="step-nav-1" onclick="window.goToStep(1)" class="p-3.5 rounded-2xl border border-teal-400 bg-teal-500/15 text-left"><span class="text-[10px] uppercase text-teal-300 font-bold block">Bước 01</span><strong class="text-xs text-white">Ngân Sách & Sở Thích</strong></button>
+      <button id="step-nav-2" onclick="window.goToStep(2)" class="p-3.5 rounded-2xl border border-white/10 bg-slate-900/60 text-left"><span class="text-[10px] uppercase text-slate-400 font-bold block">Bước 02</span><strong class="text-xs text-white">Hành Khách & VietQR</strong></button>
+      <button id="step-nav-3" onclick="window.goToStep(3)" class="p-3.5 rounded-2xl border border-white/10 bg-slate-900/60 text-left"><span class="text-[10px] uppercase text-slate-400 font-bold block">Bước 03</span><strong class="text-xs text-white">Hành Lý & Hoàn Hủy</strong></button>
+      <button id="step-nav-4" onclick="window.goToStep(4)" class="p-3.5 rounded-2xl border border-white/10 bg-slate-900/60 text-left"><span class="text-[10px] uppercase text-slate-400 font-bold block">Bước 04</span><strong class="text-xs text-white">Mở Khóa Điểm Đến</strong></button>
     </div>
 
-    <!-- BƯỚC 1 -->
     <section id="step-panel-1" style="display:block;" class="glass rounded-3xl p-6 space-y-6">
       <div class="flex flex-wrap justify-between items-center gap-2 border-b border-white/10 pb-4">
-        <div>
-          <h1 class="text-xl font-extrabold text-white">Tìm Kiếm Gói Du Lịch Bí Mật Tối Ưu Ngân Sách</h1>
-          <p class="text-xs text-slate-400">Hệ thống tự động ghép cặp Vé máy bay khứ hồi + Resort 4-5 sao khớp với ngân sách của bạn.</p>
-        </div>
-        <span id="slaRetailGuarantee" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-amber-500/15 text-amber-300 border border-amber-400/30">Giá trị thực >= 6.250.000đ</span>
+        <div><h1 class="text-xl font-extrabold text-white">Thiết Kế Chuyến Du Lịch Bí Mật Của Bạn</h1><p class="text-xs text-slate-400">Chọn ngân sách và phong cách trải nghiệm. Hệ thống tự động tối ưu Vé máy bay khứ hồi + Resort 4-5 sao.</p></div>
+        <span id="slaRetailGuarantee" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-amber-500/15 text-amber-300 border border-amber-400/30">Giá trị cam kết >= 6.250.000đ</span>
       </div>
-
       <div class="grid md:grid-cols-2 gap-6 text-xs">
         <div class="space-y-3.5 bg-slate-950/60 p-5 rounded-2xl border border-white/10">
-          <h3 class="font-bold text-sm text-teal-400">1. Phong cách trải nghiệm mong muốn</h3>
+          <h3 class="font-bold text-sm text-teal-400">1. Phong cách trải nghiệm ưu tiên</h3>
           <div><div class="flex justify-between mb-1"><span>Náo nhiệt</span><strong id="lblHealing" class="text-teal-400">Nghỉ dưỡng & Chữa lành: 85%</strong></div><input id="qHealing" type="range" min="10" max="100" value="85" oninput="window.onFormChange()" class="w-full accent-teal-400" /></div>
           <div><div class="flex justify-between mb-1"><span>Đô thị</span><strong id="lblNature" class="text-teal-400">Thiên nhiên Biển / Rừng: 90%</strong></div><input id="qNature" type="range" min="10" max="100" value="90" oninput="window.onFormChange()" class="w-full accent-teal-400" /></div>
-          <div><div class="flex justify-between mb-1"><span>Đông đúc</span><strong id="lblSolitude" class="text-teal-400">Không gian yên tĩnh, riêng tư: 80%</strong></div><input id="qSolitude" type="range" min="10" max="100" value="80" oninput="window.onFormChange()" class="w-full accent-teal-400" /></div>
-          <div><div class="flex justify-between mb-1"><span>Cơ bản</span><strong id="lblComfort" class="text-teal-400">Tiện nghi Resort 4-5 Sao: 90%</strong></div><input id="qComfort" type="range" min="10" max="100" value="90" oninput="window.onFormChange()" class="w-full accent-teal-400" /></div>
+          <div><div class="flex justify-between mb-1"><span>Đông vui</span><strong id="lblSolitude" class="text-teal-400">Không gian yên tĩnh, riêng tư: 80%</strong></div><input id="qSolitude" type="range" min="10" max="100" value="80" oninput="window.onFormChange()" class="w-full accent-teal-400" /></div>
+          <div><div class="flex justify-between mb-1"><span>Tiết kiệm</span><strong id="lblComfort" class="text-teal-400">Tiện nghi Resort 4-5 Sao: 90%</strong></div><input id="qComfort" type="range" min="10" max="100" value="90" oninput="window.onFormChange()" class="w-full accent-teal-400" /></div>
           <div><div class="flex justify-between mb-1"><span>Hiện đại</span><strong id="lblCulture" class="text-teal-400">Văn hóa, Di sản & Ẩm thực: 75%</strong></div><input id="qCulture" type="range" min="10" max="100" value="75" oninput="window.onFormChange()" class="w-full accent-teal-400" /></div>
         </div>
-
         <div class="space-y-3.5 bg-slate-950/60 p-5 rounded-2xl border border-white/10">
-          <h3 class="font-bold text-sm text-teal-400">2. Ngân sách & Điều kiện khởi hành</h3>
+          <h3 class="font-bold text-sm text-teal-400">2. Thông tin khởi hành & Ngân sách</h3>
           <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="text-slate-400 block mb-1">Điểm khởi hành</label>
-              <select id="originInput" onchange="window.onFormChange()" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3 py-2.5 font-bold text-white">
-                <option value="HAN">Hà Nội (Nội Bài)</option>
-                <option value="SGN">TP.HCM (Tân Sơn Nhất)</option>
-              </select>
-            </div>
-            <div>
-              <label class="text-slate-400 block mb-1">Số hành khách</label>
-              <select id="groupSizeInput" onchange="window.onFormChange()" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3 py-2.5 font-bold text-white">
-                <option value="1">1 người (Cá nhân)</option>
-                <option value="2">2 người (Cặp đôi)</option>
-                <option value="3">Nhóm 3 người</option>
-                <option value="4">Nhóm 4 người</option>
-              </select>
-            </div>
+            <div><label class="text-slate-400 block mb-1">Điểm khởi hành</label><select id="originInput" onchange="window.onFormChange()" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3 py-2.5 font-bold text-white"><option value="HAN">Hà Nội (Nội Bài)</option><option value="SGN">TP.HCM (Tân Sơn Nhất)</option></select></div>
+            <div><label class="text-slate-400 block mb-1">Số hành khách</label><select id="groupSizeInput" onchange="window.onFormChange()" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3 py-2.5 font-bold text-white"><option value="1">1 hành khách</option><option value="2">2 hành khách</option><option value="3">3 hành khách</option><option value="4">4 hành khách</option></select></div>
           </div>
           <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="text-slate-400 block mb-1">Ngân sách / 1 khách (VNĐ)</label>
-              <input id="budgetInput" type="number" step="500000" min="2500000" value="5000000" oninput="window.onFormChange()" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3.5 py-2.5 font-extrabold text-teal-400" />
-            </div>
-            <div>
-              <label class="text-slate-400 block mb-1">Loại trừ thành phố đã đi</label>
-              <input id="blacklistInput" type="text" placeholder="VD: Đà Lạt, Huế" oninput="window.onFormChange()" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" />
-            </div>
+            <div><label class="text-slate-400 block mb-1">Ngân sách / 1 khách (VNĐ)</label><input id="budgetInput" type="number" step="500000" min="2500000" value="5000000" oninput="window.onFormChange()" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3 py-2.5 font-extrabold text-teal-400" /></div>
+            <div><label class="text-slate-400 block mb-1">Loại trừ điểm đến đã đi</label><input id="blacklistInput" type="text" placeholder="VD: Đà Lạt, Huế" oninput="window.onFormChange()" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3 py-2.5 text-white" /></div>
           </div>
-          <div>
-            <label class="text-slate-400 block mb-1">Ghi chú mong muốn thêm (Tùy chọn)</label>
-            <input id="customPromptInput" type="text" placeholder="VD: thích săn mây, tắm khoáng nóng, hải sản..." oninput="window.onFormChange()" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" />
-          </div>
+          <div><label class="text-slate-400 block mb-1">Mong muốn đặc biệt (Tùy chọn)</label><input id="customPromptInput" type="text" placeholder="VD: săn mây, tắm khoáng nóng, hải sản..." oninput="window.onFormChange()" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3 py-2.5 text-white" /></div>
           <div class="flex flex-wrap gap-2.5 pt-2">
-            <button onclick="window.generateNewRecommendation()" class="flex-1 py-3 px-4 rounded-xl font-extrabold bg-teal-500 hover:bg-teal-400 text-slate-950">Đổi Gợi Ý Hành Trình Khác</button>
-            <button onclick="window.saveCurrentToWishlist()" class="px-4 py-3 rounded-xl font-bold bg-white/10 hover:bg-white/15 text-teal-300 border border-teal-500/30">Lưu Yêu Thích</button>
+            <button onclick="window.generateNewRecommendation()" class="flex-1 py-3 px-4 rounded-xl font-extrabold bg-teal-500 hover:bg-teal-400 text-slate-950">Đổi Gợi Ý Khác</button>
+            <button onclick="window.saveCurrentToWishlist()" class="px-4 py-3 rounded-xl font-bold bg-white/10 hover:bg-white/15 text-teal-300 border border-teal-500/30">Lưu Hành Trình</button>
             <button onclick="window.goToStep(2)" class="px-5 py-3 rounded-xl font-extrabold bg-amber-400 hover:bg-amber-300 text-slate-950">Đặt Chuyến Này →</button>
           </div>
         </div>
       </div>
-
       <div id="recommendationResultBox"></div>
     </section>
 
-    <!-- BƯỚC 2 -->
     <section id="step-panel-2" style="display:none;" class="glass rounded-3xl p-6 space-y-6">
-      <div class="border-b border-white/10 pb-4">
-        <h2 class="text-lg font-extrabold text-white">Bước 2: Thông Tin Hành Khách & Thanh Toán VietQR Tạm Giữ</h2>
-        <p class="text-xs text-slate-400">Họ tên trên CCCD và Tên chủ tài khoản ngân hàng phải khớp nhau để kích hoạt bảo hiểm hoàn tiền tự động.</p>
-      </div>
+      <div class="border-b border-white/10 pb-4"><h2 class="text-lg font-extrabold text-white">Bước 2: Thông Tin Hành Khách & Thanh Toán VietQR Tạm Giữ</h2><p class="text-xs text-slate-400">Họ tên trên CCCD và Tên chủ tài khoản ngân hàng phải trùng khớp để đảm bảo hoàn tiền tự động.</p></div>
       <div class="grid md:grid-cols-3 gap-4 text-xs">
         <div><label class="text-slate-300 block mb-1">Email nhận vé điện tử (*)</label><input id="custEmail" type="email" placeholder="email@gmail.com" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" /></div>
-        <div><label class="text-slate-300 block mb-1">Họ và tên trên CCCD (*)</label><input id="custName" type="text" placeholder="Nhập đầy đủ họ tên" oninput="window.syncBankHolderName()" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" /></div>
+        <div><label class="text-slate-300 block mb-1">Họ và tên trên CCCD (*)</label><input id="custName" type="text" placeholder="Nhập họ và tên" oninput="window.syncBankHolderName()" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" /></div>
         <div><label class="text-slate-300 block mb-1">Số CCCD / Hộ chiếu (*)</label><input id="custCCCD" type="text" placeholder="Nhập 12 số CCCD" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" /></div>
         <div><label class="text-slate-300 block mb-1">Ngân hàng nhận hoàn tiền</label><select id="custBankCode" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3.5 py-2.5 text-white"><option value="BIDV">BIDV</option><option value="VCB">Vietcombank</option><option value="MB">MBBank</option><option value="TCB">Techcombank</option></select></div>
         <div><label class="text-slate-300 block mb-1">Số tài khoản ngân hàng (*)</label><input id="custBankAcc" type="text" placeholder="Nhập số tài khoản" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" /></div>
@@ -203,24 +126,20 @@
         <button onclick="window.goToStep(3)" class="px-4 py-3 rounded-xl text-xs font-bold bg-white/10 text-white">Sang Bước 3 →</button>
       </div>
       <div id="qrPaymentSection" style="display:none;" class="bg-slate-950 p-5 rounded-2xl border border-teal-500/30 space-y-4">
-        <div class="flex justify-between items-center"><h3 class="font-bold text-sm text-teal-300">Quét Mã VietQR Thanh Toán Tạm Giữ</h3><strong id="lblBookingCode" class="text-amber-400 text-sm"></strong></div>
+        <div class="flex justify-between items-center"><h3 class="font-bold text-sm text-teal-300">Mã Thanh Toán VietQR Tạm Giữ</h3><strong id="lblBookingCode" class="text-amber-400 text-sm"></strong></div>
         <div id="qrCardsContainer" class="grid sm:grid-cols-2 md:grid-cols-4 gap-4"></div>
       </div>
     </section>
 
-    <!-- BƯỚC 3 -->
     <section id="step-panel-3" style="display:none;" class="glass rounded-3xl p-6 space-y-6">
-      <div class="flex justify-between items-center border-b border-white/10 pb-4">
-        <h2 class="text-lg font-extrabold text-white">Bước 3: Chuẩn Bị Hành Lý & Chính Sách Hoàn Hủy</h2>
-        <span id="anonWeatherBox" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300"></span>
-      </div>
+      <div class="flex justify-between items-center border-b border-white/10 pb-4"><h2 class="text-lg font-extrabold text-white">Bước 3: Chuẩn Bị Hành Lý & Chính Sách Hoàn Hủy</h2><span id="anonWeatherBox" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300"></span></div>
       <div class="grid md:grid-cols-2 gap-6">
         <div class="space-y-4">
           <div class="bg-slate-950 p-5 rounded-2xl border border-white/10"><span class="text-xs font-bold text-teal-400 uppercase">Bật mí không gian điểm đến</span><p id="aiMysteryHintText" class="text-sm italic text-slate-200 mt-2"></p></div>
-          <div class="bg-slate-950 p-5 rounded-2xl border border-white/10"><span class="text-xs font-bold text-amber-400 uppercase">Gợi ý hành lý mang theo</span><div id="packingListContainer" class="mt-3 space-y-2"></div></div>
+          <div class="bg-slate-950 p-5 rounded-2xl border border-white/10"><span class="text-xs font-bold text-amber-400 uppercase">Danh mục hành lý khuyên dùng</span><div id="packingListContainer" class="mt-3 space-y-2"></div></div>
         </div>
         <div class="bg-slate-950 p-5 rounded-2xl border border-white/10 space-y-4">
-          <h3 class="text-xs font-bold text-white uppercase">Tính Toán Số Tiền Hoàn Lại Theo Thời Điểm Hủy</h3>
+          <h3 class="text-xs font-bold text-white uppercase">Tra Cứu Mức Hoàn Tiền Tự Động</h3>
           <div class="grid grid-cols-2 gap-2.5 text-xs">
             <button onclick="window.simulateRefund('EARLY_72H')" class="p-3 rounded-xl bg-white/5 hover:bg-teal-500/20 border border-white/10 text-left">Trước 72 giờ bay<br><strong class="text-teal-400">Hoàn trả 90%</strong></button>
             <button onclick="window.simulateRefund('LATE_24_72H')" class="p-3 rounded-xl bg-white/5 hover:bg-amber-500/20 border border-white/10 text-left">Từ 24h - 72h<br><strong class="text-amber-400">Hoàn trả 65%</strong></button>
@@ -233,12 +152,8 @@
       </div>
     </section>
 
-    <!-- BƯỚC 4 -->
     <section id="step-panel-4" style="display:none;" class="glass rounded-3xl p-6 space-y-6">
-      <div class="flex justify-between items-center border-b border-white/10 pb-4">
-        <h2 class="text-lg font-extrabold text-amber-400">Bước 4: Mở Khóa Điểm Đến & Phiếu Xác Nhận Dịch Vụ</h2>
-        <button onclick="window.revealDestinationNow()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold bg-amber-400 text-slate-950">Mở Khóa Ngay</button>
-      </div>
+      <div class="flex justify-between items-center border-b border-white/10 pb-4"><h2 class="text-lg font-extrabold text-amber-400">Bước 4: Mở Khóa Điểm Đến & Phiếu Xác Nhận Dịch Vụ</h2><button onclick="window.revealDestinationNow()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold bg-amber-400 text-slate-950">Mở Khóa Ngay</button></div>
       <div class="relative w-full max-w-2xl mx-auto rounded-2xl overflow-hidden border border-teal-500/40 bg-slate-900 p-6">
         <div class="space-y-4">
           <div class="flex justify-between items-start">
@@ -260,31 +175,23 @@
     </section>
   </main>
 
-  <!-- TAB 2: CHUYẾN ĐI CỦA TÔI -->
   <main id="tab-saved" style="display:none;" class="max-w-6xl mx-auto px-4 mt-6 space-y-6">
     <div class="glass rounded-3xl p-6 space-y-5">
       <h2 class="text-lg font-extrabold text-white border-b border-white/10 pb-3">Danh Sách Hành Trình Đã Lưu & Đơn Đặt Chỗ Của Bạn</h2>
       <div class="grid md:grid-cols-2 gap-6 text-xs">
-        <div class="bg-slate-950 p-5 rounded-2xl border border-white/10 space-y-3">
-          <strong class="text-amber-400 block uppercase">Hành Trình Đã Lưu Yêu Thích</strong>
-          <div id="savedWishlistContainer" class="space-y-2.5"></div>
-        </div>
-        <div class="bg-slate-950 p-5 rounded-2xl border border-white/10 space-y-3">
-          <strong class="text-teal-400 block uppercase">Đơn Đặt Chỗ Chính Thức (VietQR)</strong>
-          <div id="savedBookingsContainer" class="space-y-2.5"></div>
-        </div>
+        <div class="bg-slate-950 p-5 rounded-2xl border border-white/10 space-y-3"><strong class="text-amber-400 block uppercase">Hành Trình Yêu Thích</strong><div id="savedWishlistContainer" class="space-y-2.5"></div></div>
+        <div class="bg-slate-950 p-5 rounded-2xl border border-white/10 space-y-3"><strong class="text-teal-400 block uppercase">Đơn Đặt Chỗ Chính Thức</strong><div id="savedBookingsContainer" class="space-y-2.5"></div></div>
       </div>
     </div>
   </main>
 
-  <!-- TAB 3: ĐỐI TÁC RESORT B2B -->
   <main id="tab-b2b" style="display:none;" class="max-w-6xl mx-auto px-4 mt-6 space-y-6">
     <div class="glass rounded-3xl p-6 space-y-4">
-      <h2 class="text-lg font-extrabold text-teal-400">Hệ Thống Quỹ Phòng Liên Kết Đối Tác (B2B Opaque Inventory)</h2>
+      <h2 class="text-lg font-extrabold text-teal-400">Hệ Thống Quỹ Phòng Liên Kết Đối Tác (B2B Inventory)</h2>
       <div id="b2bInventoryList" class="space-y-3"></div>
     </div>
   </main>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=6.0"></script>
 </body>
 </html>

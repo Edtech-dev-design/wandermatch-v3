@@ -1,7 +1,3 @@
-// ============================================================================
-// WANDERMATCH PRODUCTION ENGINE — CLEAN ARCHITECTURE FOR FLASH IDE
-// ============================================================================
-
 window.FLIGHTS_DB = [
   { id: "VN151", origin: "HAN", city: "Đà Lạt", airline: "Vietnam Airlines", time: "08:30 - 10:15", price: 2100000 },
   { id: "VJ403", origin: "HAN", city: "Đà Lạt", airline: "Vietjet Deluxe", time: "10:20 - 12:05", price: 1650000 },
@@ -9,7 +5,6 @@ window.FLIGHTS_DB = [
   { id: "VN181", origin: "HAN", city: "Măng Đen", airline: "Vietnam Airlines (Pleiku + Xe riêng)", time: "07:45 - 10:30", price: 2050000 },
   { id: "VN137", origin: "HAN", city: "Huế", airline: "Vietnam Airlines", time: "09:15 - 10:30", price: 1600000 },
   { id: "VJ971", origin: "HAN", city: "Phú Quốc", airline: "Vietjet Deluxe", time: "09:40 - 11:50", price: 2450000 },
-  { id: "VN123", origin: "HAN", city: "Nha Trang", airline: "Vietnam Airlines", time: "08:15 - 10:05", price: 1980000 },
   { id: "VN251", origin: "SGN", city: "Đà Lạt", airline: "Vietnam Airlines", time: "09:00 - 09:55", price: 1450000 },
   { id: "VN262", origin: "SGN", city: "Quy Nhơn", airline: "Bamboo Airways", time: "08:30 - 09:45", price: 1650000 },
   { id: "VN237", origin: "SGN", city: "Huế", airline: "Vietnam Airlines", time: "09:15 - 10:40", price: 1750000 },
@@ -89,24 +84,38 @@ window.HOTELS_DB = [
   }
 ];
 
-// TIỆN ÍCH CỐT LÕI
-window.loadStore = function(k, def) { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : def; } catch (e) { return def; } };
-window.saveStore = function(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+window.loadStore = function(k, def) {
+  try {
+    const r = localStorage.getItem(k);
+    if (r) return JSON.parse(r);
+    const m = document.cookie.match(new RegExp("(?:^|;\\s*)" + k + "=([^;]*)"));
+    if (m && m[1]) return JSON.parse(decodeURIComponent(m[1]));
+    return def;
+  } catch (e) { return def; }
+};
+
+window.saveStore = function(k, v) {
+  try {
+    const s = JSON.stringify(v);
+    localStorage.setItem(k, s);
+    if (k === "wm_users_prod" || k === "wm_session_prod") {
+      document.cookie = `${k}=${encodeURIComponent(s)}; path=/; max-age=31536000; SameSite=Lax`;
+    }
+  } catch (e) {}
+};
+
 window.formatVND = function(n) { return Number(n || 0).toLocaleString("vi-VN") + "đ"; };
 window.normVN = function(s = "") { return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toUpperCase().replace(/\s+/g, " ").trim(); };
 window.cleanEmail = function(e = "") { return String(e || "").trim().toLowerCase(); };
 
-// KIỂM TRA ĐỊNH DẠNG EMAIL NGHIÊM NGẶT (CHẶN .com2, .vn123)
 window.isValidEmail = function(email) {
   const e = window.cleanEmail(email);
   if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,8}$/.test(e)) return false;
-  const tld = e.split(".").pop();
-  return !/[0-9]/.test(tld);
+  return !/[0-9]/.test(e.split(".").pop());
 };
 
 window.hashPw = function(pw = "") {
-  let h = 5381;
-  const s = "WM_PROD_" + String(pw);
+  let h = 5381, s = "WM_PROD_" + String(pw);
   for (let i = 0; i < s.length; i++) h = ((h << 5) + h) + s.charCodeAt(i);
   return "pw_" + (h >>> 0).toString(16);
 };
@@ -127,9 +136,6 @@ window.showToast = function(msg, type = "success") {
   setTimeout(() => el.remove(), 3200);
 };
 
-// ============================================================================
-// 1. QUẢN LÝ ĐĂNG KÝ & ĐĂNG NHẬP CHUẨN THƯƠNG MẠI (KHÔNG DỰNG SẴN TÀI KHOẢN GIẢ)
-// ============================================================================
 window.openAuthModal = function(mode = "login") {
   document.getElementById("authModal").style.display = "flex";
   window.switchAuthMode(mode);
@@ -162,20 +168,19 @@ window.submitRegister = function() {
   const confirm = document.getElementById("regPassConfirm")?.value || "";
 
   if (name.length < 2) return window.setAuthError("Vui lòng nhập đầy đủ Họ và tên.");
-  if (!window.isValidEmail(email)) return window.setAuthError("Định dạng Email không hợp lệ (Không dùng đuôi chứa số như .com2)!");
+  if (!window.isValidEmail(email)) return window.setAuthError("Địa chỉ Email không hợp lệ (Không dùng tên miền chứa số như .com2)!");
   if (pass.length < 6) return window.setAuthError("Mật khẩu phải có tối thiểu 6 ký tự.");
-  if (pass !== confirm) return window.setAuthError("Mật khẩu nhập lại không khớp.");
+  if (pass !== confirm) return window.setAuthError("Mật khẩu xác nhận không khớp.");
 
   const users = window.loadStore("wm_users_prod", {});
   if (users[email]) return window.setAuthError("Email này đã được đăng ký. Vui lòng chuyển sang tab Đăng Nhập!");
 
-  const newUser = { name, email, passHash: window.hashPw(pass), createdAt: new Date().toISOString() };
-  users[email] = newUser;
+  users[email] = { name, email, passHash: window.hashPw(pass) };
   window.saveStore("wm_users_prod", users);
   window.saveStore("wm_session_prod", { name, email });
   window.applyUserSession();
   window.closeAuthModal();
-  window.showToast(`Đăng ký thành công! Chào mừng ${name}.`);
+  window.showToast(`Đăng ký tài khoản thành công! Chào mừng ${name}.`);
 };
 
 window.submitLogin = function() {
@@ -186,8 +191,8 @@ window.submitLogin = function() {
   const users = window.loadStore("wm_users_prod", {});
   const acc = users[email];
 
-  if (!acc) return window.setAuthError("Email này chưa được đăng ký! Vui lòng bấm sang tab 'Đăng Ký Tài Khoản'.");
-  if (acc.passHash !== window.hashPw(pass)) return window.setAuthError("Mật khẩu không chính xác. Vui lòng kiểm tra lại!");
+  if (!acc) return window.setAuthError("Email này chưa được đăng ký! Vui lòng chuyển sang tab 'Đăng Ký Mới'.");
+  if (acc.passHash !== window.hashPw(pass)) return window.setAuthError("Mật khẩu không chính xác. Vui lòng thử lại!");
 
   window.saveStore("wm_session_prod", { name: acc.name, email: acc.email });
   window.applyUserSession();
@@ -216,13 +221,11 @@ window.applyUserSession = function() {
 
 window.logoutUser = function() {
   localStorage.removeItem("wm_session_prod");
+  document.cookie = "wm_session_prod=; path=/; max-age=0";
   window.applyUserSession();
-  window.showToast("Đã đăng xuất. Tài khoản và chuyến đi của bạn vẫn được lưu an toàn.", "warn");
+  window.showToast("Đã đăng xuất khỏi phiên làm việc.", "warn");
 };
 
-// ============================================================================
-// 2. BỘ MÁY 4 THUẬT TOÁN DU LỊCH MÙ & CHỐNG TRÙNG LẶP
-// ============================================================================
 window.getFormInputs = function() {
   return {
     origin: document.getElementById("originInput")?.value || "HAN",
@@ -244,7 +247,6 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
   const inp = window.getFormInputs();
   const history = window.loadStore("wm_history_prod", []);
 
-  // Thuật toán 1: Lọc chuyến bay theo điểm đi & trần ngân sách
   let flights = window.FLIGHTS_DB.filter(f => f.origin === inp.origin && f.price <= inp.budget * 0.65);
   if (!flights.length) flights = window.FLIGHTS_DB;
 
@@ -259,14 +261,12 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
       const unitCost = f.price + (h.night_price * 2);
       const unitRetail = f.price + (h.retail_night * 2);
       if (unitCost <= inp.budget * 1.08) {
-        // Thuật toán 2: Cosine Similarity
         let dot = 0, nU = 0, nH = 0;
         keys.forEach(k => { dot += inp.vec[k] * h.vec[k]; nU += inp.vec[k] ** 2; nH += h.vec[k] ** 2; });
         let sim = (dot / (Math.sqrt(nU) * Math.sqrt(nH))) * 100;
         h.kw.forEach(w => { if (inp.prompt.includes(w)) sim += 4; });
         sim = Math.min(99.5, Math.round(sim * 10) / 10);
 
-        // Thuật toán 3: Tối ưu Cái túi (Knapsack)
         const util = Math.round(((sim * 0.55) + ((h.rating / 5) * 100 * 0.25) + (Math.min(100, (unitCost / inp.budget) * 100) * 0.20)) * 10) / 10;
         combos.push({ comboId: `${f.id}_${h.id}`, f, h, unitCost, unitRetail, sim, util });
       }
@@ -279,7 +279,6 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
   }
   combos.sort((a, b) => b.util - a.util);
 
-  // Thuật toán 4: Chống trùng lặp lịch sử
   let chosen = combos[0];
   if (avoidRepeat && combos.length > 1) {
     const freshPool = combos.filter(c => c.comboId !== history[history.length - 1]);
@@ -301,37 +300,19 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
   }));
 
   return {
-    code,
-    comboId: chosen.comboId,
-    owner: window.loadStore("wm_session_prod", null)?.email || "guest",
-    isLocked: false,
-    isRevealed: false,
-    matchScore: chosen.sim,
-    temp: chosen.h.temp,
-    weather: chosen.h.weather,
-    hint: chosen.h.hint,
-    packing: chosen.h.packing,
-    food: chosen.h.food,
-    days: chosen.h.days,
-    qrs,
+    code, comboId: chosen.comboId, isLocked: false, isRevealed: false,
+    matchScore: chosen.sim, temp: chosen.h.temp, weather: chosen.h.weather,
+    hint: chosen.h.hint, packing: chosen.h.packing, food: chosen.h.food, days: chosen.h.days, qrs,
     flightLabel: `Khứ hồi ${chosen.f.airline} (${chosen.f.time})`,
     hotelLabel: `Resort ${chosen.h.rating}★ tiêu chuẩn quốc tế (Kèm ăn sáng & xe đón)`,
     reveal: {
-      city: chosen.h.city,
-      title: chosen.h.title,
-      sla: chosen.h.sla,
+      city: chosen.h.city, title: chosen.h.title, sla: chosen.h.sla,
       transport: `${chosen.f.id} - ${chosen.f.airline} (${chosen.f.time})`,
-      hotel: chosen.h.name,
-      paid: totalPaid,
-      retail: totalRetail,
-      savings: totalRetail - totalPaid
+      hotel: chosen.h.name, paid: totalPaid, retail: totalRetail, savings: totalRetail - totalPaid
     }
   };
 };
 
-// ============================================================================
-// 3. HIỂN THỊ GIAO DIỆN & ĐIỀU HƯỚNG 4 BƯỚC
-// ============================================================================
 window.onFormChange = function() {
   const inp = window.getFormInputs();
   document.getElementById("lblHealing").innerText = `Nghỉ dưỡng & Chữa lành: ${inp.vec.healing}%`;
@@ -339,7 +320,7 @@ window.onFormChange = function() {
   document.getElementById("lblSolitude").innerText = `Không gian yên tĩnh, riêng tư: ${inp.vec.solitude}%`;
   document.getElementById("lblComfort").innerText = `Tiện nghi Resort 4-5 Sao: ${inp.vec.comfort}%`;
   document.getElementById("lblCulture").innerText = `Văn hóa, Di sản & Ẩm thực: ${inp.vec.culture}%`;
-  document.getElementById("slaRetailGuarantee").innerText = `Giá trị thực >= ${window.formatVND(Math.round(inp.budget * inp.groupSize * 1.25))}`;
+  document.getElementById("slaRetailGuarantee").innerText = `Giá trị cam kết >= ${window.formatVND(Math.round(inp.budget * inp.groupSize * 1.25))}`;
 
   const pkg = window.runBlindTravelEngine(false);
   window.saveStore("wm_draft_prod", pkg);
@@ -350,13 +331,12 @@ window.generateNewRecommendation = function() {
   const pkg = window.runBlindTravelEngine(true);
   window.saveStore("wm_draft_prod", pkg);
   window.renderPackageUI(pkg);
-  window.showToast(`Đã tìm thấy gói hành trình mới #${pkg.code} (Phù hợp ${pkg.matchScore}%)!`);
+  window.showToast(`Đã tìm thấy hành trình mới #${pkg.code} (Phù hợp ${pkg.matchScore}%)!`);
 };
 
 window.renderPackageUI = function(pkg) {
   if (!pkg) return;
-  const box = document.getElementById("recommendationResultBox");
-  box.innerHTML = `
+  document.getElementById("recommendationResultBox").innerHTML = `
     <div class="bg-slate-950/90 border border-teal-500/35 rounded-2xl p-6 space-y-5 shadow-xl">
       <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
         <div>
@@ -369,20 +349,17 @@ window.renderPackageUI = function(pkg) {
         <div class="text-right">
           <span class="text-[11px] text-slate-400 block">Tổng chi phí trọn gói (Vé bay + Resort)</span>
           <strong class="text-xl font-extrabold text-teal-400">${window.formatVND(pkg.reveal.paid)}</strong>
-          <span class="text-[11px] text-amber-300 block font-semibold">Tiết kiệm ${window.formatVND(pkg.reveal.savings)} so với giá đặt lẻ</span>
+          <span class="text-[11px] text-amber-300 block font-semibold">Tiết kiệm ${window.formatVND(pkg.reveal.savings)} so với đặt lẻ</span>
         </div>
       </div>
-
       <div class="grid sm:grid-cols-2 gap-3.5 text-xs">
-        <div class="bg-slate-900 p-3.5 rounded-xl border border-white/10"><span class="text-slate-400 block">Chuyến bay khứ hồi:</span><strong class="text-white">${pkg.flightLabel}</strong></div>
-        <div class="bg-slate-900 p-3.5 rounded-xl border border-white/10"><span class="text-slate-400 block">Lưu trú cam kết:</span><strong class="text-white">${pkg.hotelLabel}</strong></div>
+        <div class="bg-slate-900 p-3.5 rounded-xl border border-white/10"><span class="text-slate-400 block">Hàng không & Di chuyển:</span><strong class="text-white">${pkg.flightLabel}</strong></div>
+        <div class="bg-slate-900 p-3.5 rounded-xl border border-white/10"><span class="text-slate-400 block">Tiêu chuẩn lưu trú:</span><strong class="text-white">${pkg.hotelLabel}</strong></div>
       </div>
-
       <div class="bg-amber-500/10 border border-amber-400/30 p-4 rounded-xl">
         <span class="text-xs font-bold text-amber-300 uppercase">Bật mí về Điểm đến Bí mật của bạn</span>
         <p class="text-sm text-slate-100 mt-1">"${pkg.hint}"</p>
       </div>
-
       <div class="grid md:grid-cols-3 gap-3.5 text-xs">
         ${pkg.days.map(d => `
           <div class="bg-slate-900 p-4 rounded-xl border border-white/10 space-y-1.5">
@@ -396,7 +373,6 @@ window.renderPackageUI = function(pkg) {
     </div>
   `;
 
-  // Đồng bộ sang Bước 3 và Bước 4
   document.getElementById("anonWeatherBox").innerText = `Khí hậu điểm đến: ${pkg.temp}°C — ${pkg.weather}`;
   document.getElementById("aiMysteryHintText").innerText = `"${pkg.hint}"`;
   document.getElementById("packingListContainer").innerHTML = pkg.packing.map((x, i) => `
@@ -432,7 +408,6 @@ window.confirmAndLockBooking = function() {
   let pkg = window.loadStore("wm_draft_prod", null) || window.runBlindTravelEngine(true);
   pkg.isLocked = true;
   pkg.customerName = name;
-  pkg.owner = window.loadStore("wm_session_prod", null)?.email || email;
   window.saveStore("wm_draft_prod", pkg);
 
   const saved = window.loadStore("wm_saved_prod", []);
@@ -457,7 +432,6 @@ window.confirmAndLockBooking = function() {
 
 window.saveCurrentToWishlist = function() {
   let pkg = window.loadStore("wm_draft_prod", null) || window.runBlindTravelEngine(true);
-  pkg.owner = window.loadStore("wm_session_prod", null)?.email || "guest";
   const saved = window.loadStore("wm_saved_prod", []);
   if (!saved.some(x => x.code === pkg.code)) {
     saved.unshift(pkg);
@@ -591,7 +565,6 @@ window.renderB2BTab = function() {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Xóa sạch bộ nhớ "đồ hàng" cũ để tránh xung đột
   ["wm_users_vault_v4", "wm_active_session_v4", "wm_oauth_user"].forEach(k => localStorage.removeItem(k));
   window.applyUserSession();
   const draft = window.loadStore("wm_draft_prod", null) || window.runBlindTravelEngine(false);
