@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WanderMatch 3.2 — Hệ Thống Du Lịch Mù Đa Thuật Toán & OAuth Vĩnh Viễn</title>
+  <title>WanderMatch 3.3 Final — Hệ Thống Du Lịch Mù Lưu Trữ Vĩnh Viễn Toàn Trình</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -14,22 +14,26 @@
     button { cursor: pointer; }
   </style>
 </head>
-<body class="min-h-screen pb-16">
-  <!-- HEADER CHUẨN HÓA: CHUYỂN TAB + TRẠM THUẬT TOÁN + ĐĂNG NHẬP GOOGLE/FACEBOOK VĨNH VIỄN -->
+<body class="min-h-screen pb-20">
+  <!-- HEADER CHUẨN HÓA -->
   <header class="border-b border-white/10 bg-slate-950/95 sticky top-0 z-40 backdrop-blur-md">
     <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-2">
         <span class="w-3 h-3 rounded-full bg-teal-400 animate-pulse"></span>
-        <span class="font-extrabold text-lg">WANDER<span class="text-teal-400">MATCH</span> <span class="text-xs px-2 py-0.5 rounded bg-teal-500/20 text-teal-300">v3.2 Pro</span></span>
+        <span class="font-extrabold text-lg">WANDER<span class="text-teal-400">MATCH</span> <span class="text-xs px-2 py-0.5 rounded bg-teal-500/20 text-teal-300">v3.3 Final</span></span>
       </div>
 
-      <!-- CỤM NÚT CHUYỂN TAB & BẬT TRẠM THUẬT TOÁN -->
+      <!-- CỤM NÚT ĐIỀU HƯỚNG & KHO DỮ LIỆU -->
       <div class="flex flex-wrap gap-1.5">
         <button id="btn-tab-b2c" onclick="window.switchTab('b2c')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-teal-500 text-slate-950">1. Du Khách (B2C)</button>
         <button id="btn-tab-b2b" onclick="window.switchTab('b2b')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white/10 text-white">2. Cổng B2B</button>
-        <button id="btn-tab-admin" onclick="window.switchTab('admin')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white/10 text-white">3. Admin & Test</button>
-        <button onclick="window.toggleAlgoTuner()" class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-amber-400/20 text-amber-300 border border-amber-400/40 hover:bg-amber-400 hover:text-slate-950 transition">🎛️ Chỉnh Thuật Toán</button>
-        <button onclick="window.runDeepChaosDiagnostic()" class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-teal-400/20 text-teal-300 border border-teal-400/40 hover:bg-teal-400 hover:text-slate-950 transition">🛡️ Diagnostic Radar</button>
+        <button id="btn-tab-admin" onclick="window.switchTab('admin')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white/10 text-white">3. Admin & Dữ Liệu</button>
+        <button onclick="window.toggleSavedTripsDrawer()" class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-teal-500/20 text-teal-300 border border-teal-400/40 hover:bg-teal-400 hover:text-slate-950 transition">
+          🗄️ Kho Đã Lưu (<span id="lblSavedCount">0</span>)
+        </button>
+        <button onclick="window.toggleAlgoTuner()" class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-amber-400/20 text-amber-300 border border-amber-400/40 hover:bg-amber-400 hover:text-slate-950 transition">
+          🎛️ Thuật Toán
+        </button>
       </div>
 
       <!-- CỤM TÀI KHOẢN GOOGLE / FACEBOOK / EMAIL VĨNH VIỄN -->
@@ -59,7 +63,31 @@
     </div>
   </header>
 
-  <!-- BẢNG ĐIỀU KHIỂN & CHỈNH SỬA THUẬT TOÁN TRỰC TIẾP (LIVE ALGORITHM STUDIO) -->
+  <!-- KHO LƯU TRỮ GỢI Ý & CHUYẾN ĐI CỦA TÔI (SAVED WISHLIST & ACTIVE TRIPS DRAWER) -->
+  <section id="savedTripsDrawer" style="display:none;" class="max-w-5xl mx-auto px-4 mt-4">
+    <div class="bg-slate-900/95 border-2 border-teal-400/50 rounded-2xl p-5 space-y-4 shadow-2xl">
+      <div class="flex flex-wrap justify-between items-center gap-2 border-b border-white/10 pb-3">
+        <div>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 font-bold uppercase">Persistent Trip Vault</span>
+          <h3 class="text-base font-extrabold text-white mt-0.5">Kho Lưu Trữ Gợi Ý & Các Chuyến Đi Đã Lên Đơn Của Bạn</h3>
+        </div>
+        <button onclick="window.toggleSavedTripsDrawer()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-500/20 text-rose-300">Đóng Kho ✕</button>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4 text-xs">
+        <div class="bg-slate-950 p-4 rounded-xl border border-white/10 space-y-2">
+          <strong class="text-amber-300 block uppercase">📌 1. Danh Sách Gợi Ý Đã Lưu (Bấm để Lên Chuyến Đi ngay):</strong>
+          <div id="savedWishlistContainer" class="space-y-2 max-h-60 overflow-y-auto"></div>
+        </div>
+        <div class="bg-slate-950 p-4 rounded-xl border border-white/10 space-y-2">
+          <strong class="text-teal-300 block uppercase">✈️ 2. Chuyến Đi Chính Thức Đã Khóa VietQR (Bấm để Mở lại):</strong>
+          <div id="savedOfficialBookingsContainer" class="space-y-2 max-h-60 overflow-y-auto"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRẠM TÙY CHỈNH THUẬT TOÁN TRỰC TIẾP (LIVE ALGORITHM STUDIO) -->
   <section id="algoTunerDrawer" style="display:none;" class="max-w-5xl mx-auto px-4 mt-4">
     <div class="bg-slate-900/95 border-2 border-amber-400/50 rounded-2xl p-5 space-y-4 shadow-2xl">
       <div class="flex flex-wrap justify-between items-center gap-2 border-b border-white/10 pb-3">
@@ -82,7 +110,6 @@
             <option value="PURE_COSINE">Thuần Độ Tương Đồng Góc (Cosine Vector Similarity)</option>
             <option value="TOPSIS_EUCLID">Khoảng Cách Hình Học Đa Tiêu Chí (TOPSIS Euclidean)</option>
           </select>
-
           <div class="pt-2">
             <div class="flex justify-between mb-1"><span>Trần chi phí Vé máy bay / Ngân sách:</span><strong id="lblFlightCap" class="text-amber-400">62%</strong></div>
             <input id="cfgFlightCap" type="range" min="40" max="80" value="62" oninput="window.applyAlgorithmChanges()" class="w-full accent-amber-400" />
@@ -114,7 +141,6 @@
         </div>
       </div>
 
-      <!-- BẢNG XẾP HẠNG TRỰC TIẾP CÁC ỨNG VIÊN THEO THAM SỐ VỪA CHỈNH -->
       <div class="bg-slate-950 p-3.5 rounded-xl border border-white/10 text-xs space-y-2">
         <div class="flex justify-between items-center">
           <strong class="text-amber-300">Bảng Điểm Ma Trận Các Combo Theo Cấu Hình Thuật Toán Hiện Tại:</strong>
@@ -125,7 +151,7 @@
     </div>
   </section>
 
-  <!-- MODAL ĐĂNG KÝ / ĐĂNG NHẬP VĨNH VIỄN (GOOGLE / FACEBOOK / EMAIL) -->
+  <!-- MODAL ĐĂNG KÝ / ĐĂNG NHẬP VĨNH VIỄN -->
   <div id="unifiedAuthModal" style="display:none;" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-teal-500/50 rounded-2xl max-w-md w-full p-6 space-y-4 text-xs shadow-2xl">
       <div class="flex justify-between items-center border-b border-white/10 pb-3">
@@ -135,19 +161,11 @@
         </div>
         <button onclick="window.closeUnifiedAuthModal()" class="text-slate-400 hover:text-white font-bold text-base">✕</button>
       </div>
-
-      <!-- DANH SÁCH TÀI KHOẢN ĐÃ LƯU TRÊN MÁY (BẤM 1 CHẠM ĐỂ VÀO LẠI NGAY) -->
       <div id="savedAccountsContainer" class="space-y-1.5"></div>
-
-      <!-- FORM NHẬP EMAIL + HỌ TÊN + MẬT KHẨU -->
       <div class="space-y-3 bg-slate-950 p-4 rounded-xl border border-white/10">
         <div class="flex gap-2">
-          <button onclick="window.quickFillSocialProfile('google')" class="flex-1 py-2 rounded-lg font-bold bg-white text-slate-900 flex items-center justify-center gap-1.5">
-            <span>G</span> Điền nhanh Google
-          </button>
-          <button onclick="window.quickFillSocialProfile('facebook')" class="flex-1 py-2 rounded-lg font-bold bg-[#1877F2] text-white flex items-center justify-center gap-1.5">
-            <span>f</span> Điền nhanh Facebook
-          </button>
+          <button onclick="window.quickFillSocialProfile('google')" class="flex-1 py-2 rounded-lg font-bold bg-white text-slate-900 flex items-center justify-center gap-1.5"><span>G</span> Điền nhanh Google</button>
+          <button onclick="window.quickFillSocialProfile('facebook')" class="flex-1 py-2 rounded-lg font-bold bg-[#1877F2] text-white flex items-center justify-center gap-1.5"><span>f</span> Điền nhanh Facebook</button>
         </div>
         <div>
           <label class="text-slate-400 block mb-1">Email đăng nhập / đăng ký (*):</label>
@@ -161,12 +179,7 @@
           <label class="text-slate-400 block mb-1">Mật khẩu bảo vệ:</label>
           <input id="inpAuthPassword" type="password" value="123456" class="w-full bg-slate-900 border border-white/15 rounded-lg px-3 py-2 text-white" />
         </div>
-        <button onclick="window.submitUnifiedAuth()" class="w-full py-2.5 rounded-xl font-extrabold bg-teal-500 text-slate-950 hover:bg-teal-400 transition">
-          ✓ Đăng Nhập / Đăng Ký & Lưu Vĩnh Viễn
-        </button>
-        <p class="text-[11px] text-slate-400 leading-relaxed">
-          * Cam kết kỹ thuật: Tài khoản của bạn được lưu đồng thời vào <strong>Sổ cái LocalStorage + IndexedDB + Cookie</strong>. Khi bấm "Thoát" rồi vào lại, email của bạn luôn nằm sẵn ở mục 1 chạm bên trên, tuyệt đối không bao giờ báo lỗi "chưa đăng ký".
-        </p>
+        <button onclick="window.submitUnifiedAuth()" class="w-full py-2.5 rounded-xl font-extrabold bg-teal-500 text-slate-950 hover:bg-teal-400 transition">✓ Đăng Nhập / Đăng Ký & Lưu Vĩnh Viễn</button>
       </div>
     </div>
   </div>
@@ -174,8 +187,8 @@
   <!-- TAB 1: KHÁCH HÀNG B2C -->
   <main id="tab-b2c" style="display:block;" class="max-w-5xl mx-auto px-4 mt-6 space-y-6">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-      <button id="step-nav-1" onclick="window.goToStep(1)" class="p-3 rounded-xl border border-teal-400 bg-teal-500/20 text-left text-xs font-bold">Bước 1: Tâm Lý & Thuật Toán</button>
-      <button id="step-nav-2" onclick="window.goToStep(2)" class="p-3 rounded-xl border border-white/10 bg-slate-900/60 text-left text-xs font-bold">Bước 2: Định Danh & VietQR</button>
+      <button id="step-nav-1" onclick="window.goToStep(1)" class="p-3 rounded-xl border border-teal-400 bg-teal-500/20 text-left text-xs font-bold">Bước 1: Tâm Lý & Lưu Gợi Ý</button>
+      <button id="step-nav-2" onclick="window.goToStep(2)" class="p-3 rounded-xl border border-white/10 bg-slate-900/60 text-left text-xs font-bold">Bước 2: Lên Đơn & VietQR</button>
       <button id="step-nav-3" onclick="window.goToStep(3)" class="p-3 rounded-xl border border-white/10 bg-slate-900/60 text-left text-xs font-bold">Bước 3: Phòng Chờ & Hoàn Tiền</button>
       <button id="step-nav-4" onclick="window.goToStep(4)" class="p-3 rounded-xl border border-white/10 bg-slate-900/60 text-left text-xs font-bold">Bước 4: Cào Thẻ Mở Khóa</button>
     </div>
@@ -184,7 +197,7 @@
     <section id="step-panel-1" style="display:block;" class="glass rounded-2xl p-6 space-y-5">
       <div class="flex flex-wrap justify-between items-center gap-2 border-b border-white/10 pb-3">
         <div>
-          <h2 class="text-lg font-extrabold text-teal-400">Bước 1: Thiết Lập Tâm Lý & Tối Ưu Hóa Giỏ Hàng Du Lịch Mù</h2>
+          <h2 class="text-lg font-extrabold text-teal-400">Bước 1: Thiết Lập Tâm Lý, Tạo Gợi Ý & Lưu Vào Kho Chuyến Đi</h2>
           <p id="activeAlgoSubtitle" class="text-xs text-slate-400">Đang chạy: Tổ Hợp Chuẩn OTA (Knapsack + Cosine + Chống Trùng Lặp)</p>
         </div>
         <span id="slaRetailGuarantee" class="text-xs font-bold text-amber-400">Cam kết giá trị thực >= 6.250.000đ</span>
@@ -192,24 +205,24 @@
 
       <div class="grid md:grid-cols-2 gap-6">
         <div class="space-y-3 text-xs">
-          <div><div class="flex justify-between mb-1"><span>Phiêu lưu</span><strong id="lblHealing" class="text-teal-400">Chữa lành: 85%</strong></div><input id="qHealing" type="range" min="10" max="100" value="85" oninput="window.updateSliders()" class="w-full accent-teal-400" /></div>
-          <div><div class="flex justify-between mb-1"><span>Đô thị</span><strong id="lblNature" class="text-teal-400">Thiên nhiên: 90%</strong></div><input id="qNature" type="range" min="10" max="100" value="90" oninput="window.updateSliders()" class="w-full accent-teal-400" /></div>
-          <div><div class="flex justify-between mb-1"><span>Sôi động</span><strong id="lblSolitude" class="text-teal-400">Độc hành: 80%</strong></div><input id="qSolitude" type="range" min="10" max="100" value="80" oninput="window.updateSliders()" class="w-full accent-teal-400" /></div>
-          <div><div class="flex justify-between mb-1"><span>Bụi bặm</span><strong id="lblComfort" class="text-teal-400">Nghỉ dưỡng 4-5*: 90%</strong></div><input id="qComfort" type="range" min="10" max="100" value="90" oninput="window.updateSliders()" class="w-full accent-teal-400" /></div>
-          <div><div class="flex justify-between mb-1"><span>Giải trí</span><strong id="lblCulture" class="text-teal-400">Văn hóa & Di sản: 75%</strong></div><input id="qCulture" type="range" min="10" max="100" value="75" oninput="window.updateSliders()" class="w-full accent-teal-400" /></div>
+          <div><div class="flex justify-between mb-1"><span>Phiêu lưu</span><strong id="lblHealing" class="text-teal-400">Chữa lành: 85%</strong></div><input id="qHealing" type="range" min="10" max="100" value="85" oninput="window.updateSliders(true)" class="w-full accent-teal-400" /></div>
+          <div><div class="flex justify-between mb-1"><span>Đô thị</span><strong id="lblNature" class="text-teal-400">Thiên nhiên: 90%</strong></div><input id="qNature" type="range" min="10" max="100" value="90" oninput="window.updateSliders(true)" class="w-full accent-teal-400" /></div>
+          <div><div class="flex justify-between mb-1"><span>Sôi động</span><strong id="lblSolitude" class="text-teal-400">Độc hành: 80%</strong></div><input id="qSolitude" type="range" min="10" max="100" value="80" oninput="window.updateSliders(true)" class="w-full accent-teal-400" /></div>
+          <div><div class="flex justify-between mb-1"><span>Bụi bặm</span><strong id="lblComfort" class="text-teal-400">Nghỉ dưỡng 4-5*: 90%</strong></div><input id="qComfort" type="range" min="10" max="100" value="90" oninput="window.updateSliders(true)" class="w-full accent-teal-400" /></div>
+          <div><div class="flex justify-between mb-1"><span>Giải trí</span><strong id="lblCulture" class="text-teal-400">Văn hóa & Di sản: 75%</strong></div><input id="qCulture" type="range" min="10" max="100" value="75" oninput="window.updateSliders(true)" class="w-full accent-teal-400" /></div>
         </div>
 
         <div class="space-y-3 bg-slate-900/80 p-4 rounded-xl border border-white/10 text-xs">
           <div class="grid grid-cols-2 gap-3">
-            <div><label class="text-slate-400">Ngân sách / 1 người</label><input id="budgetInput" type="number" step="500000" value="5000000" oninput="window.updateSliders()" class="w-full mt-1 bg-slate-950 border border-white/15 rounded-lg px-3 py-2 font-bold text-teal-400" /></div>
-            <div><label class="text-slate-400">Số người đi</label><select id="groupSizeInput" onchange="window.updateSliders()" class="w-full mt-1 bg-slate-950 border border-white/15 rounded-lg px-3 py-2 font-bold"><option value="1">1 người (Solo)</option><option value="2">2 người (Couple)</option><option value="3">Nhóm 3 người</option><option value="4">Nhóm 4 người</option></select></div>
+            <div><label class="text-slate-400">Ngân sách / 1 người</label><input id="budgetInput" type="number" step="500000" value="5000000" oninput="window.updateSliders(true)" class="w-full mt-1 bg-slate-950 border border-white/15 rounded-lg px-3 py-2 font-bold text-teal-400" /></div>
+            <div><label class="text-slate-400">Số người đi</label><select id="groupSizeInput" onchange="window.updateSliders(true)" class="w-full mt-1 bg-slate-950 border border-white/15 rounded-lg px-3 py-2 font-bold"><option value="1">1 người (Solo)</option><option value="2">2 người (Couple)</option><option value="3">Nhóm 3 người</option><option value="4">Nhóm 4 người</option></select></div>
           </div>
-          <div><label class="text-slate-400">Loại trừ thành phố không muốn đi (Blacklist):</label><input id="blacklistInput" type="text" placeholder="VD: Đà Lạt, Sapa" value="" oninput="window.updateSliders()" class="w-full mt-1 bg-slate-950 border border-white/15 rounded-lg px-3 py-2" /></div>
-          <div><label class="text-teal-300 font-bold">Từ khóa ưu tiên & Yêu cầu cho AI Co-Pilot:</label><input id="customAIPrompt" type="text" placeholder="VD: săn mây, biển đảo, tắm khoáng nóng, hải sản..." oninput="window.updateSliders()" class="w-full mt-1 bg-slate-950 border border-teal-500/40 rounded-lg px-3 py-2 text-white" /></div>
+          <div><label class="text-slate-400">Loại trừ thành phố không muốn đi (Blacklist):</label><input id="blacklistInput" type="text" placeholder="VD: Đà Lạt, Sapa" value="" oninput="window.updateSliders(true)" class="w-full mt-1 bg-slate-950 border border-white/15 rounded-lg px-3 py-2" /></div>
+          <div><label class="text-teal-300 font-bold">Từ khóa ưu tiên & Yêu cầu cho AI Co-Pilot:</label><input id="customAIPrompt" type="text" placeholder="VD: săn mây, biển đảo, tắm khoáng nóng, hải sản..." oninput="window.updateSliders(true)" class="w-full mt-1 bg-slate-950 border border-teal-500/40 rounded-lg px-3 py-2 text-white" /></div>
           <div class="flex flex-wrap gap-2 pt-1">
-            <button id="btnPreviewAI" onclick="window.previewAIRecommendation()" class="flex-1 py-2.5 px-3 rounded-xl font-extrabold bg-teal-500 text-slate-950 hover:bg-teal-400">🎲 Quay Gợi Ý Mới (Không Trùng Lặp)</button>
-            <button onclick="window.toggleAlgoTuner()" class="px-3 py-2.5 rounded-xl font-bold bg-white/10 text-amber-300 border border-amber-400/30">🎛️ Đổi Thuật Toán</button>
-            <button onclick="window.goToStep(2)" class="px-4 py-2.5 rounded-xl font-bold bg-amber-400 text-slate-950">Sang Bước 2 →</button>
+            <button id="btnPreviewAI" onclick="window.previewAIRecommendation()" class="flex-1 py-2.5 px-3 rounded-xl font-extrabold bg-teal-500 text-slate-950 hover:bg-teal-400">🎲 Quay Gợi Ý Mới</button>
+            <button onclick="window.saveCurrentDraftToWishlist()" class="px-3 py-2.5 rounded-xl font-extrabold bg-white/10 text-teal-300 border border-teal-400/40 hover:bg-teal-500/20">📌 Lưu Gợi Ý Này</button>
+            <button onclick="window.goToStep(2)" class="px-4 py-2.5 rounded-xl font-extrabold bg-amber-400 text-slate-950">Lên Chuyến Đi →</button>
           </div>
         </div>
       </div>
@@ -220,19 +233,19 @@
     <!-- BƯỚC 2 -->
     <section id="step-panel-2" style="display:none;" class="glass rounded-2xl p-6 space-y-5">
       <div class="flex flex-wrap justify-between items-center gap-2 border-b border-white/10 pb-3">
-        <h2 class="text-lg font-extrabold text-teal-400">Bước 2: Định Danh CCCD Khớp STK Hoàn Tiền & Quét VietQR Công Ty</h2>
-        <span id="oauthSyncStatusBadge" class="text-xs px-2.5 py-1 rounded bg-white/10 text-slate-300">Chưa đăng nhập tài khoản</span>
+        <h2 class="text-lg font-extrabold text-teal-400">Bước 2: Định Danh CCCD Khớp STK Hoàn Tiền & Lên Đơn Chuyến Đi</h2>
+        <span id="oauthSyncStatusBadge" class="text-xs px-2.5 py-1 rounded bg-white/10 text-slate-300">Tự động lưu thông tin định danh</span>
       </div>
       <div class="grid md:grid-cols-3 gap-4 text-xs">
-        <div><label class="text-slate-400">Email nhận vé & thông báo</label><input id="custEmail" type="email" value="truonghuy.vnu@gmail.com" class="w-full mt-1 bg-slate-900 border border-white/15 rounded-lg px-3 py-2" /></div>
-        <div><label class="text-slate-400">Họ tên trên CCCD</label><input id="custName" type="text" value="Nguyễn Doãn Trường Huy" oninput="window.autoFillBankHolder()" class="w-full mt-1 bg-slate-900 border border-white/15 rounded-lg px-3 py-2" /></div>
-        <div><label class="text-slate-400">Số CCCD (Mã hóa AES-256)</label><input id="custCCCD" type="text" value="001206012345" class="w-full mt-1 bg-slate-900 border border-white/15 rounded-lg px-3 py-2" /></div>
-        <div><label class="text-slate-400">Ngân hàng nhận tiền hoàn</label><select id="custBankCode" class="w-full mt-1 bg-slate-900 border border-white/15 rounded-lg px-3 py-2"><option value="BIDV">BIDV</option><option value="VCB">Vietcombank</option><option value="MB">MBBank</option><option value="TCB">Techcombank</option></select></div>
-        <div><label class="text-slate-400">Số tài khoản</label><input id="custBankAcc" type="text" value="2151000889999" class="w-full mt-1 bg-slate-900 border border-white/15 rounded-lg px-3 py-2" /></div>
-        <div><label class="text-slate-400">Tên Chủ TK (Bắt buộc khớp CCCD)</label><input id="custBankHolder" type="text" value="NGUYEN DOAN TRUONG HUY" class="w-full mt-1 bg-slate-900 border border-teal-500/40 rounded-lg px-3 py-2 font-bold text-teal-300" /></div>
+        <div><label class="text-slate-400">Email nhận vé & thông báo</label><input id="custEmail" type="email" value="truonghuy.vnu@gmail.com" oninput="window.persistFormState()" class="w-full mt-1 bg-slate-900 border border-white/15 rounded-lg px-3 py-2" /></div>
+        <div><label class="text-slate-400">Họ tên trên CCCD</label><input id="custName" type="text" value="Nguyễn Doãn Trường Huy" oninput="window.autoFillBankHolder(); window.persistFormState();" class="w-full mt-1 bg-slate-900 border border-white/15 rounded-lg px-3 py-2" /></div>
+        <div><label class="text-slate-400">Số CCCD (Mã hóa AES-256)</label><input id="custCCCD" type="text" value="001206012345" oninput="window.persistFormState()" class="w-full mt-1 bg-slate-900 border border-white/15 rounded-lg px-3 py-2" /></div>
+        <div><label class="text-slate-400">Ngân hàng nhận tiền hoàn</label><select id="custBankCode" onchange="window.persistFormState()" class="w-full mt-1 bg-slate-900 border border-white/15 rounded-lg px-3 py-2"><option value="BIDV">BIDV</option><option value="VCB">Vietcombank</option><option value="MB">MBBank</option><option value="TCB">Techcombank</option></select></div>
+        <div><label class="text-slate-400">Số tài khoản</label><input id="custBankAcc" type="text" value="2151000889999" oninput="window.persistFormState()" class="w-full mt-1 bg-slate-900 border border-white/15 rounded-lg px-3 py-2" /></div>
+        <div><label class="text-slate-400">Tên Chủ TK (Bắt buộc khớp CCCD)</label><input id="custBankHolder" type="text" value="NGUYEN DOAN TRUONG HUY" oninput="window.persistFormState()" class="w-full mt-1 bg-slate-900 border border-teal-500/40 rounded-lg px-3 py-2 font-bold text-teal-300" /></div>
       </div>
       <div class="flex flex-wrap justify-between items-center gap-3">
-        <button id="btnSubmitBooking" onclick="window.createBlindBooking()" class="px-6 py-3 rounded-xl font-extrabold text-sm bg-teal-500 text-slate-950 hover:bg-teal-400">Xác Thực STK & Xuất Mã VietQR Công Ty →</button>
+        <button id="btnSubmitBooking" onclick="window.createBlindBooking()" class="px-6 py-3 rounded-xl font-extrabold text-sm bg-teal-500 text-slate-950 hover:bg-teal-400">✓ Khóa Gợi Ý Hiện Tại Thành Chuyến Đi & Xuất VietQR →</button>
         <button onclick="window.goToStep(3)" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-white/10 text-white">Sang Bước 3 (Phòng Chờ & Hoàn Tiền) →</button>
       </div>
       <div id="qrPaymentSection" style="display:none;" class="bg-slate-900/90 border border-teal-500/30 rounded-xl p-5 space-y-4">
@@ -301,17 +314,20 @@
     </div>
   </main>
 
-  <!-- TAB 3: ADMIN & KIỂM ĐỊNH -->
+  <!-- TAB 3: ADMIN & KIỂM ĐỊNH DỮ LIỆU -->
   <main id="tab-admin" style="display:none;" class="max-w-5xl mx-auto px-4 mt-6 space-y-4">
     <div class="glass rounded-2xl p-6 space-y-4">
       <div class="flex flex-wrap justify-between items-center gap-2">
-        <div><h2 class="text-lg font-extrabold text-teal-400">Trung Tâm Kiểm Định Thuật Toán Chống Trùng Lặp & Quản Trị</h2><p class="text-xs text-slate-400">Kiểm chứng 3 lần bấm liên tiếp tự động xoay vòng Điểm đến + Chuyến bay + Khách sạn.</p></div>
-        <button onclick="window.runAISensitivityTest()" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-amber-400 text-slate-950">🎲 Test 3 Lần Bấm Liên Tiếp Không Trùng Lặp</button>
+        <div><h2 class="text-lg font-extrabold text-teal-400">Trung Tâm Quản Trị Lưu Trữ & Kiểm Định Toàn Trình</h2><p class="text-xs text-slate-400">Quản lý toàn bộ Tài khoản, Gợi ý đã lưu và Đơn đặt chuyến chính thức.</p></div>
+        <div class="flex gap-2">
+          <button onclick="window.runAISensitivityTest()" class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-amber-400 text-slate-950">🎲 Test 3 Lần Không Trùng Lặp</button>
+          <button onclick="window.runDeepChaosDiagnostic()" class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-teal-500 text-slate-950">🛡️ Chạy Thẩm Định Lưu Trữ</button>
+        </div>
       </div>
       <div id="aiSensitivityTestOutput" class="grid md:grid-cols-3 gap-3"></div>
-      <h3 class="text-sm font-bold text-white pt-2 border-t border-white/10">Danh Sách Tài Khoản Đã Đăng Ký Vĩnh Viễn:</h3>
+      <h3 class="text-sm font-bold text-white pt-2 border-t border-white/10">1. Danh Sách Tài Khoản Đã Đăng Ký Vĩnh Viễn:</h3>
       <div id="adminUsersTable" class="grid sm:grid-cols-2 md:grid-cols-3 gap-2"></div>
-      <h3 class="text-sm font-bold text-white pt-2 border-t border-white/10">Danh Sách Đơn Đặt Chuyến Thực Tế:</h3>
+      <h3 class="text-sm font-bold text-white pt-2 border-t border-white/10">2. Danh Sách Đơn Đặt Chuyến Chính Thức (Lưu Bền Vững):</h3>
       <div id="adminBookingsTable" class="space-y-2"></div>
     </div>
   </main>

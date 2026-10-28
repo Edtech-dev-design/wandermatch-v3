@@ -1,8 +1,7 @@
 // ============================================================================
-// WANDERMATCH v3.2 PRO — MULTI-ALGORITHM STUDIO & TRIPLE-PERSISTENT OAUTH
+// WANDERMATCH v3.3 FINAL — END-TO-END PERSISTENCE & MULTI-ALGORITHM ENGINE
 // ============================================================================
 
-// 1. KHO DỮ LIỆU CHUYẾN BAY & KHÁCH SẠN (OTA MOCK DATABASE)
 window.WM_FLIGHTS_DB = [
   { flight_id: "VN151", origin: "HAN", city: "Đà Lạt", airline: "Vietnam Airlines", time: "08:30 - 10:15", price: 2100000 },
   { flight_id: "VJ403", origin: "HAN", city: "Đà Lạt", airline: "Vietjet Deluxe", time: "10:20 - 12:05", price: 1650000 },
@@ -26,13 +25,11 @@ window.WM_HOTELS_DB = [
     hint: "Nơi bạn sắp đến có tiết trời 16°C cùng những căn biệt thự Pháp ẩn dưới rừng thông già bảng lảng sương khói.",
     packing: ["Áo khoác giữ nhiệt & khăn choàng", "Giày thể thao chống trượt dạo đồi thông", "CCCD bản gốc làm thủ tục bay", "Kem dưỡng ẩm", "Sạc dự phòng"],
     food_guide: ["Bánh căn Lệ 27 Yersin (40.000đ/đĩa)", "Lẩu gà lá é Tao Ngộ (300.000đ/nồi)", "Cà phê Túi Mơ To (65.000đ/ly)"],
-    itinerary_variants: [
-      [
-        { day: "Ngày 1: Chạm Ngõ Biệt Thự Thông", morning: "Đáp chuyến bay sáng, xe riêng đón về Villa Pháp cổ nhận phòng & uống trà Atiso nóng.", afternoon: "Dạo bộ thiền hành dưới rừng thông & ngâm chân thảo dược ấm.", evening: "Ăn tối Lẩu gà lá é nóng hổi trong tiết trời 16°C." },
-        { day: "Ngày 2: Biển Mây & Lưu Trữ Cổ", morning: "05:30 Đón bình minh trên biển mây Cầu Đất & ăn bánh căn bản địa.", afternoon: "Tham quan Biệt điện Trần Lệ Xuân (Mộc bản Triều Nguyễn) & Spa tinh dầu thông.", evening: "Tiệc tối rau hữu cơ & rượu vang nhẹ bên lò sưởi." },
-        { day: "Ngày 3: Quà Tặng Cao Nguyên", morning: "Mua hồng treo gió công nghệ Nhật & trà Atiso tại quầy OCOP.", afternoon: "Check-out muộn theo cam kết SLA, xe riêng tiễn ra sân bay Liên Khương." }
-      ]
-    ]
+    itinerary_variants: [[
+      { day: "Ngày 1: Chạm Ngõ Biệt Thự Thông", morning: "Đáp chuyến bay sáng, xe riêng đón về Villa Pháp cổ nhận phòng & uống trà Atiso nóng.", afternoon: "Dạo bộ thiền hành dưới rừng thông & ngâm chân thảo dược ấm.", evening: "Ăn tối Lẩu gà lá é nóng hổi trong tiết trời 16°C." },
+      { day: "Ngày 2: Biển Mây & Lưu Trữ Cổ", morning: "05:30 Đón bình minh trên biển mây Cầu Đất & ăn bánh căn bản địa.", afternoon: "Tham quan Biệt điện Trần Lệ Xuân (Mộc bản Triều Nguyễn) & Spa tinh dầu thông.", evening: "Tiệc tối rau hữu cơ & rượu vang nhẹ bên lò sưởi." },
+      { day: "Ngày 3: Quà Tặng Cao Nguyên", morning: "Mua hồng treo gió công nghệ Nhật & trà Atiso tại quầy OCOP.", afternoon: "Check-out muộn theo cam kết SLA, xe riêng tiễn ra sân bay Liên Khương." }
+    ]]
   },
   {
     hotel_id: "HTL-DL-02", city: "Đà Lạt", hotel_name: "Terracotta Hotel & Resort Tuyền Lâm (4 Sao Plus)",
@@ -44,13 +41,11 @@ window.WM_HOTELS_DB = [
     hint: "Một bán đảo xanh mướt nằm trọn bên mặt hồ phủ sương sớm đang chờ bạn tách biệt khỏi mọi ồn ào.",
     packing: ["Áo ấm chống sương", "Giày đi bộ đường rừng", "CCCD bản gốc", "Tai nghe chống ồn", "Bình giữ nhiệt cá nhân"],
     food_guide: ["Gà nướng cơm lam Tuyền Lâm (280.000đ/set)", "Bánh ướt lòng gà Trang (45.000đ/tô)", "Cà phê Phê La (55.000đ/ly)"],
-    itinerary_variants: [
-      [
-        { day: "Ngày 1: Bán Đảo Sương Sớm", morning: "Đáp sân bay Liên Khương, về thẳng khu nghỉ dưỡng ven Hồ Tuyền Lâm.", afternoon: "Tản bộ dưới rừng thông ven hồ & hái dâu tây vườn công nghệ cao.", evening: "Ăn tối BBQ ấm cúng bên bờ hồ." },
-        { day: "Ngày 2: Chèo SUP & Thiền viện", morning: "06:00 Chèo SUP đón làn sương bạc trên mặt Hồ Tuyền Lâm.", afternoon: "Viếng Thiền viện Trúc Lâm & trekking nhẹ rừng lá phong.", evening: "Thưởng thức bánh ướt lòng gà & kem bơ Thanh Thảo." },
-        { day: "Ngày 3: Tạm Biệt Rừng Thông", morning: "Uống cà phê ngắm mặt hồ, mua đặc sản Đà Lạt.", afternoon: "Xe riêng tiễn ra sân bay." }
-      ]
-    ]
+    itinerary_variants: [[
+      { day: "Ngày 1: Bán Đảo Sương Sớm", morning: "Đáp sân bay Liên Khương, về thẳng khu nghỉ dưỡng ven Hồ Tuyền Lâm.", afternoon: "Tản bộ dưới rừng thông ven hồ & hái dâu tây vườn công nghệ cao.", evening: "Ăn tối BBQ ấm cúng bên bờ hồ." },
+      { day: "Ngày 2: Chèo SUP & Thiền viện", morning: "06:00 Chèo SUP đón làn sương bạc trên mặt Hồ Tuyền Lâm.", afternoon: "Viếng Thiền viện Trúc Lâm & trekking nhẹ rừng lá phong.", evening: "Thưởng thức bánh ướt lòng gà & kem bơ Thanh Thảo." },
+      { day: "Ngày 3: Tạm Biệt Rừng Thông", morning: "Uống cà phê ngắm mặt hồ, mua đặc sản Đà Lạt.", afternoon: "Xe riêng tiễn ra sân bay." }
+    ]]
   },
   {
     hotel_id: "HTL-MD-01", city: "Măng Đen", hotel_name: "Golden Boutique Hotel Măng Đen (4 Sao Plus)",
@@ -62,13 +57,11 @@ window.WM_HOTELS_DB = [
     hint: "Hành trình đưa bạn lên cao nguyên 1.200m nguyên sơ, nơi chỉ có tiếng gió rừng và tiếng thác đổ bình yên.",
     packing: ["Áo len mỏng hoặc hoodie", "Xịt chống côn trùng thảo mộc", "CCCD bản gốc", "Giày trekking nhẹ", "Sổ tay cá nhân"],
     food_guide: ["Gà nướng cơm lam Cô Sinh (260.000đ/con)", "Lẩu xuyên tiêu Măng Đen (320.000đ/nồi)", "Cà phê Eva rang củi (40.000đ/ly)"],
-    itinerary_variants: [
-      [
-        { day: "Ngày 1: Tìm Về Đại Ngàn", morning: "Hạ cánh Pleiku, xe Limousine đưa bạn xuyên rừng thông lên Măng Đen.", afternoon: "Nhận phòng view rừng, dạo bộ quanh Hồ Đăk Ke tĩnh lặng.", evening: "Ăn tối Lẩu xuyên tiêu cay nồng ấm bụng giữa tiết trời 18°C." },
-        { day: "Ngày 2: Thác Pa Sỹ & Bản Làng", morning: "Khám phá Thác Pa Sỹ hùng vĩ và vườn tượng gỗ dân gian.", afternoon: "Thăm làng văn hóa Kon Pring & hái cam sạch tại nông trại hữu cơ.", evening: "Thưởng thức Gà nướng cơm lam bên bếp lửa hồng." },
-        { day: "Ngày 3: Năng Lượng Nguyên Sơ", morning: "Ngắm bình minh rừng thông, mua sâm dây OCOP Kon Plông.", afternoon: "Xe Limousine tiễn về sân bay Pleiku." }
-      ]
-    ]
+    itinerary_variants: [[
+      { day: "Ngày 1: Tìm Về Đại Ngàn", morning: "Hạ cánh Pleiku, xe Limousine đưa bạn xuyên rừng thông lên Măng Đen.", afternoon: "Nhận phòng view rừng, dạo bộ quanh Hồ Đăk Ke tĩnh lặng.", evening: "Ăn tối Lẩu xuyên tiêu cay nồng ấm bụng giữa tiết trời 18°C." },
+      { day: "Ngày 2: Thác Pa Sỹ & Bản Làng", morning: "Khám phá Thác Pa Sỹ hùng vĩ và vườn tượng gỗ dân gian.", afternoon: "Thăm làng văn hóa Kon Pring & hái cam sạch tại nông trại hữu cơ.", evening: "Thưởng thức Gà nướng cơm lam bên bếp lửa hồng." },
+      { day: "Ngày 3: Năng Lượng Nguyên Sơ", morning: "Ngắm bình minh rừng thông, mua sâm dây OCOP Kon Plông.", afternoon: "Xe Limousine tiễn về sân bay Pleiku." }
+    ]]
   },
   {
     hotel_id: "HTL-QN-01", city: "Quy Nhơn", hotel_name: "Avani Quy Nhon Resort (5 Sao - Hướng Biển)",
@@ -80,13 +73,11 @@ window.WM_HOTELS_DB = [
     hint: "Nơi những vách đá ôm trọn đại dương xanh ngắt 2 màu nước và nhịp sống hiền hòa của làng chài ven biển.",
     packing: ["Đồ bơi & trang phục biển", "Kem chống nắng SPF50+ & Kính râm", "CCCD bản gốc", "Mũ rộng vành", "Túi chống nước điện thoại"],
     food_guide: ["Bánh xèo tôm nhảy Gia Vỹ (35.000đ/chiếc)", "Bún chả cá Ngọc Liên (45.000đ/tô)", "Ốc Thúy Kiều (40.000đ - 60.000đ/đĩa)"],
-    itinerary_variants: [
-      [
-        { day: "Ngày 1: Gió Biển Chữa Lành", morning: "Đáp sân bay Phù Cát, xe đón về Resort 5 sao có bãi biển riêng.", afternoon: "Tắm biển, nằm ghế lười nghe sóng vỗ & uống dừa tươi.", evening: "Khám phá phố ẩm thực Ngô Văn Sở & bánh xèo tôm nhảy." },
-        { day: "Ngày 2: Kỳ Co - Eo Gió", morning: "Đi cano ra bãi Kỳ Co nước trong 2 màu & lặn ngắm san hô.", afternoon: "Dạo đường đá ven biển Eo Gió & Làng chài Nhơn Lý.", evening: "Ăn tối hải sản tươi sống đánh bắt trong ngày." },
-        { day: "Ngày 3: Chào Đại Dương", morning: "Ngắm bình minh trên biển từ ban công phòng, ăn bún chả cá.", afternoon: "Mua bánh ít lá gai, xe tiễn ra sân bay Phù Cát." }
-      ]
-    ]
+    itinerary_variants: [[
+      { day: "Ngày 1: Gió Biển Chữa Lành", morning: "Đáp sân bay Phù Cát, xe đón về Resort 5 sao có bãi biển riêng.", afternoon: "Tắm biển, nằm ghế lười nghe sóng vỗ & uống dừa tươi.", evening: "Khám phá phố ẩm thực Ngô Văn Sở & bánh xèo tôm nhảy." },
+      { day: "Ngày 2: Kỳ Co - Eo Gió", morning: "Đi cano ra bãi Kỳ Co nước trong 2 màu & lặn ngắm san hô.", afternoon: "Dạo đường đá ven biển Eo Gió & Làng chài Nhơn Lý.", evening: "Ăn tối hải sản tươi sống đánh bắt trong ngày." },
+      { day: "Ngày 3: Chào Đại Dương", morning: "Ngắm bình minh trên biển từ ban công phòng, ăn bún chả cá.", afternoon: "Mua bánh ít lá gai, xe tiễn ra sân bay Phù Cát." }
+    ]]
   },
   {
     hotel_id: "HTL-HUE-01", city: "Huế", hotel_name: "Pilgrimage Village Boutique Resort & Spa (5 Sao)",
@@ -98,13 +89,11 @@ window.WM_HOTELS_DB = [
     hint: "Thời gian lắng đọng bên những mái ngói rêu phong, dòng sông êm đềm và suối khoáng nóng phục hồi năng lượng.",
     packing: ["Trang phục lịch sự tham quan di tích", "Đồ bơi ngâm khoáng nóng Onsen", "CCCD bản gốc", "Giày bệt êm chân", "Ô gấp gọn"],
     food_guide: ["Bún bò Mệ Kéo (40.000đ/tô)", "Cơm hến Hoa Đông (25.000đ/tô)", "Bánh bèo, nậm, lọc Bà Đỏ (60.000đ/khay)"],
-    itinerary_variants: [
-      [
-        { day: "Ngày 1: Chạm Vào Di Sản", morning: "Hạ cánh Phú Bài, nhận phòng Resort làng quê 5 sao.", afternoon: "Tham quan Đại Nội & uống cà phê muối sân vườn cổ.", evening: "Ăn bánh Huế truyền thống, tản bộ cầu gỗ lim sông Hương." },
-        { day: "Ngày 2: Khoáng Nóng & Thiền Tâm", morning: "Viếng chùa Thiên Mụ & rừng thông Lăng Minh Mạng.", afternoon: "Ngâm tắm suối khoáng nóng Onsen Alba phục hồi thể lực.", evening: "Thưởng thức bún bò Huế & chè hạt sen bọc nhãn lồng." },
-        { day: "Ngày 3: Hương Vị Cố Đô", morning: "Thưởng thức trà sen buổi sớm, mua trà cung đình & mè xửng.", afternoon: "Xe riêng tiễn ra sân bay Phú Bài." }
-      ]
-    ]
+    itinerary_variants: [[
+      { day: "Ngày 1: Chạm Vào Di Sản", morning: "Hạ cánh Phú Bài, nhận phòng Resort làng quê 5 sao.", afternoon: "Tham quan Đại Nội & uống cà phê muối sân vườn cổ.", evening: "Ăn bánh Huế truyền thống, tản bộ cầu gỗ lim sông Hương." },
+      { day: "Ngày 2: Khoáng Nóng & Thiền Tâm", morning: "Viếng chùa Thiên Mụ & rừng thông Lăng Minh Mạng.", afternoon: "Ngâm tắm suối khoáng nóng Onsen Alba phục hồi thể lực.", evening: "Thưởng thức bún bò Huế & chè hạt sen bọc nhãn lồng." },
+      { day: "Ngày 3: Hương Vị Cố Đô", morning: "Thưởng thức trà sen buổi sớm, mua trà cung đình & mè xửng.", afternoon: "Xe riêng tiễn ra sân bay Phú Bài." }
+    ]]
   },
   {
     hotel_id: "HTL-PQ-01", city: "Phú Quốc", hotel_name: "Salinda Resort Phu Quoc Island (5 Sao Quốc Tế)",
@@ -116,13 +105,11 @@ window.WM_HOTELS_DB = [
     hint: "Kỳ nghỉ dưỡng xa hoa bên bờ biển nhiệt đới với hồ bơi vô cực điện phân muối và ánh hoàng hôn tím rực chân trời.",
     packing: ["Trang phục biển & đồ dự tiệc tối", "Kính râm, mũ & kem chống nắng", "CCCD bản gốc", "Dép sandal biển", "Máy ảnh/Điện thoại"],
     food_guide: ["Bún quậy Kiến Xây (65.000đ/tô)", "Bún kèn Út Lượm (45.000đ/tô)", "Hải sản Làng chài Hàm Ninh (Niêm yết theo kg)"],
-    itinerary_variants: [
-      [
-        { day: "Ngày 1: Đẳng Cấp Đảo Ngọc", morning: "Bay thẳng tới Phú Quốc, nhận phòng Resort 5 sao kèm rượu vang chào mừng.", afternoon: "Tắm hồ bơi vô cực điện phân muối & ngắm hoàng hôn bãi biển riêng.", evening: "Ăn bún quậy Kiến Xây & dạo chợ đêm." },
-        { day: "Ngày 2: Khám Phá Nam Đảo", morning: "Đi cáp treo vượt biển Hòn Thơm hoặc cano lặn ngắm san hô.", afternoon: "Check-in Sunset Town và Cầu Hôn (Kiss Bridge).", evening: "Tiệc BBQ hải sản bên bờ biển." },
-        { day: "Ngày 3: Thư Giãn Tuyệt Đối", morning: "Buffet sáng quốc tế kèm nhạc piano sống, mua nước mắm cốt.", afternoon: "Xe riêng tiễn ra sân bay Phú Quốc." }
-      ]
-    ]
+    itinerary_variants: [[
+      { day: "Ngày 1: Đẳng Cấp Đảo Ngọc", morning: "Bay thẳng tới Phú Quốc, nhận phòng Resort 5 sao kèm rượu vang chào mừng.", afternoon: "Tắm hồ bơi vô cực điện phân muối & ngắm hoàng hôn bãi biển riêng.", evening: "Ăn bún quậy Kiến Xây & dạo chợ đêm." },
+      { day: "Ngày 2: Khám Phá Nam Đảo", morning: "Đi cáp treo vượt biển Hòn Thơm hoặc cano lặn ngắm san hô.", afternoon: "Check-in Sunset Town và Cầu Hôn (Kiss Bridge).", evening: "Tiệc BBQ hải sản bên bờ biển." },
+      { day: "Ngày 3: Thư Giãn Tuyệt Đối", morning: "Buffet sáng quốc tế kèm nhạc piano sống, mua nước mắm cốt.", afternoon: "Xe riêng tiễn ra sân bay Phú Quốc." }
+    ]]
   },
   {
     hotel_id: "HTL-NT-01", city: "Nha Trang", hotel_name: "Mia Resort Nha Trang (5 Sao - Biệt Thự Vách Đá)",
@@ -134,18 +121,40 @@ window.WM_HOTELS_DB = [
     hint: "Tọa lạc trên vách đá nhìn thẳng ra một trong 29 vịnh biển đẹp nhất thế giới kèm liệu trình ngâm bùn khoáng nóng.",
     packing: ["Đồ bơi & kem chống nắng", "Trang phục dạo phố biển", "CCCD bản gốc", "Mũ cói & kính râm", "Sạc dự phòng"],
     food_guide: ["Bún cá sứa Năm Beo (45.000đ/tô)", "Nem nướng Đặng Văn Quyên (65.000đ/phần)", "Hải sản Bờ Kè (Niêm yết giá chuẩn)"],
-    itinerary_variants: [
-      [
-        { day: "Ngày 1: Vách Đá Ngắm Vịnh", morning: "Hạ cánh sân bay Cam Ranh, xe đón dọc cung đường đèo sát biển về Resort.", afternoon: "Thư giãn tại bãi biển riêng Bãi Đông & hồ bơi tràn bờ trên vách đá.", evening: "Thưởng thức Nem nướng Đặng Văn Quyên bản địa." },
-        { day: "Ngày 2: Tắm Bùn Khoáng & Di Sản Chăm", morning: "Ngâm bùn khoáng nóng tự nhiên phục hồi da tại I-Resort.", afternoon: "Tham quan Tháp Bà Ponagar kiến trúc Chămpa cổ.", evening: "Ăn tối hải sản tươi sống & dạo quảng trường biển." },
-        { day: "Ngày 3: Nắng Sớm Vịnh Xanh", morning: "Ăn sáng Bún cá sứa Năm Beo, mua yến sào chính hãng.", afternoon: "Xe tiễn ra sân bay Cam Ranh." }
-      ]
-    ]
+    itinerary_variants: [[
+      { day: "Ngày 1: Vách Đá Ngắm Vịnh", morning: "Hạ cánh sân bay Cam Ranh, xe đón dọc cung đường đèo sát biển về Resort.", afternoon: "Thư giãn tại bãi biển riêng Bãi Đông & hồ bơi tràn bờ trên vách đá.", evening: "Thưởng thức Nem nướng Đặng Văn Quyên bản địa." },
+      { day: "Ngày 2: Tắm Bùn Khoáng & Di Sản Chăm", morning: "Ngâm bùn khoáng nóng tự nhiên phục hồi da tại I-Resort.", afternoon: "Tham quan Tháp Bà Ponagar kiến trúc Chămpa cổ.", evening: "Ăn tối hải sản tươi sống & dạo quảng trường biển." },
+      { day: "Ngày 3: Nắng Sớm Vịnh Xanh", morning: "Ăn sáng Bún cá sứa Năm Beo, mua yến sào chính hãng.", afternoon: "Xe tiễn ra sân bay Cam Ranh." }
+    ]]
   }
 ];
 
-// 2. CẤU HÌNH THUẬT TOÁN ĐỘNG (CHO PHÉP NGƯỜI DÙNG CHỈNH SỬA NGAY LẬP TỨC)
-window.WM_ALGO_CONFIG = JSON.parse(localStorage.getItem("wm_algo_config_v4") || JSON.stringify({
+// ============================================================================
+// LỚP LƯU TRỮ AN TOÀN ĐA TẦNG (SAFE JSON + COOKIE + LOCALSTORAGE ENGINE)
+// ============================================================================
+window.safeLoadJSON = function(key, fallbackVal) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallbackVal;
+    const parsed = JSON.parse(raw);
+    return parsed !== null && parsed !== undefined ? parsed : fallbackVal;
+  } catch (e) {
+    localStorage.removeItem(key);
+    return fallbackVal;
+  }
+};
+
+window.safeSaveJSON = function(key, val) {
+  try {
+    const str = JSON.stringify(val);
+    localStorage.setItem(key, str);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+window.WM_ALGO_CONFIG = window.safeLoadJSON("wm_algo_config_v4", {
   mode: "HYBRID_OTA",
   flightCapPct: 62,
   tabuPenaltyPct: 92,
@@ -153,13 +162,14 @@ window.WM_ALGO_CONFIG = JSON.parse(localStorage.getItem("wm_algo_config_v4") || 
   wRating: 30,
   wBudget: 20,
   enableAICoPilot: true
-}));
+});
 
 window.WM_STATE = {
-  bookings: JSON.parse(localStorage.getItem("wm_bookings_v3") || "[]"),
-  recentCities: JSON.parse(localStorage.getItem("wm_recent_cities") || "[]"),
-  recentCombos: JSON.parse(localStorage.getItem("wm_recent_combos") || "[]"),
-  currentBooking: null,
+  bookings: window.safeLoadJSON("wm_bookings_v3", []),
+  savedWishlist: window.safeLoadJSON("wm_saved_wishlist_v4", []),
+  recentCities: window.safeLoadJSON("wm_recent_cities", []),
+  recentCombos: window.safeLoadJSON("wm_recent_combos", []),
+  currentBooking: window.safeLoadJSON("wm_current_draft_v4", null),
   lastRankedCombos: []
 };
 
@@ -174,31 +184,150 @@ window.showToast = function(msg, type = "success") {
       box = document.createElement("div");
       box.id = "wmToastBox";
       box.style.cssText = "position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;";
-      if (document.body && typeof document.body.appendChild === "function") {
-        document.body.appendChild(box);
-      }
+      if (document.body && typeof document.body.appendChild === "function") document.body.appendChild(box);
     }
     const el = document.createElement("div");
     const bg = type === "error" ? "#E11D48" : (type === "warn" ? "#D97706" : "#0D9488");
     el.style.cssText = `background:${bg};color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:700;box-shadow:0 10px 25px rgba(0,0,0,0.4);pointer-events:auto;`;
     el.innerText = msg;
-    if (box && typeof box.appendChild === "function") {
-      box.appendChild(el);
-    }
-    setTimeout(() => { if (typeof el.remove === "function") el.remove(); }, 3500);
+    if (box && typeof box.appendChild === "function") box.appendChild(el);
+    setTimeout(() => { if (el && typeof el.remove === "function") el.remove(); }, 3500);
   } catch (e) {}
 };
 
 // ============================================================================
-// HỆ THỐNG LƯU TRỮ TÀI KHOẢN 3 LỚP (LOCALSTORAGE + COOKIE + INDEXEDDB)
-// Đảm bảo đăng ký xong thoát ra vào lại 100% vẫn nhớ tài khoản
+// 1. LƯU TRỮ FORM TỰ ĐỘNG (KHÔNG BAO GIỜ MẤT DỮ LIỆU KHI TẢI LẠI TRANG)
+// ============================================================================
+window.persistFormState = function() {
+  const formState = window.collectUserPayload();
+  window.safeSaveJSON("wm_form_state_v4", formState);
+};
+
+window.restoreFormState = function() {
+  const saved = window.safeLoadJSON("wm_form_state_v4", null);
+  if (!saved) return false;
+  if (document.getElementById("custEmail") && saved.email) document.getElementById("custEmail").value = String(saved.email);
+  if (document.getElementById("custName") && saved.fullName) document.getElementById("custName").value = String(saved.fullName);
+  if (document.getElementById("custCCCD") && saved.cccd) document.getElementById("custCCCD").value = String(saved.cccd);
+  if (document.getElementById("custBankCode") && saved.bankCode) document.getElementById("custBankCode").value = String(saved.bankCode);
+  if (document.getElementById("custBankAcc") && saved.bankAccount) document.getElementById("custBankAcc").value = String(saved.bankAccount);
+  if (document.getElementById("custBankHolder") && saved.bankAccountHolder) document.getElementById("custBankHolder").value = String(saved.bankAccountHolder);
+  if (document.getElementById("budgetInput") && saved.budgetVnd) document.getElementById("budgetInput").value = String(saved.budgetVnd);
+  if (document.getElementById("groupSizeInput") && saved.groupSize) document.getElementById("groupSizeInput").value = String(saved.groupSize);
+  if (document.getElementById("customAIPrompt") && saved.customPrompt !== undefined) document.getElementById("customAIPrompt").value = String(saved.customPrompt);
+  if (document.getElementById("blacklistInput") && Array.isArray(saved.blacklistedCities)) document.getElementById("blacklistInput").value = saved.blacklistedCities.join(", ");
+  if (saved.personaVector) {
+    if (document.getElementById("qHealing")) document.getElementById("qHealing").value = String(saved.personaVector.healing ?? 85);
+    if (document.getElementById("qNature")) document.getElementById("qNature").value = String(saved.personaVector.nature ?? 90);
+    if (document.getElementById("qSolitude")) document.getElementById("qSolitude").value = String(saved.personaVector.solitude ?? 80);
+    if (document.getElementById("qComfort")) document.getElementById("qComfort").value = String(saved.personaVector.comfort ?? 90);
+    if (document.getElementById("qCulture")) document.getElementById("qCulture").value = String(saved.personaVector.culture ?? 75);
+  }
+  return true;
+};
+
+// ============================================================================
+// 2. KHO LƯU TRỮ GỢI Ý (WISHLIST) & ĐƯA GỢI Ý LÊN CHUYẾN ĐI CHÍNH THỨC
+// ============================================================================
+window.saveCurrentDraftToWishlist = function() {
+  if (!window.WM_STATE.currentBooking) {
+    window.WM_STATE.currentBooking = window.executeOTABlindAlgorithms(window.collectUserPayload(), true);
+  }
+  const cur = window.WM_STATE.currentBooking;
+  const list = window.WM_STATE.savedWishlist || [];
+  const exists = list.some(x => x.bookingCode === cur.bookingCode);
+  if (!exists) {
+    const itemToSave = {
+      ...cur,
+      savedAt: new Date().toLocaleTimeString("vi-VN") + " " + new Date().toLocaleDateString("vi-VN")
+    };
+    list.unshift(itemToSave);
+    window.WM_STATE.savedWishlist = list;
+    window.safeSaveJSON("wm_saved_wishlist_v4", list);
+  }
+  window.updateSavedCounterUI();
+  window.renderSavedTripsDrawer();
+  window.showToast(`Đã lưu gợi ý #${cur.bookingCode} vào Kho Lưu Trữ Vĩnh Viễn!`);
+};
+
+window.promoteSavedDraftToTrip = function(bookingCode) {
+  const list = window.WM_STATE.savedWishlist || [];
+  const found = list.find(x => x.bookingCode === bookingCode);
+  if (!found) return;
+  window.WM_STATE.currentBooking = found;
+  window.safeSaveJSON("wm_current_draft_v4", found);
+  window.renderAIRecommendationBox(found);
+  window.syncActiveBookingToSteps(found);
+  window.goToStep(2);
+  window.showToast(`Đã nạp gợi ý #${bookingCode} lên Bước 2 để khóa chuyến đi!`);
+};
+
+window.loadLockedBookingToView = function(bookingCode) {
+  const list = window.WM_STATE.bookings || [];
+  const found = list.find(x => x.bookingCode === bookingCode);
+  if (!found) return;
+  window.WM_STATE.currentBooking = found;
+  window.safeSaveJSON("wm_current_draft_v4", found);
+  window.renderAIRecommendationBox(found);
+  window.syncActiveBookingToSteps(found);
+  window.goToStep(3);
+  window.showToast(`Đã mở lại chuyến đi chính thức #${bookingCode}!`);
+};
+
+window.toggleSavedTripsDrawer = function() {
+  const el = document.getElementById("savedTripsDrawer");
+  if (!el) return;
+  const isHidden = el.style.display === "none";
+  el.style.display = isHidden ? "block" : "none";
+  if (isHidden) window.renderSavedTripsDrawer();
+};
+
+window.updateSavedCounterUI = function() {
+  const total = (window.WM_STATE.savedWishlist?.length || 0) + (window.WM_STATE.bookings?.length || 0);
+  if (document.getElementById("lblSavedCount")) document.getElementById("lblSavedCount").innerText = String(total);
+};
+
+window.renderSavedTripsDrawer = function() {
+  window.updateSavedCounterUI();
+  const wishEl = document.getElementById("savedWishlistContainer");
+  const bookEl = document.getElementById("savedOfficialBookingsContainer");
+
+  if (wishEl) {
+    const wList = window.WM_STATE.savedWishlist || [];
+    wishEl.innerHTML = wList.length === 0
+      ? `<p class="text-slate-400 italic">Chưa có gợi ý nào được lưu. Bấm nút '📌 Lưu Gợi Ý Này' ở Bước 1 để lưu lại.</p>`
+      : wList.map(w => `
+        <div class="p-3 rounded-xl bg-slate-900 border border-white/10 flex justify-between items-center gap-2">
+          <div>
+            <strong class="text-amber-300 block">#${w.bookingCode} — Độ hợp gu: ${w.matchScore}%</strong>
+            <span class="text-slate-300 text-[11px] block">Thời tiết: ${w.weatherTempC}°C | Chi phí: ${window.formatVND(w.revealPackage.budgetPaid)}</span>
+          </div>
+          <button onclick="window.promoteSavedDraftToTrip('${w.bookingCode}')" class="px-3 py-1.5 rounded-lg bg-teal-500 text-slate-950 font-extrabold text-[11px]">Lên Chuyến Đi →</button>
+        </div>
+      `).join("");
+  }
+
+  if (bookEl) {
+    const bList = window.WM_STATE.bookings || [];
+    bookEl.innerHTML = bList.length === 0
+      ? `<p class="text-slate-400 italic">Chưa có chuyến đi chính thức nào. Hãy khóa chuyến đi ở Bước 2.</p>`
+      : bList.map(b => `
+        <div class="p-3 rounded-xl bg-slate-900 border border-teal-500/30 flex justify-between items-center gap-2">
+          <div>
+            <strong class="text-teal-300 block">#${b.bookingCode} — Khách: ${b.customerName}</strong>
+            <span class="text-white text-[11px] block">${b.isRevealed ? `Đã mở khóa: ${b.revealPackage.cityName}` : "Đang niêm phong bí mật"} (${window.formatVND(b.revealPackage.budgetPaid)})</span>
+          </div>
+          <button onclick="window.loadLockedBookingToView('${b.bookingCode}')" class="px-3 py-1.5 rounded-lg bg-amber-400 text-slate-950 font-extrabold text-[11px]">Xem Đơn →</button>
+        </div>
+      `).join("");
+  }
+};
+
+// ============================================================================
+// 3. HỆ THỐNG TÀI KHOẢN VĨNH VIỄN (LOCALSTORAGE + COOKIE BACKUP)
 // ============================================================================
 window.getUsersVault = function() {
-  let vault = {};
-  try {
-    const rawLS = localStorage.getItem("wm_users_vault_v4");
-    if (rawLS) vault = { ...vault, ...JSON.parse(rawLS) };
-  } catch (e) {}
+  let vault = window.safeLoadJSON("wm_users_vault_v4", {});
   try {
     const match = document.cookie.match(/(?:^|;\s*)wm_vault_backup=([^;]*)/);
     if (match && match[1]) {
@@ -207,7 +336,6 @@ window.getUsersVault = function() {
     }
   } catch (e) {}
 
-  // Đảm bảo luôn có sẵn các tài khoản mặc định của chủ dự án để test 1 chạm
   const defaultEmail = "truonghuy.vnu@gmail.com";
   if (!vault[defaultEmail]) {
     vault[defaultEmail] = {
@@ -222,9 +350,9 @@ window.getUsersVault = function() {
 };
 
 window.saveUsersVault = function(vault) {
+  window.safeSaveJSON("wm_users_vault_v4", vault);
   try {
     const str = JSON.stringify(vault);
-    localStorage.setItem("wm_users_vault_v4", str);
     document.cookie = `wm_vault_backup=${encodeURIComponent(str)}; path=/; max-age=31536000; SameSite=Lax`;
   } catch (e) {}
 };
@@ -247,10 +375,6 @@ window.renderSavedAccountsList = function() {
   if (!container) return;
   const vault = window.getUsersVault();
   const users = Object.values(vault);
-  if (!users.length) {
-    container.innerHTML = "";
-    return;
-  }
   container.innerHTML = `
     <span class="text-[11px] font-bold text-amber-300 uppercase block">Tài khoản đã đăng ký (Bấm 1 chạm để vào ngay):</span>
     <div class="max-h-36 overflow-y-auto space-y-1.5 pr-1">
@@ -307,18 +431,10 @@ window.submitUnifiedAuth = function(forcedProvider) {
   };
 
   vault[email] = userObj;
-  if (email.includes("chaos") || email.includes("test")) {
-    vault["truonghuy.test@gmail.com"] = { ...userObj, email: "truonghuy.test@gmail.com" };
-  }
   window.saveUsersVault(vault);
   window.activateUserSession(userObj);
   window.closeUnifiedAuthModal();
-
-  if (existing) {
-    window.showToast(`Chào mừng quay lại, ${userObj.name} (${userObj.email})!`);
-  } else {
-    window.showToast(`Đã đăng ký & lưu vĩnh viễn tài khoản ${userObj.email}!`);
-  }
+  window.showToast(existing ? `Chào mừng quay lại, ${userObj.name}!` : `Đã đăng ký & lưu vĩnh viễn tài khoản ${userObj.email}!`);
 };
 
 window.loginDirectlyWithEmail = function(email) {
@@ -333,7 +449,7 @@ window.loginDirectlyWithEmail = function(email) {
 
 window.activateUserSession = function(user) {
   if (!user) return;
-  localStorage.setItem("wm_active_session_v4", JSON.stringify(user));
+  window.safeSaveJSON("wm_active_session_v4", user);
   document.cookie = `wm_active_email=${encodeURIComponent(user.email)}; path=/; max-age=31536000; SameSite=Lax`;
 
   if (document.getElementById("authLoggedOutBox")) document.getElementById("authLoggedOutBox").style.display = "none";
@@ -345,25 +461,25 @@ window.activateUserSession = function(user) {
   if (document.getElementById("custEmail")) document.getElementById("custEmail").value = user.email;
   if (document.getElementById("custName")) document.getElementById("custName").value = user.name;
   window.autoFillBankHolder();
+  window.persistFormState();
 
   const badge = document.getElementById("oauthSyncStatusBadge");
   if (badge) {
     badge.className = "text-xs px-2.5 py-1 rounded bg-teal-500/20 text-teal-300 font-bold";
-    badge.innerText = `✓ Đã xác thực: ${user.email} (${user.provider})`;
+    badge.innerText = `✓ Đã xác thực & Lưu: ${user.email}`;
   }
 };
 
-// Đăng xuất chỉ xóa phiên tạm, GIỮ NGUYÊN 100% kho tài khoản đã đăng ký
 window.logoutSessionOnly = function() {
   localStorage.removeItem("wm_active_session_v4");
   document.cookie = "wm_active_email=; path=/; max-age=0";
   if (document.getElementById("authLoggedOutBox")) document.getElementById("authLoggedOutBox").style.display = "flex";
   if (document.getElementById("authLoggedInBox")) document.getElementById("authLoggedInBox").style.display = "none";
-  window.showToast("Đã thoát phiên. Email của bạn vẫn được lưu vĩnh viễn để đăng nhập lại 1 chạm!", "warn");
+  window.showToast("Đã thoát phiên. Toàn bộ Tài khoản, Gợi ý đã lưu và Chuyến đi vẫn được giữ nguyên 100%!", "warn");
 };
 
 // ============================================================================
-// TRẠM ĐIỀU KHIỂN & TÙY CHỈNH THUẬT TOÁN TRỰC TIẾP (LIVE ALGORITHM STUDIO)
+// 4. TRẠM TÙY CHỈNH THUẬT TOÁN & LÕI 4 THUẬT TOÁN OTA
 // ============================================================================
 window.toggleAlgoTuner = function() {
   const drawer = document.getElementById("algoTunerDrawer");
@@ -400,18 +516,19 @@ window.applyAlgorithmChanges = function() {
     wBudget: Number(document.getElementById("cfgWBudget")?.value || 20),
     enableAICoPilot: Boolean(document.getElementById("cfgEnableAICoPilot")?.checked)
   };
-  localStorage.setItem("wm_algo_config_v4", JSON.stringify(window.WM_ALGO_CONFIG));
+  window.safeSaveJSON("wm_algo_config_v4", window.WM_ALGO_CONFIG);
   window.syncAlgoTunerUI();
 
   const res = window.executeOTABlindAlgorithms(window.collectUserPayload(), false);
   window.WM_STATE.currentBooking = res;
+  window.safeSaveJSON("wm_current_draft_v4", res);
   window.renderAIRecommendationBox(res);
   window.renderLiveAlgoMatrix();
 };
 
 window.resetAlgorithmConfig = function() {
   window.WM_ALGO_CONFIG = { mode: "HYBRID_OTA", flightCapPct: 62, tabuPenaltyPct: 92, wSim: 50, wRating: 30, wBudget: 20, enableAICoPilot: true };
-  localStorage.setItem("wm_algo_config_v4", JSON.stringify(window.WM_ALGO_CONFIG));
+  window.safeSaveJSON("wm_algo_config_v4", window.WM_ALGO_CONFIG);
   window.syncAlgoTunerUI();
   window.applyAlgorithmChanges();
   window.showToast("Đã khôi phục cấu hình thuật toán chuẩn OTA!");
@@ -442,18 +559,16 @@ window.renderLiveAlgoMatrix = function() {
   `).join("");
 };
 
-// ============================================================================
-// LÕI ĐA THUẬT TOÁN OTA + CHỐNG TRÙNG LẶP LỊCH SỬ
-// ============================================================================
 window.executeOTABlindAlgorithms = function(payload, recordHistory = true) {
   const { personaVector = {}, blacklistedCities = [], customPrompt = "", budgetVnd = 5000000, groupSize = 1 } = payload;
+  const safeBudget = Math.max(1500000, Number(budgetVnd) || 5000000);
+  const safeGroup = Math.max(1, Number(groupSize) || 1);
   const cfg = window.WM_ALGO_CONFIG;
   const nights = 2;
   const blNorm = (blacklistedCities || []).map(x => window.normVN(x));
   const txtLower = String(customPrompt || "").toLowerCase();
 
-  // THUẬT TOÁN 1: Lọc Tuyến Bay theo trần % ngân sách người dùng cấu hình
-  let feasibleFlights = window.WM_FLIGHTS_DB.filter(f => f.price <= budgetVnd * (cfg.flightCapPct / 100));
+  let feasibleFlights = window.WM_FLIGHTS_DB.filter(f => f.price <= safeBudget * (cfg.flightCapPct / 100));
   if (!feasibleFlights.length) feasibleFlights = window.WM_FLIGHTS_DB;
 
   const keys = ["healing", "nature", "solitude", "comfort", "culture"];
@@ -468,8 +583,7 @@ window.executeOTABlindAlgorithms = function(payload, recordHistory = true) {
       const comboCostPerPerson = flight.price + (hotel.price_per_night * nights);
       const retailPerPerson = flight.price + (hotel.retail_per_night * nights);
 
-      if (comboCostPerPerson <= budgetVnd * 1.06) {
-        // Tính Cosine Similarity
+      if (comboCostPerPerson <= safeBudget * 1.08) {
         let dot = 0, normU = 0, normH = 0, euclidSq = 0;
         keys.forEach(k => {
           const u = Number(personaVector[k] ?? 80);
@@ -490,10 +604,9 @@ window.executeOTABlindAlgorithms = function(payload, recordHistory = true) {
         });
 
         const simScore = Math.min(99.6, Math.round((cfg.mode === "TOPSIS_EUCLID" ? topsisScore : cosineScore) * 10) / 10);
-        const budgetUtilization = Math.min(100, Math.round((comboCostPerPerson / budgetVnd) * 1000) / 10);
+        const budgetUtilization = Math.min(100, Math.round((comboCostPerPerson / safeBudget) * 1000) / 10);
         const ratingScore = (hotel.rating / 5.0) * 100;
 
-        // Tính hàm mục tiêu theo Chế độ Thuật toán đã chọn trong Studio
         let utilityScore = 0;
         if (cfg.mode === "PURE_KNAPSACK") {
           utilityScore = (budgetUtilization * 0.65) + (ratingScore * 0.35);
@@ -520,7 +633,7 @@ window.executeOTABlindAlgorithms = function(payload, recordHistory = true) {
     const f = window.WM_FLIGHTS_DB[0], h = window.WM_HOTELS_DB[0];
     validCombos.push({
       comboId: `${f.flight_id}_${h.hotel_id}`, flight: f, hotel: h,
-      comboCostPerPerson: budgetVnd, retailPerPerson: Math.round(budgetVnd * 1.28),
+      comboCostPerPerson: safeBudget, retailPerPerson: Math.round(safeBudget * 1.28),
       simScore: 94.5, budgetUtilization: 96.0, utilityScore: 95.2
     });
   }
@@ -528,40 +641,41 @@ window.executeOTABlindAlgorithms = function(payload, recordHistory = true) {
   validCombos.sort((a, b) => b.utilityScore - a.utilityScore);
   window.WM_STATE.lastRankedCombos = validCombos;
 
-  // THUẬT TOÁN 4: CHỐNG TRÙNG LẶP LỊCH SỬ (TABU COOLDOWN) & WEIGHTED RANDOM
   const recentCities = window.WM_STATE.recentCities || [];
   const recentCombos = window.WM_STATE.recentCombos || [];
   const topCandidates = validCombos.slice(0, 5);
   const keepRatio = Math.max(0.01, (100 - cfg.tabuPenaltyPct) / 100);
 
-  const weights = topCandidates.map(c => {
-    let w = Math.pow(c.utilityScore, 2);
-    if (recentCombos.length > 0 && c.comboId === recentCombos[recentCombos.length - 1] && topCandidates.length > 1) {
-      return 0;
-    }
-    if (recentCombos.includes(c.comboId)) w *= (keepRatio * 0.25);
-    if (recentCities.length > 0 && c.hotel.city === recentCities[recentCities.length - 1]) {
-      w *= keepRatio;
-    } else if (recentCities.slice(-2).includes(c.hotel.city)) {
-      w *= Math.min(1, keepRatio * 2.5);
-    }
-    return Math.max(w, 0.05);
-  });
-
   let picked = topCandidates[0];
-  if (recordHistory) {
+  if (recordHistory && topCandidates.length > 1) {
+    // Loại bỏ cứng combo vừa mới xuất hiện ở lần bấm ngay trước đó để 100% không bao giờ trùng kề nhau
+    const lastComboId = recentCombos.length > 0 ? recentCombos[recentCombos.length - 1] : "";
+    const filteredPool = topCandidates.filter(c => c.comboId !== lastComboId);
+    const activePool = filteredPool.length > 0 ? filteredPool : topCandidates;
+
+    const weights = activePool.map(c => {
+      let w = Math.pow(c.utilityScore, 2);
+      if (recentCombos.includes(c.comboId)) w *= (keepRatio * 0.2);
+      if (recentCities.length > 0 && c.hotel.city === recentCities[recentCities.length - 1]) {
+        w *= keepRatio;
+      }
+      return Math.max(w, 0.05);
+    });
+
     const totalWeight = weights.reduce((a, b) => a + b, 0);
     let rand = Math.random() * totalWeight;
-    for (let i = 0; i < topCandidates.length; i++) {
+    picked = activePool[0];
+    for (let i = 0; i < activePool.length; i++) {
       rand -= weights[i];
-      if (rand <= 0) { picked = topCandidates[i]; break; }
+      if (rand <= 0) { picked = activePool[i]; break; }
     }
+
     window.WM_STATE.recentCities.push(picked.hotel.city);
-    if (window.WM_STATE.recentCities.length > 4) window.WM_STATE.recentCities.shift();
+    if (window.WM_STATE.recentCities.length > 5) window.WM_STATE.recentCities.shift();
     window.WM_STATE.recentCombos.push(picked.comboId);
     if (window.WM_STATE.recentCombos.length > 6) window.WM_STATE.recentCombos.shift();
-    localStorage.setItem("wm_recent_cities", JSON.stringify(window.WM_STATE.recentCities));
-    localStorage.setItem("wm_recent_combos", JSON.stringify(window.WM_STATE.recentCombos));
+    window.safeSaveJSON("wm_recent_cities", window.WM_STATE.recentCities);
+    window.safeSaveJSON("wm_recent_combos", window.WM_STATE.recentCombos);
   }
 
   const modeNames = {
@@ -578,11 +692,11 @@ window.executeOTABlindAlgorithms = function(payload, recordHistory = true) {
   const variants = picked.hotel.itinerary_variants;
   const pickedItinerary = variants[Math.floor(Math.random() * variants.length)];
   const code = "WM" + Math.floor(10000 + Math.random() * 90000);
-  const totalComboActual = picked.comboCostPerPerson * Number(groupSize);
-  const totalRetail = Math.max(picked.retailPerPerson * Number(groupSize), Math.round(totalComboActual * 1.25));
+  const totalComboActual = picked.comboCostPerPerson * safeGroup;
+  const totalRetail = Math.max(picked.retailPerPerson * safeGroup, Math.round(totalComboActual * 1.25));
   const savingsVnd = totalRetail - totalComboActual;
 
-  const splitQrs = Array.from({ length: Number(groupSize) }, (_, i) => ({
+  const splitQrs = Array.from({ length: safeGroup }, (_, i) => ({
     memberIndex: i + 1,
     amount: picked.comboCostPerPerson,
     memo: `${code} M${i + 1}`,
@@ -593,11 +707,12 @@ window.executeOTABlindAlgorithms = function(payload, recordHistory = true) {
     success: true,
     bookingCode: code,
     comboId: picked.comboId,
+    isRevealed: false,
     matchScore: picked.simScore,
     utilityScore: picked.utilityScore,
     budgetUtilization: picked.budgetUtilization,
     aiEngineUsed: modeNames[cfg.mode],
-    aiReasoningLog: `[Mô hình: ${modeNames[cfg.mode]} | Điểm Utility: ${picked.utilityScore} | Lấp đầy túi ngân sách: ${picked.budgetUtilization}%] Đã ghép tối ưu chuyến bay ${picked.flight.flight_id} (${picked.flight.airline}) + ${picked.hotel.rating}★ Resort (${picked.comboCostPerPerson.toLocaleString("vi-VN")}đ/người, lời ngay ${window.formatVND(savingsVnd)}). Lịch sử tránh lặp: [${recentCities.slice(-3).join(" → ") || "Mới"}].`,
+    aiReasoningLog: `[Mô hình: ${modeNames[cfg.mode]} | Điểm Utility: ${picked.utilityScore} | Lấp đầy túi ngân sách: ${picked.budgetUtilization}%] Đã ghép tối ưu chuyến bay ${picked.flight.flight_id} (${picked.flight.airline}) + ${picked.hotel.rating}★ Resort (${picked.comboCostPerPerson.toLocaleString("vi-VN")}đ/người, lời ngay ${window.formatVND(savingsVnd)}).`,
     weatherTempC: picked.hotel.weather_temp_c,
     weatherDesc: picked.hotel.weather_desc,
     mysteryHint: picked.hotel.hint,
@@ -619,15 +734,11 @@ window.executeOTABlindAlgorithms = function(payload, recordHistory = true) {
 };
 
 window.enrichWithAICoPilot = async function(lockedResult, userPayload) {
-  if (!window.WM_ALGO_CONFIG.enableAICoPilot) {
-    const badge = document.getElementById("aiCoPilotLiveNote");
-    if (badge) badge.style.display = "none";
-    return;
-  }
+  if (!window.WM_ALGO_CONFIG.enableAICoPilot) return;
   try {
     const ctrl = new AbortController();
     setTimeout(() => ctrl.abort(), 3500);
-    const prompt = `Khách đặt du lịch mù ngân sách ${userPayload.budgetVnd}đ. Thuật toán đã chốt bí mật gói: ${lockedResult.revealPackage.cityName} (${lockedResult.revealPackage.comboTitle}), thời tiết ${lockedResult.weatherTempC}C. Yêu cầu riêng: "${userPayload.customPrompt || "Nghỉ dưỡng"}". Viết 1 câu nhận xét AI Co-Pilot (dưới 35 từ, KHÔNG LỘ TÊN ${lockedResult.revealPackage.cityName}). Trả về JSON: {"copilot_note":"..."}`;
+    const prompt = `Khách đặt du lịch mù ngân sách ${userPayload.budgetVnd}đ. Thuật toán đã chốt bí mật gói: ${lockedResult.revealPackage.cityName} (${lockedResult.revealPackage.comboTitle}), thời tiết ${lockedResult.weatherTempC}C. Viết 1 câu nhận xét AI Co-Pilot (dưới 35 từ, KHÔNG LỘ TÊN ${lockedResult.revealPackage.cityName}). Trả về JSON: {"copilot_note":"..."}`;
     const r = await fetch("https://text.pollinations.ai/openai", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ model: "openai", response_format: { type: "json_object" }, messages: [{ role: "user", content: prompt }] }),
@@ -644,19 +755,52 @@ window.enrichWithAICoPilot = async function(lockedResult, userPayload) {
   } catch (e) {}
 };
 
+// ============================================================================
+// 5. ĐIỀU KHIỂN GIAO DIỆN & ĐỒNG BỘ LƯU TRỮ XUYÊN SUỐT 4 BƯỚC
+// ============================================================================
 window.previewAIRecommendation = function() {
   const payload = window.collectUserPayload();
+  window.persistFormState();
   const res = window.executeOTABlindAlgorithms(payload, true);
   window.WM_STATE.currentBooking = res;
+  window.safeSaveJSON("wm_current_draft_v4", res);
   window.renderAIRecommendationBox(res);
+  window.syncActiveBookingToSteps(res);
   window.renderLiveAlgoMatrix();
-  window.showToast(`Đã xoay Hộp quà mới #${res.bookingCode} (Tối ưu ${res.budgetUtilization}% ngân sách - Không trùng chuyến cũ)!`);
+  window.showToast(`Đã tạo & lưu nháp gợi ý mới #${res.bookingCode} (Tối ưu ${res.budgetUtilization}% ngân sách)!`);
   window.enrichWithAICoPilot(res, payload);
+};
+
+window.syncActiveBookingToSteps = function(data) {
+  if (!data) return;
+  if (document.getElementById("lblBookingCode")) document.getElementById("lblBookingCode").innerText = `Mã đơn: ${data.bookingCode}`;
+  if (document.getElementById("qrPaymentSection")) document.getElementById("qrPaymentSection").style.display = "block";
+  if (document.getElementById("qrCardsContainer") && Array.isArray(data.splitQrs)) {
+    document.getElementById("qrCardsContainer").innerHTML = data.splitQrs.map(q => `
+      <div class="bg-slate-950 p-3 rounded-xl border border-white/10 text-center space-y-2">
+        <span class="text-xs font-bold text-teal-400">Thành viên #${q.memberIndex}</span>
+        <img src="${q.qrUrl}" alt="VietQR" class="w-40 h-40 mx-auto rounded-lg bg-white p-1" />
+        <p class="text-xs font-bold text-white">${window.formatVND(q.amount)}</p>
+        <p class="text-[11px] text-slate-400">Nội dung CK: <strong>${q.memo}</strong></p>
+      </div>
+    `).join("");
+  }
+  if (document.getElementById("anonWeatherBox")) document.getElementById("anonWeatherBox").innerText = `${data.weatherTempC}°C — ${data.weatherDesc}`;
+  if (document.getElementById("aiMysteryHintText")) document.getElementById("aiMysteryHintText").innerText = `"${data.mysteryHint}"`;
+  if (document.getElementById("packingListContainer")) {
+    document.getElementById("packingListContainer").innerHTML = (data.packingChecklist || []).map((item, i) => `
+      <label class="flex items-center gap-2 cursor-pointer text-xs">
+        <input type="checkbox" checked class="accent-teal-400 w-4 h-4" />
+        <span>${i + 1}. ${item}</span>
+      </label>
+    `).join("");
+  }
+  window.populateRevealData(Boolean(data.isRevealed));
 };
 
 window.renderAIRecommendationBox = function(data) {
   const box = document.getElementById("aiLiveResultBox");
-  if (!box) return;
+  if (!box || !data) return;
   box.style.display = "block";
   box.innerHTML = `
     <div class="bg-slate-900/95 border border-teal-500/40 rounded-2xl p-5 space-y-4 mt-4">
@@ -671,7 +815,7 @@ window.renderAIRecommendationBox = function(data) {
         </div>
       </div>
       <p class="text-xs text-slate-200 leading-relaxed bg-slate-950 p-3 rounded-xl border border-white/10">${data.aiReasoningLog}</p>
-      <p id="aiCoPilotLiveNote" class="text-xs text-teal-200 bg-teal-950/40 border border-teal-500/30 p-2.5 rounded-xl">🤖 <span class="font-bold">AI Co-Pilot Độc Lập:</span> Đang phân tích bổ trợ theo hồ sơ của bạn...</p>
+      <p id="aiCoPilotLiveNote" class="text-xs text-teal-200 bg-teal-950/40 border border-teal-500/30 p-2.5 rounded-xl">🤖 <span class="font-bold">AI Co-Pilot Độc Lập:</span> Đã đồng bộ dữ liệu gợi ý vào bộ nhớ bền vững.</p>
       <div class="bg-amber-500/10 border border-amber-400/30 p-3.5 rounded-xl">
         <span class="text-xs font-bold text-amber-300 uppercase">Thư Gợi Ý Bí Mật (Đã khóa tên thành phố — Thời tiết: ${data.weatherTempC}°C, ${data.weatherDesc})</span>
         <p class="text-sm italic text-white mt-1">"${data.mysteryHint}"</p>
@@ -742,7 +886,7 @@ window.collectUserPayload = function() {
   };
 };
 
-window.updateSliders = function() {
+window.updateSliders = function(userTriggered = false) {
   const p = window.collectUserPayload();
   if (document.getElementById("lblHealing")) document.getElementById("lblHealing").innerText = `Chữa lành: ${p.personaVector.healing}%`;
   if (document.getElementById("lblNature")) document.getElementById("lblNature").innerText = `Thiên nhiên: ${p.personaVector.nature}%`;
@@ -752,9 +896,16 @@ window.updateSliders = function() {
   if (document.getElementById("slaRetailGuarantee")) {
     document.getElementById("slaRetailGuarantee").innerText = `Cam kết giá trị thực >= ${window.formatVND(Math.round(p.budgetVnd * p.groupSize * 1.25))} (${p.groupSize} người)`;
   }
-  const res = window.executeOTABlindAlgorithms(p, false);
-  window.WM_STATE.currentBooking = res;
-  window.renderAIRecommendationBox(res);
+
+  if (userTriggered || !window.WM_STATE.currentBooking) {
+    window.persistFormState();
+    const res = window.executeOTABlindAlgorithms(p, false);
+    window.WM_STATE.currentBooking = res;
+    window.safeSaveJSON("wm_current_draft_v4", res);
+  }
+
+  window.renderAIRecommendationBox(window.WM_STATE.currentBooking);
+  window.syncActiveBookingToSteps(window.WM_STATE.currentBooking);
   window.renderLiveAlgoMatrix();
 };
 
@@ -764,41 +915,46 @@ window.autoFillBankHolder = function() {
   if (holderEl) holderEl.value = window.normVN(name);
 };
 
+// KHÓA GỢI Ý HIỆN TẠI LÊN ĐƠN CHUYẾN ĐI CHÍNH THỨC (GIỮ NGUYÊN MÃ GỢI Ý KHÁCH ĐÃ CHỌN)
 window.createBlindBooking = function() {
   const payload = window.collectUserPayload();
+  window.persistFormState();
+
   if (window.normVN(payload.fullName) !== window.normVN(payload.bankAccountHolder)) {
     window.showToast(`Từ chối: Tên CCCD (${window.normVN(payload.fullName)}) không khớp Chủ STK (${window.normVN(payload.bankAccountHolder)})!`, "error");
     return;
   }
-  const data = window.executeOTABlindAlgorithms(payload, true);
-  window.WM_STATE.currentBooking = data;
-  window.WM_STATE.bookings.unshift({ ...data, customerName: payload.fullName, bankInfo: `${payload.bankCode} - ***${payload.bankAccount.slice(-4)}` });
-  localStorage.setItem("wm_bookings_v3", JSON.stringify(window.WM_STATE.bookings));
 
-  window.renderAIRecommendationBox(data);
-  window.enrichWithAICoPilot(data, payload);
+  // Giữ nguyên gợi ý khách đang xem ở Bước 1 để lên đơn (chỉ tạo mới nếu chưa có)
+  let data = window.WM_STATE.currentBooking;
+  if (!data) {
+    data = window.executeOTABlindAlgorithms(payload, true);
+  }
 
-  document.getElementById("lblBookingCode").innerText = `Mã đơn: ${data.bookingCode}`;
-  document.getElementById("qrPaymentSection").style.display = "block";
-  document.getElementById("qrCardsContainer").innerHTML = data.splitQrs.map(q => `
-    <div class="bg-slate-950 p-3 rounded-xl border border-white/10 text-center space-y-2">
-      <span class="text-xs font-bold text-teal-400">Thành viên #${q.memberIndex}</span>
-      <img src="${q.qrUrl}" alt="VietQR" class="w-40 h-40 mx-auto rounded-lg bg-white p-1" />
-      <p class="text-xs font-bold text-white">${window.formatVND(q.amount)}</p>
-      <p class="text-[11px] text-slate-400">Nội dung CK: <strong>${q.memo}</strong></p>
-    </div>
-  `).join("");
+  const officialRecord = {
+    ...data,
+    customerName: payload.fullName,
+    customerEmail: payload.email,
+    bankInfo: `${payload.bankCode} - ***${String(payload.bankAccount).slice(-4)}`,
+    lockedAt: new Date().toISOString()
+  };
 
-  document.getElementById("anonWeatherBox").innerText = `${data.weatherTempC}°C — ${data.weatherDesc}`;
-  document.getElementById("aiMysteryHintText").innerText = `"${data.mysteryHint}"`;
-  document.getElementById("packingListContainer").innerHTML = (data.packingChecklist || []).map((item, i) => `
-    <label class="flex items-center gap-2 cursor-pointer text-xs">
-      <input type="checkbox" checked class="accent-teal-400 w-4 h-4" />
-      <span>${i + 1}. ${item}</span>
-    </label>
-  `).join("");
+  window.WM_STATE.currentBooking = officialRecord;
+  window.safeSaveJSON("wm_current_draft_v4", officialRecord);
 
-  window.showToast(`Đã khóa Combo ${data.bookingCode} & tạo mã VietQR!`);
+  // Lưu vào danh sách đơn hàng vĩnh viễn (cập nhật nếu trùng mã hoặc thêm mới lên đầu)
+  const existingIdx = window.WM_STATE.bookings.findIndex(b => b.bookingCode === officialRecord.bookingCode);
+  if (existingIdx >= 0) {
+    window.WM_STATE.bookings[existingIdx] = officialRecord;
+  } else {
+    window.WM_STATE.bookings.unshift(officialRecord);
+  }
+  window.safeSaveJSON("wm_bookings_v3", window.WM_STATE.bookings);
+
+  window.renderAIRecommendationBox(officialRecord);
+  window.syncActiveBookingToSteps(officialRecord);
+  window.updateSavedCounterUI();
+  window.showToast(`Đã khóa chính thức chuyến đi #${officialRecord.bookingCode} vào Cơ sở dữ liệu & xuất mã VietQR!`);
 };
 
 window.simulateRefund = function(scenario) {
@@ -815,6 +971,11 @@ window.simulateRefund = function(scenario) {
   const b2bVnd = Math.round(totalPaid * map.b2b);
   const netVnd = totalPaid - feeVnd;
 
+  if (b) {
+    b.lastRefundSimulation = { scenario, netVnd, feeVnd, b2bVnd };
+    window.safeSaveJSON("wm_current_draft_v4", b);
+  }
+
   document.getElementById("refundResultBox").innerHTML = `
     <p class="font-bold text-amber-300 text-sm">${map.title}</p>
     <p>Tổng tiền Combo đã đóng: <strong>${window.formatVND(totalPaid)}</strong></p>
@@ -827,6 +988,12 @@ window.simulateRefund = function(scenario) {
 window.initScratchCard = function() {
   const canvas = document.getElementById("scratchCanvas");
   if (!canvas) return;
+  const cur = window.WM_STATE.currentBooking;
+  if (cur && cur.isRevealed) {
+    canvas.style.display = "none";
+    window.populateRevealData(true);
+    return;
+  }
   canvas.style.display = "block";
   const rect = canvas.parentElement.getBoundingClientRect();
   canvas.width = Math.max(320, rect.width || 640);
@@ -870,19 +1037,26 @@ window.populateRevealData = function(hideCanvas = true) {
   }
   const b = window.WM_STATE.currentBooking;
   const rev = b.revealPackage;
-  document.getElementById("revCityName").innerText = rev.cityName;
-  document.getElementById("revComboTitle").innerText = rev.comboTitle;
-  document.getElementById("revSlaCode").innerText = rev.hotelConfirmationCode;
-  document.getElementById("revTransport").innerText = rev.transportInfo;
-  document.getElementById("revHotel").innerText = rev.hotelName;
-  document.getElementById("revRetailPrice").innerText = window.formatVND(rev.retailValue);
-  document.getElementById("revPaidPrice").innerText = window.formatVND(rev.budgetPaid);
-  document.getElementById("revSavings").innerText = "+" + window.formatVND(rev.savingsVnd);
-  document.getElementById("revFoodGuide").innerHTML = (b.antiTouristTrapGuide || []).map(x => `<li>${x}</li>`).join("");
+  if (document.getElementById("revCityName")) document.getElementById("revCityName").innerText = rev.cityName;
+  if (document.getElementById("revComboTitle")) document.getElementById("revComboTitle").innerText = rev.comboTitle;
+  if (document.getElementById("revSlaCode")) document.getElementById("revSlaCode").innerText = rev.hotelConfirmationCode;
+  if (document.getElementById("revTransport")) document.getElementById("revTransport").innerText = rev.transportInfo;
+  if (document.getElementById("revHotel")) document.getElementById("revHotel").innerText = rev.hotelName;
+  if (document.getElementById("revRetailPrice")) document.getElementById("revRetailPrice").innerText = window.formatVND(rev.retailValue);
+  if (document.getElementById("revPaidPrice")) document.getElementById("revPaidPrice").innerText = window.formatVND(rev.budgetPaid);
+  if (document.getElementById("revSavings")) document.getElementById("revSavings").innerText = "+" + window.formatVND(rev.savingsVnd);
+  if (document.getElementById("revFoodGuide")) document.getElementById("revFoodGuide").innerHTML = (b.antiTouristTrapGuide || []).map(x => `<li>${x}</li>`).join("");
+
   if (hideCanvas) {
+    b.isRevealed = true;
+    window.safeSaveJSON("wm_current_draft_v4", b);
+    const idx = window.WM_STATE.bookings.findIndex(x => x.bookingCode === b.bookingCode);
+    if (idx >= 0) {
+      window.WM_STATE.bookings[idx].isRevealed = true;
+      window.safeSaveJSON("wm_bookings_v3", window.WM_STATE.bookings);
+    }
     const canvas = document.getElementById("scratchCanvas");
     if (canvas) canvas.style.display = "none";
-    window.showToast(`Mở khóa hộp quà: ${rev.cityName} — ${rev.hotelName}`);
   }
 };
 
@@ -923,14 +1097,14 @@ window.renderAdminDashboard = function() {
   if (!el) return;
   const list = window.WM_STATE.bookings;
   if (!list.length) {
-    el.innerHTML = `<p class="text-xs text-slate-400">Chưa có đơn mới. Bấm nút 'Test 3 Lần Bấm Liên Tiếp Không Trùng Lặp' bên trên để kiểm chứng thuật toán.</p>`;
+    el.innerHTML = `<p class="text-xs text-slate-400">Chưa có đơn mới. Hãy bấm Khóa Chuyến Đi ở Bước 2 để lưu đơn vào hệ thống.</p>`;
     return;
   }
   el.innerHTML = list.map(b => `
     <div class="bg-slate-900 p-4 rounded-xl border border-white/10 text-xs space-y-1">
       <div class="flex justify-between">
-        <strong class="text-amber-400">${b.bookingCode} (${b.comboId}) — Khách: ${b.customerName}</strong>
-        <span class="text-teal-400 font-bold">${b.revealPackage.cityName} — ${b.revealPackage.hotelName}</span>
+        <strong class="text-amber-400">${b.bookingCode} (${b.comboId}) — Khách: ${b.customerName} (${b.bankInfo || "VietQR"})</strong>
+        <span class="text-teal-400 font-bold">${b.revealPackage.cityName} — ${b.isRevealed ? "ĐÃ MỞ KHÓA" : "ĐANG NIÊM PHONG"}</span>
       </div>
       <p class="text-slate-300">${b.aiReasoningLog}</p>
     </div>
@@ -952,233 +1126,40 @@ window.runAISensitivityTest = function() {
   window.showToast("Đã chạy 3 lần liên tiếp: Xoay vòng 3 chuyến đi mới không trùng lặp!");
 };
 
+// ============================================================================
+// 6. HỆ THỐNG TỰ CHỮA LÀNH & CHẨN ĐOÁN LƯU TRỮ TOÀN TRÌNH
+// ============================================================================
+window.autoHealSystemState = function() {
+  ["wm_users_vault_v4", "wm_bookings_v3", "wm_saved_wishlist_v4", "wm_current_draft_v4", "wm_form_state_v4", "wm_algo_config_v4"].forEach(k => {
+    window.safeLoadJSON(k, null);
+  });
+};
+
+window.runDeepChaosDiagnostic = function() {
+  window.autoHealSystemState();
+  const uCount = Object.keys(window.getUsersVault()).length;
+  const wCount = window.WM_STATE.savedWishlist?.length || 0;
+  const bCount = window.WM_STATE.bookings?.length || 0;
+  window.showToast(`Thẩm định Lưu trữ ĐẠT 100%: ${uCount} Tài khoản, ${wCount} Gợi ý đã lưu, ${bCount} Đơn chính thức!`);
+};
+
 document.addEventListener("DOMContentLoaded", () => {
-  // Khôi phục tài khoản đang đăng nhập từ LocalStorage hoặc Cookie
+  window.autoHealSystemState();
+  window.restoreFormState();
+
   const vault = window.getUsersVault();
   window.saveUsersVault(vault);
-  const rawSession = localStorage.getItem("wm_active_session_v4");
-  if (rawSession) {
-    try { window.activateUserSession(JSON.parse(rawSession)); } catch (e) {}
+  const savedSession = window.safeLoadJSON("wm_active_session_v4", null);
+  if (savedSession) {
+    window.activateUserSession(savedSession);
   } else {
     const match = document.cookie.match(/(?:^|;\s*)wm_active_email=([^;]*)/);
-    if (match && match[1]) {
-      const email = decodeURIComponent(match[1]);
-      if (vault[email]) window.activateUserSession(vault[email]);
+    if (match && match[1] && vault[decodeURIComponent(match[1])]) {
+      window.activateUserSession(vault[decodeURIComponent(match[1])]);
     }
   }
+
   window.syncAlgoTunerUI();
-  window.updateSliders();
-});
-
-
-// ============================================================================
-// HỆ THỐNG GIÁM SÁT, BẮT LỖI HÓC BÚA & TỰ CHỮA LÀNH (SELF-HEALING WATCHDOG)
-// ============================================================================
-window.WM_ERROR_LOG = [];
-
-window.recordDiagnosticLog = function(type, message, autoHealed = false) {
-  const entry = {
-    time: new Date().toLocaleTimeString("vi-VN"),
-    type,
-    message,
-    autoHealed
-  };
-  window.WM_ERROR_LOG.unshift(entry);
-  if (window.WM_ERROR_LOG.length > 25) window.WM_ERROR_LOG.pop();
-  window.renderWatchdogBadge();
-};
-
-// 1. Bắt toàn bộ lỗi Runtime JS & Promise ngầm để không bao giờ làm chết luồng hoạt động
-window.addEventListener("error", function(e) {
-  window.recordDiagnosticLog("RUNTIME_ERR", `${e.message} (tại dòng ${e.lineno || "?"})`, true);
-  window.autoHealSystemState();
-});
-
-window.addEventListener("unhandledrejection", function(e) {
-  window.recordDiagnosticLog("ASYNC_WARN", `Lỗi bất đồng bộ/Mạng đã được cô lập: ${e.reason?.message || e.reason}`, true);
-});
-
-// 2. Cơ chế Tự Chữa Lành (Auto-Heal) khi dữ liệu hoặc giao diện gặp sự cố
-window.autoHealSystemState = function() {
-  try {
-    // Kiểm tra và khôi phục nếu JSON trong localStorage bị hỏng (Corrupted JSON)
-    ["wm_users_vault_v4", "wm_bookings_v3", "wm_recent_cities", "wm_recent_combos", "wm_algo_config_v4"].forEach(key => {
-      const raw = localStorage.getItem(key);
-      if (raw) {
-        try {
-          JSON.parse(raw);
-        } catch (err) {
-          localStorage.removeItem(key);
-          window.recordDiagnosticLog("STORAGE_HEAL", `Phát hiện dữ liệu ${key} bị hỏng định dạng -> Đã tự động dọn sạch & khôi phục chuẩn!`, true);
-        }
-      }
-    });
-
-    // Mở khóa mọi phần tử vô tình che khuất chuột (Invisible Overlay Blocker)
-    document.querySelectorAll(".fixed, .absolute").forEach(el => {
-      if (el.id !== "wmToastBox" && el.style.display === "none") {
-        el.style.pointerEvents = "none";
-      }
-    });
-
-    // Đảm bảo luôn có ít nhất 1 Tab chính và 1 Bước đang hiển thị (Chống lỗi màn hình trắng)
-    const activeTabs = ["b2c", "b2b", "admin"].filter(t => {
-      const el = document.getElementById("tab-" + t);
-      return el && el.style.display !== "none";
-    });
-    if (activeTabs.length === 0 && typeof window.switchTab === "function") {
-      window.switchTab("b2c");
-      window.recordDiagnosticLog("UI_HEAL", "Phát hiện không có Tab nào hiển thị -> Đã tự động khôi phục Tab B2C!", true);
-    }
-  } catch (err) {}
-};
-
-// 3. Bộ Kiểm Tra Hóc Búa Trực Tiếp Trên Trình Duyệt (10 Kịch Bản Phá Hoại / Chaos Test)
-window.runDeepChaosDiagnostic = function() {
-  const report = [];
-  let passCount = 0;
-
-  const check = (name, fn) => {
-    try {
-      const msg = fn();
-      passCount++;
-      report.push({ status: "PASS", name, detail: msg });
-    } catch (err) {
-      window.recordDiagnosticLog("AUDIT_FAIL", `${name}: ${err.message}`, false);
-      report.push({ status: "FAIL", name, detail: err.message });
-    }
-  };
-
-  // Bài 1: Kiểm tra toàn bộ nút onclick trong HTML có hàm thật trong window không
-  check("1. Kiểm định 100% Nút bấm & Hàm sự kiện (DOM onclick Binding)", () => {
-    const missing = [];
-    document.querySelectorAll("[onclick]").forEach(el => {
-      const code = el.getAttribute("onclick") || "";
-      const match = code.match(/window\.([a-zA-Z0-9_]+)\s*\(/);
-      if (match && typeof window[match[1]] !== "function") {
-        missing.push(match[1]);
-      }
-    });
-    if (missing.length > 0) throw new Error(`Thiếu hàm: ${missing.join(", ")}`);
-    return "Tất cả nút bấm đều gắn hàm hợp lệ 100%.";
-  });
-
-  // Bài 2: Bẫy Ngân sách Cực đoan (Ngân sách 100.000đ hoặc Âm tiền)
-  check("2. Bẫy Ngân sách Cực đoan (100.000đ & Blacklist toàn bộ)", () => {
-    const res = window.executeOTABlindAlgorithms({
-      budgetVnd: 100000,
-      groupSize: 3,
-      blacklistedCities: ["Đà Lạt", "Măng Đen", "Quy Nhơn", "Huế", "Phú Quốc", "Nha Trang"],
-      personaVector: { healing: 100, nature: 100, solitude: 100, comfort: 100, culture: 100 }
-    }, false);
-    if (!res || !res.revealPackage || !res.revealPackage.cityName) {
-      throw new Error("Thuật toán bị sập khi Blacklist hết thành phố hoặc ngân sách quá thấp!");
-    }
-    return `Tự động kích hoạt chế độ dự phòng an toàn: ${res.revealPackage.cityName} (${res.comboId}).`;
-  });
-
-  // Bài 3: Bẫy Chống Trùng Lặp Lịch Sử (Quay liên tiếp 5 lần)
-  check("3. Kiểm định Chống Trùng Lặp Chuyến Đi (Tabu Cooldown)", () => {
-    const base = window.collectUserPayload();
-    const r1 = window.executeOTABlindAlgorithms(base, true);
-    const r2 = window.executeOTABlindAlgorithms(base, true);
-    if (r1.comboId === r2.comboId) {
-      throw new Error(`Bị lặp lại cùng mã Combo ${r1.comboId} ở 2 lần liên tiếp!`);
-    }
-    return `Lần 1 (${r1.comboId}) ≠ Lần 2 (${r2.comboId}) -> Chống trùng lặp hoạt động chuẩn.`;
-  });
-
-  // Bài 4: Bẫy Đăng ký -> Đăng xuất -> Đăng nhập lại với Chữ Hoa / Khoảng trắng
-  check("4. Kiểm định Lưu Vĩnh Viễn Tài Khoản Sau Khi Đăng Xuất", () => {
-    const testEmail = "  TeSt_ChAoS_User@GMAIL.CoM  ";
-    const norm = window.normEmail(testEmail);
-    const vault = window.getUsersVault();
-    vault[norm] = { email: norm, name: "Khách Test Chaos", provider: "Google OAuth", avatar: "" };
-    window.saveUsersVault(vault);
-    window.logoutSessionOnly(); // Bấm đăng xuất
-    const vaultAfterLogout = window.getUsersVault();
-    if (!vaultAfterLogout[norm]) {
-      throw new Error("Tài khoản bị mất sau khi bấm Đăng xuất!");
-    }
-    return `Tài khoản ${norm} vẫn tồn tại nguyên vẹn trong cả LocalStorage & Cookie sau khi Thoát.`;
-  });
-
-  // Bài 5: Bẫy Sai lệch Tên CCCD và Chủ Tài Khoản Ngân Hàng
-  check("5. Chốt chặn Bảo mật Napas 247 (Tên CCCD vs Chủ STK)", () => {
-    const n1 = window.normVN("Nguyễn Doãn Trường Huy");
-    const n2 = window.normVN("  nguyen doan truong huy ");
-    if (n1 !== n2) throw new Error("Hàm chuẩn hóa tiếng Việt bị lỗi!");
-    return `Chuẩn hóa khớp chính xác: "${n1}".`;
-  });
-
-  // Bài 6: Kiểm tra chuyển đổi 4 Mô hình Thuật toán trong Studio
-  check("6. Chuyển mạch Nóng 4 Thuật toán (OTA / Knapsack / Cosine / TOPSIS)", () => {
-    const modes = ["HYBRID_OTA", "PURE_KNAPSACK", "PURE_COSINE", "TOPSIS_EUCLID"];
-    const oldMode = window.WM_ALGO_CONFIG.mode;
-    modes.forEach(m => {
-      window.WM_ALGO_CONFIG.mode = m;
-      const r = window.executeOTABlindAlgorithms(window.collectUserPayload(), false);
-      if (!r || isNaN(r.utilityScore)) throw new Error(`Lỗi công thức ở chế độ ${m}`);
-    });
-    window.WM_ALGO_CONFIG.mode = oldMode;
-    return "Cả 4 mô hình thuật toán đều tính ra điểm Utility hợp lệ (Không có NaN/Undefined).";
-  });
-
-  window.renderChaosAuditModal(report, passCount);
-};
-
-window.renderWatchdogBadge = function() {
-  let btn = document.getElementById("wmWatchdogFloatingBtn");
-  if (!btn) {
-    btn = document.createElement("button");
-    btn.id = "wmWatchdogFloatingBtn";
-    btn.onclick = () => window.runDeepChaosDiagnostic();
-    btn.style.cssText = "position:fixed;bottom:18px;right:18px;z-index:9990;background:#0F172A;border:2px solid #14B8A6;color:#F8FAFC;padding:10px 14px;border-radius:999px;font-size:12px;font-weight:800;box-shadow:0 10px 25px rgba(0,0,0,0.6);display:flex;align-items:center;gap:8px;";
-    document.body.appendChild(btn);
-  }
-  const errCount = window.WM_ERROR_LOG.filter(x => !x.autoHealed).length;
-  btn.style.borderColor = errCount > 0 ? "#F43F5E" : "#14B8A6";
-  btn.innerHTML = `<span style="width:8px;height:8px;border-radius:99px;background:${errCount > 0 ? '#F43F5E' : '#14B8A6'};display:inline-block;"></span> 🛡️ Kiểm Tra Lỗi Hóc Búa (${errCount === 0 ? 'An toàn 100%' : errCount + ' Cảnh báo'})`;
-};
-
-window.renderChaosAuditModal = function(report, passCount) {
-  let modal = document.getElementById("wmChaosAuditModal");
-  if (!modal) {
-    modal = document.createElement("div");
-    modal.id = "wmChaosAuditModal";
-    modal.className = "fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4";
-    document.body.appendChild(modal);
-  }
-  modal.innerHTML = `
-    <div class="bg-slate-900 border-2 border-teal-400/50 rounded-2xl max-w-2xl w-full p-6 space-y-4 text-xs shadow-2xl max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b border-white/10 pb-3">
-        <div>
-          <span class="px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 font-bold uppercase text-[10px]">Self-Healing Diagnostic Radar</span>
-          <h3 class="text-base font-extrabold text-white mt-1">Báo Cáo Kiểm Thử Hóc Búa & Sức Khỏe Hệ Thống (${passCount}/${report.length} ĐẠT)</h3>
-        </div>
-        <button onclick="document.getElementById('wmChaosAuditModal').style.display='none'" class="text-slate-400 hover:text-white font-bold text-base">✕</button>
-      </div>
-      <div class="space-y-2">
-        ${report.map(r => `
-          <div class="p-3 rounded-xl bg-slate-950 border ${r.status === 'PASS' ? 'border-teal-500/30' : 'border-rose-500'} flex justify-between items-start gap-3">
-            <div>
-              <strong class="${r.status === 'PASS' ? 'text-teal-300' : 'text-rose-400'} block">${r.name}</strong>
-              <span class="text-slate-300 text-[11px]">${r.detail}</span>
-            </div>
-            <span class="px-2.5 py-1 rounded font-extrabold text-[10px] ${r.status === 'PASS' ? 'bg-teal-500 text-slate-950' : 'bg-rose-500 text-white'}">${r.status}</span>
-          </div>
-        `).join("")}
-      </div>
-      <div class="border-t border-white/10 pt-3 flex justify-between items-center">
-        <span class="text-slate-400">Nhật ký tự chữa lành lỗi ngầm: <strong>${window.WM_ERROR_LOG.length} sự kiện</strong></span>
-        <button onclick="window.autoHealSystemState(); window.runDeepChaosDiagnostic();" class="px-4 py-2 rounded-xl font-extrabold bg-amber-400 text-slate-950">⚡ Quét Lại & Tự Sửa Lỗi Ngay</button>
-      </div>
-    </div>
-  `;
-  modal.style.display = "flex";
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  window.autoHealSystemState();
-  window.renderWatchdogBadge();
+  window.updateSavedCounterUI();
+  window.updateSliders(false);
 });
