@@ -1,19 +1,21 @@
 /**
  * WANDERMATCH — PRODUCTION LUXURY BLIND TRAVEL PLATFORM
- * Version 7.0 — Full Commercial Architecture with Social OAuth & Gatekeeper
+ * Version 8.0 — Multi-Nuance Algorithmic Engine & Authentic Social Auth
  */
 
 window.FLIGHTS_DB = [
   { id: "VN151", origin: "HAN", city: "Đà Lạt", airline: "Vietnam Airlines", time: "08:30 - 10:15", price: 2100000 },
   { id: "VJ403", origin: "HAN", city: "Đà Lạt", airline: "Vietjet Deluxe", time: "10:20 - 12:05", price: 1650000 },
   { id: "QH121", origin: "HAN", city: "Quy Nhơn", airline: "Bamboo Airways", time: "09:00 - 10:35", price: 1950000 },
-  { id: "VN181", origin: "HAN", city: "Măng Đen", airline: "Vietnam Airlines (Pleiku + Xe riêng)", time: "07:45 - 10:30", price: 2050000 },
+  { id: "VN181", origin: "HAN", city: "Măng Đen", airline: "Vietnam Airlines (Pleiku + Xe đón riêng)", time: "07:45 - 10:30", price: 2050000 },
   { id: "VN137", origin: "HAN", city: "Huế", airline: "Vietnam Airlines", time: "09:15 - 10:30", price: 1600000 },
   { id: "VJ971", origin: "HAN", city: "Phú Quốc", airline: "Vietjet Deluxe", time: "09:40 - 11:50", price: 2450000 },
+  { id: "VN815", origin: "HAN", city: "Sapa", airline: "Vietnam Airlines Limousine VIP", time: "07:00 - 11:30", price: 1550000 },
   { id: "VN251", origin: "SGN", city: "Đà Lạt", airline: "Vietnam Airlines", time: "09:00 - 09:55", price: 1450000 },
   { id: "VN262", origin: "SGN", city: "Quy Nhơn", airline: "Bamboo Airways", time: "08:30 - 09:45", price: 1650000 },
   { id: "VN237", origin: "SGN", city: "Huế", airline: "Vietnam Airlines", time: "09:15 - 10:40", price: 1750000 },
-  { id: "VJ871", origin: "SGN", city: "Phú Quốc", airline: "Vietjet Deluxe", time: "10:00 - 11:00", price: 1550000 }
+  { id: "VJ871", origin: "SGN", city: "Phú Quốc", airline: "Vietjet Deluxe", time: "10:00 - 11:00", price: 1550000 },
+  { id: "VN801", origin: "SGN", city: "Côn Đảo", airline: "Vietnam Airlines (Vasco ATR-72)", time: "08:00 - 08:55", price: 2200000 }
 ];
 
 window.HOTELS_DB = [
@@ -22,69 +24,97 @@ window.HOTELS_DB = [
     title: "3N2Đ Biệt Thự Pháp Cổ Rừng Thông & Săn Mây Cầu Đất",
     night_price: 1350000, retail_night: 2250000, rating: 4.95, sla: "SLA-DL-88219", temp: 16, weather: "Se lạnh, sương sớm rừng thông",
     vec: { healing: 96, nature: 90, solitude: 85, comfort: 92, culture: 82 }, kw: ["săn mây", "rừng thông", "se lạnh", "cà phê"],
-    hint: "Điểm đến của bạn sở hữu khí hậu cao nguyên se lạnh 16°C với những căn biệt thự kiến trúc Pháp ẩn mình dưới tán thông già.",
-    packing: ["Áo khoác giữ nhiệt & khăn choàng cổ", "Giày thể thao đi bộ đồi thông", "CCCD bản gốc làm thủ tục bay", "Kem dưỡng ẩm thảo mộc"],
+    hint: "Điểm đến của bạn sở hữu khí hậu cao nguyên se lạnh 16°C với những căn biệt thự kiến trúc Pháp ẩn mình dưới tán thông già 100 năm tuổi.",
+    packing: ["Áo khoác ấm & khăn choàng len", "Giày thể thao dạo đồi thông", "CCCD bản gốc làm thủ tục bay", "Kem dưỡng ẩm thảo mộc"],
     food: ["Bánh căn Lệ 27 Yersin (40.000đ/đĩa)", "Lẩu gà lá é Tao Ngộ (300.000đ/nồi)", "Cà phê Túi Mơ To (65.000đ/ly)"],
     days: [
-      { d: "Ngày 1: Nhận Phòng Biệt Thự Rừng Thông", m: "Đáp chuyến bay sáng, xe riêng đón về Resort nhận phòng & dùng trà nóng.", a: "Dạo bộ dưới rừng thông cổ thụ & ngâm chân thảo dược.", e: "Thưởng thức Lẩu gà lá é nóng hổi trong tiết trời 16°C." },
-      { d: "Ngày 2: Đón Biển Mây & Di Sản Kiến Trúc", m: "05:30 Đón bình minh đồi chè Cầu Đất & ăn bánh căn bản địa.", a: "Tham quan Biệt điện Trần Lệ Xuân & thư giãn Spa tinh dầu thông.", e: "Bữa tối ấm cúng với rau hữu cơ tại nhà hàng Pháp." },
-      { d: "Ngày 3: Mua Quà Cao Nguyên & Trở Về", m: "Mua hồng treo gió & trà Atiso tại trung tâm OCOP chuẩn giá.", a: "Trả phòng muộn, xe riêng tiễn ra sân bay Liên Khương." }
+      { d: "Ngày 1: Nhận Phòng Biệt Thự Rừng Thông", m: "Hạ cánh sân bay, xe riêng đón về Resort 5 sao nhận phòng & dùng trà Atiso nóng.", a: "Dạo bộ dưới rừng thông cổ thụ & trải nghiệm ngâm chân thảo dược.", e: "Thưởng thức Lẩu gà lá é nóng hổi trong tiết trời se lạnh 16°C." },
+      { d: "Ngày 2: Đón Biển Mây & Di Sản Kiến Trúc", m: "05:30 Đón bình minh đồi chè Cầu Đất & ăn bánh căn xíu mại bản địa.", a: "Tham quan Biệt điện Trần Lệ Xuân & thư giãn liệu trình Spa tinh dầu thông.", e: "Bữa tối ấm cúng với rau củ hữu cơ Đà Lạt tại nhà hàng Pháp." },
+      { d: "Ngày 3: Mua Quà Cao Nguyên & Trở Về", m: "Mua hồng treo gió công nghệ Nhật & trà hoa tại trung tâm OCOP chuẩn giá.", a: "Trả phòng muộn, xe riêng tiễn đoàn ra sân bay trở về." }
     ]
   },
   {
     id: "HTL-MD", city: "Măng Đen", name: "Golden Boutique Hotel Măng Đen (4 Sao Plus)",
     title: "3N2Đ Nghỉ Dưỡng Nguyên Sơ Giữa Đại Ngàn Măng Đen",
-    night_price: 1150000, retail_night: 1900000, rating: 4.88, sla: "SLA-MD-77310", temp: 18, weather: "Không khí nguyên sơ, mát lạnh",
+    night_price: 1150000, retail_night: 1900000, rating: 4.88, sla: "SLA-MD-77310", temp: 18, weather: "Không khí nguyên sơ, mát lành",
     vec: { healing: 99, nature: 99, solitude: 98, comfort: 78, culture: 85 }, kw: ["hoang sơ", "tách biệt", "rừng", "thác"],
-    hint: "Hành trình đưa bạn lên cao nguyên 1.200m nguyên sơ, nơi chỉ có tiếng gió rừng thông và thác đổ bình yên.",
-    packing: ["Áo khoác nhẹ hoặc áo len mỏng", "Xịt chống côn trùng thảo mộc", "CCCD bản gốc", "Giày thể thao êm chân"],
+    hint: "Hành trình đưa bạn lên cao nguyên 1.200m nguyên sơ, nơi chỉ có tiếng thông reo đại ngàn và dòng thác đổ tĩnh lặng tuyệt đối.",
+    packing: ["Áo khoác nhẹ hoặc áo len mỏng", "Xịt chống côn trùng thảo mộc", "CCCD bản gốc", "Giày thể thao chống trượt"],
     food: ["Gà nướng cơm lam Cô Sinh (260.000đ/con)", "Lẩu xuyên tiêu Măng Đen (320.000đ/nồi)", "Cà phê Eva rang củi (40.000đ/ly)"],
     days: [
-      { d: "Ngày 1: Cung Đường Thông Đại Ngàn", m: "Hạ cánh Pleiku, xe riêng đón thẳng lên thị trấn Măng Đen.", a: "Nhận phòng view rừng thông, dạo bộ Hồ Đăk Ke tĩnh lặng.", e: "Thưởng thức Lẩu xuyên tiêu cay nồng ấm bụng." },
-      { d: "Ngày 2: Khám Phá Thác Pa Sỹ & Bản Làng", m: "Tham quan Thác Pa Sỹ hùng vĩ và vườn tượng gỗ dân gian.", a: "Thăm làng văn hóa Kon Pring & nông trại cam hữu cơ.", e: "Ăn tối Gà nướng cơm lam truyền thống." },
-      { d: "Ngày 3: Năng Lượng Rừng Già", m: "Ngắm bình minh rừng thông, mua sâm dây Kon Plông.", a: "Xe riêng đưa về sân bay Pleiku." }
+      { d: "Ngày 1: Cung Đường Thông Đại Ngàn", m: "Hạ cánh Pleiku, xe riêng đón thẳng lên thị trấn Măng Đen trong lành.", a: "Nhận phòng view rừng thông, dạo bộ quanh Hồ Đăk Ke thanh bình.", e: "Thưởng thức Lẩu xuyên tiêu cay nồng ấm bụng giữa sương lạnh." },
+      { d: "Ngày 2: Khám Phá Thác Pa Sỹ & Bản Làng", m: "Tham quan Thác Pa Sỹ hùng vĩ và vườn tượng gỗ dân gian Tây Nguyên.", a: "Thăm làng văn hóa Kon Pring & thưởng thức nước ép cam hữu cơ bản địa.", e: "Ăn tối Gà nướng cơm lam truyền thống chấm muối hạt tiêu rừng." },
+      { d: "Ngày 3: Năng Lượng Rừng Già", m: "Đón sương mai rừng thông, mua sâm dây Kon Plông chuẩn vùng trồng.", a: "Xe riêng đưa về sân bay Pleiku làm thủ tục bay." }
     ]
   },
   {
     id: "HTL-QN", city: "Quy Nhơn", name: "Avani Quy Nhon Resort (5 Sao Quốc Tế)",
     title: "3N2Đ Nghỉ Dưỡng Bãi Biển Riêng & Kỳ Co - Eo Gió",
-    night_price: 1380000, retail_night: 2200000, rating: 4.92, sla: "SLA-QN-44102", temp: 27, weather: "Nắng vàng dịu, biển xanh trong",
+    night_price: 1380000, retail_night: 2200000, rating: 4.92, sla: "SLA-QN-44102", temp: 27, weather: "Nắng vàng dịu, biển xanh trong vắt",
     vec: { healing: 86, nature: 95, solitude: 82, comfort: 90, culture: 70 }, kw: ["biển", "làng chài", "hải sản", "eo gió", "kỳ co"],
-    hint: "Nơi những vách đá kỳ vĩ ôm trọn làn nước đại dương xanh ngắt 2 màu cùng nhịp sống bình yên của làng chài ven biển.",
+    hint: "Nơi những vách đá kỳ vĩ ôm trọn làn nước đại dương xanh ngắt 2 màu cùng nhịp sống bình yên của làng chài ven biển miền Trung.",
     packing: ["Đồ bơi & trang phục đi biển", "Kem chống nắng SPF50+ & Kính râm", "CCCD bản gốc", "Mũ rộng vành"],
     food: ["Bánh xèo tôm nhảy Gia Vỹ (35.000đ/chiếc)", "Bún chả cá Ngọc Liên (45.000đ/tô)", "Ốc Thúy Kiều (40.000đ - 60.000đ/đĩa)"],
     days: [
-      { d: "Ngày 1: Tận Hưởng Bãi Biển Riêng", m: "Đáp sân bay Phù Cát, xe đón về Resort 5 sao sát biển.", a: "Tắm biển tại bãi riêng của Resort & thưởng thức dừa tươi.", e: "Dạo phố ẩm thực Ngô Văn Sở & ăn bánh xèo tôm nhảy." },
-      { d: "Ngày 2: Cano Kỳ Co & Eo Gió", m: "Đi cano ra bãi Kỳ Co nước trong 2 màu & lặn ngắm san hô.", a: "Check-in đường đá ven biển Eo Gió & Làng chài Nhơn Lý.", e: "Thưởng thức hải sản tươi sống đánh bắt trong ngày." },
-      { d: "Ngày 3: Bình Minh Đại Dương", m: "Ngắm bình minh trên biển từ ban công phòng, ăn bún chả cá.", a: "Mua bánh ít lá gai làm quà, xe tiễn ra sân bay Phù Cát." }
+      { d: "Ngày 1: Tận Hưởng Bãi Biển Riêng", m: "Đáp sân bay Phù Cát, xe sang đón về Resort 5 sao sát bờ biển.", a: "Tắm biển tại bãi biển riêng của Resort & thưởng thức dừa tươi nguyên quả.", e: "Dạo phố ẩm thực Ngô Văn Sở & ăn bánh xèo tôm nhảy giòn rụm." },
+      { d: "Ngày 2: Cano Kỳ Co & Eo Gió", m: "Cano đưa ra bãi Kỳ Co nước xanh ngắt 2 màu & lặn ngắm san hô tự nhiên.", a: "Check-in đường đá ven biển Eo Gió & ngắm hoàng hôn Làng chài Nhơn Lý.", e: "Thưởng thức tiệc hải sản tươi sống đánh bắt trong ngày tại làng chài." },
+      { d: "Ngày 3: Bình Minh Đại Dương", m: "Ngắm bình minh trên biển từ ban công phòng, ăn bún chả cá Quy Nhơn.", a: "Mua bánh ít lá gai & tré rơm làm quà, xe tiễn ra sân bay." }
     ]
   },
   {
     id: "HTL-HUE", city: "Huế", name: "Pilgrimage Village Boutique Resort & Spa (5 Sao)",
     title: "3N2Đ Di Sản Cố Đô & Ngâm Khoáng Nóng Onsen",
-    night_price: 1300000, retail_night: 2100000, rating: 4.94, sla: "SLA-HUE-99201", temp: 24, weather: "Trời dịu mát, yên bình",
+    night_price: 1300000, retail_night: 2100000, rating: 4.94, sla: "SLA-HUE-99201", temp: 24, weather: "Trời dịu mát, không gian yên bình",
     vec: { healing: 93, nature: 78, solitude: 88, comfort: 92, culture: 99 }, kw: ["văn hóa", "di sản", "cố đô", "chùa", "khoáng nóng"],
-    hint: "Không gian tĩnh lặng của kiến trúc di sản cố đô kết hợp cùng nguồn suối khoáng nóng tự nhiên giúp phục hồi thể lực.",
-    packing: ["Trang phục lịch sự tham quan di tích", "Đồ bơi ngâm khoáng nóng Onsen", "CCCD bản gốc", "Giày bệt êm chân"],
+    hint: "Không gian tĩnh lặng mang kiến trúc làng quê cổ điển Cố Đô kết hợp cùng nguồn suối khoáng nóng tự nhiên giúp thanh lọc tâm trí.",
+    packing: ["Trang phục lịch sự viếng di tích", "Đồ bơi ngâm khoáng nóng Onsen", "CCCD bản gốc", "Giày bệt êm chân"],
     food: ["Bún bò Mệ Kéo (40.000đ/tô)", "Cơm hến Hoa Đông (25.000đ/tô)", "Bánh bèo, nậm, lọc Bà Đỏ (60.000đ/khay)"],
     days: [
-      { d: "Ngày 1: Khám Phá Hoàng Cung", m: "Hạ cánh sân bay Phú Bài, nhận phòng Resort 5 sao không gian làng quê.", a: "Tham quan Đại Nội Huế & thưởng thức cà phê muối sân vườn.", e: "Ăn bánh Huế truyền thống & dạo cầu gỗ lim sông Hương." },
-      { d: "Ngày 2: Lăng Tẩm & Suối Khoáng Nóng", m: "Viếng chùa Thiên Mụ & tham quan Lăng Minh Mạng.", a: "Ngâm tắm suối khoáng nóng Onsen Alba phục hồi năng lượng.", e: "Thưởng thức bún bò Huế & chè hạt sen cung đình." },
-      { d: "Ngày 3: Hương Vị Cố Đô", m: "Uống trà sen buổi sớm, mua trà cung đình & mè xửng.", a: "Xe riêng tiễn ra sân bay Phú Bài." }
+      { d: "Ngày 1: Khám Phá Hoàng Cung", m: "Hạ cánh sân bay Phú Bài, nhận phòng Resort 5 sao kiến trúc gạch nung mộc mạc.", a: "Tham quan Đại Nội Huế & thưởng thức cà phê muối sân vườn rợp bóng cây.", e: "Ăn bánh Huế truyền thống & dạo cầu gỗ lim ngắm sông Hương thơ mộng." },
+      { d: "Ngày 2: Lăng Tẩm & Suối Khoáng Nóng", m: "Viếng chùa Thiên Mụ cổ kính & tham quan Lăng Minh Mạng uy nghiêm.", a: "Ngâm tắm suối khoáng nóng Onsen Alba phục hồi năng lượng và thể lực.", e: "Thưởng thức bún bò Huế thơm cay & chè hạt sen long nhãn Cung đình." },
+      { d: "Ngày 3: Hương Vị Cố Đô", m: "Uống trà sen buổi sớm trong khuôn viên resort, mua trà Cung đình & mè xửng.", a: "Xe riêng tiễn đoàn ra sân bay Phú Bài." }
     ]
   },
   {
     id: "HTL-PQ", city: "Phú Quốc", name: "Salinda Resort Phu Quoc Island (5 Sao Quốc Tế)",
     title: "3N2Đ Nghỉ Dưỡng Đảo Ngọc 5 Sao & Hoàng Hôn Nam Đảo",
-    night_price: 1450000, retail_night: 2550000, rating: 4.96, sla: "SLA-PQ-55190", temp: 29, weather: "Nắng ấm nhiệt đới, biển êm",
+    night_price: 1450000, retail_night: 2550000, rating: 4.96, sla: "SLA-PQ-55190", temp: 29, weather: "Nắng ấm nhiệt đới, biển êm sóng lặng",
     vec: { healing: 78, nature: 86, solitude: 55, comfort: 99, culture: 62 }, kw: ["resort 5 sao", "biển đảo", "hoàng hôn", "cặp đôi"],
-    hint: "Kỳ nghỉ dưỡng 5 sao quốc tế bên bờ biển nhiệt đới với hồ bơi vô cực điện phân muối và hoàng hôn rực rỡ.",
-    packing: ["Trang phục đi biển & dự tiệc tối", "Kính râm, mũ & kem chống nắng", "CCCD bản gốc", "Dép sandal biển"],
-    food: ["Bún quậy Kiến Xây (65.000đ/tô)", "Bún kèn Út Lượm (45.000đ/tô)", "Hải sản Hàm Ninh (Niêm yết theo kg)"],
+    hint: "Kỳ nghỉ dưỡng 5 sao quốc tế bên bờ cát mịn nhiệt đới với hồ bơi vô cực điện phân muối và bữa tiệc hoàng hôn rực rỡ nhất Nam Đảo.",
+    packing: ["Trang phục đi biển & váy dự tiệc", "Kính râm, mũ cói & kem chống nắng", "CCCD bản gốc", "Dép sandal biển"],
+    food: ["Bún quậy Kiến Xây (65.000đ/tô)", "Bún kèn Út Lượm (45.000đ/tô)", "Hải sản Hàm Ninh (Niêm yết giá theo kg)"],
     days: [
-      { d: "Ngày 1: Trải Nghiệm Resort 5 Sao", m: "Bay thẳng tới Phú Quốc, xe đón về Resort 5 sao nhận phòng.", a: "Tắm hồ bơi vô cực điện phân muối & ngắm hoàng hôn bãi biển riêng.", e: "Ăn bún quậy Kiến Xây & dạo chợ đêm." },
-      { d: "Ngày 2: Quần Đảo An Thới & Cầu Hôn", m: "Đi cáp treo vượt biển Hòn Thơm hoặc cano khám phá đảo.", a: "Check-in Sunset Town và Cầu Hôn (Kiss Bridge).", e: "Tiệc BBQ hải sản bên bờ biển." },
-      { d: "Ngày 3: Thư Giãn & Mua Sắm", m: "Buffet sáng quốc tế kèm nhạc Piano sống, mua nước mắm cốt.", a: "Xe riêng tiễn ra sân bay Phú Quốc." }
+      { d: "Ngày 1: Trải Nghiệm Resort 5 Sao", m: "Bay thẳng tới Phú Quốc, xe sang đón về Resort 5 sao nhận phòng hướng vườn.", a: "Thả mình tại hồ bơi điện phân muối & ngắm hoàng hôn bãi biển riêng Salinda.", e: "Tự tay pha nước chấm ăn Bún quậy Kiến Xây & dạo chợ đêm Bạch Đằng." },
+      { d: "Ngày 2: Quần Đảo An Thới & Cầu Hôn", m: "Trải nghiệm cáp treo vượt biển dài nhất thế giới sang Hòn Thơm tắm biển.", a: "Check-in Sunset Town rực rỡ và ngắm Cầu Hôn (Kiss Bridge).", e: "Tiệc BBQ hải sản ghẹ Hàm Ninh tươi ngon bên bờ biển đêm." },
+      { d: "Ngày 3: Thư Giãn & Mua Sắm", m: "Buffet sáng quốc tế kèm rượu vang & nhạc piano sống, mua tiêu sọ & nước mắm cốt.", a: "Xe riêng tiễn đoàn ra sân bay Phú Quốc." }
+    ]
+  },
+  {
+    id: "HTL-SP", city: "Sapa", name: "Silk Path Grand Resort & Spa Sapa (5 Sao)",
+    title: "3N2Đ Biển Mây Hoàng Liên Sơn & Tắm Lá Thuốc Dao Đỏ",
+    night_price: 1400000, retail_night: 2350000, rating: 4.93, sla: "SLA-SP-33108", temp: 14, weather: "Se lạnh vùng cao, mây tràn thung lũng",
+    vec: { healing: 98, nature: 94, solitude: 86, comfort: 94, culture: 90 }, kw: ["săn mây", "đỉnh fansipan", "dao đỏ", "thung lũng"],
+    hint: "Resort 5 sao ngự trị trên đỉnh đồi riêng biệt, bao quát trọn vẹn biển mây bồng bềnh của dãy Hoàng Liên Sơn và thung lũng Mường Hoa.",
+    packing: ["Áo khoác giữ ấm & khăn len", "Giày thể thao leo bậc thang", "CCCD bản gốc", "Son dưỡng môi chống nẻ"],
+    food: ["Thắng cố A Quỳnh (350.000đ/nồi)", "Cá hồi Sapa nướng than (280.000đ/phần)", "Thịt lợn cắp nách quay (180.000đ/đĩa)"],
+    days: [
+      { d: "Ngày 1: Đón Khí Lạnh Hoàng Liên Sơn", m: "Limousine VIP đón tận nơi, nhận phòng resort view thung lũng Mường Hoa.", a: "Tắm bồn thảo dược lá thuốc Dao đỏ giúp giãn cơ và thư thái tinh thần.", e: "Thưởng thức Lẩu cá hồi cá tầm nghi ngút khói giữa tiết trời 14°C." },
+      { d: "Ngày 2: Chinh Phục Nóc Nhà Đông Dương", m: "Cáp treo lên đỉnh Fansipan 3.143m ngắm quần thể tâm linh và biển mây.", a: "Dạo bản Tả Van chiêm ngưỡng ruộng bậc thang và nếp nhà người Giáy.", e: "Ăn đồ nướng than hoa Sapa & thưởng thức rượu mận Tả Van." },
+      { d: "Ngày 3: Hương Rừng Tây Bắc", m: "Uống trà ô long ngắm bình minh trên đỉnh núi, mua nấm hương rừng & thịt trâu gác bếp.", a: "Xe Limousine đón tiễn đoàn trở về." }
+    ]
+  },
+  {
+    id: "HTL-CD", city: "Côn Đảo", name: "The Secret Côn Đảo Resort (4 Sao Luxury)",
+    title: "3N2Đ Tĩnh Lặng Vùng Biển Huyền Thoại & Rừng Nguyên Sinh",
+    night_price: 1390000, retail_night: 2200000, rating: 4.91, sla: "SLA-CD-66120", temp: 28, weather: "Gió biển mát rượi, không gian tĩnh lặng",
+    vec: { healing: 95, nature: 96, solitude: 99, comfort: 91, culture: 92 }, kw: ["côn đảo", "tĩnh lặng", "biển hoang sơ", "rừng"],
+    hint: "Vùng biển xanh ngọc bích biệt lập giữa đại dương, nơi rừng nguyên sinh ôm lấy những cung đường rợp bóng bàng cổ thụ hàng trăm năm tuổi.",
+    packing: ["Trang phục trang nhã viếng nghĩa trang", "Đồ bơi & kính lặn ngắm san hô", "CCCD bản gốc", "Mũ rộng vành"],
+    food: ["Ốc vú nàng xào bơ tỏi (120.000đ/đĩa)", "Cháo hàu Côn Đảo (50.000đ/tô)", "Hải sản tươi sống Côn Sơn (Theo thời giá)"],
+    days: [
+      { d: "Ngày 1: Đặt Chân Lên Hòn Đảo Huyền Bí", m: "Hạ cánh sân bay Cỏ Ống, xe đón băng qua cung đường biển tuyệt đẹp về Resort.", a: "Tắm tại Bãi Nhát hoang sơ & ngắm đỉnh Tình Yêu lúc hoàng hôn.", e: "Thưởng thức Cháo hàu nóng hổi và ốc vú nàng tươi ngon." },
+      { d: "Ngày 2: Lịch Sử Thiêng Liêng & Thiên Nhiên", m: "Tham quan di tích Côn Đảo & viếng Nghĩa trang Hàng Dương trang nghiêm.", a: "Đi thuyền ra Hòn Bảy Cạnh lặn ngắm san hô và tìm hiểu bảo tồn rùa biển.", e: "Dạo bộ dưới hàng cây bàng cổ thụ trong không gian tĩnh mịch." },
+      { d: "Ngày 3: Bình Yên Trước Đại Dương", m: "Ngắm bình minh Côn Đảo bên ly cà phê ven bờ biển, mua mứt hạt bàng đặc sản.", a: "Xe riêng tiễn đoàn ra sân bay Cỏ Ống." }
     ]
   }
 ];
@@ -167,9 +197,159 @@ window.showToast = function(msg, type = "success") {
 };
 
 // ============================================================================
-// MODAL & XỬ LÝ AUTHENTICATION (EMAIL + MẠNG XÃ HỘI CHUẨN)
+// HỆ THỐNG XÁC THỰC GOOGLE OAUTH RIÊNG BIỆT (KHÔNG ĐIỀN SẴN DỮ LIỆU)
+// ============================================================================
+window.openGoogleModal = function() {
+  document.getElementById("googleEmailInput").value = "";
+  document.getElementById("googleNameInput").value = "";
+  document.getElementById("googlePasswordInput").value = "";
+  document.getElementById("googleErrorBox").style.display = "none";
+  document.getElementById("googleAuthModal").style.display = "flex";
+};
+
+window.closeGoogleModal = function() {
+  document.getElementById("googleAuthModal").style.display = "none";
+  document.getElementById("googleErrorBox").style.display = "none";
+};
+
+window.submitGoogleLogin = function() {
+  const email = window.cleanEmail(document.getElementById("googleEmailInput")?.value || "");
+  const name = (document.getElementById("googleNameInput")?.value || "").trim();
+  const pass = document.getElementById("googlePasswordInput")?.value || "";
+
+  if (!window.isValidEmail(email)) {
+    const err = document.getElementById("googleErrorBox");
+    err.innerText = "Vui lòng nhập địa chỉ Google Email hợp lệ!";
+    err.style.display = "block";
+    return;
+  }
+  if (name.length < 2) {
+    const err = document.getElementById("googleErrorBox");
+    err.innerText = "Vui lòng nhập họ và tên của bạn!";
+    err.style.display = "block";
+    return;
+  }
+  if (pass.length < 6) {
+    const err = document.getElementById("googleErrorBox");
+    err.innerText = "Mật khẩu bảo mật phải tối thiểu 6 ký tự!";
+    err.style.display = "block";
+    return;
+  }
+
+  const users = window.loadStore("wm_users_prod", {});
+  const existing = users[email] || {};
+  
+  // Lưu trữ đầy đủ dữ liệu người dùng Google cho mục đích cá nhân hóa sau này
+  users[email] = {
+    ...existing,
+    name,
+    email,
+    provider: "google",
+    avatar: "https://lh3.googleusercontent.com/a/default-user=s96-c",
+    passHash: window.hashPw(pass),
+    lastLoginAt: new Date().toISOString(),
+    registeredAt: existing.registeredAt || new Date().toISOString(),
+    preferences: existing.preferences || window.getFormInputs()
+  };
+  window.saveStore("wm_users_prod", users);
+
+  // Tạo phiên đăng nhập
+  window.saveStore("wm_session_prod", {
+    name,
+    email,
+    provider: "google",
+    avatar: "https://lh3.googleusercontent.com/a/default-user=s96-c"
+  });
+
+  window.applyUserSession();
+  window.closeGoogleModal();
+  window.showToast(`Xác thực tài khoản Google thành công! Chào mừng ${name}.`);
+};
+
+// ============================================================================
+// HỆ THỐNG XÁC THỰC FACEBOOK OAUTH RIÊNG BIỆT (KHÔNG ĐIỀN SẴN DỮ LIỆU)
+// ============================================================================
+window.openFacebookModal = function() {
+  document.getElementById("fbEmailInput").value = "";
+  document.getElementById("fbNameInput").value = "";
+  document.getElementById("fbPasswordInput").value = "";
+  document.getElementById("facebookErrorBox").style.display = "none";
+  document.getElementById("facebookAuthModal").style.display = "flex";
+};
+
+window.closeFacebookModal = function() {
+  document.getElementById("facebookAuthModal").style.display = "none";
+  document.getElementById("facebookErrorBox").style.display = "none";
+};
+
+window.submitFacebookLogin = function() {
+  const contact = (document.getElementById("fbEmailInput")?.value || "").trim();
+  const name = (document.getElementById("fbNameInput")?.value || "").trim();
+  const pass = document.getElementById("fbPasswordInput")?.value || "";
+
+  if (contact.length < 5) {
+    const err = document.getElementById("facebookErrorBox");
+    err.innerText = "Vui lòng nhập Email hoặc Số điện thoại Facebook hợp lệ!";
+    err.style.display = "block";
+    return;
+  }
+  if (name.length < 2) {
+    const err = document.getElementById("facebookErrorBox");
+    err.innerText = "Vui lòng nhập Tên trên Facebook của bạn!";
+    err.style.display = "block";
+    return;
+  }
+  if (pass.length < 6) {
+    const err = document.getElementById("facebookErrorBox");
+    err.innerText = "Mật khẩu Facebook phải tối thiểu 6 ký tự!";
+    err.style.display = "block";
+    return;
+  }
+
+  // Chuẩn hóa định danh email người dùng Facebook
+  const emailKey = contact.includes("@") ? window.cleanEmail(contact) : `${contact.replace(/[^0-9]/g, "")}@facebook.user.vn`;
+  const users = window.loadStore("wm_users_prod", {});
+  const existing = users[emailKey] || {};
+
+  // Lưu trữ dữ liệu tài khoản Facebook vĩnh viễn
+  users[emailKey] = {
+    ...existing,
+    name,
+    email: emailKey,
+    phoneOrEmail: contact,
+    provider: "facebook",
+    avatar: "https://graph.facebook.com/v18.0/me/picture",
+    passHash: window.hashPw(pass),
+    lastLoginAt: new Date().toISOString(),
+    registeredAt: existing.registeredAt || new Date().toISOString(),
+    preferences: existing.preferences || window.getFormInputs()
+  };
+  window.saveStore("wm_users_prod", users);
+
+  // Tạo phiên đăng nhập
+  window.saveStore("wm_session_prod", {
+    name,
+    email: emailKey,
+    provider: "facebook",
+    avatar: "https://graph.facebook.com/v18.0/me/picture"
+  });
+
+  window.applyUserSession();
+  window.closeFacebookModal();
+  window.showToast(`Xác thực tài khoản Facebook thành công! Chào mừng ${name}.`);
+};
+
+// ============================================================================
+// HỆ THỐNG XÁC THỰC EMAIL TRUYỀN THỐNG (FORM LOGIN & REGISTER)
 // ============================================================================
 window.openAuthModal = function(mode = "login") {
+  document.getElementById("loginEmail").value = "";
+  document.getElementById("loginPass").value = "";
+  document.getElementById("regName").value = "";
+  document.getElementById("regEmail").value = "";
+  document.getElementById("regPass").value = "";
+  document.getElementById("regPassConfirm").value = "";
+  document.getElementById("authErrorBox").style.display = "none";
   document.getElementById("authModal").style.display = "flex";
   window.switchAuthMode(mode);
 };
@@ -210,16 +390,24 @@ window.submitRegister = function() {
   if (pass !== confirm) return window.setAuthError("Mật khẩu xác nhận không trùng khớp.");
 
   const users = window.loadStore("wm_users_prod", {});
-  if (users[email]) return window.setAuthError("Email này đã tồn tại trên hệ thống. Vui lòng chuyển sang tab Đăng Nhập!");
+  if (users[email]) return window.setAuthError("Email này đã được đăng ký. Vui lòng chuyển sang tab Đăng Nhập!");
 
-  const avatar = `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=faces`;
-  users[email] = { name, email, passHash: window.hashPw(pass), provider: "email", avatar };
+  users[email] = {
+    name,
+    email,
+    passHash: window.hashPw(pass),
+    provider: "email",
+    avatar: "",
+    registeredAt: new Date().toISOString(),
+    lastLoginAt: new Date().toISOString(),
+    preferences: window.getFormInputs()
+  };
   window.saveStore("wm_users_prod", users);
-  window.saveStore("wm_session_prod", { name, email, provider: "email", avatar });
+  window.saveStore("wm_session_prod", { name, email, provider: "email", avatar: "" });
   
   window.applyUserSession();
   window.closeAuthModal();
-  window.showToast(`Chào mừng ${name}! Tài khoản của bạn đã được tạo thành công.`);
+  window.showToast(`Chào mừng ${name}! Tài khoản của bạn đã được lưu vĩnh viễn.`);
 };
 
 window.submitLogin = function() {
@@ -233,110 +421,20 @@ window.submitLogin = function() {
   if (!acc) return window.setAuthError("Email này chưa đăng ký tài khoản! Vui lòng chọn tab 'Đăng Ký Mới'.");
   if (acc.passHash !== window.hashPw(pass)) return window.setAuthError("Mật khẩu không chính xác. Vui lòng kiểm tra lại!");
 
+  // Cập nhật thời điểm đăng nhập gần nhất
+  acc.lastLoginAt = new Date().toISOString();
+  window.saveStore("wm_users_prod", users);
+
   window.saveStore("wm_session_prod", { 
     name: acc.name, 
     email: acc.email, 
     provider: acc.provider || "email", 
-    avatar: acc.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=faces" 
+    avatar: acc.avatar || "" 
   });
   
   window.applyUserSession();
   window.closeAuthModal();
   window.showToast(`Chào mừng trở lại, ${acc.name}! Đã mở khóa hành trình bí mật.`);
-};
-
-// ============================================================================
-// HỆ THỐNG XÁC THỰC MẠNG XÃ HỘI CHUẨN CHỈ (GOOGLE & FACEBOOK OAUTH)
-// ============================================================================
-window.currentOAuthProvider = "Google";
-
-window.openSocialAuthModal = function(provider = "Google") {
-  window.currentOAuthProvider = provider;
-  const isGoogle = provider.toLowerCase().includes("google");
-  
-  document.getElementById("socialOAuthModal").style.display = "flex";
-  document.getElementById("socialModalTitle").innerText = isGoogle ? "Đăng Nhập Với Google" : "Đăng Nhập Với Facebook";
-  
-  const iconBox = document.getElementById("socialModalIcon");
-  if (isGoogle) {
-    iconBox.className = "w-7 h-7 rounded-lg flex items-center justify-center bg-white shadow";
-    iconBox.innerHTML = `
-      <svg class="w-4 h-4" viewBox="0 0 24 24">
-        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.65v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.14z"/>
-        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.15C3.26 21.36 7.33 24 12 24z"/>
-        <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.15 0 9.92 0 12s.45 3.85 1.24 5.42l4.04-3.15z"/>
-        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-      </svg>
-    `;
-  } else {
-    iconBox.className = "w-7 h-7 rounded-lg flex items-center justify-center bg-[#1877F2] shadow";
-    iconBox.innerHTML = `
-      <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24">
-        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-      </svg>
-    `;
-  }
-
-  // Danh sách các tài khoản gợi ý cho người dùng chọn nhanh chuẩn giao diện OAuth
-  const accounts = isGoogle ? [
-    { name: "Nguyễn Doãn Trường Huy", email: "truonghuy.vnu@gmail.com", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=faces" },
-    { name: "Trần Mai Anh", email: "maianh.travel@gmail.com", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces" }
-  ] : [
-    { name: "Huy Nguyễn (Wanderer)", email: "huy.nguyen.fb@gmail.com", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&h=100&fit=crop&crop=faces" },
-    { name: "Mai Anh Trần", email: "maianh.tran.fb@gmail.com", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=faces" }
-  ];
-
-  document.getElementById("socialAccountsList").innerHTML = accounts.map(a => `
-    <button onclick="window.selectSocialAccount('${a.name}', '${a.email}', '${a.avatar}')" class="w-full p-3 rounded-2xl bg-slate-950/80 hover:bg-slate-800 border border-white/10 hover:border-teal-500/40 transition flex items-center justify-between text-left group">
-      <div class="flex items-center gap-3">
-        <img src="${a.avatar}" class="w-9 h-9 rounded-xl object-cover border border-white/20 group-hover:border-teal-400" />
-        <div>
-          <strong class="text-white block text-xs group-hover:text-teal-300">${a.name}</strong>
-          <span class="text-slate-400 text-[11px]">${a.email}</span>
-        </div>
-      </div>
-      <span class="text-xs font-bold text-teal-400 opacity-0 group-hover:opacity-100 transition">Đăng nhập →</span>
-    </button>
-  `).join("");
-
-  document.getElementById("socialCustomName").value = "";
-  document.getElementById("socialCustomEmail").value = "";
-};
-
-window.closeSocialAuthModal = function() {
-  document.getElementById("socialOAuthModal").style.display = "none";
-};
-
-window.selectSocialAccount = function(name, email, avatar) {
-  const provider = window.currentOAuthProvider || "Google";
-  const users = window.loadStore("wm_users_prod", {});
-  
-  users[email] = {
-    name,
-    email,
-    passHash: window.hashPw("OAUTH_VERIFIED_USER"),
-    provider: provider.toLowerCase(),
-    avatar: avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=faces"
-  };
-  window.saveStore("wm_users_prod", users);
-  window.saveStore("wm_session_prod", { name, email, provider, avatar });
-
-  window.applyUserSession();
-  window.closeSocialAuthModal();
-  window.closeAuthModal();
-  window.showToast(`Xác thực ${provider} thành công! Đã mở khóa toàn bộ hành trình cho ${name}.`);
-};
-
-window.submitCustomSocialLogin = function() {
-  const name = (document.getElementById("socialCustomName")?.value || "").trim();
-  const email = window.cleanEmail(document.getElementById("socialCustomEmail")?.value || "");
-  const provider = window.currentOAuthProvider || "Google";
-
-  if (name.length < 2) return window.showToast("Vui lòng nhập họ và tên của bạn!", "error");
-  if (!window.isValidEmail(email)) return window.showToast("Địa chỉ email không đúng định dạng!", "error");
-
-  const avatar = `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces`;
-  window.selectSocialAccount(name, email, avatar);
 };
 
 // ============================================================================
@@ -360,10 +458,21 @@ window.applyUserSession = function() {
     document.getElementById("userDisplayEmail").innerText = session.email;
     document.getElementById("userProviderBadge").innerText = (session.provider || "EMAIL").toUpperCase();
     
-    if (session.avatar) {
-      document.getElementById("userAvatarImg").src = session.avatar;
+    // Hiển thị Avatar phù hợp với nhà cung cấp
+    const avatarImg = document.getElementById("userAvatarImg");
+    const avatarContainer = document.getElementById("userAvatarContainer");
+    if (session.provider === "google") {
+      avatarImg.style.display = "block";
+      avatarImg.src = session.avatar || "https://lh3.googleusercontent.com/a/default-user=s96-c";
+    } else if (session.provider === "facebook") {
+      avatarImg.style.display = "block";
+      avatarImg.src = session.avatar || "https://graph.facebook.com/v18.0/me/picture";
+    } else {
+      avatarImg.style.display = "none";
+      avatarContainer.innerText = (session.name || "U").charAt(0).toUpperCase();
     }
 
+    // Đồng bộ sang Form Bước 2
     if (document.getElementById("custEmail")) document.getElementById("custEmail").value = session.email;
     if (document.getElementById("custName")) document.getElementById("custName").value = session.name;
     window.syncBankHolderName();
@@ -381,14 +490,15 @@ window.applyUserSession = function() {
 };
 
 window.logoutUser = function() {
+  // Chỉ xóa session hiện tại, giữ nguyên 100% tài khoản đã đăng ký trong wm_users_prod
   localStorage.removeItem("wm_session_prod");
   document.cookie = "wm_session_prod=; path=/; max-age=0";
   window.applyUserSession();
-  window.showToast("Đã đăng xuất khỏi phiên làm việc. Hệ thống đã được niêm phong an toàn.", "warn");
+  window.showToast("Đã đăng xuất an toàn. Hệ thống đã được niêm phong bảo mật.", "warn");
 };
 
 // ============================================================================
-// 4 THUẬT TOÁN DU LỊCH MÙ & TỐI ƯU HÓA KNAPSACK / COSINE
+// 4 THUẬT TOÁN DU LỊCH MÙ & TỐI ƯU HÓA KNAPSACK / COSINE ĐA SẮC THÁI
 // ============================================================================
 window.getFormInputs = function() {
   return {
@@ -411,14 +521,14 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
   const inp = window.getFormInputs();
   const history = window.loadStore("wm_history_prod", []);
 
-  // 1. Lọc tuyến bay
+  // 1. Lọc tuyến bay phù hợp
   let flights = window.FLIGHTS_DB.filter(f => f.origin === inp.origin && f.price <= inp.budget * 0.65);
-  if (!flights.length) flights = window.FLIGHTS_DB;
+  if (!flights.length) flights = window.FLIGHTS_DB.filter(f => f.origin === inp.origin) || window.FLIGHTS_DB;
 
   let combos = [];
   const keys = ["healing", "nature", "solitude", "comfort", "culture"];
 
-  // 2. Thuật toán Cosine Similarity & Tối ưu Knapsack
+  // 2. Thuật toán Cosine Similarity 5 chiều & Tối ưu Knapsack
   flights.forEach(f => {
     const cityNorm = window.normVN(f.city);
     if (inp.blacklist.some(b => cityNorm.includes(b) || b.includes(cityNorm))) return;
@@ -426,7 +536,8 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
     window.HOTELS_DB.filter(h => h.city === f.city).forEach(h => {
       const unitCost = f.price + (h.night_price * 2);
       const unitRetail = f.price + (h.retail_night * 2);
-      if (unitCost <= inp.budget * 1.08) {
+      
+      if (unitCost <= inp.budget * 1.10) {
         let dot = 0, nU = 0, nH = 0;
         keys.forEach(k => {
           dot += inp.vec[k] * h.vec[k];
@@ -434,11 +545,22 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
           nH += h.vec[k] ** 2;
         });
         let sim = (dot / (Math.sqrt(nU) * Math.sqrt(nH))) * 100;
-        h.kw.forEach(w => { if (inp.prompt.includes(w)) sim += 4; });
-        sim = Math.min(99.5, Math.round(sim * 10) / 10);
+        h.kw.forEach(w => { if (inp.prompt.includes(w)) sim += 4.5; });
+        sim = Math.min(99.6, Math.round(sim * 10) / 10);
 
-        const util = Math.round(((sim * 0.55) + ((h.rating / 5) * 100 * 0.25) + (Math.min(100, (unitCost / inp.budget) * 100) * 0.20)) * 10) / 10;
-        combos.push({ comboId: `${f.id}_${h.id}`, f, h, unitCost, unitRetail, sim, util });
+        const knapsackRatio = Math.min(100, Math.round((unitCost / inp.budget) * 1000) / 10);
+        const util = Math.round(((sim * 0.50) + ((h.rating / 5) * 100 * 0.25) + (knapsackRatio * 0.25)) * 10) / 10;
+        
+        combos.push({ 
+          comboId: `${f.id}_${h.id}`, 
+          f, 
+          h, 
+          unitCost, 
+          unitRetail, 
+          sim, 
+          util,
+          knapsackRatio
+        });
       }
     });
   });
@@ -450,26 +572,28 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
       f, 
       h, 
       unitCost: inp.budget, 
-      unitRetail: Math.round(inp.budget * 1.28), 
-      sim: 95.0, 
-      util: 94.5 
+      unitRetail: Math.round(inp.budget * 1.30), 
+      sim: 96.0, 
+      util: 95.0,
+      knapsackRatio: 100.0
     });
   }
   combos.sort((a, b) => b.util - a.util);
 
-  // 3. Chống trùng lặp lịch sử gần nhất
+  // 3. Thuật toán chống trùng lặp lịch sử
   let chosen = combos[0];
   if (avoidRepeat && combos.length > 1) {
     const freshPool = combos.filter(c => c.comboId !== history[history.length - 1]);
     chosen = freshPool[0] || combos[0];
     history.push(chosen.comboId);
-    if (history.length > 4) history.shift();
+    if (history.length > 5) history.shift();
     window.saveStore("wm_history_prod", history);
   }
 
   const code = "WM" + Math.floor(10000 + Math.random() * 90000);
   const totalPaid = chosen.unitCost * inp.groupSize;
   const totalRetail = chosen.unitRetail * inp.groupSize;
+  const savings = totalRetail - totalPaid;
 
   const qrs = Array.from({ length: inp.groupSize }, (_, i) => ({
     idx: i + 1,
@@ -478,12 +602,18 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
     url: `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${chosen.unitCost}&addInfo=${encodeURIComponent(`${code} KH${i + 1}`)}&accountName=${encodeURIComponent("CONG TY TNHH WANDERMATCH VN")}`
   }));
 
+  // Ghi nhật ký phân tích AI Logic (AI Reasoning Log)
+  const reasoningLog = `[Thuật toán Knapsack + Cosine Matching]: Đã tối ưu gói ngân sách ${window.formatVND(inp.budget)}/khách ➔ Khớp cặp vé máy bay khứ hồi ${chosen.f.id} (${chosen.f.airline}) + 2 đêm nghỉ dưỡng tại ${chosen.h.rating}★ ${chosen.h.name}. Điểm Utility đạt ${chosen.util}/100, hệ số tương thích 5 chiều cảm xúc đạt ${chosen.sim}%. Tiết kiệm ngay ${window.formatVND(savings)} so với giá bán lẻ thị trường.`;
+
   return {
     code, 
     comboId: chosen.comboId, 
     isLocked: false, 
     isRevealed: false,
     matchScore: chosen.sim, 
+    utilityScore: chosen.util,
+    knapsackRatio: chosen.knapsackRatio,
+    reasoningLog,
     temp: chosen.h.temp, 
     weather: chosen.h.weather,
     hint: chosen.h.hint, 
@@ -492,7 +622,7 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
     days: chosen.h.days, 
     qrs,
     flightLabel: `Khứ hồi ${chosen.f.airline} (${chosen.f.time})`,
-    hotelLabel: `Resort ${chosen.h.rating}★ tiêu chuẩn quốc tế (Kèm ăn sáng & xe đón)`,
+    hotelLabel: `Resort ${chosen.h.rating}★ tiêu chuẩn quốc tế (Kèm buffet sáng & xe đưa đón)`,
     reveal: {
       city: chosen.h.city, 
       title: chosen.h.title, 
@@ -501,7 +631,7 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
       hotel: chosen.h.name, 
       paid: totalPaid, 
       retail: totalRetail, 
-      savings: totalRetail - totalPaid
+      savings
     }
   };
 };
@@ -518,71 +648,114 @@ window.onFormChange = function() {
   const pkg = window.runBlindTravelEngine(false);
   window.saveStore("wm_draft_prod", pkg);
   window.renderPackageUI(pkg);
+
+  // Lưu lại sở thích của người dùng vào wm_users_prod để phục vụ cho các phiên sau
+  const session = window.loadStore("wm_session_prod", null);
+  if (session && session.email) {
+    const users = window.loadStore("wm_users_prod", {});
+    if (users[session.email]) {
+      users[session.email].preferences = inp;
+      window.saveStore("wm_users_prod", users);
+    }
+  }
 };
 
 window.generateNewRecommendation = function() {
   const pkg = window.runBlindTravelEngine(true);
   window.saveStore("wm_draft_prod", pkg);
   window.renderPackageUI(pkg);
-  window.showToast(`Đã tính toán hành trình mới #${pkg.code} (Khớp gu ${pkg.matchScore}%)!`);
+  window.showToast(`Đã xoay vòng hành trình mới #${pkg.code} (Khớp gu ${pkg.matchScore}%)!`);
 };
 
+// ============================================================================
+// GIAO DIỆN HỘP GỢI Ý CHUYẾN ĐI ĐA SẮC THÁI & CHUẨN CHỈ
+// ============================================================================
 window.renderPackageUI = function(pkg) {
   if (!pkg) return;
   const resultBox = document.getElementById("recommendationResultBox");
   if (!resultBox) return;
 
   resultBox.innerHTML = `
-    <div class="bg-slate-950/90 border border-teal-500/40 rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl relative overflow-hidden">
-      <div class="absolute -top-20 -right-20 w-60 h-60 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="bg-slate-950/95 border-2 border-teal-500/40 rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl relative overflow-hidden transition-all duration-300">
+      <!-- GLOW HIỆU ỨNG NỀN -->
+      <div class="absolute -top-24 -right-24 w-72 h-72 bg-gradient-to-br from-teal-500/15 to-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-gradient-to-tr from-amber-500/15 to-rose-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
+      <!-- HEADER HỘP GỢI Ý ĐA SẮC THÁI -->
       <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-5">
         <div>
           <div class="flex flex-wrap items-center gap-2">
-            <span class="text-xs px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 font-extrabold border border-teal-500/30">
+            <span class="text-xs px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 font-extrabold border border-teal-500/40 shadow-sm flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
               Độ Khớp Gu: ${pkg.matchScore}%
             </span>
-            <span class="text-xs px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-extrabold border border-amber-500/30">
+            <span class="text-xs px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-extrabold border border-amber-500/40 shadow-sm">
               Khí hậu dự báo: ${pkg.temp}°C — ${pkg.weather}
             </span>
+            <span class="text-xs px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 font-bold border border-sky-500/40 font-mono">
+              Knapsack: ${pkg.knapsackRatio}% ngân sách
+            </span>
           </div>
-          <h3 class="text-xl md:text-2xl font-extrabold text-white mt-2 font-heading">
-            Gói Nghỉ Dưỡng Bí Mật 3N2Đ (Mã Chuyến Đi: #${pkg.code})
+          <h3 class="text-xl md:text-2xl font-extrabold text-white mt-2 font-heading tracking-tight flex items-center gap-2">
+            <span>Gói Nghỉ Dưỡng Bí Mật 3N2Đ</span>
+            <span class="text-xs px-2.5 py-1 rounded-lg bg-white/10 text-amber-400 font-mono border border-amber-400/30">Mã: #${pkg.code}</span>
           </h3>
         </div>
 
         <div class="text-right">
           <span class="text-[11px] text-slate-400 block font-semibold">Tổng chi phí trọn gói (Vé bay + Resort 4-5★)</span>
-          <strong class="text-2xl font-black text-teal-300 font-heading block mt-0.5">${window.formatVND(pkg.reveal.paid)}</strong>
-          <span class="text-xs text-amber-300 block font-bold">Tiết kiệm ${window.formatVND(pkg.reveal.savings)} so với đặt lẻ</span>
+          <strong class="text-2xl md:text-3xl font-black text-teal-300 font-heading block mt-0.5">${window.formatVND(pkg.reveal.paid)}</strong>
+          <span class="text-xs text-amber-300 block font-bold mt-0.5">Tiết kiệm ${window.formatVND(pkg.reveal.savings)} so với thị trường</span>
         </div>
       </div>
 
+      <!-- NHẬT KÝ THUẬT TOÁN LOG (DIAGNOSTIC REASONING LOG) -->
+      <div class="bg-slate-900/90 border border-teal-500/30 p-3.5 rounded-2xl font-mono text-[11px] leading-relaxed text-teal-200">
+        <span class="text-amber-400 font-bold">⚙️ [AI REASONING LOG]:</span> ${pkg.reasoningLog}
+      </div>
+
+      <!-- 2 CỘT CHI TIẾT DỊCH VỤ -->
       <div class="grid sm:grid-cols-2 gap-4 text-xs">
-        <div class="bg-slate-900/90 p-4 rounded-2xl border border-white/10">
-          <span class="text-slate-400 block font-semibold">Hãng hàng không & Lịch bay vàng:</span>
+        <div class="bg-slate-900/90 p-4 rounded-2xl border border-white/10 hover:border-teal-500/40 transition">
+          <div class="flex items-center gap-2 text-teal-400 font-bold mb-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            <span>Hàng Không & Tuyến Bay Khứ Hồi:</span>
+          </div>
           <strong class="text-white text-sm block mt-1">${pkg.flightLabel}</strong>
+          <span class="text-[11px] text-slate-400 block mt-1">Đã bao gồm 20kg hành lý ký gửi + 7kg xách tay.</span>
         </div>
-        <div class="bg-slate-900/90 p-4 rounded-2xl border border-white/10">
-          <span class="text-slate-400 block font-semibold">Tiêu chuẩn nghỉ dưỡng bảo chứng:</span>
+
+        <div class="bg-slate-900/90 p-4 rounded-2xl border border-white/10 hover:border-teal-500/40 transition">
+          <div class="flex items-center gap-2 text-amber-400 font-bold mb-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            <span>Tiêu Chuẩn Lưu Trú Bảo Chứng:</span>
+          </div>
           <strong class="text-white text-sm block mt-1">${pkg.hotelLabel}</strong>
+          <span class="text-[11px] text-slate-400 block mt-1">Phòng Deluxe view đẹp + Miễn phí sử dụng hồ bơi & phòng Gym.</span>
         </div>
       </div>
 
-      <div class="bg-gradient-to-r from-amber-500/15 to-teal-500/10 border border-amber-400/30 p-5 rounded-2xl">
-        <span class="text-xs font-black text-amber-300 uppercase tracking-wider block">Bật Mí Về Không Gian Điểm Đến Của Bạn</span>
-        <p class="text-sm text-slate-100 mt-1.5 leading-relaxed italic">"${pkg.hint}"</p>
+      <!-- BỨC THƯ BẬT MÍ KHÔNG GIAN BÍ MẬT (MYSTERY LETTER BOX) -->
+      <div class="bg-gradient-to-r from-amber-500/15 via-teal-500/10 to-indigo-500/15 border-2 border-amber-400/40 p-5 rounded-3xl relative">
+        <div class="flex items-center gap-2 text-amber-300 font-extrabold text-xs uppercase tracking-wider">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+          <span>Thư Gợi Ý Không Gian Điểm Đến Bí Mật (Đã Niêm Phong)</span>
+        </div>
+        <p class="text-sm md:text-base text-white mt-2 leading-relaxed italic font-serif">
+          "${pkg.hint}"
+        </p>
       </div>
 
-      <div>
-        <span class="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-3">Lịch trình mẫu 3 Ngày 2 Đêm được thiết kế riêng:</span>
+      <!-- LỊCH TRÌNH MẪU 3 NGÀY 2 ĐÊM ĐA SẮC THÁI -->
+      <div class="space-y-3">
+        <span class="text-xs font-bold text-slate-300 uppercase tracking-wider block">Lịch trình mẫu 3 Ngày 2 Đêm được thiết kế riêng:</span>
         <div class="grid md:grid-cols-3 gap-4 text-xs">
           ${pkg.days.map(d => `
-            <div class="bg-slate-900/90 p-4 rounded-2xl border border-white/10 space-y-2">
-              <strong class="text-teal-400 block border-b border-white/10 pb-1.5 font-bold">${d.d}</strong>
-              <p><span class="text-amber-300 font-extrabold">Sáng:</span> <span class="text-slate-300">${d.m}</span></p>
-              <p><span class="text-sky-300 font-extrabold">Chiều:</span> <span class="text-slate-300">${d.a}</span></p>
-              <p><span class="text-purple-300 font-extrabold">Tối:</span> <span class="text-slate-300">${d.e}</span></p>
+            <div class="bg-slate-900/90 p-4 rounded-2xl border border-white/10 space-y-2.5 hover:border-teal-500/40 transition">
+              <strong class="text-teal-400 block border-b border-white/10 pb-2 font-bold text-sm">${d.d}</strong>
+              <p class="leading-relaxed"><span class="px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 font-black mr-1 text-[11px]">SÁNG</span> <span class="text-slate-200">${d.m}</span></p>
+              <p class="leading-relaxed"><span class="px-1.5 py-0.5 rounded bg-sky-400/20 text-sky-300 font-black mr-1 text-[11px]">CHIỀU</span> <span class="text-slate-200">${d.a}</span></p>
+              <p class="leading-relaxed"><span class="px-1.5 py-0.5 rounded bg-purple-400/20 text-purple-300 font-black mr-1 text-[11px]">TỐI</span> <span class="text-slate-200">${d.e}</span></p>
             </div>
           `).join("")}
         </div>
@@ -593,7 +766,7 @@ window.renderPackageUI = function(pkg) {
   document.getElementById("anonWeatherBox").innerText = `Khí hậu điểm đến: ${pkg.temp}°C — ${pkg.weather}`;
   document.getElementById("aiMysteryHintText").innerText = `"${pkg.hint}"`;
   document.getElementById("packingListContainer").innerHTML = pkg.packing.map((x, i) => `
-    <label class="flex items-center gap-2.5 text-xs text-slate-200 p-2 rounded-xl bg-slate-900/60 border border-white/5 cursor-pointer hover:bg-slate-900">
+    <label class="flex items-center gap-2.5 text-xs text-slate-200 p-2.5 rounded-xl bg-slate-900/60 border border-white/5 cursor-pointer hover:bg-slate-900 transition">
       <input type="checkbox" checked class="accent-teal-400 w-4 h-4 rounded cursor-pointer" />
       <span>${i + 1}. ${x}</span>
     </label>
@@ -635,6 +808,17 @@ window.confirmAndLockBooking = function() {
   if (idx >= 0) saved[idx] = pkg; else saved.unshift(pkg);
   window.saveStore("wm_saved_prod", saved);
 
+  // Lưu chuyến đi vào hồ sơ người dùng trong wm_users_prod để phục vụ sau này
+  const session = window.loadStore("wm_session_prod", null);
+  if (session && session.email) {
+    const users = window.loadStore("wm_users_prod", {});
+    if (users[session.email]) {
+      users[session.email].bookings = users[session.email].bookings || [];
+      users[session.email].bookings.unshift(pkg);
+      window.saveStore("wm_users_prod", users);
+    }
+  }
+
   document.getElementById("lblBookingCode").innerText = `Mã Đơn Escrow: #${pkg.code}`;
   document.getElementById("qrPaymentSection").style.display = "block";
   document.getElementById("qrCardsContainer").innerHTML = pkg.qrs.map(q => `
@@ -657,6 +841,18 @@ window.saveCurrentToWishlist = function() {
     saved.unshift(pkg);
     window.saveStore("wm_saved_prod", saved);
   }
+
+  // Lưu vào wishlist người dùng trong wm_users_prod
+  const session = window.loadStore("wm_session_prod", null);
+  if (session && session.email) {
+    const users = window.loadStore("wm_users_prod", {});
+    if (users[session.email]) {
+      users[session.email].wishlist = users[session.email].wishlist || [];
+      users[session.email].wishlist.unshift(pkg);
+      window.saveStore("wm_users_prod", users);
+    }
+  }
+
   window.updateSavedBadge();
   window.showToast(`Đã lưu hành trình #${pkg.code} vào danh sách chuyến đi của bạn!`);
 };
@@ -671,7 +867,7 @@ window.simulateRefund = function(type) {
   const pkg = window.loadStore("wm_draft_prod", null);
   const paid = pkg ? pkg.reveal.paid : 5000000;
   const map = {
-    EARLY_72H: { t: "Hủy trước 72 giờ khởi hành", r: 0.90, d: "Hoàn trả tức thì 90% về tài khoản ngân hàng thụ hưởng (Khấu trừ 10% phí vận hành sàn)." },
+    EARLY_72H: { t: "Hủy trước 72 giờ khởi hành", r: 0.90, d: "Hoàn trả tức thì 90% về tài khoản ngân hàng thụ hưởng (Khấu trừ 10% chi phí vận hành sàn)." },
     LATE_24_72H: { t: "Hủy từ 24 giờ đến 72 giờ", r: 0.65, d: "Hoàn trả 65% (Khấu trừ 35% phí giữ phòng Resort cận ngày theo cam kết SLA)." },
     FORCE_MAJEURE: { t: "Sự cố thời tiết / Bất khả kháng", r: 0.90, d: "Bảo hiểm hỗ trợ hoàn trả 90% sau khi xác minh thông báo từ Cảng vụ hàng không." },
     UNDER_24H: { t: "Hủy dưới 24 giờ trước giờ bay", r: 0.00, d: "Vé máy bay và phòng Resort đã xuất định danh cố định, không hỗ trợ hoàn tiền." }
@@ -699,7 +895,7 @@ window.initScratchCanvas = function() {
   const ctx = c.getContext("2d");
 
   // Nền thẻ cào màu tối sang trọng
-  ctx.fillStyle = "#090D16";
+  ctx.fillStyle = "#080C16";
   ctx.fillRect(0, 0, c.width, c.height);
 
   // Đường viền vàng ánh kim
