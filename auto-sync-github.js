@@ -4,8 +4,14 @@
  * tự động git add -> git commit -> git push lên GitHub.
  */
 
+import { createRequire } from "module";
+import { fileURLToPath } from "url";
+import path from "path";
+const require = createRequire(import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const fs = require('fs');
-const path = require('path');
 const { exec } = require('child_process');
 
 const ROOT_DIR = __dirname;
