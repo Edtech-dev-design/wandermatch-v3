@@ -538,7 +538,82 @@ const STORAGE = {
   feedback: []
 };
 
-export default {
+
+// ============================================================================
+// LƯU TRỮ BỀN VỮNG (Workers KV) + TÀI KHOẢN EMAIL THẬT (PBKDF2 + token ký HMAC)
+// ============================================================================
+const enc = new TextEncoder();
+const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const unb64 = (s) => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+
+async function hydrate(env) {
+  STORAGE.users = STORAGE.users || {};
+  if (!env.DB) return;
+  const raw = await env.DB.get("store");
+  if (raw) { try { Object.assign(STORAGE, JSON.parse(raw)); } catch (e) {} }
+}
+async function persist(env) {
+  if (env.DB) await env.DB.put("store", JSON.stringify(STORAGE));
+}
+async function hashPassword(pw, saltB64) {
+  const salt = saltB64 ? unb64(saltB64) : crypto.getRandomValues(new Uint8Array(16));
+  const key = await crypto.subtle.importKey("raw", enc.encode(pw), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt, iterations: 100000 }, key, 256);
+  return { salt: b64(salt), hash: b64(bits) };
+}
+async function hmac(data, env) {
+  const secret = env.SESSION_SECRET || "dev-only-secret-change-me";
+  const key = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  return b64(await crypto.subtle.sign("HMAC", key, enc.encode(data)));
+}
+async function issueToken(email, env) {
+  const exp = Date.now() + 7 * 24 * 3600 * 1000;
+  const body = btoa(JSON.stringify({ email, exp }));
+  return body + "." + await hmac(body, env);
+}
+async function verifyToken(token, env) {
+  if (!token || !token.includes(".")) return null;
+  const [body, sig] = token.split(".");
+  if (sig !== await hmac(body, env)) return null;
+  try { const d = JSON.parse(atob(body)); return d.exp > Date.now() ? d : null; } catch (e) { return null; }
+}
+const publicUser = (u) => ({ email: u.email, name: u.name, avatar: u.avatar || "", provider: u.provider || "email" });
+const validEmail = (e) => /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(e);
+
+async function handleAuth(url, request, env, cors) {
+  const J = { ...cors, "Content-Type": "application/json" };
+  const out = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: J });
+  if (url.pathname === "/api/auth/register" && request.method === "POST") {
+    const { email: rawEmail, password, name } = await request.json();
+    const email = String(rawEmail || "").trim().toLowerCase();
+    if (!validEmail(email)) return out({ success: false, error: "Email không hợp lệ" }, 400);
+    if (!password || password.length < 6) return out({ success: false, error: "Mật khẩu tối thiểu 6 ký tự" }, 400);
+    if (STORAGE.users[email]) return out({ success: false, error: "Email đã được đăng ký", code: "EXISTS" }, 409);
+    const h = await hashPassword(password);
+    STORAGE.users[email] = { email, name: (name || email.split("@")[0]).trim(), salt: h.salt, hash: h.hash, provider: "email", createdAt: new Date().toISOString() };
+    return out({ success: true, user: publicUser(STORAGE.users[email]), token: await issueToken(email, env) });
+  }
+  if (url.pathname === "/api/auth/login" && request.method === "POST") {
+    const { email: rawEmail, password } = await request.json();
+    const email = String(rawEmail || "").trim().toLowerCase();
+    const u = STORAGE.users[email];
+    if (!u) return out({ success: false, error: "Tài khoản chưa tồn tại", code: "NO_ACCOUNT" }, 404);
+    const h = await hashPassword(password || "", u.salt);
+    if (h.hash !== u.hash) return out({ success: false, error: "Mật khẩu không chính xác", code: "BAD_PASSWORD" }, 401);
+    return out({ success: true, user: publicUser(u), token: await issueToken(email, env) });
+  }
+  if (url.pathname === "/api/auth/me" && request.method === "GET") {
+    const tok = (request.headers.get("Authorization") || "").replace("Bearer ", "");
+    const d = await verifyToken(tok, env);
+    const u = d && STORAGE.users[d.email];
+    return u ? out({ success: true, user: publicUser(u) }) : out({ success: false, error: "Phiên hết hạn" }, 401);
+  }
+  return null;
+}
+
+const handlerForAuthHook = null;
+
+const handler = {
   async fetch(request, env) {
     const cors = {
       "Access-Control-Allow-Origin": "*",
@@ -551,6 +626,7 @@ export default {
     }
 
     const url = new URL(request.url);
+    { const authRes = await handleAuth(url, request, env, cors); if (authRes) return authRes; }
 
     // ===== XÁC THỰC SOCIAL: máy chủ tự hỏi Google/Facebook, KHÔNG tin dữ liệu client =====
     if (url.pathname === "/api/auth/social-login" && request.method === "POST") {
@@ -976,5 +1052,15 @@ export default {
       status: "WanderMatch Cloudflare Dual-Core Engine Ready",
       time: new Date().toISOString()
     }), { headers: { ...cors, "Content-Type": "application/json" } });
+  }
+};
+
+
+export default {
+  async fetch(request, env, ctx) {
+    await hydrate(env);
+    const res = await handler.fetch(request, env, ctx);
+    if (request.method === "POST") await persist(env);
+    return res;
   }
 };

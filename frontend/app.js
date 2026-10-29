@@ -718,99 +718,41 @@ window.closeUnifiedAuthModal = function() {
   if (errBox) errBox.style.display = "none";
 };
 
-window.submitUnifiedAuth = function() {
+window.submitUnifiedAuth = async function() {
   const email = window.cleanEmail(document.getElementById("uniEmail")?.value || "");
   const nameInput = (document.getElementById("uniName")?.value || "").trim();
   const pass = document.getElementById("uniPass")?.value || "";
   const errBox = document.getElementById("unifiedAuthErrorBox");
+  const setUniError = (msg) => { if (errBox) { errBox.innerText = msg; errBox.style.display = "block"; } };
 
-  const setUniError = (msg) => {
-    if (errBox) {
-      errBox.innerText = msg;
-      errBox.style.display = "block";
-    }
+  if (!window.isValidEmail(email)) return setUniError("Địa chỉ Email không hợp lệ (Không dùng tên miền có số như .com2)!");
+
+  const call = async (path, body) => {
+    const res = await fetch(`${window.API_BASE}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    return { status: res.status, data: await res.json().catch(() => ({})) };
   };
 
-  if (!window.isValidEmail(email)) {
-    return setUniError("Địa chỉ Email không hợp lệ (Không dùng tên miền có số như .com2)!");
+  let r;
+  try {
+    r = await call("/api/auth/login", { email, password: pass });
+    if (r.status === 404) {
+      if (pass.length < 6) return setUniError("Mật khẩu tài khoản mới phải có tối thiểu 6 ký tự!");
+      r = await call("/api/auth/register", { email, password: pass, name: nameInput });
+    }
+  } catch (e) {
+    return setUniError("Không kết nối được máy chủ. Hãy chắc chắn backend đang chạy rồi thử lại.");
   }
+  if (!r.data.success) return setUniError(r.data.error || "Xác thực thất bại");
 
+  const u = r.data.user;
   const users = window.loadStore("wm_users_prod", {});
-  const existingAcc = users[email];
-
-  if (existingAcc) {
-    // 1. LUỒNG ĐĂNG NHẬP TÀI KHOẢN ĐÃ CÓ
-    const isPwMatch = (existingAcc.passHash === window.hashPw(pass)) || 
-                      (existingAcc.passHash === "pw_wm_prod_" + pass) ||
-                      (pass === "123" && email === "khachhang@wandermatch.vn") ||
-                      (pass === "admin" && email === "admin@wandermatch.vn");
-    if (!isPwMatch) {
-      return setUniError(`Mật khẩu không chính xác cho tài khoản "${email}". Vui lòng kiểm tra lại!`);
-    }
-
-    existingAcc.lastLoginAt = new Date().toISOString();
-    window.saveStore("wm_users_prod", users);
-
-    window.saveStore("wm_session_prod", {
-      name: existingAcc.name,
-      email: existingAcc.email,
-      provider: existingAcc.provider || "email",
-      avatar: existingAcc.avatar || ""
-    });
-
-    // Đồng bộ Supabase session
-    if (window.supabaseClient && window.supabaseClient.auth) {
-      try {
-        window.supabaseClient.auth.signInWithPassword({ email, password: pass });
-      } catch (e) {}
-    }
-
-    window.applyUserSession();
-    window.closeUnifiedAuthModal();
-    window.showToast(`Chào mừng trở lại, ${existingAcc.name}! Đã mở khóa hành trình bí mật.`);
-  } else {
-    // 2. LUỒNG TỰ ĐỘNG TẠO TÀI KHOẢN MỚI
-    if (pass.length < 6) {
-      return setUniError("Mật khẩu tài khoản mới phải có tối thiểu 6 ký tự bảo mật!");
-    }
-    const fullName = nameInput || email.split("@")[0].toUpperCase();
-    
-    users[email] = {
-      name: fullName,
-      email,
-      passHash: window.hashPw(pass),
-      provider: "email",
-      avatar: "",
-      registeredAt: new Date().toISOString(),
-      lastLoginAt: new Date().toISOString(),
-      preferences: window.getFormInputs(),
-      bookings: [],
-      wishlist: []
-    };
-    window.saveStore("wm_users_prod", users);
-
-    window.saveStore("wm_session_prod", {
-      name: fullName,
-      email,
-      provider: "email",
-      avatar: ""
-    });
-
-    // Đồng bộ sang Supabase User Store
-    if (window.supabaseClient && window.supabaseClient.auth) {
-      try {
-        window.supabaseClient.auth.signUp({
-          email,
-          password: pass,
-          options: { data: { full_name: fullName } }
-        });
-      } catch (e) {}
-    }
-
-    window.applyUserSession();
-    window.closeUnifiedAuthModal();
-    window.showToast(`Đã tự động tạo tài khoản vĩnh viễn và đăng nhập thành công cho ${fullName}!`);
-  }
+  users[u.email] = { ...(users[u.email] || {}), name: u.name, email: u.email, provider: "email", avatar: u.avatar || "", lastLoginAt: new Date().toISOString(),
+    preferences: (users[u.email] || {}).preferences || window.getFormInputs(), bookings: (users[u.email] || {}).bookings || [], wishlist: (users[u.email] || {}).wishlist || [] };
+  window.saveStore("wm_users_prod", users);
+  window.saveStore("wm_session_prod", { name: u.name, email: u.email, provider: "email", avatar: u.avatar || "", token: r.data.token });
+  window.applyUserSession();
+  window.closeUnifiedAuthModal();
+  window.showToast(`Chào mừng ${u.name}! Đã đăng nhập thành công.`);
 };
 
 // ============================================================================

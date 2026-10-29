@@ -4,6 +4,10 @@ compatibility_date = "2026-04-01"
 workers_dev = true
 keep_vars = true
 
+[[kv_namespaces]]
+binding = "DB"
+id = "wandermatch_local_db"
+
 [ai]
 binding = "AI"
 
