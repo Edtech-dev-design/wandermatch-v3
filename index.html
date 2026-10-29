@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WanderMatch — Nền Tảng Đặt Chuyến Du Lịch Bí Mật & Tối Ưu Ngân Sách</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <style>
     :root {
@@ -15,27 +15,27 @@
     }
     body {
       font-family: var(--font-body);
-      background-color: #060912;
+      background-color: #060913;
       background-image: 
-        radial-gradient(at 10% 10%, rgba(20, 184, 166, 0.18) 0px, transparent 45%),
-        radial-gradient(at 90% 12%, rgba(56, 189, 248, 0.16) 0px, transparent 45%),
-        radial-gradient(at 50% 85%, rgba(245, 158, 11, 0.10) 0px, transparent 50%);
+        radial-gradient(at 12% 10%, rgba(20, 184, 166, 0.16) 0px, transparent 45%),
+        radial-gradient(at 88% 12%, rgba(14, 165, 233, 0.14) 0px, transparent 45%),
+        radial-gradient(at 50% 88%, rgba(245, 158, 11, 0.08) 0px, transparent 50%);
       background-attachment: fixed;
       color: #F8FAFC;
     }
     h1, h2, h3, h4, .font-heading { font-family: var(--font-heading); }
     .font-mono { font-family: var(--font-mono); }
     .glass-card {
-      background: rgba(13, 20, 36, 0.82);
+      background: rgba(13, 20, 36, 0.85);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
       border: 1px solid rgba(255, 255, 255, 0.12);
       box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.65);
     }
     .glass-nav {
-      background: rgba(6, 9, 18, 0.92);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      background: rgba(6, 9, 18, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
     .gold-gradient-text {
@@ -71,11 +71,22 @@
       box-shadow: 0 0 14px rgba(45, 212, 191, 0.9);
       cursor: pointer;
     }
+    .badge-shimmer {
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 2.5s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
   </style>
 </head>
 <body class="min-h-screen pb-24 selection:bg-teal-500 selection:text-slate-950">
 
+  <!-- ========================================================================= -->
   <!-- HEADER THANH ĐIỀU HƯỚNG CAO CẤP -->
+  <!-- ========================================================================= -->
   <header class="glass-nav sticky top-0 z-40 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
       <!-- LOGO THƯƠNG HIỆU -->
@@ -96,7 +107,7 @@
 
       <!-- MENU TABS CHÍNH -->
       <nav class="flex items-center gap-1.5 bg-slate-900/90 border border-white/10 p-1.5 rounded-2xl text-xs font-semibold">
-        <button id="btn-tab-b2c" onclick="window.switchTab('b2c')" class="px-4 py-2 rounded-xl font-bold bg-teal-500 text-slate-950 transition">
+        <button id="btn-tab-b2c" onclick="window.switchTab('b2c')" class="px-4 py-2 rounded-xl font-bold bg-teal-500 text-slate-950 transition shadow">
           Khám Phá Chuyến Đi
         </button>
         <button id="btn-tab-saved" onclick="window.switchTab('saved')" class="px-4 py-2 rounded-xl text-slate-300 hover:text-white transition flex items-center gap-1.5">
@@ -108,7 +119,7 @@
         </button>
       </nav>
 
-      <!-- KHU VỰC TÀI KHOẢN & ĐĂNG NHẬP (GOOGLE / FACEBOOK / EMAIL) -->
+      <!-- KHU VỰC TÀI KHOẢN & ĐĂNG NHẬP -->
       <div class="flex items-center gap-2.5">
         <!-- TRẠNG THÁI: CHƯA ĐĂNG NHẬP -->
         <div id="authLoggedOutBox" class="flex items-center gap-2">
@@ -139,7 +150,7 @@
           </button>
         </div>
 
-        <!-- TRẠNG THÁI: ĐÃ ĐĂNG NHẬP THỰC TẾ -->
+        <!-- TRẠNG THÁI: ĐÃ ĐĂNG NHẬP -->
         <div id="authLoggedInBox" style="display:none;" class="flex items-center gap-3 bg-slate-900/95 border border-teal-500/35 p-1.5 pl-3 rounded-2xl shadow-xl">
           <div class="relative">
             <div id="userAvatarContainer" class="w-8 h-8 rounded-xl overflow-hidden border border-teal-400 flex items-center justify-center font-bold text-xs bg-slate-800 text-teal-300">
@@ -216,7 +227,7 @@
       </div>
     </div>
 
-    <!-- KHUNG MÔ PHỎNG ENGINE BỊ KHÓA (LOCKED TEASER CARD) -->
+    <!-- KHUNG MÔ PHỎNG ENGINE BỊ KHÓA -->
     <div class="relative rounded-3xl border border-white/10 bg-slate-950/60 p-6 md:p-8 overflow-hidden shadow-2xl">
       <div class="absolute inset-0 z-20 backdrop-blur-md bg-slate-950/80 flex flex-col items-center justify-center p-6 text-center space-y-4">
         <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-amber-500/20 to-amber-400/10 border border-amber-400/40 flex items-center justify-center text-amber-400 shadow-2xl shadow-amber-500/20">
@@ -275,7 +286,7 @@
   <main id="tab-b2c" style="display:none;" class="max-w-6xl mx-auto px-4 mt-6 space-y-6">
     <!-- THANH TIẾN TRÌNH 4 BƯỚC THƯƠNG MẠI -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <button id="step-nav-1" onclick="window.goToStep(1)" class="p-4 rounded-2xl border border-teal-400/50 bg-teal-500/15 text-left transition relative overflow-hidden group">
+      <button id="step-nav-1" onclick="window.goToStep(1)" class="p-4 rounded-2xl border border-teal-400/50 bg-teal-500/15 text-left transition relative overflow-hidden group shadow-lg">
         <span class="text-[10px] uppercase text-teal-300 font-extrabold tracking-wider block">Bước 01</span>
         <strong class="text-xs md:text-sm text-white block mt-0.5">Ngân Sách & Sở Thích</strong>
         <div class="absolute bottom-0 left-0 right-0 h-1 bg-teal-400"></div>
@@ -424,7 +435,7 @@
         </div>
       </div>
 
-      <!-- KẾT QUẢ GỢI Ý THUẬT TOÁN ĐA SẮC THÁI (RENDER ĐỘNG TỪ APP.JS) -->
+      <!-- KẾT QUẢ GỢI Ý THUẬT TOÁN ĐA SẮC THÁI KÈM HÌNH ẢNH & CHI PHÍ MINH BẠCH -->
       <div id="recommendationResultBox" class="transition-all duration-300"></div>
     </section>
 
@@ -481,15 +492,30 @@
       </div>
 
       <!-- KHUNG HIỂN THỊ VIETQR KÝ QUỸ -->
-      <div id="qrPaymentSection" style="display:none;" class="bg-slate-950/90 p-6 rounded-2xl border border-teal-500/30 space-y-4">
+      <div id="qrPaymentSection" style="display:none;" class="bg-slate-950/90 p-6 rounded-3xl border border-teal-500/30 space-y-5">
         <div class="flex flex-wrap justify-between items-center gap-2 border-b border-white/10 pb-3">
           <div>
             <h3 class="font-extrabold text-sm text-teal-300">Cổng Thanh Toán VietQR Tạm Giữ Minh Bạch</h3>
             <p class="text-[11px] text-slate-400">Tiền được phong tỏa an toàn trong tài khoản Escrow đến khi bạn hoàn tất chuyến đi.</p>
           </div>
-          <strong id="lblBookingCode" class="text-amber-400 text-sm font-mono px-3 py-1 bg-amber-500/10 rounded-lg border border-amber-400/30"></strong>
+          <div class="flex items-center gap-2">
+            <span class="text-xs px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 font-mono font-bold" id="qrCountdownTimer">Hết hạn sau: 15:00</span>
+            <strong id="lblBookingCode" class="text-amber-400 text-sm font-mono px-3 py-1 bg-amber-500/10 rounded-lg border border-amber-400/30"></strong>
+          </div>
         </div>
+        
         <div id="qrCardsContainer" class="grid sm:grid-cols-2 md:grid-cols-4 gap-4"></div>
+
+        <!-- MÔ PHỎNG XÁC MINH THANH TOÁN TỰ ĐỘNG THỜI GIAN THỰC -->
+        <div class="bg-slate-900 p-4 rounded-2xl border border-teal-500/30 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-slate-300">Hệ thống đang quét Napas 24/7 kiểm tra giao dịch tự động...</span>
+          </div>
+          <button onclick="window.simulatePaymentSuccess()" class="px-4 py-2 rounded-xl font-bold text-xs bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition shadow">
+            ⚡ Giả Lập Nhận Tiền Ký Quỹ Thành Công
+          </button>
+        </div>
       </div>
     </section>
 
@@ -546,65 +572,69 @@
       </div>
     </section>
 
-    <!-- BƯỚC 4: MỞ KHÓA ĐIỂM ĐẾN & THẺ CÀO -->
+    <!-- BƯỚC 4: MỞ KHÓA ĐIỂM ĐẾN & THẺ CÀO & PHIẾU DỊCH VỤ -->
     <section id="step-panel-4" style="display:none;" class="glass-card rounded-3xl p-6 md:p-8 space-y-6">
       <div class="flex flex-wrap justify-between items-center border-b border-white/10 pb-4 gap-2">
         <div>
           <h2 class="text-xl font-extrabold text-amber-400 font-heading">
             Bước 4: Mở Khóa Điểm Đến & Phiếu Dịch Vụ Nghỉ Dưỡng
           </h2>
-          <p class="text-xs text-slate-400 mt-0.5">Cào trực tiếp lớp phủ kỹ thuật số bên dưới để khám phá điểm đến bí mật của bạn.</p>
+          <p class="text-xs text-slate-400 mt-0.5">Cào trực tiếp lớp phủ kỹ thuật số bên dưới hoặc bấm nút mở khóa để xem trọn vẹn điểm đến.</p>
         </div>
-        <button onclick="window.revealDestinationNow()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold btn-glow-gold text-slate-950">
-          Mở Khóa Ngay Không Cần Cào
-        </button>
+        <div class="flex gap-2">
+          <button onclick="window.revealDestinationNow()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold btn-glow-gold text-slate-950">
+            Mở Khóa Ngay
+          </button>
+          <button onclick="window.printVoucher()" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white border border-white/10 transition">
+            In Phiếu / PDF
+          </button>
+        </div>
       </div>
 
-      <!-- KHUNG THẺ CÀO VÀ NỘI DUNG VOUCHER -->
-      <div class="relative w-full max-w-2xl mx-auto rounded-3xl overflow-hidden border border-teal-500/40 bg-slate-900 p-6 md:p-8 shadow-2xl">
-        <div class="space-y-4">
-          <div class="flex justify-between items-start">
-            <div>
-              <span class="text-[10px] font-extrabold px-2.5 py-1 rounded-md bg-teal-500/20 text-teal-300 uppercase tracking-wider">
-                Điểm Đến Chính Thức Đã Mở Khóa
-              </span>
-              <h3 id="revCityName" class="text-3xl font-extrabold text-white mt-1.5 font-heading">---</h3>
-              <p id="revComboTitle" class="text-xs text-teal-300 mt-0.5 font-medium"></p>
-            </div>
-            <div class="text-right bg-slate-950 p-3 rounded-2xl border border-amber-400/40">
-              <span class="text-[10px] text-slate-400 block font-semibold">Mã Đặt Phòng Resort SLA</span>
-              <strong id="revSlaCode" class="text-sm font-extrabold text-amber-400 font-mono">---</strong>
-            </div>
+      <!-- KHUNG THẺ CÀO VÀ NỘI DUNG VOUCHER CHUẨN THƯƠNG MẠI -->
+      <div id="voucherPrintArea" class="relative w-full max-w-2xl mx-auto rounded-3xl overflow-hidden border border-teal-500/40 bg-slate-900 p-6 md:p-8 shadow-2xl space-y-5">
+        <div class="flex justify-between items-start border-b border-white/10 pb-4">
+          <div>
+            <span class="text-[10px] font-extrabold px-2.5 py-1 rounded-md bg-teal-500/20 text-teal-300 uppercase tracking-wider">
+              Điểm Đến Chính Thức Đã Mở Khóa
+            </span>
+            <h3 id="revCityName" class="text-3xl font-extrabold text-white mt-1.5 font-heading">---</h3>
+            <p id="revComboTitle" class="text-xs text-teal-300 mt-0.5 font-medium"></p>
           </div>
-
-          <div class="grid sm:grid-cols-2 gap-3 text-xs bg-slate-950 p-4 rounded-2xl border border-white/10">
-            <div>
-              <span class="text-slate-400 block font-semibold">Chuyến bay khứ hồi:</span>
-              <strong id="revTransport" class="text-white block mt-0.5">---</strong>
-            </div>
-            <div>
-              <span class="text-slate-400 block font-semibold">Resort lưu trú cao cấp:</span>
-              <strong id="revHotel" class="text-white block mt-0.5">---</strong>
-            </div>
-          </div>
-
-          <div class="bg-teal-950/40 border border-teal-400/30 p-4 rounded-2xl flex justify-between items-center text-xs">
-            <div>
-              <p class="text-slate-400">Giá bán lẻ thị trường: <strong id="revRetailPrice" class="line-through text-slate-400 ml-1">0đ</strong></p>
-              <p class="mt-1 text-slate-200">Giá trọn gói bạn chi trả: <strong id="revPaidPrice" class="text-white font-bold text-sm ml-1">0đ</strong></p>
-            </div>
-            <div class="text-right">
-              <span class="text-teal-300 block font-semibold">Tiết kiệm thực tế</span>
-              <strong id="revSavings" class="text-xl font-extrabold text-teal-400 font-heading">+0đ</strong>
-            </div>
-          </div>
-
-          <div class="pt-1">
-            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider block">Gợi ý ẩm thực bản địa kèm giá niêm yết:</span>
-            <ul id="revFoodGuide" class="list-disc list-inside text-xs text-slate-200 mt-2 space-y-1"></ul>
+          <div class="text-right bg-slate-950 p-3 rounded-2xl border border-amber-400/40">
+            <span class="text-[10px] text-slate-400 block font-semibold">Mã Đặt Phòng Resort SLA</span>
+            <strong id="revSlaCode" class="text-sm font-extrabold text-amber-400 font-mono">---</strong>
           </div>
         </div>
 
+        <div class="grid sm:grid-cols-2 gap-3.5 text-xs bg-slate-950 p-4 rounded-2xl border border-white/10">
+          <div>
+            <span class="text-slate-400 block font-semibold">Chuyến bay khứ hồi:</span>
+            <strong id="revTransport" class="text-white block mt-0.5">---</strong>
+          </div>
+          <div>
+            <span class="text-slate-400 block font-semibold">Resort lưu trú cao cấp:</span>
+            <strong id="revHotel" class="text-white block mt-0.5">---</strong>
+          </div>
+        </div>
+
+        <div class="bg-teal-950/40 border border-teal-400/30 p-4 rounded-2xl flex justify-between items-center text-xs">
+          <div>
+            <p class="text-slate-400">Giá bán lẻ thị trường: <strong id="revRetailPrice" class="line-through text-slate-400 ml-1">0đ</strong></p>
+            <p class="mt-1 text-slate-200">Giá trọn gói bạn chi trả: <strong id="revPaidPrice" class="text-white font-bold text-sm ml-1">0đ</strong></p>
+          </div>
+          <div class="text-right">
+            <span class="text-teal-300 block font-semibold">Tiết kiệm thực tế</span>
+            <strong id="revSavings" class="text-xl font-extrabold text-teal-400 font-heading">+0đ</strong>
+          </div>
+        </div>
+
+        <div class="pt-1">
+          <span class="text-xs font-bold text-amber-400 uppercase tracking-wider block">Gợi ý ẩm thực bản địa kèm giá niêm yết:</span>
+          <ul id="revFoodGuide" class="list-disc list-inside text-xs text-slate-200 mt-2 space-y-1"></ul>
+        </div>
+
+        <!-- CANVAS CÀO NGHỆ THUẬT -->
         <canvas id="scratchCanvas" class="absolute inset-0 w-full h-full cursor-crosshair z-10"></canvas>
       </div>
     </section>
@@ -619,7 +649,7 @@
         <h2 class="text-xl font-extrabold text-white font-heading">
           Danh Sách Hành Trình Đã Lưu & Đơn Đặt Chỗ Của Bạn
         </h2>
-        <p class="text-xs text-slate-400 mt-0.5">Toàn bộ dữ liệu được lưu vĩnh viễn trên tài khoản cá nhân của bạn.</p>
+        <p class="text-xs text-slate-400 mt-0.5">Toàn bộ dữ liệu được liên kết và đồng bộ vĩnh viễn với tài khoản cá nhân của bạn.</p>
       </div>
 
       <div class="grid md:grid-cols-2 gap-6 text-xs">
@@ -648,12 +678,12 @@
         <p class="text-xs text-slate-400 mt-0.5">Giá độc quyền phân phối trực tiếp từ chuỗi Resort 4-5 sao ký kết cam kết SLA với WanderMatch.</p>
       </div>
 
-      <div id="b2bInventoryList" class="space-y-3"></div>
+      <div id="b2bInventoryList" class="grid sm:grid-cols-2 md:grid-cols-3 gap-5"></div>
     </div>
   </main>
 
   <!-- ========================================================================= -->
-  <!-- 5. GOOGLE OAUTH MODAL RIÊNG BIỆT (CHÂN THẬT, KHÔNG ĐIỀN SẴN DỮ LIỆU) -->
+  <!-- 5. GOOGLE OAUTH MODAL RIÊNG BIỆT -->
   <!-- ========================================================================= -->
   <div id="googleAuthModal" style="display:none;" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="bg-white text-slate-900 rounded-3xl max-w-md w-full p-6 md:p-8 space-y-5 text-xs shadow-2xl relative border border-slate-200">
@@ -703,11 +733,10 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- 6. FACEBOOK OAUTH MODAL RIÊNG BIỆT (CHÂN THẬT, KHÔNG ĐIỀN SẴN DỮ LIỆU) -->
+  <!-- 6. FACEBOOK OAUTH MODAL RIÊNG BIỆT -->
   <!-- ========================================================================= -->
   <div id="facebookAuthModal" style="display:none;" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="bg-white text-slate-900 rounded-3xl max-w-md w-full overflow-hidden text-xs shadow-2xl relative border border-slate-200">
-      <!-- HEADER XANH FACEBOOK -->
       <div class="bg-[#1877F2] text-white p-4 flex justify-between items-center">
         <div class="flex items-center gap-2">
           <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
@@ -752,7 +781,7 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- 7. MODAL ĐĂNG NHẬP / ĐĂNG KÝ EMAIL RIÊNG BIỆT (KHÔNG ĐIỀN SẴN DỮ LIỆU) -->
+  <!-- 7. MODAL ĐĂNG NHẬP / ĐĂNG KÝ EMAIL RIÊNG BIỆT -->
   <!-- ========================================================================= -->
   <div id="authModal" style="display:none;" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-white/15 rounded-3xl max-w-md w-full p-6 md:p-8 space-y-5 text-xs shadow-2xl relative">
@@ -768,10 +797,8 @@
         <button onclick="window.closeAuthModal()" class="text-slate-400 hover:text-white font-bold text-lg px-2">✕</button>
       </div>
 
-      <!-- HỘP BÁO LỖI -->
       <div id="authErrorBox" style="display:none;" class="p-3.5 rounded-xl bg-rose-500/20 border border-rose-500/50 text-rose-300 font-semibold leading-relaxed"></div>
 
-      <!-- FORM ĐĂNG NHẬP (TRẮNG TINH, CHỜ NGƯỜI DÙNG NHẬP) -->
       <form id="formLogin" onsubmit="event.preventDefault(); window.submitLogin();" class="space-y-3.5">
         <div>
           <label class="text-slate-300 font-semibold block mb-1">Địa chỉ Email đã đăng ký</label>
@@ -786,7 +813,6 @@
         </button>
       </form>
 
-      <!-- FORM ĐĂNG KÝ (TRẮNG TINH, CHỜ NGƯỜI DÙNG NHẬP) -->
       <form id="formRegister" style="display:none;" onsubmit="event.preventDefault(); window.submitRegister();" class="space-y-3">
         <div>
           <label class="text-slate-300 font-semibold block mb-1">Họ và tên hành khách</label>
@@ -813,6 +839,7 @@
     </div>
   </div>
 
-  <script src="app.js?v=8.0"></script>
+  <script src="supabaseClient.js"></script>
+  <script src="app.js?v=9.0"></script>
 </body>
 </html>
