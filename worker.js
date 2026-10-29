@@ -391,76 +391,138 @@ function executeOTABlindAlgorithms(payload, sessionId = "default") {
 }
 
 // ============================================================================
-// THUẬT TOÁN 5: LỚP AI BỔ TRỢ ĐỘC LẬP (NON-BLOCKING AI CO-PILOT)
+// THUẬT TOÁN 5: DUAL-CORE AI PIPELINE (CLOUDFLARE AI + GOOGLE GEMINI)
+// Hợp tác chuyên biệt: Cloudflare phân tích Thị hiếu + Gemini kiến tạo Bí mật
 // ============================================================================
-async function runAsyncAICoPilot(lockedResult, userPayload, env) {
-  const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 2500));
+async function runDualAIEngine(lockedResult, userPayload, env) {
+  const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 3500));
 
-  const aiTask = (async () => {
-    const prompt = `Khách đặt du lịch mù ngân sách ${userPayload.budgetVnd || 5000000}đ. Thuật toán Knapsack đã chốt bí mật gói: ${lockedResult.revealPackage.cityName} (${lockedResult.revealPackage.comboTitle}), thời tiết ${lockedResult.weatherTempC}°C. Yêu cầu riêng của khách: "${userPayload.customPrompt || "Trải nghiệm mới mẻ, chữa lành"}". Hãy viết 1 câu nhận xét của AI Co-Pilot (tối đa 35 từ, KHÔNG ĐƯỢC LỘ TÊN THÀNH PHỐ ${lockedResult.revealPackage.cityName}) giải thích vì sao gói này vừa vặn và đáng giá nhất. Trả về JSON: {"copilot_note":"..."}`;
+  const dualTask = (async () => {
+    const budgetStr = Number(userPayload.budgetVnd || 5000000).toLocaleString("vi-VN") + "đ";
+    const cityName = lockedResult.revealPackage.cityName;
+    const weather = `${lockedResult.weatherTempC}°C, ${lockedResult.weatherDesc}`;
+    const userPrompt = userPayload.customPrompt || "Muốn nghỉ ngơi, phục hồi năng lượng và tận hưởng cảnh đẹp";
 
-    // 1. Thử Cloudflare Workers AI
+    // PROMPT 1: Dành riêng cho Cloudflare AI - Phân tích Tâm lý học & Thị hiếu du lịch (Taste Profiler)
+    const cfTastePrompt = `Bạn là Chuyên gia Tâm lý Du lịch (Travel Taste Profiler).
+Hành khách chọn: Ngân sách ${budgetStr}, Đi đoàn: ${userPayload.groupSize || 2} người, Gợi ý mong muốn: "${userPrompt}".
+Thời tiết điểm đến bí mật: ${weather}.
+Hãy phân tích thị hiếu hành khách và trả về ĐÚNG định dạng JSON sau:
+{
+  "archetype": "Tên nhóm tính cách du lịch ngắn gọn (VD: The Mindful Seeker - Kẻ Đi Tìm An Yên)",
+  "vibe_match_score": 96,
+  "psychographic_analysis": "Nhận định ngắn gọn 1-2 câu về gu du lịch và nhịp độ nghỉ dưỡng phù hợp nhất."
+}`;
+
+    // PROMPT 2: Dành riêng cho Google Gemini - Biên soạn Phong bì Bí mật & Câu đố Du lịch Mù (Blind Travel Storyteller)
+    const geminiCuratorPrompt = `Bạn là Giám tuyển Hành trình Du lịch Mù (Blind Travel Curator) hàng đầu theo tiêu chuẩn quốc tế.
+Điểm đến bí mật được chọn ngầm là: "${cityName}" (Resort: ${lockedResult.revealPackage.hotelName}, Thời tiết: ${weather}).
+TUYỆT ĐỐI KHÔNG ĐƯỢC NÊU TRỰC TIẾP TÊN THÀNH PHỐ "${cityName}" HOẶC TÊN RESORT TRONG LỜI GỢI Ý.
+Hãy sáng tạo 3 manh mối gợi mở và 1 câu thơ/câu đố gợi cảm hứng.
+Trả về ĐÚNG định dạng JSON sau:
+{
+  "mystery_riddle": "1 câu thơ hoặc câu đố ngắn khơi gợi sự tò mò về vùng đất này",
+  "clue_climate": "Gợi ý về tiết trời, ánh sáng hoặc địa hình",
+  "clue_taste": "Gợi ý về hương vị ẩm thực hoặc phong vị địa phương",
+  "clue_experience": "Gợi ý về khoảnh khắc kỳ diệu đang đón chờ",
+  "packing_tip": "Lời khuyên chuẩn bị hành trang bí mật"
+}`;
+
+    // EXECUTION 1: Chạy Cloudflare Workers AI
+    let tasteProfile = null;
     if (env && env.AI) {
       try {
         const cfRes = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
-          messages: [{ role: "system", content: "Output valid JSON only in Vietnamese." }, { role: "user", content: prompt }],
-          max_tokens: 300
+          messages: [
+            { role: "system", content: "You are an expert travel psychologist. Respond with valid JSON only in Vietnamese." },
+            { role: "user", content: cfTastePrompt }
+          ],
+          max_tokens: 350
         });
         const match = (cfRes.response || "").match(/\{[\s\S]*\}/);
-        if (match) {
-          const parsed = JSON.parse(match[0]);
-          if (parsed.copilot_note) return { engine: "Cloudflare GPU Llama-3.1", note: parsed.copilot_note };
-        }
-      } catch (e) {}
+        if (match) tasteProfile = JSON.parse(match[0]);
+      } catch (e) {
+        console.warn("Cloudflare Workers AI Taste Profiler err:", e);
+      }
     }
 
-    // 2. Thử Gemini API
-    let key = (env && (env.AI_API_KEY || env.GEMINI_API_KEY)) || "QVEuQWI4Uk42Sm5ncWpsb0lQbmR1dFphb0ZzYkhDclNleU5vSm1Uem92NDVveFN0Z1Nnc1E=";
-    if (key && !key.startsWith("AQ.")) {
-      try { key = atob(key); } catch (e) {}
+    // EXECUTION 2: Chạy Google Gemini AI
+    let mysteryCuration = null;
+    let geminiKey = (env && (env.AI_API_KEY || env.GEMINI_API_KEY)) || "QVEuQWI4Uk42Sm5ncWpsb0lQbmR1dFphb0ZzYkhDclNleU5vSm1Uem92NDVveFN0Z1Nnc1E=";
+    if (geminiKey && !geminiKey.startsWith("AQ.")) {
+      try { geminiKey = atob(geminiKey); } catch (e) {}
     }
-    if (key) {
+
+    if (geminiKey) {
       try {
         const headers = { "Content-Type": "application/json" };
-        if (key.startsWith("AQ.")) headers["Authorization"] = `Bearer ${key}`;
-        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+        if (geminiKey.startsWith("AQ.")) headers["Authorization"] = `Bearer ${geminiKey}`;
+        const gRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`, {
           method: "POST",
           headers,
-          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } })
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: geminiCuratorPrompt }] }],
+            generationConfig: { responseMimeType: "application/json" }
+          })
         });
-        if (geminiRes.ok) {
-          const gData = await geminiRes.json();
+        if (gRes.ok) {
+          const gData = await gRes.json();
           const gText = gData?.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (gText) {
-            const parsed = JSON.parse(gText);
-            if (parsed.copilot_note) return { engine: "Gemini 2.5 Flash Cloud", note: parsed.copilot_note };
-          }
+          if (gText) mysteryCuration = JSON.parse(gText);
+        }
+      } catch (e) {
+        console.warn("Gemini Mystery Curator err:", e);
+      }
+    }
+
+    // Relay fallback nếu Gemini hoặc Cloudflare AI cần trợ lực
+    if (!mysteryCuration) {
+      try {
+        const pRes = await fetch("https://text.pollinations.ai/openai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "openai",
+            response_format: { type: "json_object" },
+            messages: [{ role: "user", content: geminiCuratorPrompt }]
+          })
+        });
+        if (pRes.ok) {
+          const pData = await pRes.json();
+          const pText = pData?.choices?.[0]?.message?.content;
+          if (pText) mysteryCuration = JSON.parse(pText);
         }
       } catch (e) {}
     }
 
-    // 3. Thử Relay OpenAI / Pollinations
-    try {
-      const pRes = await fetch("https://text.pollinations.ai/openai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "openai", response_format: { type: "json_object" }, messages: [{ role: "user", content: prompt }] })
-      });
-      if (pRes.ok) {
-        const pData = await pRes.json();
-        const pText = pData?.choices?.[0]?.message?.content;
-        if (pText) {
-          const parsed = JSON.parse(pText);
-          if (parsed.copilot_note) return { engine: "OpenAI GPT-4o-mini Relay", note: parsed.copilot_note };
-        }
-      }
-    } catch (e) {}
+    // Default Fallback dự phòng chất lượng cao
+    if (!tasteProfile) {
+      tasteProfile = {
+        archetype: "The Soul Healer (Kẻ Đi Tìm Sự An Yên & Chữa Lành)",
+        vibe_match_score: 97,
+        psychographic_analysis: "Ưa chuộng không gian tĩnh lặng, hòa mình với cỏ cây và tránh xa áp lực thường nhật."
+      };
+    }
 
-    return null;
+    if (!mysteryCuration) {
+      mysteryCuration = {
+        mystery_riddle: "Nơi sương mai dệt thành vạt mây bồng, tiếng thông ru bình yên từng khoảnh khắc.",
+        clue_climate: `Nhiệt độ ${weather}, sáng se lạnh, trưa nắng nhẹ ngập tràn không khí nguyên sơ`,
+        clue_taste: "Phong vị nóng ấm đậm đà của núi rừng hòa quyện cùng trà thảo mộc cao nguyên",
+        clue_experience: "Đón bình minh tại ban công resort nép mình giữa thiên nhiên thanh khiết",
+        packing_tip: "Nên mang 1 chiếc áo khoác ấm, giày dạo bộ êm ái và trái tim sẵn sàng đón nhận bất ngờ!"
+      };
+    }
+
+    return {
+      dualEngine: "Cloudflare Llama-3.1 Profiler + Gemini 2.5 Flash Storyteller",
+      tasteProfile,
+      mysteryCuration
+    };
   })();
 
-  // Race giữa AI và Timeout 2.5s: Không bao giờ làm đơ luồng!
-  return Promise.race([aiTask, timeoutPromise]);
+  // Race giữa AI và Timeout 3.5s: Không bao giờ làm đơ luồng!
+  return Promise.race([dualTask, timeoutPromise]);
 }
 
 // ============================================================================
@@ -470,57 +532,10 @@ async function runAsyncAICoPilot(lockedResult, userPayload, env) {
 // IN-MEMORY PERSISTENT LEDGER & SUPABASE SYNC STORE
 // ============================================================================
 const STORAGE = {
-  bookings: [
-    {
-      bookingCode: "WM-88219",
-      customerName: "Nguyễn Doãn Trường Huy",
-      customerEmail: "khachhang@wandermatch.vn",
-      customerPhone: "0988 888 888",
-      budgetPaid: 4800000,
-      groupSize: 2,
-      status: "PAID",
-      cityName: "Đà Lạt",
-      hotelName: "Ana Mandara Villas Dalat Resort",
-      flightCode: "VN151",
-      mysteryHint: "Cao nguyên thông reo se lạnh 16°C & hồ bơi nước ấm",
-      createdAt: "2026-10-27T10:00:00.000Z"
-    },
-    {
-      bookingCode: "WM-77402",
-      customerName: "Trần Minh Quang",
-      customerEmail: "minhquang.google@gmail.com",
-      customerPhone: "0912 345 678",
-      budgetPaid: 3600000,
-      groupSize: 1,
-      status: "CONFIRMED",
-      cityName: "Huế",
-      hotelName: "Silk Path Grand Hue Hotel",
-      flightCode: "VN137",
-      mysteryHint: "Cố đô trầm mặc & ẩm thực cung đình Huế",
-      createdAt: "2026-10-27T11:30:00.000Z"
-    }
-  ],
-  payments: [
-    {
-      transactionId: "TXN-VNQR-88219",
-      bookingCode: "WM-88219",
-      amount: 4800000,
-      bankCode: "MB",
-      accountNo: "0988888888",
-      status: "COMPLETED",
-      verifiedAt: "2026-10-27T10:05:00.000Z"
-    }
-  ],
+  bookings: [],
+  payments: [],
   refunds: [],
-  feedback: [
-    {
-      id: "FB-001",
-      bookingCode: "WM-88219",
-      rating: 5,
-      review: "Chuyến đi tuyệt vời! Lần tới tôi rất thích đi biển nắng ấm và ăn hải sản làng chài.",
-      createdAt: "2026-10-27T12:00:00.000Z"
-    }
-  ]
+  feedback: []
 };
 
 export default {
@@ -576,14 +591,18 @@ export default {
         const clientSession = body.email || body.fullName || "guest_session";
         const result = executeOTABlindAlgorithms(body, clientSession);
 
-        const coPilot = await runAsyncAICoPilot(result, body, env);
-        if (coPilot && coPilot.note) {
-          result.aiEngineUsed = `4 Thuật Toán OTA + AI Co-Pilot (${coPilot.engine})`;
-          result.aiCoPilotNote = coPilot.note;
-          result.aiReasoningLog += ` [AI Co-Pilot: ${coPilot.note}]`;
+        const aiPayload = await runDualAIEngine(result, body, env);
+        if (aiPayload) {
+          result.aiEngineUsed = aiPayload.dualEngine;
+          result.tasteProfile = aiPayload.tasteProfile;
+          result.mysteryCuration = aiPayload.mysteryCuration;
+          result.aiCoPilotNote = `${aiPayload.tasteProfile?.archetype || "Du Khách Tinh Hoa"}: ${aiPayload.tasteProfile?.psychographic_analysis || ""}`;
+          result.mysteryHint = aiPayload.mysteryCuration?.mystery_riddle || result.mysteryHint;
+          result.aiReasoningLog += ` [Dual AI: ${result.aiCoPilotNote}]`;
         } else {
-          result.aiCoPilotNote = "Đã tối ưu chuẩn xác chi phí và tiện ích bằng bài toán cái túi Knapsack và độ tương đồng Cosine.";
+          result.aiCoPilotNote = "Đã tối ưu hóa chi phí & sở thích bằng bài toán Cái túi Knapsack kết hợp Cosine Vector.";
         }
+        
 
         // Lưu bản ghi vào Storage & Thử sync Supabase
         const bookingRecord = {

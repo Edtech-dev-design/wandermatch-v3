@@ -1,3 +1,7 @@
+// ============================================================================
+// WANDERMATCH PRODUCTION CONFIG & LIVE BACKEND API ENDPOINT
+// ============================================================================
+window.API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") ? "http://localhost:8787" : "";
 /**
  * WANDERMATCH — PRODUCTION LUXURY BLIND TRAVEL PLATFORM
  * Version 10.0 — Unified One-Step Auth, Live Google & Facebook OAuth Connectors,
@@ -563,149 +567,219 @@ window.processOAuthLoginSuccess = function({ name, email, avatar, provider }) {
     } catch(e) {}
   }
 
-  window.closeGoogleModal();
-  window.closeFacebookModal();
   window.closeUnifiedAuthModal();
   window.applyUserSession();
   window.showToast(`Xác thực tài khoản ${provider === "google" ? "Google" : "Facebook"} thành công! Chào mừng ${users[email].name}.`);
 };
 
-window.openGoogleModal = function() {
-  const emailInput = document.getElementById("googleEmailInput");
-  const nameInput = document.getElementById("googleNameInput");
-  if (emailInput) emailInput.value = "";
-  if (nameInput) nameInput.value = "";
-  
-  const err = document.getElementById("googleErrorBox");
-  if (err) err.style.display = "none";
-  
-  const modal = document.getElementById("googleAuthModal");
-  if (modal) modal.style.display = "flex";
-};
+// ============================================================================
+// 4. KẾT NỐI ỦY QUYỀN GOOGLE OAUTH CHÍNH THỨC (ACCOUNTS.GOOGLE.COM / SUPABASE AUTH)
+// ============================================================================
+window.loginWithGoogle = async function() {
+  window.showToast("Đang kết nối cổng ủy quyền bảo mật Google chính thức...", "warn");
 
-window.closeGoogleModal = function() {
-  const modal = document.getElementById("googleAuthModal");
-  if (modal) modal.style.display = "none";
-  const err = document.getElementById("googleErrorBox");
-  if (err) err.style.display = "none";
-};
-
-window.triggerDirectGoogleOAuth = function() {
-  // 1. Thử gọi Google Identity Services One Tap prompt nếu khả dụng
-  if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+  // Cách 1: Sử dụng Supabase Auth OAuth trực tiếp (nếu có SDK)
+  if (window.supabaseClient && window.supabaseClient.auth && typeof window.supabaseClient.auth.signInWithOAuth === "function") {
     try {
-      google.accounts.id.prompt();
-    } catch (e) {}
+      const cleanUrl = window.location.href.split("#")[0].split("?")[0];
+      const { data, error } = await window.supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: cleanUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'select_account'
+          }
+        }
+      });
+      if (data && data.url) {
+        window.location.href = data.url;
+        return;
+      }
+    } catch (e) {
+      console.warn("Supabase Google OAuth fallback:", e);
+    }
   }
 
-  // 2. Mở cửa sổ Google OAuth chính thức
-  const w = 480, h = 640;
-  const left = Math.max(0, (window.screen.width - w) / 2);
-  const top = Math.max(0, (window.screen.height - h) / 2);
-  const popup = window.open("google-auth.html", "GoogleOAuthWindow", `width=${w},height=${h},top=${top},left=${left},status=no,menubar=no,toolbar=no`);
-  if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-    window.showToast("Trình duyệt đã chặn popup. Bạn có thể xác thực trực tiếp trong hộp thoại Google!", "warn");
-  } else {
-    window.showToast("Đang mở cửa sổ ủy quyền Google chính thức...", "warn");
+  // Cách 2: Sử dụng Google Identity Services (GIS Token Client chính thức)
+  if (typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
+    try {
+      const client = google.accounts.oauth2.initTokenClient({
+        client_id: "1082531641775-v7v0j7e3o9o32u4lsm3l280c4p0f4b8u.apps.googleusercontent.com",
+        scope: "openid profile email",
+        callback: async (tokenResponse) => {
+          if (tokenResponse && tokenResponse.access_token) {
+            await window.fetchGoogleUserProfile(tokenResponse.access_token);
+          }
+        }
+      });
+      client.requestAccessToken();
+      return;
+    } catch (e) {
+      console.warn("GIS token client fallback:", e);
+    }
   }
+
+  // Cách 3: Redirect trực tiếp đến Cổng OAuth 2.0 chuẩn của Google (RFC 6749)
+  const cleanRedirectUri = window.location.href.split("#")[0].split("?")[0];
+  const clientId = "1082531641775-v7v0j7e3o9o32u4lsm3l280c4p0f4b8u.apps.googleusercontent.com";
+  const state = "google_auth_" + Date.now();
+  const nonce = "nonce_" + Date.now();
+  const googleOAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(cleanRedirectUri)}&response_type=token%20id_token&scope=${encodeURIComponent("openid profile email")}&state=${state}&nonce=${nonce}&prompt=select_account`;
+  
+  window.location.href = googleOAuthUrl;
 };
 
-window.submitGoogleLogin = function() {
-  const email = window.cleanEmail(document.getElementById("googleEmailInput")?.value || "");
-  const name = (document.getElementById("googleNameInput")?.value || "").trim() || email.split("@")[0].toUpperCase();
-
-  if (!window.isValidEmail(email)) {
-    const err = document.getElementById("googleErrorBox");
-    err.innerText = "Vui lòng nhập địa chỉ Google Email hợp lệ (VD: tenban@gmail.com)!";
-    err.style.display = "block";
-    return;
+// Hàm lấy profile người dùng Google thật từ Google API
+window.fetchGoogleUserProfile = async function(accessToken) {
+  try {
+    const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+      headers: { "Authorization": `Bearer ${accessToken}` }
+    });
+    if (res.ok) {
+      const profile = await res.json();
+      if (profile && profile.email) {
+        window.processOAuthLoginSuccess({
+          name: profile.name || profile.given_name || "Hành Khách Google",
+          email: profile.email,
+          avatar: profile.picture || "https://lh3.googleusercontent.com/a/default-user=s96-c",
+          provider: "google"
+        });
+        return true;
+      }
+    }
+  } catch (e) {
+    console.error("Lỗi fetch profile Google:", e);
   }
-
-  window.processOAuthLoginSuccess({
-    name,
-    email,
-    avatar: "https://lh3.googleusercontent.com/a/default-user=s96-c",
-    provider: "google"
-  });
+  return false;
 };
 
 // ============================================================================
-// 5. KẾT NỐI FACEBOOK OAUTH THỰC TẾ & XÁC THỰC
+// 5. KẾT NỐI ỦY QUYỀN FACEBOOK OAUTH CHÍNH THỨC (META GRAPH / SUPABASE AUTH)
 // ============================================================================
-window.openFacebookModal = function() {
-  const emailInput = document.getElementById("fbEmailInput");
-  const nameInput = document.getElementById("fbNameInput");
-  if (emailInput) emailInput.value = "";
-  if (nameInput) nameInput.value = "";
-  
-  const err = document.getElementById("facebookErrorBox");
-  if (err) err.style.display = "none";
-  
-  const modal = document.getElementById("facebookAuthModal");
-  if (modal) modal.style.display = "flex";
-};
+window.loginWithFacebook = async function() {
+  window.showToast("Đang kết nối cổng ủy quyền bảo mật Facebook chính thức...", "warn");
 
-window.closeFacebookModal = function() {
-  const modal = document.getElementById("facebookAuthModal");
-  if (modal) modal.style.display = "none";
-  const err = document.getElementById("facebookErrorBox");
-  if (err) err.style.display = "none";
-};
-
-window.triggerDirectFacebookOAuth = function() {
-  // 1. Thử gọi Facebook SDK Login nếu khả dụng
+  // Cách 1: Sử dụng Meta Facebook JavaScript SDK chính thức
   if (typeof FB !== 'undefined' && FB.login) {
     try {
-      FB.login(function(response) {
-        if (response.authResponse) {
-          FB.api('/me', { fields: 'id,name,email,picture.type(large)' }, function(userData) {
-            if (userData && userData.name) {
+      FB.login((response) => {
+        if (response && response.authResponse) {
+          FB.api('/me', { fields: 'id,name,email,picture.type(large)' }, (user) => {
+            if (user && user.name) {
               window.processOAuthLoginSuccess({
-                name: userData.name,
-                email: userData.email || `${userData.id}@facebook.user.vn`,
-                avatar: userData.picture?.data?.url || "https://graph.facebook.com/v18.0/me/picture",
+                name: user.name,
+                email: user.email || `${user.id}@facebook.user.vn`,
+                avatar: user.picture?.data?.url || "https://graph.facebook.com/v18.0/me/picture",
                 provider: "facebook"
               });
             }
           });
-          return;
         }
-      }, { scope: 'public_profile,email' });
+      }, { scope: 'email,public_profile' });
+      return;
     } catch (e) {
-      console.warn("FB.login error:", e);
+      console.warn("FB SDK fallback:", e);
     }
   }
 
-  // 2. Mở cửa sổ Facebook OAuth chính thức
-  const w = 520, h = 680;
-  const left = Math.max(0, (window.screen.width - w) / 2);
-  const top = Math.max(0, (window.screen.height - h) / 2);
-  const popup = window.open("facebook-auth.html", "FacebookOAuthWindow", `width=${w},height=${h},top=${top},left=${left},status=no,menubar=no,toolbar=no`);
-  if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-    window.showToast("Trình duyệt đã chặn popup. Bạn có thể xác thực trực tiếp trong hộp thoại Facebook!", "warn");
-  } else {
-    window.showToast("Đang mở cửa sổ ủy quyền Facebook chính thức...", "warn");
+  // Cách 2: Sử dụng Supabase Auth OAuth trực tiếp
+  if (window.supabaseClient && window.supabaseClient.auth && typeof window.supabaseClient.auth.signInWithOAuth === "function") {
+    try {
+      const cleanUrl = window.location.href.split("#")[0].split("?")[0];
+      const { data } = await window.supabaseClient.auth.signInWithOAuth({
+        provider: 'facebook',
+        options: { redirectTo: cleanUrl }
+      });
+      if (data && data.url) {
+        window.location.href = data.url;
+        return;
+      }
+    } catch (e) {
+      console.warn("Supabase Facebook OAuth fallback:", e);
+    }
   }
+
+  // Cách 3: Redirect trực tiếp đến Cổng OAuth 2.0 chuẩn của Meta Facebook
+  const cleanRedirectUri = window.location.href.split("#")[0].split("?")[0];
+  const fbAppId = "1085372439502931";
+  const state = "fb_auth_" + Date.now();
+  const fbOAuthUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${fbAppId}&redirect_uri=${encodeURIComponent(cleanRedirectUri)}&response_type=token&scope=${encodeURIComponent("email,public_profile")}&state=${state}`;
+
+  window.location.href = fbOAuthUrl;
 };
 
-window.submitFacebookLogin = function() {
-  const contact = (document.getElementById("fbEmailInput")?.value || "").trim();
-  const name = (document.getElementById("fbNameInput")?.value || "").trim() || "Hành Khách Facebook";
+// ============================================================================
+// BỘ TỰ ĐỘNG BẮT VÀ XỬ LÝ PHẢN HỒI OAUTH KHI REDIRECT VỀ TRANG CHỦ
+// ============================================================================
+window.checkOAuthRedirectCallback = async function() {
+  const hash = window.location.hash;
 
-  if (contact.length < 5) {
-    const err = document.getElementById("facebookErrorBox");
-    err.innerText = "Vui lòng nhập Email hoặc Số di động Facebook hợp lệ!";
-    err.style.display = "block";
-    return;
+  // 1. Kiểm tra access_token từ URL hash (OAuth 2.0 Implicit Grant / Token Flow)
+  if (hash && hash.includes("access_token=")) {
+    const params = new URLSearchParams(hash.replace(/^#/, ""));
+    const accessToken = params.get("access_token");
+    const idToken = params.get("id_token");
+    const state = params.get("state") || "";
+
+    if (accessToken) {
+      // Nếu là Facebook OAuth
+      if (state.includes("fb_") || params.get("provider") === "facebook") {
+        try {
+          const res = await fetch(`https://graph.facebook.com/me?fields=id,name,email,picture.type(large)&access_token=${accessToken}`);
+          if (res.ok) {
+            const fbUser = await res.json();
+            window.processOAuthLoginSuccess({
+              name: fbUser.name,
+              email: fbUser.email || `${fbUser.id}@facebook.user.vn`,
+              avatar: fbUser.picture?.data?.url || "https://graph.facebook.com/v18.0/me/picture",
+              provider: "facebook"
+            });
+          }
+        } catch (e) {}
+      } else {
+        // Mặc định là Google OAuth
+        const fetched = await window.fetchGoogleUserProfile(accessToken);
+        if (!fetched && idToken) {
+          try {
+            const base64Url = idToken.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+            const u = JSON.parse(jsonPayload);
+            if (u && u.email) {
+              window.processOAuthLoginSuccess({
+                name: u.name || u.given_name || "Hành Khách Google",
+                email: u.email,
+                avatar: u.picture || "https://lh3.googleusercontent.com/a/default-user=s96-c",
+                provider: "google"
+              });
+            }
+          } catch (e) {}
+        }
+      }
+
+      window.history.replaceState({}, document.title, window.location.pathname);
+      return;
+    }
   }
 
-  const emailKey = contact.includes("@") ? window.cleanEmail(contact) : `${contact.replace(/[^0-9]/g, "")}@facebook.user.vn`;
-  window.processOAuthLoginSuccess({
-    name,
-    email: emailKey,
-    avatar: "https://graph.facebook.com/v18.0/me/picture",
-    provider: "facebook"
-  });
+  // 2. Kiểm tra Supabase Auth Session
+  if (window.supabaseClient && window.supabaseClient.auth && typeof window.supabaseClient.auth.getSession === "function") {
+    try {
+      const { data } = await window.supabaseClient.auth.getSession();
+      if (data && data.session && data.session.user) {
+        const u = data.session.user;
+        const meta = u.user_metadata || {};
+        window.processOAuthLoginSuccess({
+          name: meta.full_name || meta.name || u.email.split("@")[0].toUpperCase(),
+          email: u.email,
+          avatar: meta.avatar_url || meta.picture || "https://lh3.googleusercontent.com/a/default-user=s96-c",
+          provider: u.app_metadata?.provider || "supabase"
+        });
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    } catch (e) {}
+  }
 };
 
 // ============================================================================
@@ -1223,11 +1297,56 @@ window.onFormChange = function() {
   }
 };
 
-window.generateNewRecommendation = function() {
+window.generateNewRecommendation = async function() {
+  // 1. Tính toán offline tức thì để trải nghiệm không có độ trễ
   const pkg = window.runBlindTravelEngine(true);
   window.saveStore("wm_draft_prod", pkg);
   window.renderPackageUI(pkg);
   window.updatePersonaUI();
+  window.showToast(`Đang kết nối Dual AI (Cloudflare + Gemini) tính toán hành trình #${pkg.code}...`, "warn");
+
+  // 2. Gọi Backend Cloudflare Worker trực tiếp để lấy dữ liệu Dual AI
+  if (window.API_BASE) {
+    try {
+      const inp = window.getFormInputs();
+      const res = await fetch(`${window.API_BASE}/api/ai-recommend`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          originAirport: inp.origin,
+          budgetVnd: inp.budget,
+          groupSize: inp.groupSize,
+          customPrompt: inp.prompt,
+          userVector: inp.vec,
+          blacklistCities: inp.blacklist
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.success) {
+          pkg.aiEngineUsed = data.aiEngineUsed || pkg.aiEngineUsed;
+          pkg.aiCoPilotNote = data.aiCoPilotNote || pkg.aiCoPilotNote;
+          pkg.tasteProfile = data.tasteProfile;
+          pkg.mysteryCuration = data.mysteryCuration;
+          if (data.mysteryHint) pkg.hint = data.mysteryHint;
+          if (data.packingChecklist) pkg.packing = data.packingChecklist;
+          if (data.antiTouristTrapGuide) pkg.food = data.antiTouristTrapGuide;
+          if (data.itinerary) pkg.days = data.itinerary;
+          if (data.matchScore) pkg.matchScore = data.matchScore;
+          if (data.utilityScore) pkg.utilityScore = data.utilityScore;
+
+          window.saveStore("wm_draft_prod", pkg);
+          window.renderPackageUI(pkg);
+          window.updatePersonaUI();
+          window.showToast(`✓ Dual AI đã tối ưu trọn vẹn gói #${pkg.code} (Khớp gu ${pkg.matchScore}%)!`);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn("Backend AI recommend fallback to local engine:", e);
+    }
+  }
+
   window.showToast(`Đã tính toán hành trình mới #${pkg.code} (Khớp gu ${pkg.matchScore}%)!`);
 };
 
@@ -1640,7 +1759,7 @@ window.syncBankHolderName = function() {
 // ============================================================================
 window.qrTimerInterval = null;
 
-window.confirmAndLockBooking = function() {
+window.confirmAndLockBooking = async function() {
   const email = (document.getElementById("custEmail")?.value || "").trim();
   const name = (document.getElementById("custName")?.value || "").trim();
   const acc = (document.getElementById("custBankAcc")?.value || "").trim();
@@ -1707,6 +1826,23 @@ window.confirmAndLockBooking = function() {
     }
   }, 1000);
 
+    // Đồng bộ đơn hàng lên Backend Cloudflare Worker & Supabase Live
+  if (window.API_BASE) {
+    try {
+      fetch(`${window.API_BASE}/api/create-booking`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookingCode: pkg.code,
+          fullName: name,
+          email: email,
+          phone: acc,
+          budgetVnd: pkg.reveal ? pkg.reveal.paid : 5000000,
+          groupSize: pkg.qrs.length
+        })
+      }).catch(e => console.warn("Backend create-booking async notice:", e));
+    } catch(e) {}
+  }
   window.updateSavedBadge();
   window.showToast(`Đã xuất mã VietQR ký quỹ cho chuyến đi #${pkg.code}!`);
 };
@@ -1726,6 +1862,20 @@ window.simulatePaymentSuccess = function() {
     window.saveStore("wm_saved_prod", saved);
   }
 
+    // Gửi xác nhận đối soát lên Backend Cloudflare Worker
+  if (window.API_BASE) {
+    try {
+      fetch(`${window.API_BASE}/api/payment/confirm-receipt`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookingCode: pkg.code,
+          amount: pkg.reveal ? pkg.reveal.paid : 5000000,
+          transactionId: "TXN-VNQR-" + Date.now()
+        })
+      }).catch(e => console.warn("Backend payment confirm notice:", e));
+    } catch(e) {}
+  }
   window.showToast(`Napas 24/7: Đã xác nhận nhận tiền ký quỹ thành công cho đơn #${pkg.code}!`, "success");
   setTimeout(() => {
     window.goToStep(3);
@@ -2199,3 +2349,10 @@ document.addEventListener("DOMContentLoaded", () => {
   window.renderPackageUI(draft);
   window.updatePersonaUI();
 });
+
+// Tự động kiểm tra callback OAuth khi vừa tải trang
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => window.checkOAuthRedirectCallback());
+} else {
+  window.checkOAuthRedirectCallback();
+}
