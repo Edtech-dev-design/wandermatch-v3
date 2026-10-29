@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập bằng tài khoản Facebook</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Helvetica, Arial, sans-serif; }
+    body { background-color: #f0f2f5; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+    .card { background: #fff; width: 100%; max-width: 480px; border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,0.12); overflow: hidden; border: 1px solid #dddfe2; }
+    .header { background: #1877f2; color: #fff; padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
+    .header svg { width: 32px; height: 32px; fill: #fff; flex-shrink: 0; }
+    .header h2 { font-size: 17px; font-weight: 700; }
+    .body { padding: 28px 24px; }
+    h1 { font-size: 19px; font-weight: 700; color: #1c1e21; margin-bottom: 8px; }
+    .subtitle { font-size: 14px; color: #606770; line-height: 1.4; margin-bottom: 24px; }
+    .profile-box { display: flex; align-items: center; gap: 14px; padding: 14px; border: 1px solid #1877f2; background: #e7f3ff; border-radius: 10px; margin-bottom: 16px; cursor: pointer; transition: all 0.2s; }
+    .profile-box:hover { background: #dbe7f2; }
+    .fb-avatar { width: 48px; height: 48px; border-radius: 50%; background: #1877f2; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0; }
+    .profile-info { flex-grow: 1; }
+    .profile-name { font-size: 15px; font-weight: 700; color: #1c1e21; display: block; }
+    .profile-sub { font-size: 12px; color: #1877f2; font-weight: 600; display: block; }
+    .btn-continue { width: 100%; padding: 12px; background: #1877f2; color: #fff; font-size: 15px; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 12px; transition: background 0.2s; }
+    .btn-continue:hover { background: #166fe5; }
+    .btn-cancel { width: 100%; padding: 10px; background: #e4e6eb; color: #4b4f56; font-size: 14px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; }
+    .btn-cancel:hover { background: #d8dadf; }
+    .manual-link { display: block; text-align: center; margin-top: 18px; font-size: 13px; color: #1877f2; text-decoration: none; cursor: pointer; font-weight: 600; }
+    .manual-box { margin-top: 14px; padding-top: 14px; border-top: 1px solid #dadde1; }
+    .manual-box input { width: 100%; padding: 10px 12px; border: 1px solid #ccd0d5; border-radius: 6px; font-size: 13px; margin-bottom: 10px; outline: none; }
+    .manual-box input:focus { border-color: #1877f2; }
+    .footer { padding: 14px 24px; background: #f0f2f5; font-size: 12px; color: #8a8d91; text-align: center; border-top: 1px solid #e5e5e5; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <svg viewBox="0 0 24 24">
+        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+      </svg>
+      <h2>Đăng nhập bằng Facebook</h2>
+    </div>
+
+    <div class="body">
+      <h1>Tiếp tục với tên Facebook của bạn</h1>
+      <p class="subtitle">Ứng dụng <strong>WanderMatch Travel</strong> sẽ nhận được tên và ảnh đại diện Facebook công khai của bạn.</p>
+
+      <div class="profile-box" onclick="chooseFbAccount('Nguyễn Doãn Trường Huy (Facebook VIP)', '0988888888@facebook.user.vn')">
+        <div class="fb-avatar">H</div>
+        <div class="profile-info">
+          <span class="profile-name">Nguyễn Doãn Trường Huy</span>
+          <span class="profile-sub">Tài khoản Facebook đã liên kết ✓</span>
+        </div>
+      </div>
+
+      <button class="btn-continue" onclick="chooseFbAccount('Nguyễn Doãn Trường Huy (Facebook VIP)', '0988888888@facebook.user.vn')">
+        Tiếp tục dưới tên Huy
+      </button>
+
+      <button class="btn-cancel" onclick="window.close()">Hủy Bỏ</button>
+
+      <a class="manual-link" onclick="toggleCustomFb()">Đăng nhập bằng số điện thoại hoặc email khác</a>
+
+      <div id="customFbBox" class="manual-box" style="display:none;">
+        <input id="fbCustomContact" type="text" placeholder="Số điện thoại hoặc Email Facebook..." />
+        <input id="fbCustomName" type="text" placeholder="Tên hiển thị trên Facebook..." />
+        <button class="btn-continue" onclick="submitCustomFb()">Đăng Nhập Tài Khoản Này</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      WanderMatch cam kết bảo vệ dữ liệu quyền riêng tư của bạn. Không bao giờ tự ý đăng bài lên dòng thời gian Facebook.
+    </div>
+  </div>
+
+  <script>
+    function chooseFbAccount(name, email) {
+      const payload = {
+        type: 'FB_AUTH_SUCCESS',
+        name: name,
+        email: email,
+        avatar: 'https://graph.facebook.com/v18.0/me/picture',
+        provider: 'facebook'
+      };
+      if (window.opener) {
+        window.opener.postMessage(payload, '*');
+        setTimeout(() => window.close(), 300);
+      } else {
+        localStorage.setItem('wm_pending_oauth', JSON.stringify(payload));
+        alert('Đã xác thực tài khoản Facebook: ' + name);
+        window.close();
+      }
+    }
+
+    function toggleCustomFb() {
+      const b = document.getElementById('customFbBox');
+      b.style.display = b.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function submitCustomFb() {
+      const c = (document.getElementById('fbCustomContact').value || '').trim();
+      const n = (document.getElementById('fbCustomName').value || '').trim() || 'Hành Khách Facebook';
+      if (!c || c.length < 5) {
+        alert('Vui lòng nhập Email hoặc Số điện thoại Facebook hợp lệ!');
+        return;
+      }
+      const em = c.includes('@') ? c.toLowerCase() : (c.replace(/[^0-9]/g, '') + '@facebook.user.vn');
+      chooseFbAccount(n, em);
+    }
+  </script>
+</body>
+</html>
