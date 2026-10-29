@@ -48,7 +48,7 @@
       email: "admin@wandermatch.vn",
       password: "admin",
       pin: "888888",
-      full_name: "Nguyễn Doãn Trường Huy (Admin)",
+      full_name: "Quản Trị Viên Hệ Thống",
       phone: "0988 888 888",
       role: "admin",
       tier: "Quản Trị Viên Hệ Thống"
@@ -68,7 +68,7 @@
       email: "khachhang@wandermatch.vn",
       password: "123",
       pin: "888888",
-      full_name: "Nguyễn Doãn Trường Huy",
+      full_name: "Du Khách VIP Gold",
       phone: "0988 999 888",
       role: "b2c",
       tier: "Du Khách VIP Gold"
@@ -329,8 +329,8 @@ const supabaseAdapter = {
 
         // 3. Khởi tạo phiên đăng nhập Social OAuth chuẩn xác (Google / Facebook)
         // Cho phép nhận email và họ tên từ options hoặc người dùng chọn
-        const defaultName = cleanProvider === 'facebook' ? 'Nguyễn Anh Tuấn (Facebook)' : 'Trần Minh Quang (Google VIP)';
-        const defaultEmail = cleanProvider === 'facebook' ? 'anhtuan.fb@gmail.com' : 'minhquang.google@gmail.com';
+        const defaultName = cleanProvider === 'facebook' ? 'Hành Khách Facebook' : 'Hành Khách Google VIP';
+        const defaultEmail = cleanProvider === 'facebook' ? 'traveler.fb@facebook.user.vn' : 'traveler.google@gmail.com';
         
         const socialEmail = (options && (options.email || options.data?.email)) || defaultEmail;
         const socialName = (options && (options.fullName || options.name || options.data?.full_name)) || defaultName;

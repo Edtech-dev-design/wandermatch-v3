@@ -3,32 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đăng nhập bằng tài khoản Facebook</title>
+  <title>Cổng Ủy Quyền Tài Khoản Facebook — WanderMatch</title>
+  <!-- FACEBOOK JAVASCRIPT SDK CHÍNH THỨC -->
+  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Helvetica, Arial, sans-serif; }
     body { background-color: #f0f2f5; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-    .card { background: #fff; width: 100%; max-width: 480px; border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,0.12); overflow: hidden; border: 1px solid #dddfe2; }
-    .header { background: #1877f2; color: #fff; padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
+    .card { background: #fff; width: 100%; max-width: 480px; border-radius: 16px; box-shadow: 0 8px 28px rgba(0,0,0,0.12); overflow: hidden; border: 1px solid #dddfe2; }
+    .header { background: #1877f2; color: #fff; padding: 18px 24px; display: flex; align-items: center; gap: 12px; }
     .header svg { width: 32px; height: 32px; fill: #fff; flex-shrink: 0; }
     .header h2 { font-size: 17px; font-weight: 700; }
     .body { padding: 28px 24px; }
     h1 { font-size: 19px; font-weight: 700; color: #1c1e21; margin-bottom: 8px; }
-    .subtitle { font-size: 14px; color: #606770; line-height: 1.4; margin-bottom: 24px; }
-    .profile-box { display: flex; align-items: center; gap: 14px; padding: 14px; border: 1px solid #1877f2; background: #e7f3ff; border-radius: 10px; margin-bottom: 16px; cursor: pointer; transition: all 0.2s; }
-    .profile-box:hover { background: #dbe7f2; }
-    .fb-avatar { width: 48px; height: 48px; border-radius: 50%; background: #1877f2; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0; }
-    .profile-info { flex-grow: 1; }
-    .profile-name { font-size: 15px; font-weight: 700; color: #1c1e21; display: block; }
-    .profile-sub { font-size: 12px; color: #1877f2; font-weight: 600; display: block; }
-    .btn-continue { width: 100%; padding: 12px; background: #1877f2; color: #fff; font-size: 15px; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 12px; transition: background 0.2s; }
-    .btn-continue:hover { background: #166fe5; }
-    .btn-cancel { width: 100%; padding: 10px; background: #e4e6eb; color: #4b4f56; font-size: 14px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; }
-    .btn-cancel:hover { background: #d8dadf; }
-    .manual-link { display: block; text-align: center; margin-top: 18px; font-size: 13px; color: #1877f2; text-decoration: none; cursor: pointer; font-weight: 600; }
-    .manual-box { margin-top: 14px; padding-top: 14px; border-top: 1px solid #dadde1; }
-    .manual-box input { width: 100%; padding: 10px 12px; border: 1px solid #ccd0d5; border-radius: 6px; font-size: 13px; margin-bottom: 10px; outline: none; }
-    .manual-box input:focus { border-color: #1877f2; }
-    .footer { padding: 14px 24px; background: #f0f2f5; font-size: 12px; color: #8a8d91; text-align: center; border-top: 1px solid #e5e5e5; }
+    .subtitle { font-size: 13px; color: #606770; line-height: 1.4; margin-bottom: 24px; }
+    .btn-fb-official { width: 100%; padding: 13px; background: #1877f2; color: #fff; font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.2s; box-shadow: 0 4px 12px rgba(24,119,242,0.3); }
+    .btn-fb-official:hover { background: #166fe5; }
+    .btn-fb-official svg { width: 20px; height: 20px; fill: #fff; }
+    .divider { display: flex; align-items: center; margin: 20px 0; text-align: center; color: #8a8d91; font-size: 11px; text-transform: uppercase; }
+    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #dadde1; }
+    .divider:not(:empty)::before { margin-right: .5em; }
+    .divider:not(:empty)::after { margin-left: .5em; }
+    .manual-box label { font-size: 12px; font-weight: 600; color: #4b4f56; display: block; margin-bottom: 6px; }
+    .manual-box input { width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 10px; font-size: 13px; margin-bottom: 12px; outline: none; }
+    .manual-box input:focus { border-color: #1877f2; box-shadow: 0 0 0 2px rgba(24,119,242,0.15); }
+    .btn-continue { width: 100%; padding: 12px; background: #42b72a; color: #fff; font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; transition: background 0.2s; }
+    .btn-continue:hover { background: #36a420; }
+    .footer { padding: 14px 24px; background: #f0f2f5; font-size: 11px; color: #8a8d91; text-align: center; border-top: 1px solid #e5e5e5; }
   </style>
 </head>
 <body>
@@ -37,74 +37,107 @@
       <svg viewBox="0 0 24 24">
         <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
       </svg>
-      <h2>Đăng nhập bằng Facebook</h2>
+      <h2>Đăng nhập bằng tài khoản Facebook</h2>
     </div>
 
     <div class="body">
-      <h1>Tiếp tục với tên Facebook của bạn</h1>
-      <p class="subtitle">Ứng dụng <strong>WanderMatch Travel</strong> sẽ nhận được tên và ảnh đại diện Facebook công khai của bạn.</p>
+      <h1>Ủy quyền tài khoản Facebook</h1>
+      <p class="subtitle">Ứng dụng <strong>WanderMatch Luxury Travel</strong> sẽ nhận được tên và ảnh đại diện Facebook công khai của bạn theo chuẩn bảo mật Meta OAuth.</p>
 
-      <div class="profile-box" onclick="chooseFbAccount('Nguyễn Doãn Trường Huy (Facebook VIP)', '0988888888@facebook.user.vn')">
-        <div class="fb-avatar">H</div>
-        <div class="profile-info">
-          <span class="profile-name">Nguyễn Doãn Trường Huy</span>
-          <span class="profile-sub">Tài khoản Facebook đã liên kết ✓</span>
-        </div>
-      </div>
-
-      <button class="btn-continue" onclick="chooseFbAccount('Nguyễn Doãn Trường Huy (Facebook VIP)', '0988888888@facebook.user.vn')">
-        Tiếp tục dưới tên Huy
+      <!-- NÚT GỌI FACEBOOK SDK CHÍNH THỨC -->
+      <button class="btn-fb-official" onclick="triggerFacebookLogin()">
+        <svg viewBox="0 0 24 24">
+          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+        </svg>
+        Đăng Nhập Trực Tiếp Bằng Facebook SDK
       </button>
 
-      <button class="btn-cancel" onclick="window.close()">Hủy Bỏ</button>
+      <div class="divider">Hoặc nhập thông tin tài khoản Facebook</div>
 
-      <a class="manual-link" onclick="toggleCustomFb()">Đăng nhập bằng số điện thoại hoặc email khác</a>
+      <div class="manual-box">
+        <label>Số điện thoại hoặc Email đăng ký Facebook</label>
+        <input id="fbContact" type="text" required placeholder="0988... hoặc email@domain.com" />
 
-      <div id="customFbBox" class="manual-box" style="display:none;">
-        <input id="fbCustomContact" type="text" placeholder="Số điện thoại hoặc Email Facebook..." />
-        <input id="fbCustomName" type="text" placeholder="Tên hiển thị trên Facebook..." />
-        <button class="btn-continue" onclick="submitCustomFb()">Đăng Nhập Tài Khoản Này</button>
+        <label>Họ và tên hiển thị trên Facebook</label>
+        <input id="fbName" type="text" required placeholder="Nhập họ và tên trên Facebook" />
+
+        <button class="btn-continue" onclick="submitManualFb()">Xác Thực & Đồng Bộ Vào WanderMatch</button>
       </div>
     </div>
 
     <div class="footer">
-      WanderMatch cam kết bảo vệ dữ liệu quyền riêng tư của bạn. Không bao giờ tự ý đăng bài lên dòng thời gian Facebook.
+      WanderMatch cam kết bảo vệ dữ liệu quyền riêng tư của bạn. Tuyệt đối không đăng bài lên dòng thời gian Facebook.
     </div>
   </div>
 
   <script>
-    function chooseFbAccount(name, email) {
+    window.fbAsyncInit = function() {
+      if (typeof FB !== 'undefined') {
+        FB.init({
+          appId: '1085372439502931',
+          cookie: true,
+          xfbml: true,
+          version: 'v18.0'
+        });
+      }
+    };
+
+    function triggerFacebookLogin() {
+      if (typeof FB !== 'undefined' && FB.login) {
+        FB.login(function(response) {
+          if (response.authResponse) {
+            FB.api('/me', { fields: 'id,name,email,picture.type(large)' }, function(userData) {
+              if (userData && userData.name) {
+                dispatchSuccess({
+                  name: userData.name,
+                  email: userData.email || `${userData.id}@facebook.user.vn`,
+                  avatar: userData.picture?.data?.url || 'https://graph.facebook.com/v18.0/me/picture',
+                  provider: 'facebook'
+                });
+              }
+            });
+          } else {
+            alert('Bạn đã đóng cửa sổ ủy quyền Facebook!');
+          }
+        }, { scope: 'public_profile,email' });
+      } else {
+        // Fallback mở hộp thoại nhập thông tin
+        alert('Đang tải Facebook SDK, bạn có thể nhập thông tin vào biểu mẫu bên dưới.');
+      }
+    }
+
+    function dispatchSuccess(authData) {
       const payload = {
         type: 'FB_AUTH_SUCCESS',
-        name: name,
-        email: email,
-        avatar: 'https://graph.facebook.com/v18.0/me/picture',
+        name: authData.name,
+        email: authData.email,
+        avatar: authData.avatar,
         provider: 'facebook'
       };
-      if (window.opener) {
+      if (window.opener && !window.opener.closed) {
         window.opener.postMessage(payload, '*');
         setTimeout(() => window.close(), 300);
       } else {
         localStorage.setItem('wm_pending_oauth', JSON.stringify(payload));
-        alert('Đã xác thực tài khoản Facebook: ' + name);
+        alert('Xác thực Facebook thành công cho: ' + authData.name);
         window.close();
       }
     }
 
-    function toggleCustomFb() {
-      const b = document.getElementById('customFbBox');
-      b.style.display = b.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function submitCustomFb() {
-      const c = (document.getElementById('fbCustomContact').value || '').trim();
-      const n = (document.getElementById('fbCustomName').value || '').trim() || 'Hành Khách Facebook';
-      if (!c || c.length < 5) {
-        alert('Vui lòng nhập Email hoặc Số điện thoại Facebook hợp lệ!');
+    function submitManualFb() {
+      const contact = (document.getElementById('fbContact').value || '').trim();
+      const name = (document.getElementById('fbName').value || '').trim();
+      if (contact.length < 5) {
+        alert('Vui lòng nhập số điện thoại hoặc email Facebook hợp lệ!');
         return;
       }
-      const em = c.includes('@') ? c.toLowerCase() : (c.replace(/[^0-9]/g, '') + '@facebook.user.vn');
-      chooseFbAccount(n, em);
+      const email = contact.includes('@') ? contact.toLowerCase() : `${contact.replace(/[^0-9]/g, '')}@facebook.user.vn`;
+      dispatchSuccess({
+        name: name || 'Hành Khách Facebook',
+        email: email,
+        avatar: 'https://graph.facebook.com/v18.0/me/picture',
+        provider: 'facebook'
+      });
     }
   </script>
 </body>

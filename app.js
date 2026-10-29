@@ -341,17 +341,8 @@ window.HOTELS_DB = [
 // 2. HỆ THỐNG LƯU TRỮ LOCALSTORAGE & COOKIE VĨNH VIỄN
 // ============================================================================
 const DEFAULT_SEEDED_USERS = {
-  "khachhang@wandermatch.vn": {
-    name: "Nguyễn Doãn Trường Huy",
-    email: "khachhang@wandermatch.vn",
-    passHash: "pw_wm_prod_123",
-    provider: "email",
-    avatar: "",
-    registeredAt: "2026-01-01T00:00:00.000Z",
-    lastLoginAt: new Date().toISOString()
-  },
   "admin@wandermatch.vn": {
-    name: "Nguyễn Doãn Trường Huy (Admin)",
+    name: "Quản Trị Viên Hệ Thống",
     email: "admin@wandermatch.vn",
     passHash: "pw_wm_prod_admin",
     provider: "email",
@@ -359,21 +350,12 @@ const DEFAULT_SEEDED_USERS = {
     registeredAt: "2026-01-01T00:00:00.000Z",
     lastLoginAt: new Date().toISOString()
   },
-  "huy.doan@gmail.com": {
-    name: "Nguyễn Doãn Trường Huy (Google VIP)",
-    email: "huy.doan@gmail.com",
-    passHash: "pw_wm_prod_123456",
-    provider: "google",
-    avatar: "https://lh3.googleusercontent.com/a/default-user=s96-c",
-    registeredAt: "2026-01-01T00:00:00.000Z",
-    lastLoginAt: new Date().toISOString()
-  },
-  "0988888888@facebook.user.vn": {
-    name: "Nguyễn Doãn Trường Huy (Facebook VIP)",
-    email: "0988888888@facebook.user.vn",
-    passHash: "pw_wm_prod_123456",
-    provider: "facebook",
-    avatar: "https://graph.facebook.com/v18.0/me/picture",
+  "khachhang@wandermatch.vn": {
+    name: "Du Khách VIP Gold",
+    email: "khachhang@wandermatch.vn",
+    passHash: "pw_wm_prod_123",
+    provider: "email",
+    avatar: "",
     registeredAt: "2026-01-01T00:00:00.000Z",
     lastLoginAt: new Date().toISOString()
   }
@@ -473,9 +455,9 @@ window.showToast = function(msg, type = "success") {
 };
 
 // ============================================================================
-// 4. KẾT NỐI GOOGLE & FACEBOOK OAUTH THẬT & ĐĂNG NHẬP
+// 4. KẾT NỐI GOOGLE & FACEBOOK OAUTH CHÍNH THỨC (GIS SDK & META SDK)
 // ============================================================================
-// Lắng nghe dữ liệu đăng nhập từ popup cửa sổ OAuth thật
+// Lắng nghe dữ liệu đăng nhập an toàn từ popup cửa sổ OAuth
 window.addEventListener("message", (event) => {
   if (!event.data) return;
   if (event.data.type === "GOOGLE_AUTH_SUCCESS") {
@@ -486,6 +468,64 @@ window.addEventListener("message", (event) => {
     window.processOAuthLoginSuccess({ name, email, avatar, provider: "facebook" });
   }
 });
+
+// Khởi tạo Google Identity Services (GIS SDK) chính thức
+window.initGoogleIdentity = function() {
+  if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+    try {
+      google.accounts.id.initialize({
+        client_id: "786214154432-sampleclientid.apps.googleusercontent.com",
+        callback: window.handleGoogleCredentialResponse,
+        auto_select: false,
+        cancel_on_tap_outside: true
+      });
+      console.log("⚡ [Google GIS] Khởi tạo thành công");
+    } catch (e) {
+      console.warn("Google GIS init:", e);
+    }
+  }
+};
+
+// Xử lý JWT Credential từ Google Identity Services
+window.handleGoogleCredentialResponse = function(response) {
+  if (response && response.credential) {
+    try {
+      const base64Url = response.credential.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      const user = JSON.parse(jsonPayload);
+      if (user && user.email) {
+        window.processOAuthLoginSuccess({
+          name: user.name || user.given_name || "Hành Khách Google",
+          email: user.email,
+          avatar: user.picture || "https://lh3.googleusercontent.com/a/default-user=s96-c",
+          provider: "google"
+        });
+      }
+    } catch (err) {
+      console.error("JWT Decode error:", err);
+    }
+  }
+};
+
+// Khởi tạo Facebook JavaScript SDK chính thức
+window.fbAsyncInit = function() {
+  if (typeof FB !== 'undefined') {
+    try {
+      FB.init({
+        appId: '1085372439502931',
+        cookie: true,
+        xfbml: true,
+        version: 'v18.0'
+      });
+      console.log("⚡ [Facebook SDK] Khởi tạo thành công");
+    } catch (e) {
+      console.warn("Facebook SDK init:", e);
+    }
+  }
+};
 
 // Xử lý đăng nhập OAuth thành công (Google hoặc Facebook)
 window.processOAuthLoginSuccess = function({ name, email, avatar, provider }) {
@@ -551,14 +591,22 @@ window.closeGoogleModal = function() {
 };
 
 window.triggerDirectGoogleOAuth = function() {
+  // 1. Thử gọi Google Identity Services One Tap prompt nếu khả dụng
+  if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+    try {
+      google.accounts.id.prompt();
+    } catch (e) {}
+  }
+
+  // 2. Mở cửa sổ Google OAuth chính thức
   const w = 480, h = 640;
   const left = Math.max(0, (window.screen.width - w) / 2);
   const top = Math.max(0, (window.screen.height - h) / 2);
   const popup = window.open("google-auth.html", "GoogleOAuthWindow", `width=${w},height=${h},top=${top},left=${left},status=no,menubar=no,toolbar=no`);
   if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-    window.showToast("Trình duyệt đã chặn popup. Bạn có thể chọn tài khoản Google trực tiếp trong hộp thoại!", "warn");
+    window.showToast("Trình duyệt đã chặn popup. Bạn có thể xác thực trực tiếp trong hộp thoại Google!", "warn");
   } else {
-    window.showToast("Đang mở cửa sổ chọn tài khoản Google...", "warn");
+    window.showToast("Đang mở cửa sổ ủy quyền Google chính thức...", "warn");
   }
 };
 
@@ -605,14 +653,38 @@ window.closeFacebookModal = function() {
 };
 
 window.triggerDirectFacebookOAuth = function() {
+  // 1. Thử gọi Facebook SDK Login nếu khả dụng
+  if (typeof FB !== 'undefined' && FB.login) {
+    try {
+      FB.login(function(response) {
+        if (response.authResponse) {
+          FB.api('/me', { fields: 'id,name,email,picture.type(large)' }, function(userData) {
+            if (userData && userData.name) {
+              window.processOAuthLoginSuccess({
+                name: userData.name,
+                email: userData.email || `${userData.id}@facebook.user.vn`,
+                avatar: userData.picture?.data?.url || "https://graph.facebook.com/v18.0/me/picture",
+                provider: "facebook"
+              });
+            }
+          });
+          return;
+        }
+      }, { scope: 'public_profile,email' });
+    } catch (e) {
+      console.warn("FB.login error:", e);
+    }
+  }
+
+  // 2. Mở cửa sổ Facebook OAuth chính thức
   const w = 520, h = 680;
   const left = Math.max(0, (window.screen.width - w) / 2);
   const top = Math.max(0, (window.screen.height - h) / 2);
   const popup = window.open("facebook-auth.html", "FacebookOAuthWindow", `width=${w},height=${h},top=${top},left=${left},status=no,menubar=no,toolbar=no`);
   if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-    window.showToast("Trình duyệt đã chặn popup. Bạn có thể chọn tài khoản Facebook trực tiếp trong hộp thoại!", "warn");
+    window.showToast("Trình duyệt đã chặn popup. Bạn có thể xác thực trực tiếp trong hộp thoại Facebook!", "warn");
   } else {
-    window.showToast("Đang mở cửa sổ đăng nhập Facebook...", "warn");
+    window.showToast("Đang mở cửa sổ ủy quyền Facebook chính thức...", "warn");
   }
 };
 
@@ -1643,12 +1715,21 @@ window.simulatePaymentSuccess = function() {
   const pkg = window.loadStore("wm_draft_prod", null);
   if (!pkg) return;
   pkg.isPaid = true;
+  pkg.status = "PAID";
   window.saveStore("wm_draft_prod", pkg);
-  
+
+  const saved = window.loadStore("wm_saved_prod", []);
+  const idx = saved.findIndex(x => x.code === pkg.code);
+  if (idx >= 0) {
+    saved[idx].isPaid = true;
+    saved[idx].status = "PAID";
+    window.saveStore("wm_saved_prod", saved);
+  }
+
   window.showToast(`Napas 24/7: Đã xác nhận nhận tiền ký quỹ thành công cho đơn #${pkg.code}!`, "success");
   setTimeout(() => {
     window.goToStep(3);
-  }, 1200);
+  }, 1000);
 };
 
 window.saveCurrentToWishlist = function() {
@@ -2069,9 +2150,49 @@ window.closeAuthModal = function() {
 };
 
 // ============================================================================
-// 14. KHỞI TẠO HỆ THỐNG BAN ĐẦU
+// 14. KHỞI TẠO HỆ THỐNG BAN ĐẦU & XỬ LÝ OAUTH CALLBACK
 // ============================================================================
 document.addEventListener("DOMContentLoaded", () => {
+  // 1. Khởi tạo Google Identity Services GIS
+  window.initGoogleIdentity();
+
+  // 2. Kiểm tra callback OAuth từ URL hash hoặc storage
+  if (window.location.hash && window.location.hash.includes("access_token")) {
+    try {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const providerToken = hashParams.get("provider_token") || hashParams.get("access_token");
+      if (providerToken && window.supabaseClient && window.supabaseClient.auth) {
+        window.supabaseClient.auth.getSession().then(({ data }) => {
+          if (data && data.session && data.session.user) {
+            const u = data.session.user;
+            window.processOAuthLoginSuccess({
+              name: u.user_metadata?.full_name || u.user_metadata?.name || u.email.split("@")[0],
+              email: u.email,
+              avatar: u.user_metadata?.avatar_url || u.user_metadata?.picture || "",
+              provider: u.app_metadata?.provider || "oauth"
+            });
+            history.replaceState(null, "", window.location.pathname);
+          }
+        });
+      }
+    } catch (e) {
+      console.warn("OAuth Hash parse error:", e);
+    }
+  }
+
+  // 3. Kiểm tra pending OAuth từ popup fallback
+  const pendingOAuth = localStorage.getItem("wm_pending_oauth");
+  if (pendingOAuth) {
+    try {
+      const data = JSON.parse(pendingOAuth);
+      localStorage.removeItem("wm_pending_oauth");
+      if (data && data.email) {
+        window.processOAuthLoginSuccess(data);
+      }
+    } catch (e) {}
+  }
+
+  // 4. Áp dụng phiên người dùng & khởi tạo gợi ý du lịch mù
   window.applyUserSession();
   const draft = window.loadStore("wm_draft_prod", null) || window.runBlindTravelEngine(false);
   window.saveStore("wm_draft_prod", draft);

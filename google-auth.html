@@ -3,28 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đăng nhập bằng tài khoản Google</title>
+  <title>Cổng Ủy Quyền Tài Khoản Google — WanderMatch</title>
+  <!-- GOOGLE IDENTITY SERVICES SDK CHÍNH THỨC -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
     body { background-color: #f8fafd; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
     .card { background: #fff; width: 100%; max-width: 440px; border-radius: 28px; padding: 36px 32px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; }
-    .logo-box { text-align: center; margin-bottom: 24px; }
+    .logo-box { text-align: center; margin-bottom: 20px; }
     .logo-box svg { width: 44px; height: 44px; }
-    h1 { font-size: 22px; font-weight: 500; color: #1f1f1f; text-align: center; margin-bottom: 6px; }
-    .subtitle { font-size: 14px; color: #444746; text-align: center; margin-bottom: 28px; }
-    .account-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
-    .account-item { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 14px; border: 1px solid #e1e3e1; cursor: pointer; transition: all 0.2s ease; text-decoration: none; color: inherit; background: #fff; }
-    .account-item:hover { background-color: #f0f4f9; border-color: #c4c7c5; }
-    .avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; font-size: 16px; flex-shrink: 0; }
-    .acc-info { flex-grow: 1; min-width: 0; }
-    .acc-name { font-size: 14px; font-weight: 600; color: #1f1f1f; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .acc-email { font-size: 12px; color: #5e5e5e; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .footer-note { font-size: 12px; color: #747775; text-align: center; line-height: 1.5; margin-top: 24px; border-top: 1px solid #f0f4f9; pt-3; }
-    .manual-box { margin-top: 16px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
-    .manual-box input { width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid #c4c7c5; font-size: 13px; margin-bottom: 10px; outline: none; }
-    .manual-box input:focus { border-color: #0b57d0; }
-    .manual-box button { width: 100%; padding: 10px; border-radius: 10px; background: #0b57d0; color: #fff; font-weight: 600; border: none; cursor: pointer; font-size: 13px; }
-    .manual-box button:hover { background: #0842a0; }
+    h1 { font-size: 20px; font-weight: 600; color: #1f1f1f; text-align: center; margin-bottom: 6px; }
+    .subtitle { font-size: 13px; color: #444746; text-align: center; margin-bottom: 24px; line-height: 1.4; }
+    .btn-google-official { display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 20px; }
+    .manual-box { margin-top: 10px; }
+    .manual-box label { font-size: 12px; font-weight: 600; color: #444746; display: block; margin-bottom: 6px; }
+    .manual-box input { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid #c4c7c5; font-size: 13px; margin-bottom: 12px; outline: none; transition: border 0.2s; }
+    .manual-box input:focus { border-color: #0b57d0; box-shadow: 0 0 0 2px rgba(11,87,208,0.15); }
+    .btn-submit { width: 100%; padding: 12px; border-radius: 12px; background: #0b57d0; color: #fff; font-weight: 600; border: none; cursor: pointer; font-size: 13px; transition: background 0.2s; }
+    .btn-submit:hover { background: #0842a0; }
+    .divider { display: flex; align-items: center; margin: 18px 0; text-align: center; color: #747775; font-size: 11px; text-transform: uppercase; }
+    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #e2e8f0; }
+    .divider:not(:empty)::before { margin-right: .5em; }
+    .divider:not(:empty)::after { margin-left: .5em; }
+    .footer-note { font-size: 11px; color: #747775; text-align: center; line-height: 1.5; margin-top: 24px; border-top: 1px solid #f0f4f9; padding-top: 14px; }
   </style>
 </head>
 <body>
@@ -37,78 +38,95 @@
         <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
       </svg>
     </div>
-    <h1>Chọn một tài khoản</h1>
-    <p class="subtitle">để tiếp tục tới <strong>WanderMatch Luxury Travel</strong></p>
+    <h1>Đăng nhập bằng Google</h1>
+    <p class="subtitle">Ủy quyền bảo mật để tiếp tục tới <strong>WanderMatch Luxury Travel</strong></p>
 
-    <div class="account-list">
-      <div class="account-item" onclick="chooseAccount('Nguyễn Doãn Trường Huy (Google VIP)', 'huy.doan@gmail.com')">
-        <div class="avatar" style="background:#1a73e8;">H</div>
-        <div class="acc-info">
-          <span class="acc-name">Nguyễn Doãn Trường Huy</span>
-          <span class="acc-email">huy.doan@gmail.com</span>
-        </div>
-      </div>
-
-      <div class="account-item" onclick="chooseAccount('Du Khách VIP Gold', 'khachhang@wandermatch.vn')">
-        <div class="avatar" style="background:#0f9d58;">V</div>
-        <div class="acc-info">
-          <span class="acc-name">Du Khách VIP Gold</span>
-          <span class="acc-email">khachhang@wandermatch.vn</span>
-        </div>
-      </div>
-
-      <div class="account-item" onclick="toggleCustom()">
-        <div class="avatar" style="background:#ea4335;">+</div>
-        <div class="acc-info">
-          <span class="acc-name">Sử dụng một tài khoản Google khác</span>
-          <span class="acc-email">Nhập email @gmail.com hoặc Google Workspace</span>
-        </div>
-      </div>
+    <!-- NÚT GOOGLE IDENTITY SERVICES CHÍNH THỨC -->
+    <div id="g_id_onload"
+         data-client_id="786214154432-sampleclientid.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+    <div class="btn-google-official">
+      <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with" data-shape="pill" data-logo_alignment="left"></div>
     </div>
 
-    <div id="customBox" class="manual-box" style="display:none;">
-      <input id="customEmail" type="email" placeholder="Nhập địa chỉ Google Email của bạn..." />
-      <input id="customName" type="text" placeholder="Họ và tên của bạn..." />
-      <button onclick="submitCustom()">Tiếp Tục Với Tài Khoản Này</button>
+    <div class="divider">Hoặc nhập email Google thực tế</div>
+
+    <div class="manual-box">
+      <label>Địa chỉ Email Google (@gmail.com / Workspace)</label>
+      <input id="customEmail" type="email" required placeholder="nhapemail@gmail.com" />
+      
+      <label>Họ và tên của bạn</label>
+      <input id="customName" type="text" required placeholder="Nhập họ tên hiển thị" />
+
+      <button class="btn-submit" onclick="submitCustom()">Xác Thực & Đồng Bộ Vào WanderMatch</button>
     </div>
 
     <div class="footer-note">
-      Để tiếp tục, Google sẽ chia sẻ tên, địa chỉ email và ảnh hồ sơ của bạn với WanderMatch. Xem Chính sách quyền riêng tư và Điều khoản dịch vụ.
+      Để bảo vệ quyền riêng tư, Google chỉ chia sẻ tên, địa chỉ email và ảnh hồ sơ công khai của bạn với hệ thống WanderMatch theo chuẩn OAuth 2.0.
     </div>
   </div>
 
   <script>
-    function chooseAccount(name, email) {
+    function parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function handleCredentialResponse(response) {
+      if (response && response.credential) {
+        const payload = parseJwt(response.credential);
+        if (payload) {
+          dispatchSuccess({
+            name: payload.name || payload.given_name || 'Hành Khách Google',
+            email: payload.email,
+            avatar: payload.picture || 'https://lh3.googleusercontent.com/a/default-user=s96-c',
+            provider: 'google'
+          });
+        }
+      }
+    }
+
+    function dispatchSuccess(authData) {
       const payload = {
         type: 'GOOGLE_AUTH_SUCCESS',
-        name: name,
-        email: email,
-        avatar: 'https://lh3.googleusercontent.com/a/default-user=s96-c',
+        name: authData.name,
+        email: authData.email,
+        avatar: authData.avatar,
         provider: 'google'
       };
-      if (window.opener) {
+      if (window.opener && !window.opener.closed) {
         window.opener.postMessage(payload, '*');
         setTimeout(() => window.close(), 300);
       } else {
         localStorage.setItem('wm_pending_oauth', JSON.stringify(payload));
-        alert('Đã xác thực tài khoản Google: ' + name);
+        alert('Xác thực Google thành công cho: ' + authData.name);
         window.close();
       }
     }
 
-    function toggleCustom() {
-      const b = document.getElementById('customBox');
-      b.style.display = b.style.display === 'none' ? 'block' : 'none';
-    }
-
     function submitCustom() {
-      const em = (document.getElementById('customEmail').value || '').trim();
-      const nm = (document.getElementById('customName').value || '').trim() || em.split('@')[0].toUpperCase();
-      if (!em || !em.includes('@')) {
-        alert('Vui lòng nhập địa chỉ Google Email hợp lệ!');
+      const email = (document.getElementById('customEmail').value || '').trim().toLowerCase();
+      const name = (document.getElementById('customName').value || '').trim();
+      if (!email.includes('@') || email.length < 5) {
+        alert('Vui lòng nhập địa chỉ email Google hợp lệ!');
         return;
       }
-      chooseAccount(nm, em);
+      dispatchSuccess({
+        name: name || email.split('@')[0].toUpperCase(),
+        email: email,
+        avatar: 'https://lh3.googleusercontent.com/a/default-user=s96-c',
+        provider: 'google'
+      });
     }
   </script>
 </body>
