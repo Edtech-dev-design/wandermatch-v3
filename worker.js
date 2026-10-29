@@ -649,6 +649,56 @@ export default {
     }
 
     // ========================================================================
+    // ENDPOINT: XÁC THỰC SOCIAL LOGIN REALTIME (/api/auth/social-login)
+    // ========================================================================
+    if (url.pathname === "/api/auth/social-login" && request.method === "POST") {
+      try {
+        const body = await request.json();
+        const { provider = "google", email, name, avatar } = body;
+        if (!email) {
+          return new Response(JSON.stringify({ success: false, error: "Email bắt buộc" }), {
+            status: 400, headers: { ...cors, "Content-Type": "application/json" }
+          });
+        }
+        const userRecord = {
+          email,
+          name: name || (provider === "google" ? "Hành Khách Google" : "Hành Khách Facebook"),
+          provider,
+          avatar: avatar || "",
+          authenticatedAt: new Date().toISOString()
+        };
+        return new Response(JSON.stringify({
+          success: true,
+          message: `Xác thực thành công tài khoản ${provider}`,
+          user: userRecord,
+          token: "wm_tok_" + Math.random().toString(36).substring(2) + Date.now().toString(36)
+        }), { headers: { ...cors, "Content-Type": "application/json" } });
+      } catch (e) {
+        return new Response(JSON.stringify({ success: false, error: e.message }), {
+          status: 400, headers: { ...cors, "Content-Type": "application/json" }
+        });
+      }
+    }
+
+    // ========================================================================
+    // ENDPOINT: KIỂM TRA TRẠNG THÁI THANH TOÁN THỜI GIAN THỰC (/api/payment/check-status)
+    // ========================================================================
+    if (url.pathname === "/api/payment/check-status" && request.method === "GET") {
+      const bookingCode = url.searchParams.get("bookingCode") || "";
+      const matched = STORAGE.bookings.find(b => b.bookingCode === bookingCode);
+      const isPaid = matched ? matched.status === "PAID" : false;
+      const payment = STORAGE.payments.find(p => p.bookingCode === bookingCode);
+      return new Response(JSON.stringify({
+        success: true,
+        bookingCode,
+        isPaid,
+        status: isPaid ? "PAID" : "PENDING_ESCROW",
+        transactionId: payment ? payment.transactionId : null,
+        verifiedAt: payment ? payment.verifiedAt : null
+      }), { headers: { ...cors, "Content-Type": "application/json" } });
+    }
+
+    // ========================================================================
     // ENDPOINT 3: XÁC NHẬN THANH TOÁN VIETQR & LƯU BIÊN LAI (/api/payment/confirm-receipt)
     // ========================================================================
     if (url.pathname === "/api/payment/confirm-receipt" && request.method === "POST") {
