@@ -478,7 +478,7 @@ window.initGoogleIdentity = function() {
   if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
     try {
       google.accounts.id.initialize({
-        client_id: "786214154432-sampleclientid.apps.googleusercontent.com",
+        client_id: (window.WM_CONFIG||{}).GOOGLE_CLIENT_ID || "",
         callback: window.handleGoogleCredentialResponse,
         auto_select: false,
         cancel_on_tap_outside: true
@@ -519,7 +519,7 @@ window.fbAsyncInit = function() {
   if (typeof FB !== 'undefined') {
     try {
       FB.init({
-        appId: '1085372439502931',
+        appId: (window.WM_CONFIG||{}).FACEBOOK_APP_ID || '',
         cookie: true,
         xfbml: true,
         version: 'v18.0'
@@ -575,120 +575,49 @@ window.processOAuthLoginSuccess = function({ name, email, avatar, provider }) {
 // ============================================================================
 // 4. KẾT NỐI ỦY QUYỀN GOOGLE OAUTH THẬT (GOOGLE IDENTITY SERVICES & API SYNC)
 // ============================================================================
+window.wmCfg = function(k) { return ((window.WM_CONFIG || {})[k] || "").trim(); };
+
+window.verifyWithBackend = async function(provider, token) {
+  const res = await fetch(`${window.API_BASE}/api/auth/social-login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ provider, accessToken: token })
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success) throw new Error(data.error || "Máy chủ từ chối xác thực");
+  return data.user;
+};
+
 window.loginWithGoogle = async function() {
-  // 1. Thử kích hoạt native Google One Tap prompt nếu GIS SDK đã sẵn sàng
-  if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
-    try {
-      google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          console.log("GIS OneTap notification skipped, displaying auth sheet");
-        }
-      });
-    } catch (e) {}
-  }
-
-  // 2. Mở Google Identity Authorization Sheet trực tiếp (Không bao giờ redirect tới URL lỗi 400)
-  const sheet = document.getElementById("googleAuthSheet");
-  if (sheet) {
-    sheet.style.display = "flex";
-    const emailInput = document.getElementById("googleSheetEmail");
-    if (emailInput) emailInput.focus();
-  }
+  const clientId = window.wmCfg("GOOGLE_CLIENT_ID");
+  if (!clientId) return window.showToast("Đăng nhập Google chưa được cấu hình (thiếu GOOGLE_CLIENT_ID). Hãy dùng Email hoặc liên hệ quản trị.", "error");
+  if (typeof google === "undefined" || !google.accounts || !google.accounts.oauth2) return window.showToast("Không tải được dịch vụ Google. Kiểm tra mạng rồi thử lại.", "error");
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: clientId,
+    scope: "openid profile email",
+    callback: async (resp) => {
+      if (!resp || !resp.access_token) return window.showToast("Google không cấp quyền truy cập.", "error");
+      try {
+        const u = await window.verifyWithBackend("google", resp.access_token);
+        window.processOAuthLoginSuccess({ name: u.name, email: u.email, avatar: u.avatar, provider: "google" });
+      } catch (e) { window.showToast("Xác thực Google thất bại: " + e.message, "error"); }
+    }
+  });
+  client.requestAccessToken({ prompt: "select_account" });
 };
 
-window.closeGoogleAuthSheet = function() {
-  const sheet = document.getElementById("googleAuthSheet");
-  if (sheet) sheet.style.display = "none";
-};
-
-window.submitGoogleAuthSheet = async function() {
-  const email = window.cleanEmail(document.getElementById("googleSheetEmail")?.value || "");
-  const name = (document.getElementById("googleSheetName")?.value || "").trim() || email.split("@")[0].toUpperCase();
-
-  if (!window.isValidEmail(email)) {
-    return window.showToast("Vui lòng nhập địa chỉ Google Email hợp lệ!", "error");
-  }
-
-  const avatar = "https://lh3.googleusercontent.com/a/default-user=s96-c";
-
-  // Đồng bộ lên backend Cloudflare Worker
-  if (window.API_BASE) {
-    try {
-      await fetch(`${window.API_BASE}/api/auth/social-login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: "google", email, name, avatar })
-      });
-    } catch(e) {}
-  }
-
-  window.processOAuthLoginSuccess({ name, email, avatar, provider: "google" });
-  window.closeGoogleAuthSheet();
-};
-
-// ============================================================================
-// 5. KẾT NỐI ỦY QUYỀN FACEBOOK OAUTH THẬT (META SDK & GRAPH API SYNC)
-// ============================================================================
 window.loginWithFacebook = async function() {
-  // 1. Thử gọi Meta Facebook SDK Login nếu khả dụng
-  if (typeof FB !== 'undefined' && FB.login) {
+  const appId = window.wmCfg("FACEBOOK_APP_ID");
+  if (!appId) return window.showToast("Đăng nhập Facebook chưa được cấu hình (thiếu FACEBOOK_APP_ID). Hãy dùng Email hoặc liên hệ quản trị.", "error");
+  if (typeof FB === "undefined") return window.showToast("Không tải được Facebook SDK. Kiểm tra mạng rồi thử lại.", "error");
+  if (!window.__fbInited) { FB.init({ appId, cookie: true, xfbml: false, version: "v18.0" }); window.__fbInited = true; }
+  FB.login(async (r) => {
+    if (!r || !r.authResponse) return window.showToast("Bạn đã huỷ đăng nhập Facebook.", "warn");
     try {
-      FB.login((response) => {
-        if (response && response.authResponse) {
-          FB.api('/me', { fields: 'id,name,email,picture.type(large)' }, (user) => {
-            if (user && user.name) {
-              window.processOAuthLoginSuccess({
-                name: user.name,
-                email: user.email || `${user.id}@facebook.user.vn`,
-                avatar: user.picture?.data?.url || "https://graph.facebook.com/v18.0/me/picture",
-                provider: "facebook"
-              });
-            }
-          });
-          return;
-        }
-      }, { scope: 'email,public_profile' });
-    } catch (e) {}
-  }
-
-  // 2. Mở Facebook Identity Sheet trực tiếp
-  const sheet = document.getElementById("facebookAuthSheet");
-  if (sheet) {
-    sheet.style.display = "flex";
-    const contactInput = document.getElementById("fbSheetContact");
-    if (contactInput) contactInput.focus();
-  }
-};
-
-window.closeFacebookAuthSheet = function() {
-  const sheet = document.getElementById("facebookAuthSheet");
-  if (sheet) sheet.style.display = "none";
-};
-
-window.submitFacebookAuthSheet = async function() {
-  const contact = (document.getElementById("fbSheetContact")?.value || "").trim();
-  const name = (document.getElementById("fbSheetName")?.value || "").trim() || "Hành Khách Facebook";
-
-  if (contact.length < 5) {
-    return window.showToast("Vui lòng nhập Email hoặc Số di động Facebook hợp lệ!", "error");
-  }
-
-  const emailKey = contact.includes("@") ? window.cleanEmail(contact) : `${contact.replace(/[^0-9]/g, "")}@facebook.user.vn`;
-  const avatar = "https://graph.facebook.com/v18.0/me/picture";
-
-  // Đồng bộ lên backend Cloudflare Worker
-  if (window.API_BASE) {
-    try {
-      await fetch(`${window.API_BASE}/api/auth/social-login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider: "facebook", email: emailKey, name, avatar })
-      });
-    } catch(e) {}
-  }
-
-  window.processOAuthLoginSuccess({ name, email: emailKey, avatar, provider: "facebook" });
-  window.closeFacebookAuthSheet();
+      const u = await window.verifyWithBackend("facebook", r.authResponse.accessToken);
+      window.processOAuthLoginSuccess({ name: u.name, email: u.email, avatar: u.avatar, provider: "facebook" });
+    } catch (e) { window.showToast("Xác thực Facebook thất bại: " + e.message, "error"); }
+  }, { scope: "email,public_profile" });
 };
 
 // ============================================================================
@@ -1872,66 +1801,48 @@ window.confirmAndLockBooking = async function() {
       }).catch(e => console.warn("Backend create-booking async notice:", e));
     } catch(e) {}
   }
+  window.startPaymentPolling();
   window.updateSavedBadge();
   window.showToast(`Đã xuất mã VietQR ký quỹ cho chuyến đi #${pkg.code}!`);
 };
 
-window.verifyAndConfirmPayment = async function() {
+window.verifyAndConfirmPayment = async function(silent) {
   const pkg = window.loadStore("wm_draft_prod", null);
   if (!pkg) return window.showToast("Không tìm thấy thông tin đơn giữ chỗ!", "error");
-
   const btn = document.getElementById("btnVerifyPayment");
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = `<span class="inline-block animate-spin mr-2">⟳</span> Đang đối soát Napas 24/7...`;
+  if (btn && !silent) { btn.disabled = true; btn.innerText = "Đang kiểm tra giao dịch ngân hàng..."; }
+
+  let st = null;
+  try {
+    const res = await fetch(`${window.API_BASE}/api/payment/check-status?bookingCode=${encodeURIComponent(pkg.code)}`);
+    st = await res.json();
+  } catch (e) {
+    if (!silent) window.showToast("Không kết nối được máy chủ đối soát.", "error");
+  }
+  if (btn) { btn.disabled = false; btn.innerText = "Tôi Đã Chuyển Khoản — Kiểm Tra Giao Dịch Ngay"; }
+
+  if (!st || !st.isPaid) {
+    if (!silent) window.showToast("Chưa nhận được tiền từ ngân hàng. Vui lòng chuyển đúng số tiền & nội dung, hệ thống tự kiểm tra mỗi 5 giây.", "warn");
+    return false;
   }
 
-  let txnId = "TXN-VNQR-" + Math.floor(100000 + Math.random() * 900000);
-
-  // Gửi xác nhận đối soát thật lên Backend Cloudflare Worker
-  if (window.API_BASE) {
-    try {
-      const res = await fetch(`${window.API_BASE}/api/payment/confirm-receipt`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          bookingCode: pkg.code,
-          amount: pkg.reveal ? pkg.reveal.paid : 5000000,
-          transactionId: txnId
-        })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.transactionId) txnId = data.transactionId;
-      }
-    } catch(e) {
-      console.warn("Backend payment confirm notice:", e);
-    }
-  }
-
-  pkg.isPaid = true;
-  pkg.status = "PAID";
-  pkg.transactionId = txnId;
+  if (window.payPollTimer) { clearInterval(window.payPollTimer); window.payPollTimer = null; }
+  pkg.isPaid = true; pkg.status = "PAID"; pkg.transactionId = st.transactionId;
   window.saveStore("wm_draft_prod", pkg);
-
   const saved = window.loadStore("wm_saved_prod", []);
   const idx = saved.findIndex(x => x.code === pkg.code);
-  if (idx >= 0) {
-    saved[idx].isPaid = true;
-    saved[idx].status = "PAID";
-    saved[idx].transactionId = txnId;
-    window.saveStore("wm_saved_prod", saved);
-  }
+  if (idx >= 0) { saved[idx].isPaid = true; saved[idx].status = "PAID"; saved[idx].transactionId = st.transactionId; window.saveStore("wm_saved_prod", saved); }
+  const sb = document.getElementById("paymentStatusBox"), vb = document.getElementById("paymentVerifiedBadge");
+  if (sb) sb.style.display = "none";
+  if (vb) vb.style.display = "block";
+  window.showToast("Đã nhận tiền từ ngân hàng. Mã giao dịch: " + st.transactionId, "success");
+  setTimeout(() => window.goToStep(3), 1200);
+  return true;
+};
 
-  const statusBox = document.getElementById("paymentStatusBox");
-  const verifiedBadge = document.getElementById("paymentVerifiedBadge");
-  if (statusBox) statusBox.style.display = "none";
-  if (verifiedBadge) verifiedBadge.style.display = "block";
-
-  window.showToast(`✓ Đã xác thực thanh toán Napas 24/7 thành công! Mã chuẩn chi: ${txnId}`, "success");
-  setTimeout(() => {
-    window.goToStep(3);
-  }, 1200);
+window.startPaymentPolling = function() {
+  if (window.payPollTimer) clearInterval(window.payPollTimer);
+  window.payPollTimer = setInterval(() => window.verifyAndConfirmPayment(true), 5000);
 };
 
 window.simulatePaymentSuccess = window.verifyAndConfirmPayment;

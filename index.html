@@ -784,90 +784,14 @@
     </div>
   </div>
 
+  <script>
+    // CẤU HÌNH ĐĂNG NHẬP THẬT: điền Client ID / App ID do chính bạn đăng ký.
+    // Để trống = nút đăng nhập sẽ báo "chưa cấu hình" thay vì giả vờ đăng nhập.
+    window.WM_CONFIG = { GOOGLE_CLIENT_ID: "", FACEBOOK_APP_ID: "" };
+  </script>
   <script src="supabaseClient.js"></script>
   <script src="app.js?v=10.0"></script>
 
-  <!-- ========================================================================= -->
-  <!-- GOOGLE OAUTH IDENTITY SHEET CHÍNH THỨC -->
-  <!-- ========================================================================= -->
-  <div id="googleAuthSheet" style="display:none;" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="bg-white text-slate-900 rounded-3xl max-w-md w-full p-6 md:p-8 space-y-5 text-xs shadow-2xl relative border border-slate-200">
-      <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-        <div class="flex items-center gap-2.5">
-          <svg class="w-6 h-6" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.65v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.14z"/>
-            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.15C3.26 21.36 7.33 24 12 24z"/>
-            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.15 0 9.92 0 12s.45 3.85 1.24 5.42l4.04-3.15z"/>
-            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-          </svg>
-          <div>
-            <h3 class="text-sm font-bold text-slate-900 font-heading">Đăng nhập bằng Google</h3>
-            <span class="text-[10px] text-slate-500">accounts.google.com</span>
-          </div>
-        </div>
-        <button onclick="window.closeGoogleAuthSheet()" class="text-slate-400 hover:text-slate-700 font-bold text-base px-2">✕</button>
-      </div>
-
-      <div class="space-y-2">
-        <p class="text-slate-600 text-xs leading-relaxed">
-          WanderMatch sẽ nhận được tên, địa chỉ email và ảnh hồ sơ cá nhân để bảo vệ quyền lợi đặt chuyến du lịch bí mật của bạn.
-        </p>
-      </div>
-
-      <form onsubmit="event.preventDefault(); window.submitGoogleAuthSheet();" class="space-y-3.5">
-        <div>
-          <label class="text-slate-700 font-semibold block mb-1">Địa chỉ Google Account (* @gmail.com hoặc Google Workspace)</label>
-          <input id="googleSheetEmail" type="email" required placeholder="ten_cua_ban@gmail.com" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-slate-900 focus:border-blue-500 focus:bg-white outline-none" />
-        </div>
-        <div>
-          <label class="text-slate-700 font-semibold block mb-1">Họ và tên hiển thị trên Google</label>
-          <input id="googleSheetName" type="text" placeholder="Nguyễn Văn A" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-slate-900 focus:border-blue-500 focus:bg-white outline-none" />
-        </div>
-
-        <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-xs bg-[#1A73E8] hover:bg-[#1557B0] text-white shadow-lg transition flex items-center justify-center gap-2">
-          <span>✓</span> Xác Thực & Đăng Nhập Google Ngay
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ========================================================================= -->
-  <!-- FACEBOOK OAUTH IDENTITY SHEET CHÍNH THỨC -->
-  <!-- ========================================================================= -->
-  <div id="facebookAuthSheet" style="display:none;" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="bg-white text-slate-900 rounded-3xl max-w-md w-full overflow-hidden text-xs shadow-2xl relative border border-slate-200">
-      <div class="bg-[#1877F2] text-white p-4 flex justify-between items-center">
-        <div class="flex items-center gap-2.5">
-          <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-          </svg>
-          <strong class="text-sm font-bold font-heading">Đăng nhập bằng Facebook</strong>
-        </div>
-        <button onclick="window.closeFacebookAuthSheet()" class="text-white/80 hover:text-white font-bold text-lg px-2">✕</button>
-      </div>
-
-      <div class="p-6 md:p-8 space-y-4">
-        <p class="text-slate-600 text-xs leading-relaxed">
-          Tiếp tục để liên kết tài khoản Facebook với WanderMatch. Chúng tôi sẽ bảo mật và tự động ghi nhớ hồ sơ chuyến đi của bạn.
-        </p>
-
-        <form onsubmit="event.preventDefault(); window.submitFacebookAuthSheet();" class="space-y-3.5">
-          <div>
-            <label class="text-slate-700 font-semibold block mb-1">Email hoặc Số di động Facebook (*)</label>
-            <input id="fbSheetContact" type="text" required placeholder="0988... hoặc email@domain.com" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-slate-900 focus:border-[#1877F2] focus:bg-white outline-none" />
-          </div>
-          <div>
-            <label class="text-slate-700 font-semibold block mb-1">Họ và tên đại diện trên Facebook</label>
-            <input id="fbSheetName" type="text" placeholder="Nguyễn Văn A" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-slate-900 focus:border-[#1877F2] focus:bg-white outline-none" />
-          </div>
-
-          <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-xs bg-[#1877F2] hover:bg-[#166fe5] text-white shadow-lg shadow-[#1877F2]/25 transition flex items-center justify-center gap-2">
-            <span>✓</span> Tiếp Tục Bằng Tài Khoản Facebook
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
 
 </body>
 </html>

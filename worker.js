@@ -552,6 +552,59 @@ export default {
 
     const url = new URL(request.url);
 
+    // ===== XÁC THỰC SOCIAL: máy chủ tự hỏi Google/Facebook, KHÔNG tin dữ liệu client =====
+    if (url.pathname === "/api/auth/social-login" && request.method === "POST") {
+      const J = { ...cors, "Content-Type": "application/json" };
+      try {
+        const { provider, accessToken } = await request.json();
+        if (!accessToken) return new Response(JSON.stringify({ success: false, error: "Thiếu accessToken" }), { status: 400, headers: J });
+        let user = null;
+        if (provider === "google") {
+          const r = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", { headers: { Authorization: "Bearer " + accessToken } });
+          if (r.ok) { const p = await r.json(); if (p.email && p.email_verified !== false) user = { email: p.email, name: p.name || p.email, avatar: p.picture || "", provider }; }
+        } else if (provider === "facebook") {
+          const r = await fetch("https://graph.facebook.com/me?fields=id,name,email,picture.type(large)&access_token=" + encodeURIComponent(accessToken));
+          if (r.ok) { const p = await r.json(); if (p.id) user = { email: p.email || (p.id + "@facebook.user"), name: p.name, avatar: (p.picture && p.picture.data && p.picture.data.url) || "", provider }; }
+        }
+        if (!user) return new Response(JSON.stringify({ success: false, error: "Token không hợp lệ hoặc đã hết hạn" }), { status: 401, headers: J });
+        return new Response(JSON.stringify({ success: true, user }), { headers: J });
+      } catch (e) {
+        return new Response(JSON.stringify({ success: false, error: e.message }), { status: 400, headers: J });
+      }
+    }
+
+    // ===== WEBHOOK NGÂN HÀNG (SePay/Casso): nguồn DUY NHẤT được phép đánh dấu PAID =====
+    if (url.pathname === "/api/payment/webhook" && request.method === "POST") {
+      const J = { ...cors, "Content-Type": "application/json" };
+      const secret = env.PAYMENT_WEBHOOK_SECRET;
+      const auth = request.headers.get("Authorization") || request.headers.get("x-webhook-secret") || "";
+      if (!secret || !(auth === secret || auth === "Apikey " + secret || auth === "Bearer " + secret)) {
+        return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), { status: 401, headers: J });
+      }
+      try {
+        const b = await request.json();
+        const content = String(b.content || b.description || "");
+        const amount = Number(b.transferAmount || b.amount || 0);
+        const m = content.match(/WM[-]?\d{4,6}/i);
+        if (!m) return new Response(JSON.stringify({ success: true, ignored: "no booking code" }), { headers: J });
+        const code = m[0].toUpperCase().replace("WM-", "WM");
+        let bk = STORAGE.bookings.find(x => x.bookingCode.replace("-", "") === code);
+        if (!bk) { bk = { bookingCode: code, budgetPaid: 0, status: "LOCKED", createdAt: new Date().toISOString() }; STORAGE.bookings.unshift(bk); }
+        bk.paidAmount = (bk.paidAmount || 0) + amount;
+        if (!bk.budgetPaid || bk.paidAmount >= bk.budgetPaid) bk.status = "PAID";
+        STORAGE.payments.unshift({ transactionId: String(b.id || b.referenceCode || "BANK-" + Date.now()), bookingCode: bk.bookingCode, amount, status: "COMPLETED", verifiedAt: new Date().toISOString() });
+        return new Response(JSON.stringify({ success: true, bookingCode: bk.bookingCode, status: bk.status }), { headers: J });
+      } catch (e) {
+        return new Response(JSON.stringify({ success: false, error: e.message }), { status: 400, headers: J });
+      }
+    }
+
+    // Chặn client tự xác nhận đã thanh toán
+    if (url.pathname === "/api/payment/confirm-receipt") {
+      return new Response(JSON.stringify({ success: false, error: "Chỉ ngân hàng (webhook) mới xác nhận được thanh toán" }), { status: 403, headers: { ...cors, "Content-Type": "application/json" } });
+    }
+
+
         // ========================================================================
     // ENDPOINT 1: HEALTH CHECK (TÌNH TRẠNG 4 ỨNG DỤNG GITHUB-CF-SUPABASE-VERCEL)
     // ========================================================================
@@ -606,7 +659,7 @@ export default {
 
         // Lưu bản ghi vào Storage & Thử sync Supabase
         const bookingRecord = {
-          bookingCode: result.bookingCode,
+          bookingCode: body.bookingCode || result.bookingCode,
           customerName: body.fullName || "Khách Hàng Du Lịch",
           customerEmail: body.email || "khachhang@wandermatch.vn",
           customerPhone: body.phone || "0988 888 888",
@@ -685,9 +738,9 @@ export default {
     // ========================================================================
     if (url.pathname === "/api/payment/check-status" && request.method === "GET") {
       const bookingCode = url.searchParams.get("bookingCode") || "";
-      const matched = STORAGE.bookings.find(b => b.bookingCode === bookingCode);
+      const matched = STORAGE.bookings.find(b => b.bookingCode.replace("-", "") === bookingCode.replace("-", ""));
       const isPaid = matched ? matched.status === "PAID" : false;
-      const payment = STORAGE.payments.find(p => p.bookingCode === bookingCode);
+      const payment = STORAGE.payments.find(p => p.bookingCode.replace("-", "") === bookingCode.replace("-", ""));
       return new Response(JSON.stringify({
         success: true,
         bookingCode,
