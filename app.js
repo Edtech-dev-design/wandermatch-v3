@@ -145,6 +145,9 @@ window.HOTELS_DB = [
   {
     id: "HTL-DL", city: "Đà Lạt", name: "Ana Mandara Villas Dalat Resort & Spa (5 Sao)",
     title: "3N2Đ Biệt Thự Pháp Cổ Rừng Thông & Săn Mây Cầu Đất",
+    mysteryTitle: "Kỳ Nghỉ Bí Mật: Biệt Thự Pháp Cổ & Săn Mây Rừng Thông 16°C",
+    mysteryTheme: "Cao Nguyên Sương Mù 16°C",
+    mysteryStayLabel: "Resort 5★ Di Sản Rừng Thông (Niêm Phong Tên Đến Sân Bay)",
     room_type: "Le Petit Room (Biệt Thự Di Sản Pháp)",
     img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1000&auto=format&fit=crop&q=80",
     gallery: [
@@ -168,18 +171,26 @@ window.HOTELS_DB = [
     packing: ["Áo khoác giữ ấm & khăn choàng len", "Giày thể thao dạo đồi thông", "CCCD bản gốc làm thủ tục bay", "Kem dưỡng ẩm thảo mộc"],
     food: ["Bánh căn Lệ 27 Yersin (40.000đ/đĩa)", "Lẩu gà lá é Tao Ngộ (300.000đ/nồi)", "Cà phê Túi Mơ To (65.000đ/ly)"],
     reviews: [
-      { name: "Hoàng Nhật Linh", rating: 5, date: "15/10/2026", tag: "Cặp đôi du lịch bí mật", text: "Trải nghiệm du lịch bí mật đỉnh cao! Lúc cào thẻ mới biết đi Đà Lạt, phòng Ana Mandara siêu sang, nhân viên đón tận sân bay." },
-      { name: "Đặng Minh Tâm", rating: 5, date: "08/10/2026", tag: "Nghỉ dưỡng gia đình", text: "Tiết kiệm được gần 4 triệu so với tự book Agoda. Vé Vietnam Airlines giờ bay đẹp, resort chuẩn 5 sao không chê vào đâu được!" }
+      { name: "Hoàng Nhật Linh", rating: 5, date: "15/10/2026", tag: "Cặp đôi du lịch bí mật", text: "Trải nghiệm du lịch bí mật đỉnh cao! Lúc cào thẻ mới biết điểm đến, resort 5 sao đón tận sân bay siêu chu đáo, phòng ốc và dịch vụ xuất sắc." },
+      { name: "Đặng Minh Tâm", rating: 5, date: "08/10/2026", tag: "Nghỉ dưỡng gia đình", text: "Tiết kiệm được gần 4 triệu so với tự book Agoda. Vé hàng không giờ bay đẹp, resort chuẩn 5 sao không chê vào đâu được!" }
     ],
     days: [
       { d: "Ngày 1: Nhận Phòng Biệt Thự Rừng Thông", m: "Hạ cánh sân bay Liên Khương, xe riêng đón về Resort 5 sao nhận phòng & dùng trà Atiso nóng.", a: "Dạo bộ dưới rừng thông cổ thụ & trải nghiệm ngâm chân thảo dược.", e: "Thưởng thức Lẩu gà lá é nóng hổi trong tiết trời se lạnh 16°C." },
       { d: "Ngày 2: Đón Biển Mây & Di Sản Kiến Trúc", m: "05:30 Đón bình minh đồi chè Cầu Đất & ăn bánh căn xíu mại bản địa.", a: "Tham quan Biệt điện Trần Lệ Xuân & thư giãn liệu trình Spa tinh dầu thông.", e: "Bữa tối ấm cúng với rau củ hữu cơ Đà Lạt tại nhà hàng Pháp Le Petit." },
       { d: "Ngày 3: Mua Quà Cao Nguyên & Trở Về", m: "Mua hồng treo gió công nghệ Nhật & trà hoa tại trung tâm OCOP chuẩn giá.", a: "Trả phòng muộn 13:00, xe riêng tiễn đoàn ra sân bay trở về an toàn." }
+    ],
+    mysteryDays: [
+      { d: "Ngày 1: Chạm Ngõ Biệt Thự Rừng Thông", m: "Hạ cánh sân bay đón, xe riêng đón về Resort 5 sao nhận phòng biệt thự cổ & dùng trà thảo mộc ấm.", a: "Dạo bộ dưới rừng thông cổ thụ & trải nghiệm ngâm chân thảo dược phục hồi.", e: "Thưởng thức lẩu nóng đặc sản bản địa thơm lừng trong tiết trời se lạnh 16°C." },
+      { d: "Ngày 2: Đón Biển Mây Sớm & Di Sản Cổ Điển", m: "05:30 Đón bình minh trên biển mây cao nguyên bồng bềnh & thưởng thức bữa sáng bản địa.", a: "Tham quan công trình kiến trúc di sản cổ điển & thư giãn liệu trình Spa tinh dầu tự nhiên.", e: "Bữa tối ấm cúng với rau củ hữu cơ tươi ngon tại nhà hàng phong cách Pháp cổ." },
+      { d: "Ngày 3: Sản Vật Cao Nguyên & Trở Về", m: "Mua đặc sản hoa quả sấy cao cấp & trà hoa tại trung tâm OCOP chuẩn giá.", a: "Trả phòng muộn theo chuẩn cam kết SLA, xe riêng tiễn đoàn ra sân bay trở về an toàn." }
     ]
   },
   {
     id: "HTL-MD", city: "Măng Đen", name: "Golden Boutique Hotel Măng Đen (4 Sao Plus)",
     title: "3N2Đ Nghỉ Dưỡng Nguyên Sơ Giữa Đại Ngàn Măng Đen",
+    mysteryTitle: "Kỳ Nghỉ Bí Mật: Đại Ngàn Nguyên Sơ & Thác Nước Tĩnh Lặng 18°C",
+    mysteryTheme: "Đại Ngàn Nguyên Sơ 18°C",
+    mysteryStayLabel: "Boutique Hotel 4★ Plus Giữa Rừng Đại Ngàn (Niêm Phong Tên Đến Sân Bay)",
     room_type: "Deluxe Pine Forest View",
     img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1000&auto=format&fit=crop&q=80",
     gallery: [
@@ -203,18 +214,26 @@ window.HOTELS_DB = [
     packing: ["Áo khoác nhẹ hoặc áo len mỏng", "Xịt chống côn trùng thảo mộc", "CCCD bản gốc", "Giày thể thao chống trượt"],
     food: ["Gà nướng cơm lam Cô Sinh (260.000đ/con)", "Lẩu xuyên tiêu Măng Đen (320.000đ/nồi)", "Cà phê Eva rang củi (40.000đ/ly)"],
     reviews: [
-      { name: "Phạm Hải Đăng", rating: 5, date: "18/10/2026", tag: "Chữa lành & Yên tĩnh", text: "Không ngờ thuật toán ghép đúng điểm đến không khí sạch tinh khiết như Măng Đen. Khách sạn chuẩn xịn, đồ ăn Tây Nguyên ngon mê ly." },
-      { name: "Lê Thu Uyên", rating: 5, date: "11/10/2026", tag: "Nhóm bạn thân", text: "Trải nghiệm đáng giá từng đồng, được đón từ sân bay Pleiku rất chu đáo, đêm lạnh ngồi đốt lửa trại ăn gà nướng cơm lam tuyệt vời." }
+      { name: "Phạm Hải Đăng", rating: 5, date: "18/10/2026", tag: "Chữa lành & Yên tĩnh", text: "Không ngờ thuật toán du lịch mù ghép đúng điểm đến không khí sạch tinh khiết đến vậy. Khách sạn chuẩn xịn, đồ ăn bản địa ngon mê ly." },
+      { name: "Lê Thu Uyên", rating: 5, date: "11/10/2026", tag: "Nhóm bạn thân", text: "Trải nghiệm đáng giá từng đồng, được đón từ sân bay rất chu đáo, đêm lạnh ngồi đốt lửa trại ăn gà nướng cơm lam tuyệt vời." }
     ],
     days: [
       { d: "Ngày 1: Cung Đường Thông Đại Ngàn", m: "Hạ cánh Pleiku, xe riêng đón thẳng lên thị trấn Măng Đen trong lành ngát hương thông.", a: "Nhận phòng view rừng thông, dạo bộ quanh Hồ Đăk Ke thanh bình tĩnh mịch.", e: "Thưởng thức Lẩu xuyên tiêu cay nồng ấm bụng giữa tiết trời 18°C." },
       { d: "Ngày 2: Khám Phá Thác Pa Sỹ & Bản Làng", m: "Tham quan Thác Pa Sỹ hùng vĩ và vườn tượng gỗ dân gian Tây Nguyên.", a: "Thăm làng văn hóa Kon Pring & thưởng thức nước ép cam hữu cơ bản địa.", e: "Ăn tối Gà nướng cơm lam truyền thống chấm muối hạt tiêu rừng giòn rụm." },
       { d: "Ngày 3: Năng Lượng Rừng Già", m: "Đón sương mai rừng thông, mua sâm dây Kon Plông chuẩn vùng trồng làm quà.", a: "Xe riêng đưa về sân bay Pleiku làm thủ tục bay trở về." }
+    ],
+    mysteryDays: [
+      { d: "Ngày 1: Cung Đường Rừng Thông Trong Lành", m: "Hạ cánh sân bay đón, xe riêng đón thẳng lên vùng cao nguyên trong lành ngát hương thông non.", a: "Nhận phòng ban công view rừng thông, dạo bộ quanh hồ nước thanh bình tĩnh mịch.", e: "Thưởng thức món lẩu cay nồng ấm bụng giữa tiết trời se lạnh 18°C." },
+      { d: "Ngày 2: Khám Phá Thác Nước Tự Nhiên & Bản Làng", m: "Tham quan dòng thác tự nhiên hùng vĩ và không gian văn hóa bản địa độc đáo.", a: "Thăm làng văn hóa truyền thống & thưởng thức nước ép hoa quả hữu cơ bản địa.", e: "Ăn tối gà nướng than hoa cơm lam ống nứa chấm muối tiêu rừng giòn rụm." },
+      { d: "Ngày 3: Năng Lượng Tươi Mới & Trở Về", m: "Đón sương mai rừng thông, mua trà thảo mộc & sâm dây tự nhiên chuẩn vùng trồng làm quà.", a: "Xe riêng đưa về sân bay làm thủ tục bay trở về thuận lợi." }
     ]
   },
   {
     id: "HTL-QN", city: "Quy Nhơn", name: "Avani Quy Nhon Resort (5 Sao Quốc Tế)",
     title: "3N2Đ Nghỉ Dưỡng Bãi Biển Riêng & Kỳ Co - Eo Gió",
+    mysteryTitle: "Kỳ Nghỉ Bí Mật: Vịnh Biển Riêng Biệt & Nắng Vàng Nhiệt Đới 27°C",
+    mysteryTheme: "Vịnh Biển Riêng Biệt 27°C",
+    mysteryStayLabel: "Resort 5★ Quốc Tế Bên Bờ Vịnh Biển (Niêm Phong Tên Đến Sân Bay)",
     room_type: "Ocean View Deluxe King Bed",
     img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1000&auto=format&fit=crop&q=80",
     gallery: [
@@ -238,17 +257,25 @@ window.HOTELS_DB = [
     packing: ["Đồ bơi & trang phục đi biển", "Kem chống nắng SPF50+ & Kính râm", "CCCD bản gốc", "Mũ rộng vành"],
     food: ["Bánh xèo tôm nhảy Gia Vỹ (35.000đ/chiếc)", "Bún chả cá Ngọc Liên (45.000đ/tô)", "Ốc Thúy Kiều (40.000đ - 60.000đ/đĩa)"],
     reviews: [
-      { name: "Trương Khánh Vy", rating: 5, date: "20/10/2026", tag: "Cặp đôi Honeymoon", text: "Bãi biển riêng của Avani Quy Nhơn đẹp mê hồn, biển lặng nước trong veo, phòng mở cửa ra là nghe tiếng sóng vỗ. 10/10!" }
+      { name: "Trương Khánh Vy", rating: 5, date: "20/10/2026", tag: "Cặp đôi Honeymoon", text: "Bãi biển riêng đẹp mê hồn, biển lặng nước trong veo, phòng mở cửa ra là nghe tiếng sóng vỗ. Du lịch mù quá bất ngờ và hài lòng!" }
     ],
     days: [
       { d: "Ngày 1: Tận Hưởng Bãi Biển Riêng", m: "Đáp sân bay Phù Cát, xe sang đón về Resort 5 sao sát bờ biển nhận phòng.", a: "Tắm biển tại bãi biển riêng của Resort & thưởng thức dừa tươi nguyên quả.", e: "Dạo phố ẩm thực Ngô Văn Sở & ăn bánh xèo tôm nhảy giòn rụm thơm lừng." },
       { d: "Ngày 2: Cano Kỳ Co & Eo Gió", m: "Cano đưa ra bãi Kỳ Co nước xanh ngắt 2 màu & lặn ngắm san hô tự nhiên.", a: "Check-in đường đá ven biển Eo Gió & ngắm hoàng hôn Làng chài Nhơn Lý.", e: "Thưởng thức tiệc hải sản tươi sống đánh bắt trong ngày tại làng chài." },
       { d: "Ngày 3: Bình Minh Đại Dương", m: "Ngắm bình minh trên biển từ ban công phòng, ăn bún chả cá Quy Nhơn trứ danh.", a: "Mua bánh ít lá gai & tré rơm làm quà, xe tiễn ra sân bay chuẩn giờ." }
+    ],
+    mysteryDays: [
+      { d: "Ngày 1: Tận Hưởng Bãi Biển Riêng Biệt", m: "Hạ cánh sân bay đón, xe sang đưa về Resort 5 sao sát bờ biển nhận phòng hướng đại dương.", a: "Tắm biển tại bãi biển riêng biệt lập của Resort & thưởng thức dừa tươi nguyên quả.", e: "Dạo phố ẩm thực hải sản đêm & thưởng thức đặc sản tôm nhảy giòn rụm thơm lừng." },
+      { d: "Ngày 2: Cano Vịnh Biển & Lặn Ngắm San Hô", m: "Cano riêng đưa ra vịnh biển nước xanh ngắt 2 màu & lặn ngắm san hô tự nhiên.", a: "Check-in con đường ven biển ngoạn mục & ngắm hoàng hôn làng chài thanh bình.", e: "Thưởng thức tiệc hải sản tươi sống đánh bắt trong ngày tại làng chài bản địa." },
+      { d: "Ngày 3: Bình Minh Biển Xanh & Trở Về", m: "Ngắm bình minh trên biển từ ban công phòng, thưởng thức bún chả cá trứ danh.", a: "Mua đặc sản địa phương truyền thống làm quà, xe tiễn ra sân bay chuẩn giờ." }
     ]
   },
   {
     id: "HTL-HUE", city: "Huế", name: "Pilgrimage Village Boutique Resort & Spa (5 Sao)",
     title: "3N2Đ Di Sản Cố Đô & Ngâm Khoáng Nóng Onsen",
+    mysteryTitle: "Kỳ Nghỉ Bí Mật: Di Sản Cung Đình & Suối Khoáng Nóng Onsen 24°C",
+    mysteryTheme: "Không Gian Di Sản & Khoáng Nóng 24°C",
+    mysteryStayLabel: "Resort 5★ Thảo Mộc & Khoáng Nóng Onsen (Niêm Phong Tên Đến Sân Bay)",
     room_type: "Traditional Villa Room Garden View",
     img: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1000&auto=format&fit=crop&q=80",
     gallery: [
@@ -272,17 +299,25 @@ window.HOTELS_DB = [
     packing: ["Trang phục lịch sự viếng di tích", "Đồ bơi ngâm khoáng nóng Onsen", "CCCD bản gốc", "Giày bệt êm chân"],
     food: ["Bún bò Mệ Kéo (40.000đ/tô)", "Cơm hến Hoa Đông (25.000đ/tô)", "Bánh bèo, nậm, lọc Bà Đỏ (60.000đ/khay)"],
     reviews: [
-      { name: "Vũ Đình Nam", rating: 5, date: "12/10/2026", tag: "Du lịch văn hóa di sản", text: "Không gian ở Làng Hành Hương Huế tĩnh lặng tuyệt đối, ngâm khoáng nóng Onsen xong tinh thần nhẹ nhõm hẳn." }
+      { name: "Vũ Đình Nam", rating: 5, date: "12/10/2026", tag: "Du lịch văn hóa di sản", text: "Không gian resort tĩnh lặng tuyệt đối, ngâm khoáng nóng Onsen xong tinh thần nhẹ nhõm hẳn. Rất thích mô hình du lịch bí mật này!" }
     ],
     days: [
       { d: "Ngày 1: Khám Phá Hoàng Cung", m: "Hạ cánh sân bay Phú Bài, nhận phòng Resort 5 sao kiến trúc gạch nung mộc mạc.", a: "Tham quan Đại Nội Huế & thưởng thức cà phê muối sân vườn rợp bóng cây.", e: "Ăn bánh Huế truyền thống & dạo cầu gỗ lim ngắm sông Hương thơ mộng." },
       { d: "Ngày 2: Lăng Tẩm & Suối Khoáng Nóng", m: "Viếng chùa Thiên Mụ cổ kính & tham quan Lăng Minh Mạng uy nghiêm.", a: "Ngâm tắm suối khoáng nóng Onsen Alba phục hồi năng lượng và thể lực.", e: "Thưởng thức bún bò Huế thơm cay & chè hạt sen long nhãn Cung đình." },
       { d: "Ngày 3: Hương Vị Cố Đô", m: "Uống trà sen buổi sớm trong khuôn viên resort, mua trà Cung đình & mè xửng.", a: "Xe riêng tiễn đoàn ra sân bay Phú Bài về lại TP.HCM / Hà Nội." }
+    ],
+    mysteryDays: [
+      { d: "Ngày 1: Không Gian Nghỉ Dưỡng Làng Cổ", m: "Hạ cánh sân bay đón, nhận phòng Resort 5 sao kiến trúc gạch nung mộc mạc và thanh tịnh.", a: "Tham quan quần thể di sản lịch sử cổ kính & thưởng thức cà phê sân vườn rợp bóng cây.", e: "Thưởng thức các món bánh truyền thống thanh nhã & dạo bộ ven bờ sông thơ mộng." },
+      { d: "Ngày 2: Quần Thể Cổ Kính & Suối Khoáng Nóng", m: "Viếng danh thắng cổ kính & khám phá kiến trúc hoàng gia uy nghiêm.", a: "Ngâm tắm suối khoáng nóng Onsen thảo mộc tự nhiên phục hồi năng lượng và thể lực.", e: "Thưởng thức món bún thơm cay truyền thống & chè hạt sen long nhãn ngọt thanh." },
+      { d: "Ngày 3: Tinh Hoa Văn Hóa & Trở Về", m: "Uống trà sen buổi sớm trong khuôn viên resort, mua trà thảo mộc & đặc sản truyền thống.", a: "Xe riêng tiễn đoàn ra sân bay làm thủ tục bay trở về an toàn." }
     ]
   },
   {
     id: "HTL-PQ", city: "Phú Quốc", name: "Salinda Resort Phu Quoc Island (5 Sao Quốc Tế)",
     title: "3N2Đ Nghỉ Dưỡng Đảo Ngọc 5 Sao & Hoàng Hôn Nam Đảo",
+    mysteryTitle: "Kỳ Nghỉ Bí Mật: Thiên Đường Đảo Ngọc & Hoàng Hôn Đại Dương 29°C",
+    mysteryTheme: "Biển Đảo Nhiệt Đới 29°C",
+    mysteryStayLabel: "Resort 5★ Quốc Tế Bờ Biển Hoàng Hôn (Niêm Phong Tên Đến Sân Bay)",
     room_type: "Deluxe Sunset View Room",
     img: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1000&auto=format&fit=crop&q=80",
     gallery: [
@@ -306,17 +341,25 @@ window.HOTELS_DB = [
     packing: ["Trang phục đi biển & váy dự tiệc", "Kính râm, mũ cói & kem chống nắng", "CCCD bản gốc", "Dép sandal biển"],
     food: ["Bún quậy Kiến Xây (65.000đ/tô)", "Bún kèn Út Lượm (45.000đ/tô)", "Hải sản Hàm Ninh (Niêm yết giá theo kg)"],
     reviews: [
-      { name: "Nguyễn Minh Châu", rating: 5, date: "24/10/2026", tag: "Kỳ nghỉ 5 sao cao cấp", text: "Hồ bơi điện phân muối của Salinda bơi không bị cay mắt. Buffet sáng có sâm panh và nghệ sĩ đàn piano trực tiếp cực chill!" }
+      { name: "Nguyễn Minh Châu", rating: 5, date: "24/10/2026", tag: "Kỳ nghỉ 5 sao cao cấp", text: "Hồ bơi điện phân muối bơi không bị cay mắt. Buffet sáng có sâm panh và nghệ sĩ đàn piano trực tiếp cực chill! Đi du lịch mù mà được resort 5 sao đỉnh chóp!" }
     ],
     days: [
       { d: "Ngày 1: Trải Nghiệm Resort 5 Sao", m: "Bay thẳng tới Phú Quốc, xe sang đón về Resort 5 sao nhận phòng hướng vườn.", a: "Thả mình tại hồ bơi điện phân muối & ngắm hoàng hôn bãi biển riêng Salinda.", e: "Tự tay pha nước chấm ăn Bún quậy Kiến Xây & dạo chợ đêm Bạch Đằng." },
       { d: "Ngày 2: Quần Đảo An Thới & Cầu Hôn", m: "Trải nghiệm cáp treo vượt biển dài nhất thế giới sang Hòn Thơm tắm biển.", a: "Check-in Sunset Town rực rỡ và ngắm Cầu Hôn (Kiss Bridge).", e: "Tiệc BBQ hải sản ghẹ Hàm Ninh tươi ngon bên bờ biển đêm." },
       { d: "Ngày 3: Thư Giãn & Mua Sắm", m: "Buffet sáng quốc tế kèm rượu vang & nhạc piano sống, mua tiêu sọ & nước mắm cốt.", a: "Xe riêng tiễn đoàn ra sân bay Phú Quốc chuẩn giờ khởi hành." }
+    ],
+    mysteryDays: [
+      { d: "Ngày 1: Trải Nghiệm Resort 5 Sao Nhiệt Đới", m: "Bay thẳng tới hòn đảo nhiệt đới, xe sang đón về Resort 5 sao nhận phòng ban công hướng hoàng hôn.", a: "Thả mình tại hồ bơi vô cực điện phân muối & ngắm hoàng hôn rực rỡ trên bãi biển riêng.", e: "Tự tay pha nước chấm thưởng thức món bún đặc sản trứ danh & dạo chợ đêm bản địa sôi động." },
+      { d: "Ngày 2: Quần Đảo Biển Xanh & Cáp Treo Vượt Biển", m: "Trải nghiệm tuyến cáp treo vượt biển dài nhất thế giới sang đảo ngọc tắm biển.", a: "Check-in thị trấn hoàng hôn rực rỡ và ngắm cây cầu biểu tượng tình yêu.", e: "Tiệc BBQ hải sản tươi ngon bên bờ biển đêm trong làn gió mát rượi." },
+      { d: "Ngày 3: Thư Giãn & Trở Về", m: "Buffet sáng quốc tế kèm rượu vang & nhạc piano sống, mua sản vật hải đảo truyền thống.", a: "Xe riêng tiễn đoàn ra sân bay chuẩn giờ khởi hành." }
     ]
   },
   {
     id: "HTL-SP", city: "Sapa", name: "Silk Path Grand Resort & Spa Sapa (5 Sao)",
     title: "3N2Đ Biển Mây Hoàng Liên Sơn & Tắm Lá Thuốc Dao Đỏ",
+    mysteryTitle: "Kỳ Nghỉ Bí Mật: Biển Mây Đỉnh Núi & Tắm Thảo Dược Bản Địa 14°C",
+    mysteryTheme: "Đỉnh Núi Biển Mây 14°C",
+    mysteryStayLabel: "Resort 5★ Trên Mây View Thung Lũng (Niêm Phong Tên Đến Sân Bay)",
     room_type: "Classic Mountain View King",
     img: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=1000&auto=format&fit=crop&q=80",
     gallery: [
@@ -340,17 +383,25 @@ window.HOTELS_DB = [
     packing: ["Áo khoác giữ ấm & khăn len", "Giày thể thao leo bậc thang", "CCCD bản gốc", "Son dưỡng môi chống nẻ"],
     food: ["Thắng cố A Quỳnh (350.000đ/nồi)", "Cá hồi Sapa nướng than (280.000đ/phần)", "Thịt lợn cắp nách quay (180.000đ/đĩa)"],
     reviews: [
-      { name: "Trịnh Thùy Trang", rating: 5, date: "21/10/2026", tag: "Săn mây mùa thu", text: "Resort như một lâu đài trên mây giữa Sapa. Bể bơi nước nóng trong nhà nhìn thẳng ra dãy Hoàng Liên Sơn hùng vĩ, chụp góc nào cũng đẹp." }
+      { name: "Trịnh Thùy Trang", rating: 5, date: "21/10/2026", tag: "Săn mây mùa thu", text: "Resort như một lâu đài trên mây. Bể bơi nước nóng trong nhà nhìn thẳng ra dãy núi hùng vĩ, chụp góc nào cũng đẹp!" }
     ],
     days: [
       { d: "Ngày 1: Đón Khí Lạnh Hoàng Liên Sơn", m: "Limousine VIP đón tận nơi, nhận phòng resort view thung lũng Mường Hoa.", a: "Tắm bồn thảo dược lá thuốc Dao đỏ giúp giãn cơ và thư thái tinh thần.", e: "Thưởng thức Lẩu cá hồi cá tầm nghi ngút khói giữa tiết trời 14°C." },
       { d: "Ngày 2: Chinh Phục Nóc Nhà Đông Dương", m: "Cáp treo lên đỉnh Fansipan 3.143m ngắm quần thể tâm linh và biển mây.", a: "Dạo bản Tả Van chiêm ngưỡng ruộng bậc thang và nếp nhà người Giáy.", e: "Ăn đồ nướng than hoa Sapa & thưởng thức rượu mận Tả Van êm dịu." },
       { d: "Ngày 3: Hương Rừng Tây Bắc", m: "Uống trà ô long ngắm bình minh trên đỉnh núi, mua nấm hương rừng & thịt trâu gác bếp.", a: "Xe Limousine đón tiễn đoàn trở về thuận lợi." }
+    ],
+    mysteryDays: [
+      { d: "Ngày 1: Đón Khí Lạnh Vùng Cao", m: "Xe Limousine đón tận nơi, nhận phòng resort 5 sao ngự trên đồi cao view thung lũng mây bồng bềnh.", a: "Tắm bồn thảo dược lá thuốc tự nhiên của đồng bào bản địa giúp giãn cơ và thư thái.", e: "Thưởng thức lẩu cá tầm nóng hổi nghi ngút khói giữa tiết trời se lạnh 14°C." },
+      { d: "Ngày 2: Chinh Phục Nóc Nhà Đại Ngàn & Biển Mây", m: "Cáp treo lên đỉnh núi cao nhất ngắm toàn cảnh quần thể tâm linh và biển mây.", a: "Dạo thung lũng ruộng bậc thang chiêm ngưỡng nếp nhà gỗ truyền thống của người bản địa.", e: "Ăn đồ nướng than hoa thơm lừng & thưởng thức thức uống lên men êm dịu." },
+      { d: "Ngày 3: Hương Sắc Núi Rừng & Trở Về", m: "Uống trà ngắm bình minh trên đỉnh núi, mua đặc sản nông sản tự nhiên làm quà.", a: "Xe Limousine đón tiễn đoàn trở về thuận lợi." }
     ]
   },
   {
     id: "HTL-CD", city: "Côn Đảo", name: "The Secret Côn Đảo Resort (4 Sao Luxury)",
     title: "3N2Đ Tĩnh Lặng Vùng Biển Huyền Thoại & Rừng Nguyên Sinh",
+    mysteryTitle: "Kỳ Nghỉ Bí Mật: Biển Xanh Ngọc Bích Biệt Lập & Rừng Nguyên Sinh 28°C",
+    mysteryTheme: "Hòn Đảo Huyền Bí 28°C",
+    mysteryStayLabel: "Resort 4★ Luxury Bên Bờ Biển Ngọc (Niêm Phong Tên Đến Sân Bay)",
     room_type: "Deluxe Heritage Balcony Room",
     img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1000&auto=format&fit=crop&q=80",
     gallery: [
@@ -374,19 +425,21 @@ window.HOTELS_DB = [
     packing: ["Trang phục trang nhã viếng nghĩa trang", "Đồ bơi & kính lặn ngắm san hô", "CCCD bản gốc", "Mũ rộng vành"],
     food: ["Ốc vú nàng xào bơ tỏi (120.000đ/đĩa)", "Cháo hàu Côn Đảo (50.000đ/tô)", "Hải sản tươi sống Côn Sơn (Theo thời giá)"],
     reviews: [
-      { name: "Trần Bảo Lâm", rating: 5, date: "26/10/2026", tag: "Hành trình tĩnh lặng", text: "Côn Đảo thật sự bình yên và thiêng liêng. The Secret Resort nằm ở vị trí tuyệt đẹp, nhân viên phục vụ tận tâm từ lúc đón ở sân bay Cỏ Ống." }
+      { name: "Trần Bảo Lâm", rating: 5, date: "26/10/2026", tag: "Hành trình tĩnh lặng", text: "Vùng biển thật sự bình yên và thiêng liêng. Resort nằm ở vị trí tuyệt đẹp, nhân viên phục vụ tận tâm từ lúc đón ở sân bay. Chuyến du lịch mù tuyệt vời!" }
     ],
     days: [
       { d: "Ngày 1: Đặt Chân Lên Hòn Đảo Huyền Bí", m: "Hạ cánh sân bay Cỏ Ống, xe đón băng qua cung đường biển tuyệt đẹp về Resort.", a: "Tắm tại Bãi Nhát hoang sơ & ngắm đỉnh Tình Yêu lúc hoàng hôn.", e: "Thưởng thức Cháo hàu nóng hổi và ốc vú nàng tươi ngon giòn sần sật." },
       { d: "Ngày 2: Lịch Sử Thiêng Liêng & Thiên Nhiên", m: "Tham quan di tích Côn Đảo & viếng Nghĩa trang Hàng Dương trang nghiêm.", a: "Đi thuyền ra Hòn Bảy Cạnh lặn ngắm san hô và tìm hiểu bảo tồn rùa biển.", e: "Dạo bộ dưới hàng cây bàng cổ thụ trong không gian tĩnh mịch về đêm." },
       { d: "Ngày 3: Bình Yên Trước Đại Dương", m: "Ngắm bình minh Côn Đảo bên ly cà phê ven bờ biển, mua mứt hạt bàng đặc sản.", a: "Xe riêng tiễn đoàn ra sân bay Cỏ Ống làm thủ tục về lại." }
+    ],
+    mysteryDays: [
+      { d: "Ngày 1: Đặt Chân Đến Hòn Đảo Huyền Bí", m: "Hạ cánh sân bay đón trên đảo, xe đón băng qua cung đường biển tuyệt đẹp về Resort nhận phòng.", a: "Tắm tại bãi biển hoang sơ trong vắt & ngắm hoàng hôn buông lãng mạn.", e: "Thưởng thức cháo hải sản nóng hổi và ốc biển tươi ngon giòn sần sật." },
+      { d: "Ngày 2: Di Tích Lịch Sử & Rạn San Hô Nguyên Sơ", m: "Tham quan các di tích lịch sử thiêng liêng và dâng hương tưởng niệm trang nghiêm.", a: "Đi thuyền ra rạn san hô lặn ngắm hệ sinh thái biển nguyên sơ và tìm hiểu bảo tồn sinh vật biển.", e: "Dạo bộ dưới hàng cây cổ thụ hàng trăm năm tuổi trong không gian tĩnh mịch về đêm." },
+      { d: "Ngày 3: Bình Yên Trước Đại Dương & Trở Về", m: "Ngắm bình minh bên ly cà phê ven bờ biển, mua đặc sản hạt bàng trứ danh làm quà.", a: "Xe riêng tiễn đoàn ra sân bay làm thủ tục bay trở về trọn vẹn cảm xúc." }
     ]
   }
 ];
 
-// ============================================================================
-// 2. HỆ THỐNG LƯU TRỮ LOCALSTORAGE & COOKIE VĨNH VIỄN
-// ============================================================================
 const DEFAULT_SEEDED_USERS = {
   "admin@wandermatch.vn": {
     name: "Quản Trị Viên Hệ Thống",
@@ -989,7 +1042,7 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
     url: `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${chosen.unitCost}&addInfo=${encodeURIComponent(`${code} KH${i + 1}`)}&accountName=${encodeURIComponent("CONG TY TNHH WANDERMATCH VN")}`
   }));
 
-  const reasoningLog = `[Thuật toán Knapsack + Cosine Matching]: Đã tối ưu gói ngân sách ${window.formatVND(inp.budget)}/khách ➔ Khớp cặp vé máy bay khứ hồi ${chosen.f.id} (${chosen.f.airline}) + 2 đêm nghỉ dưỡng tại ${chosen.h.rating}★ ${chosen.h.name}. Điểm Utility đạt ${chosen.util}/100, hệ số tương thích 5 chiều cảm xúc đạt ${chosen.sim}%. Tiết kiệm ngay ${window.formatVND(savings)} so với giá bán lẻ thị trường.`;
+  const reasoningLog = `[Thuật toán Knapsack + Cosine Matching]: Đã tối ưu gói ngân sách ${window.formatVND(inp.budget)}/khách ➔ Khớp cặp vé máy bay khứ hồi ${chosen.f.airline} + 2 đêm nghỉ dưỡng tại Resort ${chosen.h.rating}★ chuẩn SLA quốc tế (Đã niêm phong tên đến sân bay). Điểm Utility đạt ${chosen.util}/100, tương thích 5 chiều cảm xúc đạt ${chosen.sim}%. Tiết kiệm ngay ${window.formatVND(savings)} nhờ quỹ phòng ẩn danh OTA Wholesale.`;
 
   return {
     code, 
@@ -1005,12 +1058,13 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
     hint: chosen.h.hint, 
     packing: chosen.h.packing, 
     food: chosen.h.food, 
-    days: chosen.h.days, 
+    days: chosen.h.mysteryDays || chosen.h.days,
+    realDays: chosen.h.days, 
     reviews: chosen.h.reviews || [],
     flight: chosen.f,
     hotel: chosen.h,
     qrs,
-    flightLabel: `Khứ hồi ${chosen.f.airline} (${chosen.f.time})`,
+    flightLabel: `Khứ hồi ${chosen.f.airline} (Khởi hành từ ${inp.origin || 'HAN'} ✈️ Sân bay bí mật)`,
     hotelLabel: `Resort ${chosen.h.rating}★ tiêu chuẩn quốc tế (Kèm buffet sáng & xe đưa đón)`,
     reveal: {
       city: chosen.h.city, 
@@ -1052,7 +1106,7 @@ window.computeTravelerPersona = function(vec, budget, groupSize) {
         { label: "Sức Bật Trải Nghiệm Thượng Lưu", val: Math.min(100, Math.round((b / 8000000) * 100)), color: "bg-teal-400" }
       ],
       recommendation: "Gợi ý hệ thống: Biệt thự biển kèm hồ bơi vô cực hoặc resort thung lũng cổ điển, xe sang đón tiễn sân bay trọn gói.",
-      destinations: ["Phú Quốc", "Nha Trang", "Quy Nhơn"]
+      mysteryEcosystems: ["Resort 5★ Quốc Tế", "Biển Đảo Nhiệt Đới 28°C", "Hồ Bơi Vô Cực Nước Mặn"]
     };
   } else if (v.healing >= 75 && v.nature >= 75 && v.solitude >= 60) {
     return {
@@ -1069,7 +1123,7 @@ window.computeTravelerPersona = function(vec, budget, groupSize) {
         { label: "Nhu Cầu Riêng Tư Tối Đa", val: v.solitude, color: "bg-sky-400" }
       ],
       recommendation: "Gợi ý hệ thống: Các khu nghỉ dưỡng biệt lập giữa rừng thông hoặc ven biển hoang sơ, kèm liệu trình ngâm thảo mộc bản địa.",
-      destinations: ["Đà Lạt", "Măng Đen", "Phú Quốc"]
+      mysteryEcosystems: ["Cao Nguyên Sương Mù 16°C", "Rừng Thông Cổ Thụ", "Onsen Thảo Mộc"]
     };
   } else if (v.solitude >= 75 && v.nature >= 60) {
     return {
@@ -1086,7 +1140,7 @@ window.computeTravelerPersona = function(vec, budget, groupSize) {
         { label: "Tinh Thần Khám Phá Tự Do", val: Math.round((v.healing + v.culture) / 2), color: "bg-indigo-400" }
       ],
       recommendation: "Gợi ý hệ thống: Bungalow sát biển tại vịnh biển hoang sơ, thưởng thức hải sản ghe câu làng chài vào lúc chạng vạng.",
-      destinations: ["Quy Nhơn", "Phú Quốc", "Nha Trang"]
+      mysteryEcosystems: ["Vịnh Biển Riêng Biệt 27°C", "Bãi Cát Trắng Mịn", "Hoàng Hôn Đại Dương"]
     };
   } else if (v.culture >= 70) {
     return {
@@ -1103,7 +1157,7 @@ window.computeTravelerPersona = function(vec, budget, groupSize) {
         { label: "Độ Cảm Thụ Văn Hóa Bản Địa", val: Math.round((v.culture + v.healing) / 2), color: "bg-amber-400" }
       ],
       recommendation: "Gợi ý hệ thống: Khách sạn mang đậm kiến trúc thuộc địa / cung đình cổ kính, kết hợp tour ẩm thực bản địa ban đêm.",
-      destinations: ["Huế", "Quy Nhơn", "Đà Lạt"]
+      mysteryEcosystems: ["Không Gian Di Sản 24°C", "Kiến Trúc Cung Đình", "Khoáng Nóng Thiên Nhiên"]
     };
   } else {
     return {
@@ -1120,7 +1174,7 @@ window.computeTravelerPersona = function(vec, budget, groupSize) {
         { label: "Độ Hài Lòng Dịch Vụ Mở", val: 90, color: "bg-teal-400" }
       ],
       recommendation: "Gợi ý hệ thống: Khách sạn trung tâm gần bãi biển và khu ẩm thực đêm, linh hoạt lịch trình tham quan tự do.",
-      destinations: ["Nha Trang", "Đà Lạt", "Quy Nhơn"]
+      mysteryEcosystems: ["Thiên Đường Đảo Ngọc 29°C", "Biển Xanh 2 Màu", "Ẩm Thực Đêm Thượng Hạng"]
     };
   }
 };
@@ -1147,9 +1201,9 @@ window.updatePersonaUI = function() {
         </div>
       </div>
       <div class="text-right">
-        <span class="text-[10px] text-slate-400 block font-semibold">Tuyến Điểm Khuyến Nghị Tối Ưu</span>
+        <span class="text-[10px] text-teal-300 block font-bold uppercase tracking-wider">✦ Hệ Sinh Thái Khí Hậu Bí Mật Được Khớp Lệnh</span>
         <div class="flex flex-wrap justify-end gap-1.5 mt-1">
-          ${persona.destinations.map(d => `<span class="text-[11px] px-2.5 py-1 rounded-lg bg-white/10 text-white font-bold border border-white/15">${d}</span>`).join("")}
+          ${(persona.mysteryEcosystems || ["Resort 5★ Bí Mật"]).map(d => `<span class="text-[11px] px-2.5 py-1 rounded-lg bg-teal-500/15 text-teal-200 font-bold border border-teal-500/30">🌿 ${d}</span>`).join("")}
         </div>
       </div>
     </div>
@@ -1388,7 +1442,7 @@ window.selectComboAlternative = function(idx) {
     url: `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${chosen.unitCost}&addInfo=${encodeURIComponent(`${code} KH${i + 1}`)}&accountName=${encodeURIComponent("CONG TY TNHH WANDERMATCH VN")}`
   }));
 
-  const reasoningLog = `[Lựa chọn trực tiếp phương án #${idx + 1}]: Khách hàng đã chuyển sang gói ${chosen.h.rating}★ ${chosen.h.name} (${chosen.h.city}). Độ tương thích ${chosen.sim}%, tối ưu ${chosen.knapsackRatio}% ngân sách. Tiết kiệm ${window.formatVND(savings)}.`;
+  const reasoningLog = `[Lựa chọn phương án #${idx + 1}]: Khách hàng đã chuyển sang gói ${chosen.h.mysteryTheme || chosen.h.title}. Độ tương thích ${chosen.sim}%, tối ưu ${chosen.knapsackRatio}% ngân sách. Tiết kiệm ${window.formatVND(savings)}.`;
 
   const newPkg = {
     code, 
@@ -1404,12 +1458,13 @@ window.selectComboAlternative = function(idx) {
     hint: chosen.h.hint, 
     packing: chosen.h.packing, 
     food: chosen.h.food, 
-    days: chosen.h.days, 
+    days: chosen.h.mysteryDays || chosen.h.days,
+    realDays: chosen.h.days, 
     reviews: chosen.h.reviews || [],
     flight: chosen.f,
     hotel: chosen.h,
     qrs,
-    flightLabel: `Khứ hồi ${chosen.f.airline} (${chosen.f.time})`,
+    flightLabel: `Khứ hồi ${chosen.f.airline} (Khởi hành từ ${inp.origin || 'HAN'} ✈️ Sân bay bí mật)`,
     hotelLabel: `Resort ${chosen.h.rating}★ tiêu chuẩn quốc tế (Kèm buffet sáng & xe đưa đón)`,
     reveal: {
       city: chosen.h.city, 
@@ -1430,7 +1485,7 @@ window.selectComboAlternative = function(idx) {
 
   window.saveStore("wm_draft_prod", newPkg);
   window.renderPackageUI(newPkg);
-  window.showToast(`Đã chuyển sang phương án #${idx + 1}: ${chosen.h.title} (Khớp ${chosen.sim}%)!`);
+  window.showToast(`Đã chuyển sang phương án #${idx + 1}: ${chosen.h.mysteryTitle || chosen.h.title} (Khớp ${chosen.sim}%)!`);
 };
 
 // ============================================================================
@@ -1659,9 +1714,9 @@ window.renderPackageUI = function(pkg) {
           <!-- THÔNG TIN ĐÁY ẢNH & TIỆN ÍCH 5 SAO -->
           <div class="absolute bottom-4 left-4 right-4 space-y-2">
             <div>
-              <span class="text-[11px] text-teal-300 uppercase tracking-widest font-black block">Resort Nghỉ Dưỡng Đối Tác Phút Chót</span>
-              <h4 class="text-xl md:text-2xl font-black text-white font-heading mt-0.5">${pkg.reveal.hotel}</h4>
-              <p class="text-xs text-slate-300 mt-0.5">${pkg.reveal.room_type} — Kèm Buffet Sáng Quốc Tế Miễn Phí</p>
+              <span class="text-[11px] text-teal-300 uppercase tracking-widest font-black block">Resort 5★ Bí Mật Đạt Chuẩn SLA Quốc Tế</span>
+              <h4 class="text-xl md:text-2xl font-black text-white font-heading mt-0.5">✦ Resort 5★ Tiêu Chuẩn Quốc Tế SLA (Niêm Phong Tên Đến Sân Bay) ✦</h4>
+              <p class="text-xs text-slate-300 mt-0.5">Phòng Suite Ban Công Hướng Thiên Nhiên — Kèm Buffet Sáng 60 Món & Xe Đưa Đón Sân Bay</p>
             </div>
             
             <div class="flex flex-wrap gap-2 pt-1">
@@ -1830,8 +1885,8 @@ window.renderPackageUI = function(pkg) {
                     </span>
                     <span class="text-amber-300 font-bold font-mono text-[11px]">${tc.sim}% Tương Thích</span>
                   </div>
-                  <strong class="text-sm text-white font-heading block line-clamp-1">${tc.h.title}</strong>
-                  <p class="text-[11px] text-slate-300 mt-0.5 line-clamp-1">✈️ ${tc.f.airline} • 🏨 Resort ${tc.h.rating}★</p>
+                  <strong class="text-sm text-white font-heading block line-clamp-1">${tc.h.mysteryTitle || tc.h.title}</strong>
+                  <p class="text-[11px] text-slate-300 mt-0.5 line-clamp-1">✈️ ${tc.f.airline} • 🏨 Resort ${tc.h.rating}★ (${tc.h.temp}°C — ${tc.h.weather})</p>
                 </div>
 
                 <div class="pt-2 border-t border-white/10 flex items-center justify-between">
@@ -2077,28 +2132,44 @@ window.renderPackageUI = function(pkg) {
     window.updatePackingProgress();
   }
 
-  // Điền dữ liệu cho thẻ mở khóa ở Bước 4
-  if (document.getElementById("revCityName")) document.getElementById("revCityName").innerText = pkg.reveal.city;
-  if (document.getElementById("revComboTitle")) document.getElementById("revComboTitle").innerText = pkg.reveal.title;
+  // Điền dữ liệu cho thẻ mở khóa ở Bước 4 (Bảo mật 100% trước khi cào phong ấn)
+  if (pkg.isRevealed) {
+    if (document.getElementById("revCityName")) {
+      document.getElementById("revCityName").innerText = pkg.reveal.city;
+      document.getElementById("revCityName").className = "text-3xl md:text-4xl font-black golden-reveal-text mt-1.5 font-heading";
+    }
+    if (document.getElementById("revComboTitle")) document.getElementById("revComboTitle").innerText = pkg.reveal.title;
+    if (document.getElementById("revTransport")) document.getElementById("revTransport").innerText = pkg.reveal.transport;
+    if (document.getElementById("revHotel")) document.getElementById("revHotel").innerText = pkg.reveal.hotel;
+    if (document.getElementById("revDestAirportCode")) {
+      const codeMap = { "Phú Quốc": "PQC", "Đà Lạt": "DLI", "Nha Trang": "CXR", "Quy Nhơn": "UIH", "Huế": "HUI", "Măng Đen": "PXU / Măng Đen", "Đà Nẵng": "DAD" };
+      document.getElementById("revDestAirportCode").innerText = (codeMap[pkg.reveal.city] || "PQC") + " (" + pkg.reveal.city + ")";
+    }
+    if (document.getElementById("revFoodGuide")) {
+      document.getElementById("revFoodGuide").innerHTML = pkg.food.map(f => `<li>${f}</li>`).join("");
+    }
+  } else {
+    if (document.getElementById("revCityName")) {
+      document.getElementById("revCityName").innerText = "✦ ĐIỂM ĐẾN NIÊM PHONG SÁP ✦";
+      document.getElementById("revCityName").className = "text-xl md:text-2xl font-black text-amber-300 mt-1.5 font-heading";
+    }
+    if (document.getElementById("revComboTitle")) document.getElementById("revComboTitle").innerText = "(Mở khóa bằng cách cào thẻ hoặc bấm nút Mở Khóa Ngay tại sân bay)";
+    if (document.getElementById("revTransport")) document.getElementById("revTransport").innerText = `Chuyến bay khứ hồi ${pkg.flight?.airline || ''} (✈️ Sân bay bí mật)`;
+    if (document.getElementById("revHotel")) document.getElementById("revHotel").innerText = "Resort 5★ Tiêu Chuẩn Quốc Tế SLA (Niêm Phong Tên)";
+    if (document.getElementById("revDestAirportCode")) document.getElementById("revDestAirportCode").innerText = "??? (Sân Bay Bí Mật)";
+    if (document.getElementById("revFoodGuide")) {
+      document.getElementById("revFoodGuide").innerHTML = "<li class='italic text-amber-200'>Cẩm nang ẩm thực bản địa chuẩn giá sẽ mở khóa ngay khi bạn cào phá niêm phong sáp!</li>";
+    }
+  }
   if (document.getElementById("revSlaCode")) document.getElementById("revSlaCode").innerText = pkg.reveal.sla;
-  if (document.getElementById("revTransport")) document.getElementById("revTransport").innerText = pkg.reveal.transport;
-  if (document.getElementById("revHotel")) document.getElementById("revHotel").innerText = pkg.reveal.hotel;
   if (document.getElementById("revRoomType")) document.getElementById("revRoomType").innerText = pkg.reveal.room_type || "Deluxe Suite View Đẹp";
   if (document.getElementById("revPassengerName")) {
     const custName = document.getElementById("custName")?.value || pkg.customerName || "QUY KHACH WANDERMATCH";
     document.getElementById("revPassengerName").innerText = window.normVN(custName).toUpperCase();
   }
-  if (document.getElementById("revDestAirportCode")) {
-    const city = pkg.reveal.city || "";
-    const codeMap = { "Phú Quốc": "PQC", "Đà Lạt": "DLI", "Nha Trang": "CXR", "Quy Nhơn": "UIH", "Huế": "HUI", "Măng Đen": "PXU / Măng Đen", "Đà Nẵng": "DAD" };
-    document.getElementById("revDestAirportCode").innerText = (codeMap[city] || "PQC") + " (" + city + ")";
-  }
   if (document.getElementById("revRetailPrice")) document.getElementById("revRetailPrice").innerText = window.formatVND(pkg.reveal.retail);
   if (document.getElementById("revPaidPrice")) document.getElementById("revPaidPrice").innerText = window.formatVND(pkg.reveal.paid);
   if (document.getElementById("revSavings")) document.getElementById("revSavings").innerText = "+" + window.formatVND(pkg.reveal.savings);
-  if (document.getElementById("revFoodGuide")) {
-    document.getElementById("revFoodGuide").innerHTML = pkg.food.map(f => `<li>${f}</li>`).join("");
-  }
 };
 
 window.runDualAIAudit = function() {
@@ -2538,6 +2609,18 @@ window.revealDestinationNow = function() {
       cityEl.className = "text-3xl md:text-4xl font-black golden-reveal-text mt-1.5 font-heading";
     }
 
+    const comboEl = document.getElementById("revComboTitle");
+    if (comboEl) comboEl.innerText = pkg.reveal.title;
+
+    const hotelEl = document.getElementById("revHotel");
+    if (hotelEl) hotelEl.innerText = pkg.reveal.hotel;
+
+    const transportEl = document.getElementById("revTransport");
+    if (transportEl) transportEl.innerText = pkg.reveal.transport;
+
+    const foodEl = document.getElementById("revFoodGuide");
+    if (foodEl) foodEl.innerHTML = pkg.food.map(f => `<li>${f}</li>`).join("");
+
     // Cập nhật tên hành khách và mã sân bay trên Boarding pass
     const custName = document.getElementById("custName")?.value || pkg.customerName || "QUY KHACH WANDERMATCH";
     const passNameEl = document.getElementById("revPassengerName");
@@ -2548,6 +2631,9 @@ window.revealDestinationNow = function() {
       const codeMap = { "Phú Quốc": "PQC", "Đà Lạt": "DLI", "Nha Trang": "CXR", "Quy Nhơn": "UIH", "Huế": "HUI", "Măng Đen": "PXU / Măng Đen", "Đà Nẵng": "DAD" };
       destCodeEl.innerText = (codeMap[pkg.reveal.city] || "PQC") + " (" + pkg.reveal.city + ")";
     }
+
+    // Đồng bộ lại thẻ Passport trong Tab Saved
+    window.renderSavedTab();
 
     window.showToast(`🎉 CHÚC MỪNG! Điểm đến bí mật chính thức của bạn là: ${pkg.reveal.city}!`, "success");
   }
@@ -2868,7 +2954,7 @@ window.renderSavedTab = function() {
               <img src="${(x.reveal && x.reveal.img) || 'https://images.unsplash.com/photo-1540555700478-4be289fbecef'}" class="w-full h-full object-cover" alt="Preview" />
             </div>
             <div class="space-y-0.5 flex-1 text-xs">
-              <strong class="text-white block font-heading">${x.reveal.title || 'Kỳ nghỉ bí mật 3N2Đ'}</strong>
+              <strong class="text-white block font-heading">${x.isRevealed ? (x.reveal.title || 'Kỳ nghỉ 3N2Đ') : ((x.hotel && x.hotel.mysteryTitle) || 'Kỳ Nghỉ Bí Mật 3N2Đ')}</strong>
               <div class="flex items-center gap-2">
                 <span class="text-teal-300 font-extrabold font-mono text-sm">${window.formatVND(x.reveal.paid)}</span>
                 <span class="text-[10px] text-amber-400 font-bold">(Tiết kiệm ${window.formatVND(x.reveal.savings)})</span>
@@ -2918,7 +3004,7 @@ window.renderSavedTab = function() {
               <img src="${(x.reveal && x.reveal.img) || 'https://images.unsplash.com/photo-1566073771259-6a8506099945'}" class="w-full h-full object-cover" alt="Resort" />
             </div>
             <div class="space-y-1 flex-1">
-              <h4 class="text-white font-bold text-sm font-heading">${x.isRevealed ? x.reveal.city + ' — ' + x.reveal.hotel : 'Điểm Đến Bí Mật (Đã Niêm Phong)'}</h4>
+              <h4 class="text-white font-bold text-sm font-heading">${x.isRevealed ? x.reveal.city + ' — ' + x.reveal.hotel : '✦ ĐIỂM ĐẾN BÍ MẬT ĐANG NIÊM PHONG SÁP ✦'}</h4>
               <p class="text-slate-300 text-xs">${x.flightLabel || 'Chuyến bay khứ hồi chuẩn SLA'}</p>
               <div class="flex flex-wrap items-center gap-3 text-[11px] text-slate-400 pt-0.5">
                 <span>Hành khách: <strong class="text-white">${x.customerName || 'Quý khách'}</strong></span>
@@ -2990,9 +3076,16 @@ window.renderB2BTab = function() {
   if (!b2bList) return;
 
   const city = window.currentB2BCityFilter || "ALL";
-  const filtered = city === "ALL"
-    ? window.HOTELS_DB
-    : window.HOTELS_DB.filter(h => h.city === city);
+  let filtered = window.HOTELS_DB;
+  if (city === "HIGHLAND") {
+    filtered = window.HOTELS_DB.filter(h => ["Đà Lạt", "Măng Đen", "Sapa"].includes(h.city));
+  } else if (city === "BEACH") {
+    filtered = window.HOTELS_DB.filter(h => ["Quy Nhơn", "Phú Quốc", "Côn Đảo"].includes(h.city));
+  } else if (city === "HERITAGE") {
+    filtered = window.HOTELS_DB.filter(h => ["Huế"].includes(h.city));
+  } else if (city !== "ALL") {
+    filtered = window.HOTELS_DB.filter(h => h.city === city);
+  }
 
   b2bList.innerHTML = filtered.map(h => `
     <div class="bg-slate-900/90 rounded-3xl border border-white/10 overflow-hidden hover:border-teal-500/40 transition text-xs shadow-2xl flex flex-col justify-between group">
@@ -3116,7 +3209,7 @@ window.createPackageFromB2B = function(hotelId) {
   window.goToStep(1);
   const resultBox = document.getElementById("recommendationResultBox");
   if (resultBox) resultBox.scrollIntoView({ behavior: "smooth", block: "start" });
-  window.showToast(`🎉 Đã thiết lập thành công gói du lịch từ Quỹ phòng đối tác: ${hotel.name}!`);
+  window.showToast(`🎉 Đã thiết lập thành công gói du lịch từ Quỹ phòng đối tác: ${hotel.mysteryStayLabel || hotel.name}!`);
 };
 
 // ============================================================================

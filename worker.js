@@ -366,7 +366,7 @@ function executeOTABlindAlgorithms(payload, sessionId = "default") {
     utilityScore: picked.utilityScore,
     budgetUtilization: picked.budgetUtilization,
     aiEngineUsed: "4 Thuật Toán OTA (Knapsack + Cosine + Tabu Cooldown)",
-    aiReasoningLog: `[Knapsack Optimizer: Đạt ${picked.budgetUtilization}% ngân sách | Cosine Match: ${picked.simScore}%] Gói combo tối ưu: vé bay ${picked.flight.flight_id} (${picked.flight.airline}) + ${picked.hotel.rating}★ ${picked.hotel.hotel_name} (${picked.comboCostPerPerson.toLocaleString("vi-VN")}đ/khách, tiết kiệm ${savingsVnd.toLocaleString("vi-VN")}đ). Bộ nhớ Tabu đã kích hoạt chống trùng lặp [${recentCities.slice(-2).join(" → ") || "Mới"}].`,
+    aiReasoningLog: `[Knapsack Optimizer: Đạt ${picked.budgetUtilization}% ngân sách | Cosine Match: ${picked.simScore}%] Gói combo tối ưu: vé bay khứ hồi ${picked.flight.airline} + Resort ${picked.hotel.rating}★ chuẩn SLA quốc tế (${picked.comboCostPerPerson.toLocaleString("vi-VN")}đ/khách, tiết kiệm ${savingsVnd.toLocaleString("vi-VN")}đ nhờ quỹ phòng ẩn danh OTA Wholesale). Đã niêm phong sáp bảo mật điểm đến.`,
     weatherTempC: picked.hotel.weather_temp_c,
     weatherDesc: picked.hotel.weather_desc,
     mysteryHint: picked.hotel.hint,
