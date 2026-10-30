@@ -949,6 +949,24 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
   }
   combos.sort((a, b) => b.util - a.util);
 
+  // Thu thập top 3 combo tiêu biểu khác nhau về thành phố/resort để so sánh
+  let topCombos = [];
+  const seenCitySet = new Set();
+  combos.forEach(c => {
+    if (!seenCitySet.has(c.h.city) && topCombos.length < 3) {
+      seenCitySet.add(c.h.city);
+      topCombos.push(c);
+    }
+  });
+  if (topCombos.length < 3) {
+    combos.forEach(c => {
+      if (topCombos.length < 3 && !topCombos.some(tc => tc.comboId === c.comboId)) {
+        topCombos.push(c);
+      }
+    });
+  }
+  window.currentTopCombos = topCombos;
+
   // 3. Chống trùng lặp lịch sử
   let chosen = combos[0];
   if (avoidRepeat && combos.length > 1) {
@@ -1297,14 +1315,29 @@ window.switchResortImage = function(idx) {
   window.currentActiveImageIdx = idx;
   const pkg = window.loadStore("wm_draft_prod", null);
   if (!pkg || !pkg.reveal || !pkg.reveal.gallery) return;
+  const gallery = pkg.reveal.gallery;
+  if (!gallery[idx]) return;
   
   const heroImg = document.getElementById("resortHeroImg");
-  if (heroImg && pkg.reveal.gallery[idx]) {
-    heroImg.style.opacity = "0.4";
-    heroImg.src = pkg.reveal.gallery[idx];
+  const counterEl = document.getElementById("resortImageCounter");
+  const captions = [
+    "Toàn Cảnh Resort & Cảnh Quan",
+    "Phòng Nghỉ Deluxe View Đẹp",
+    "Hồ Bơi Vô Cực & Tiện Ích Thư Giãn"
+  ];
+
+  if (heroImg) {
+    heroImg.style.opacity = "0.3";
+    heroImg.style.transform = "scale(0.98)";
     setTimeout(() => {
+      heroImg.src = gallery[idx];
       heroImg.style.opacity = "1";
+      heroImg.style.transform = "scale(1)";
     }, 150);
+  }
+
+  if (counterEl) {
+    counterEl.innerText = `📷 ${idx + 1}/${gallery.length} • ${captions[idx] || 'Ảnh thực tế'}`;
   }
 
   // Cập nhật viền cho thumbnail buttons
@@ -1312,12 +1345,219 @@ window.switchResortImage = function(idx) {
     const btn = document.getElementById("thumbBtn_" + i);
     if (btn) {
       if (i === idx) {
-        btn.className = "flex-1 py-1.5 px-2 rounded-xl text-[11px] font-extrabold bg-teal-500 text-slate-950 border border-teal-300 shadow transition";
+        btn.className = "flex-1 py-2 px-3 rounded-xl text-xs font-black bg-teal-500 text-slate-950 border border-teal-300 shadow-lg transition flex items-center justify-center gap-1.5 transform scale-[1.02]";
       } else {
-        btn.className = "flex-1 py-1.5 px-2 rounded-xl text-[11px] font-bold bg-slate-900/90 text-slate-300 border border-white/20 hover:bg-slate-800 transition";
+        btn.className = "flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-slate-900/90 text-slate-300 border border-white/10 hover:border-white/30 hover:bg-slate-800 transition flex items-center justify-center gap-1.5";
       }
     }
   });
+};
+
+window.nextResortImage = function() {
+  const pkg = window.loadStore("wm_draft_prod", null);
+  const gallery = (pkg && pkg.reveal && pkg.reveal.gallery) || [];
+  if (!gallery.length) return;
+  const nextIdx = ((window.currentActiveImageIdx || 0) + 1) % gallery.length;
+  window.switchResortImage(nextIdx);
+};
+
+window.prevResortImage = function() {
+  const pkg = window.loadStore("wm_draft_prod", null);
+  const gallery = (pkg && pkg.reveal && pkg.reveal.gallery) || [];
+  if (!gallery.length) return;
+  const prevIdx = ((window.currentActiveImageIdx || 0) - 1 + gallery.length) % gallery.length;
+  window.switchResortImage(prevIdx);
+};
+
+// ============================================================================
+// CHUYỂN ĐỔI NHANH 3 PHƯƠNG ÁN TỐI ƯU (TOP 3 CURATED ALTERNATIVE COMBOS)
+// ============================================================================
+window.selectComboAlternative = function(idx) {
+  if (!window.currentTopCombos || !window.currentTopCombos[idx]) return;
+  const chosen = window.currentTopCombos[idx];
+  const inp = window.getFormInputs();
+  const code = "WM" + Math.floor(10000 + Math.random() * 90000);
+  const totalPaid = chosen.unitCost * inp.groupSize;
+  const totalRetail = chosen.unitRetail * inp.groupSize;
+  const savings = totalRetail - totalPaid;
+
+  const qrs = Array.from({ length: inp.groupSize }, (_, i) => ({
+    idx: i + 1,
+    amount: chosen.unitCost,
+    memo: `${code} KH${i + 1}`,
+    url: `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${chosen.unitCost}&addInfo=${encodeURIComponent(`${code} KH${i + 1}`)}&accountName=${encodeURIComponent("CONG TY TNHH WANDERMATCH VN")}`
+  }));
+
+  const reasoningLog = `[Lựa chọn trực tiếp phương án #${idx + 1}]: Khách hàng đã chuyển sang gói ${chosen.h.rating}★ ${chosen.h.name} (${chosen.h.city}). Độ tương thích ${chosen.sim}%, tối ưu ${chosen.knapsackRatio}% ngân sách. Tiết kiệm ${window.formatVND(savings)}.`;
+
+  const newPkg = {
+    code, 
+    comboId: chosen.comboId, 
+    isLocked: false, 
+    isRevealed: false,
+    matchScore: chosen.sim, 
+    utilityScore: chosen.util,
+    knapsackRatio: chosen.knapsackRatio,
+    reasoningLog,
+    temp: chosen.h.temp, 
+    weather: chosen.h.weather,
+    hint: chosen.h.hint, 
+    packing: chosen.h.packing, 
+    food: chosen.h.food, 
+    days: chosen.h.days, 
+    reviews: chosen.h.reviews || [],
+    flight: chosen.f,
+    hotel: chosen.h,
+    qrs,
+    flightLabel: `Khứ hồi ${chosen.f.airline} (${chosen.f.time})`,
+    hotelLabel: `Resort ${chosen.h.rating}★ tiêu chuẩn quốc tế (Kèm buffet sáng & xe đưa đón)`,
+    reveal: {
+      city: chosen.h.city, 
+      title: chosen.h.title, 
+      sla: chosen.h.sla,
+      room_type: chosen.h.room_type,
+      img: chosen.h.img,
+      gallery: chosen.h.gallery || [chosen.h.img],
+      room_specs: chosen.h.room_specs,
+      amenities: chosen.h.amenities,
+      transport: `${chosen.f.id} - ${chosen.f.airline} (${chosen.f.time})`,
+      hotel: chosen.h.name, 
+      paid: totalPaid, 
+      retail: totalRetail, 
+      savings
+    }
+  };
+
+  window.saveStore("wm_draft_prod", newPkg);
+  window.renderPackageUI(newPkg);
+  window.showToast(`Đã chuyển sang phương án #${idx + 1}: ${chosen.h.title} (Khớp ${chosen.sim}%)!`);
+};
+
+// ============================================================================
+// GIỌNG ĐỌC AI ĐỌC THƠ BÍ MẬT (WEB SPEECH SYNTHESIS)
+// ============================================================================
+window.isSpeakingHint = false;
+window.speakMysteryHint = function() {
+  const pkg = window.loadStore("wm_draft_prod", null);
+  if (!pkg || !pkg.hint) return;
+
+  const synth = window.speechSynthesis;
+  if (!synth) {
+    window.showToast("Trình duyệt không hỗ trợ tổng hợp giọng nói!");
+    return;
+  }
+
+  const btn = document.getElementById("btnSpeakHint");
+  const hintTextEl = document.getElementById("mysteryHintParagraph");
+
+  if (window.isSpeakingHint) {
+    synth.cancel();
+    window.isSpeakingHint = false;
+    if (btn) btn.innerHTML = `<span>🔊</span> <span>Nghe AI Đọc Thơ Bí Mật</span>`;
+    if (hintTextEl) hintTextEl.classList.remove("text-amber-200", "scale-[1.01]");
+    return;
+  }
+
+  synth.cancel();
+  const utter = new SpeechSynthesisUtterance(pkg.hint);
+  utter.lang = "vi-VN";
+  utter.rate = 0.92;
+  utter.pitch = 1.0;
+
+  const voices = synth.getVoices();
+  const viVoice = voices.find(v => v.lang.includes("vi") || v.lang.includes("VN"));
+  if (viVoice) utter.voice = viVoice;
+
+  utter.onstart = () => {
+    window.isSpeakingHint = true;
+    if (btn) btn.innerHTML = `<span class="animate-pulse text-amber-300">⏹</span> <span class="text-amber-300">Đang đọc thơ... (Bấm dừng)</span>`;
+    if (hintTextEl) hintTextEl.classList.add("text-amber-200", "scale-[1.01]");
+  };
+
+  utter.onend = () => {
+    window.isSpeakingHint = false;
+    if (btn) btn.innerHTML = `<span>🔊</span> <span>Nghe Lại Thơ Bí Mật</span>`;
+    if (hintTextEl) hintTextEl.classList.remove("text-amber-200", "scale-[1.01]");
+  };
+
+  utter.onerror = () => {
+    window.isSpeakingHint = false;
+    if (btn) btn.innerHTML = `<span>🔊</span> <span>Nghe AI Đọc Thơ Bí Mật</span>`;
+  };
+
+  synth.speak(utter);
+};
+
+// ============================================================================
+// HIỆU ỨNG PHÁO HOA CHÚC MỪNG MỞ KHÓA ĐIỂM ĐẾN (CANVAS CONFETTI CANNON)
+// ============================================================================
+window.launchConfetti = function() {
+  const existing = document.getElementById("confettiCanvas");
+  if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+
+  const canvas = document.createElement("canvas");
+  canvas.id = "confettiCanvas";
+  canvas.style.position = "fixed";
+  canvas.style.top = "0";
+  canvas.style.left = "0";
+  canvas.style.width = "100vw";
+  canvas.style.height = "100vh";
+  canvas.style.zIndex = "999999";
+  canvas.style.pointerEvents = "none";
+  document.body.appendChild(canvas);
+
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const colors = ["#2dd4bf", "#f59e0b", "#38bdf8", "#ec4899", "#a855f7", "#10b981", "#fbbf24", "#e0e7ff"];
+  const pieces = Array.from({ length: 90 }, () => ({
+    x: canvas.width / 2 + (Math.random() - 0.5) * 320,
+    y: canvas.height / 2 - 60,
+    vx: (Math.random() - 0.5) * 18,
+    vy: (Math.random() - 0.8) * 16,
+    size: Math.random() * 8 + 5,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    rotation: Math.random() * 360,
+    rSpeed: (Math.random() - 0.5) * 10,
+    opacity: 1
+  }));
+
+  let animFrame = null;
+  const start = Date.now();
+
+  function render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const elapsed = Date.now() - start;
+
+    pieces.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.38;
+      p.vx *= 0.985;
+      p.rotation += p.rSpeed;
+      if (elapsed > 1800) {
+        p.opacity = Math.max(0, p.opacity - 0.02);
+      }
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rotation * Math.PI) / 180);
+      ctx.globalAlpha = p.opacity;
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 1.6);
+      ctx.restore();
+    });
+
+    if (elapsed < 3500) {
+      animFrame = requestAnimationFrame(render);
+    } else {
+      cancelAnimationFrame(animFrame);
+      if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
+    }
+  }
+
+  render();
 };
 
 // ============================================================================
@@ -1344,6 +1584,13 @@ window.renderPackageUI = function(pkg) {
     otp: "98.9% Đúng giờ",
     luggage: "20kg ký gửi + 7kg xách tay"
   };
+
+  // Mẹo thổ địa bí truyền theo từng ngày
+  const insiderTips = [
+    "💡 Mẹo thổ địa ngày 1: Hãy yêu cầu phòng tầng cao hướng biển/đồi khi check-in để ngắm trọn hoàng hôn mà không bị che khuất tầm nhìn.",
+    "💡 Mẹo thổ địa ngày 2: Khung giờ vàng 05:30 - 06:45 sáng là thời điểm đẹp nhất để săn mây hoặc ngắm bình minh đại dương vắng người, chụp ảnh siêu nét.",
+    "💡 Mẹo thổ địa ngày 3: Mua đặc sản tại các cửa hàng OCOP địa phương chuẩn giá niêm yết để tránh bị đội giá tại các quầy du lịch vãng lai."
+  ];
 
   resultBox.innerHTML = `
     <div class="bg-slate-950/95 border-2 border-teal-500/40 rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl relative overflow-hidden transition-all duration-300">
@@ -1379,44 +1626,70 @@ window.renderPackageUI = function(pkg) {
         </div>
       </div>
 
-      <!-- GALLERY ẢNH RESORT ĐA GÓC NHÌN (INTERACTIVE THUMBNAIL SWITCHER) -->
+      <!-- GALLERY ẢNH RESORT ĐA GÓC NHÌN (INTERACTIVE THUMBNAIL SWITCHER KÈM NÚT ĐIỀU HƯỚNG) -->
       <div class="space-y-3">
-        <div class="relative rounded-2xl overflow-hidden h-72 md:h-80 border border-white/15 shadow-xl group">
-          <img id="resortHeroImg" src="${gallery[0]}" alt="Resort Preview" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+        <div class="relative rounded-3xl overflow-hidden h-80 md:h-96 border border-white/15 shadow-2xl group">
+          <img id="resortHeroImg" src="${gallery[0]}" alt="Resort Preview" class="w-full h-full object-cover fade-img-transition group-hover:scale-105" />
           <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
           
+          <!-- NÚT PREV / NEXT TRÊN ẢNH CHÍNH -->
+          <button type="button" onclick="window.prevResortImage()" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/75 hover:bg-teal-500 hover:text-slate-950 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition shadow-xl z-10 cursor-pointer">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <button type="button" onclick="window.nextResortImage()" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/75 hover:bg-teal-500 hover:text-slate-950 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition shadow-xl z-10 cursor-pointer">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+          </button>
+
+          <!-- BADGES GÓC TRÊN -->
           <div class="absolute top-4 left-4 flex flex-wrap gap-2">
-            <span class="text-xs px-3 py-1 rounded-full bg-slate-900/90 text-amber-400 font-extrabold border border-amber-400/40 backdrop-blur-md flex items-center gap-1 shadow">
-              ★ ${pkg.hotel ? pkg.hotel.rating : 4.95}/5 (Tiêu chuẩn 5 Sao Quốc Tế)
+            <span class="text-xs px-3.5 py-1.5 rounded-full bg-slate-950/85 text-amber-300 font-extrabold border border-amber-400/40 backdrop-blur-md flex items-center gap-1.5 shadow-lg">
+              <span>★</span> ${(pkg.hotel && pkg.hotel.rating) || 4.95}/5 (Chuẩn 5 Sao Quốc Tế)
             </span>
-            <span class="text-xs px-3 py-1 rounded-full bg-teal-950/90 text-teal-300 font-bold border border-teal-400/40 backdrop-blur-md shadow">
-              🛡️ Cam Kết Dịch Vụ SLA: ${pkg.reveal.sla}
+            <span class="text-xs px-3.5 py-1.5 rounded-full bg-teal-950/85 text-teal-300 font-bold border border-teal-400/40 backdrop-blur-md shadow-lg flex items-center gap-1.5">
+              <span>🛡️</span> Cam Kết SLA: ${pkg.reveal.sla}
             </span>
           </div>
 
-          <div class="absolute bottom-4 left-4 right-4 flex flex-wrap justify-between items-end gap-2">
+          <div class="absolute top-4 right-4">
+            <span id="resortImageCounter" class="text-xs px-3.5 py-1.5 rounded-full bg-slate-950/85 text-slate-200 font-mono font-bold border border-white/20 backdrop-blur-md shadow-lg">
+              📷 1/${gallery.length} • Toàn Cảnh Resort & Cảnh Quan
+            </span>
+          </div>
+
+          <!-- THÔNG TIN ĐÁY ẢNH & TIỆN ÍCH 5 SAO -->
+          <div class="absolute bottom-4 left-4 right-4 space-y-2">
             <div>
               <span class="text-[11px] text-teal-300 uppercase tracking-widest font-black block">Resort Nghỉ Dưỡng Đối Tác Phút Chót</span>
-              <h4 class="text-lg md:text-xl font-extrabold text-white font-heading mt-0.5">${pkg.reveal.hotel}</h4>
+              <h4 class="text-xl md:text-2xl font-black text-white font-heading mt-0.5">${pkg.reveal.hotel}</h4>
               <p class="text-xs text-slate-300 mt-0.5">${pkg.reveal.room_type} — Kèm Buffet Sáng Quốc Tế Miễn Phí</p>
             </div>
-            <div class="flex flex-wrap gap-1.5">
-              ${(pkg.reveal.amenities || []).slice(0, 3).map(a => `
-                <span class="text-[10px] px-2.5 py-1 rounded-lg bg-white/15 backdrop-blur-md text-white font-medium border border-white/20">${a}</span>
-              `).join("")}
+            
+            <div class="flex flex-wrap gap-2 pt-1">
+              <span class="text-[11px] px-3 py-1 rounded-xl bg-slate-950/80 backdrop-blur-md text-amber-300 font-semibold border border-amber-400/30 flex items-center gap-1.5">
+                <span>🏊</span> Hồ Bơi Vô Cực View Đẹp
+              </span>
+              <span class="text-[11px] px-3 py-1 rounded-xl bg-slate-950/80 backdrop-blur-md text-teal-300 font-semibold border border-teal-400/30 flex items-center gap-1.5">
+                <span>🍳</span> Buffet Sáng Á - Âu 60+ Món
+              </span>
+              <span class="text-[11px] px-3 py-1 rounded-xl bg-slate-950/80 backdrop-blur-md text-sky-300 font-semibold border border-sky-400/30 flex items-center gap-1.5">
+                <span>💆</span> Liệu Trình Spa Thảo Mộc
+              </span>
+              <span class="text-[11px] px-3 py-1 rounded-xl bg-slate-950/80 backdrop-blur-md text-purple-300 font-semibold border border-purple-400/30 flex items-center gap-1.5">
+                <span>🚗</span> Buggy & Xe Đón Tiễn 24/7
+              </span>
             </div>
           </div>
         </div>
 
         <!-- 3 NÚT CHỌN GÓC ẢNH CHỤP THỰC TẾ -->
         <div class="flex gap-2">
-          <button id="thumbBtn_0" onclick="window.switchResortImage(0)" class="flex-1 py-1.5 px-2 rounded-xl text-[11px] font-extrabold bg-teal-500 text-slate-950 border border-teal-300 shadow transition flex items-center justify-center gap-1.5">
+          <button id="thumbBtn_0" onclick="window.switchResortImage(0)" class="flex-1 py-2 px-3 rounded-xl text-xs font-black bg-teal-500 text-slate-950 border border-teal-300 shadow-lg transition flex items-center justify-center gap-1.5 transform scale-[1.02]">
             <span>📷 Góc 1:</span> Toàn Cảnh Resort & Cảnh Quan
           </button>
-          <button id="thumbBtn_1" onclick="window.switchResortImage(1)" class="flex-1 py-1.5 px-2 rounded-xl text-[11px] font-bold bg-slate-900/90 text-slate-300 border border-white/20 hover:bg-slate-800 transition flex items-center justify-center gap-1.5">
+          <button id="thumbBtn_1" onclick="window.switchResortImage(1)" class="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-slate-900/90 text-slate-300 border border-white/10 hover:border-white/30 hover:bg-slate-800 transition flex items-center justify-center gap-1.5">
             <span>🛏️ Góc 2:</span> Phòng Nghỉ Deluxe View Đẹp
           </button>
-          <button id="thumbBtn_2" onclick="window.switchResortImage(2)" class="flex-1 py-1.5 px-2 rounded-xl text-[11px] font-bold bg-slate-900/90 text-slate-300 border border-white/20 hover:bg-slate-800 transition flex items-center justify-center gap-1.5">
+          <button id="thumbBtn_2" onclick="window.switchResortImage(2)" class="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-slate-900/90 text-slate-300 border border-white/10 hover:border-white/30 hover:bg-slate-800 transition flex items-center justify-center gap-1.5">
             <span>🏊 Góc 3:</span> Hồ Bơi & Tiện Ích Thư Giãn
           </button>
         </div>
@@ -1474,7 +1747,7 @@ window.renderPackageUI = function(pkg) {
         </h4>
         <div class="space-y-1.5 text-slate-300">
           <div class="flex justify-between">
-            <span>Vé máy bay khứ hồi (Hãng hàng không quốc gia):</span>
+            <span>Vé máy bay khứ hồi (${flight.airline}):</span>
             <strong class="text-white font-mono">${window.formatVND(Math.round(pkg.reveal.paid * 0.45))}</strong>
           </div>
           <div class="flex justify-between">
@@ -1496,15 +1769,91 @@ window.renderPackageUI = function(pkg) {
         </div>
       </div>
 
-      <!-- BỨC THƯ BẬT MÍ KHÔNG GIAN BÍ MẬT -->
-      <div class="bg-gradient-to-r from-amber-500/15 via-teal-500/10 to-indigo-500/15 border-2 border-amber-400/40 p-5 rounded-3xl relative">
-        <div class="flex items-center gap-2 text-amber-300 font-extrabold text-xs uppercase tracking-wider">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
-          <span>Thư Gợi Ý Không Gian Điểm Đến Bí Mật (Đã Niêm Phong Tên Thành Phố)</span>
+      <!-- BỨC THƯ GỢI Ý KHÔNG GIAN BÍ MẬT (ROYAL WAX ENVELOPE DẬP NỔI WM & GIỌNG ĐỌC AI) -->
+      <div class="relative bg-gradient-to-r from-amber-950/35 via-slate-900/95 to-amber-950/25 border-2 border-amber-400/50 p-6 md:p-7 rounded-3xl shadow-2xl overflow-hidden group">
+        <div class="absolute -right-8 -bottom-8 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-amber-400/20 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="wax-seal-stamp">WM</div>
+            <div>
+              <span class="text-[10px] text-amber-400/80 font-mono uppercase tracking-widest font-black block">Royal Secret Wax Seal</span>
+              <h4 class="text-sm font-extrabold text-amber-300 font-heading tracking-wide">Bức Thư Gợi Ý Không Gian Điểm Đến Bí Mật</h4>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-mono px-2.5 py-1 rounded-lg bg-amber-400/15 text-amber-300 border border-amber-400/30 font-bold">
+              ĐÃ NIÊM PHONG TÊN THÀNH PHỐ
+            </span>
+            <button id="btnSpeakHint" type="button" onclick="window.speakMysteryHint()" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-400/40 transition flex items-center gap-1.5 shadow cursor-pointer">
+              <span>🔊</span> <span>Nghe AI Đọc Thơ Bí Mật</span>
+            </button>
+          </div>
         </div>
-        <p class="text-sm md:text-base text-white mt-2 leading-relaxed italic font-serif">
-          "${pkg.hint}"
-        </p>
+
+        <div class="mt-4 p-4 rounded-2xl bg-slate-950/70 border border-amber-400/20">
+          <p id="mysteryHintParagraph" class="text-base md:text-lg text-amber-100 font-serif italic leading-relaxed tracking-wide text-center">
+            "${pkg.hint}"
+          </p>
+        </div>
+        
+        <div class="flex flex-wrap items-center justify-between mt-3 text-[11px] text-slate-400 gap-2">
+          <span class="italic">💡 Gợi ý: Hãy lắng nghe vi khí hậu và cảm giác để phỏng đoán điểm đến trước ngày khởi hành!</span>
+          <span class="text-amber-400/90 font-mono font-bold">Hệ thống mở khóa tại sân bay</span>
+        </div>
+      </div>
+
+      <!-- SO SÁNH 3 PHƯƠNG ÁN TỐI ƯU ĐƯỢC CHỌN LỌC RIÊNG CHO BẠN (TOP 3 CURATED ALTERNATIVES) -->
+      <div class="space-y-3 pt-2">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+          <div>
+            <h4 class="text-sm font-extrabold text-white uppercase tracking-wider font-heading flex items-center gap-2">
+              <span class="text-amber-400">✨</span>
+              <span>So Sánh 3 Phương Án Tối Ưu Được Chọn Lọc Riêng Cho Bạn</span>
+            </h4>
+            <p class="text-[11px] text-slate-400">Bạn có thể linh hoạt chuyển đổi giữa 3 phong cách nghỉ dưỡng cao cấp mà không cần cấu hình lại.</p>
+          </div>
+          <span class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-teal-500/15 text-teal-300 border border-teal-500/30">
+            Knapsack Optimal Pool
+          </span>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-3">
+          ${(window.currentTopCombos || []).map((tc, cIdx) => {
+            const isCurrent = tc.comboId === pkg.comboId;
+            return `
+              <div class="relative p-4 rounded-2xl transition-all duration-300 ${isCurrent ? 'bg-gradient-to-b from-teal-950/60 to-slate-900/90 border-2 border-teal-400 shadow-xl shadow-teal-500/20' : 'bg-slate-900/70 border border-white/10 hover:border-white/30 hover:bg-slate-900/90'} flex flex-col justify-between space-y-3">
+                <div>
+                  <div class="flex items-center justify-between text-xs mb-1.5">
+                    <span class="text-[10px] px-2 py-0.5 rounded-full ${isCurrent ? 'bg-teal-400 text-slate-950 font-black' : 'bg-white/10 text-slate-300 font-mono'}">
+                      ${isCurrent ? '✓ ĐANG CHỌN' : 'Phương Án #' + (cIdx + 1)}
+                    </span>
+                    <span class="text-amber-300 font-bold font-mono text-[11px]">${tc.sim}% Tương Thích</span>
+                  </div>
+                  <strong class="text-sm text-white font-heading block line-clamp-1">${tc.h.title}</strong>
+                  <p class="text-[11px] text-slate-300 mt-0.5 line-clamp-1">✈️ ${tc.f.airline} • 🏨 Resort ${tc.h.rating}★</p>
+                </div>
+
+                <div class="pt-2 border-t border-white/10 flex items-center justify-between">
+                  <div>
+                    <span class="text-[10px] text-slate-400 block font-semibold">Trọn gói/khách</span>
+                    <strong class="text-sm font-extrabold text-teal-300 font-mono">${window.formatVND(tc.unitCost)}</strong>
+                  </div>
+                  ${isCurrent ? `
+                    <span class="px-3 py-1.5 rounded-xl bg-teal-500/20 text-teal-300 text-xs font-bold border border-teal-400/40">
+                      Đang Xem ✓
+                    </span>
+                  ` : `
+                    <button type="button" onclick="window.selectComboAlternative(${cIdx})" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-teal-500 hover:text-slate-950 text-white text-xs font-bold border border-white/20 transition flex items-center gap-1 shadow cursor-pointer">
+                      <span>Chọn Gói Này</span>
+                      <span>→</span>
+                    </button>
+                  `}
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
       </div>
 
       <!-- PHÒNG THÍ NGHIỆM ĐA TRÍ TUỆ NHÂN TẠO (DUAL-AI INTELLIGENCE CHAMBER: GEMINI + CLOUDFLARE AI) -->
@@ -1517,7 +1866,7 @@ window.renderPackageUI = function(pkg) {
               <span class="text-[10px] px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 font-mono">Gemini Flash + Cloudflare AI</span>
             </h4>
           </div>
-          <button id="btnDualAIAudit" onclick="window.runDualAIAudit()" class="px-3.5 py-1.5 rounded-xl text-[11px] font-bold bg-white/10 hover:bg-white/15 text-teal-300 border border-teal-500/30 transition flex items-center gap-1.5">
+          <button id="btnDualAIAudit" onclick="window.runDualAIAudit()" class="px-3.5 py-1.5 rounded-xl text-[11px] font-bold bg-white/10 hover:bg-white/15 text-teal-300 border border-teal-500/30 transition flex items-center gap-1.5 cursor-pointer">
             <svg class="w-3.5 h-3.5 animate-spin hidden" id="spinDualAI" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
             <span id="txtDualAIBtn">⚡ Chạy Kiểm Định Song Song Dual-AI</span>
           </button>
@@ -1588,7 +1937,7 @@ window.renderPackageUI = function(pkg) {
         <!-- 3 TABS NGÀY PHONG CÁCH AIRBNB / LUXURY OTA -->
         <div class="flex flex-wrap gap-2 p-1 bg-slate-900/90 rounded-2xl border border-white/10">
           ${pkg.days.map((d, idx) => `
-            <button id="itinDayTab_${idx}" onclick="window.switchItineraryDay(${idx})" class="flex-1 py-2.5 px-3 rounded-xl font-${idx === 0 ? 'extrabold bg-teal-500 text-slate-950 border border-teal-300 shadow-md' : 'semibold bg-slate-900/80 text-slate-400 hover:text-white border border-white/10'} text-xs transition flex items-center justify-center gap-1.5">
+            <button id="itinDayTab_${idx}" onclick="window.switchItineraryDay(${idx})" class="flex-1 py-2.5 px-3 rounded-xl font-${idx === 0 ? 'extrabold bg-teal-500 text-slate-950 border border-teal-300 shadow-md' : 'semibold bg-slate-900/80 text-slate-400 hover:text-white border border-white/10'} text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
               <span>${idx === 0 ? '🌅' : (idx === 1 ? '🌟' : '🌿')}</span>
               <span>${d.d.split(':')[0] || 'Ngày ' + (idx + 1)}</span>
             </button>
@@ -1598,7 +1947,7 @@ window.renderPackageUI = function(pkg) {
         <!-- NỘI DUNG TIMELINE CỦA TỪNG NGÀY -->
         <div class="space-y-3">
           ${pkg.days.map((d, idx) => `
-            <div id="itinDayContent_${idx}" style="display: ${idx === 0 ? 'block' : 'none'};" class="space-y-4 p-5 bg-slate-900/90 rounded-2xl border border-teal-500/30 shadow-xl">
+            <div id="itinDayContent_${idx}" style="display: ${idx === 0 ? 'block' : 'none'};" class="space-y-4 p-5 bg-slate-900/90 rounded-2xl border border-teal-500/30 shadow-xl animate-step-in">
               <div class="flex items-center justify-between border-b border-white/10 pb-3">
                 <strong class="text-teal-300 font-heading text-sm md:text-base flex items-center gap-2">
                   <span>✦</span> ${d.d}
@@ -1644,6 +1993,11 @@ window.renderPackageUI = function(pkg) {
                     ${d.e}
                   </p>
                 </div>
+
+                <!-- MẸO THỔ ĐỊA BÍ TRUYỀN -->
+                <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-400/20 text-amber-200 text-xs">
+                  ${insiderTips[idx] || insiderTips[0]}
+                </div>
               </div>
             </div>
           `).join("")}
@@ -1671,6 +2025,23 @@ window.renderPackageUI = function(pkg) {
           </div>
         </div>
       ` : ""}
+
+      <!-- CALL-TO-ACTION (CTA) CHỐT CHUYẾN NỔI BẬT Ở CUỐI THẺ -->
+      <div class="bg-gradient-to-r from-teal-500/20 via-slate-900/95 to-emerald-500/20 border-2 border-teal-400/50 rounded-3xl p-6 md:p-7 flex flex-wrap items-center justify-between gap-4 shadow-2xl">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2 text-teal-300 font-extrabold text-sm uppercase">
+            <span class="w-2.5 h-2.5 rounded-full bg-teal-400 animate-ping"></span>
+            <span>Bạn Hài Lòng Với Hành Trình Bí Mật Này?</span>
+          </div>
+          <p class="text-xs text-slate-300 max-w-xl">
+            Giá ưu đãi OTA Wholesale và cặp vé bay khứ hồi ${pkg.flightLabel} đang được giữ tạm thời. Nhấn nút bên dưới để điền thông tin và nhận mã VietQR ký quỹ bảo chứng Escrow 200%.
+          </p>
+        </div>
+        <button onclick="window.goToStep(2); setTimeout(() => { document.getElementById('custEmail')?.focus(); }, 300);" class="px-8 py-4 rounded-2xl font-black text-sm btn-glow-teal shimmer-btn text-slate-950 flex items-center gap-2 shadow-2xl hover:scale-105 transition transform cursor-pointer">
+          <span>Tiến Hành Đặt Chỗ & Giữ Vé (Bước 2)</span>
+          <span>→</span>
+        </button>
+      </div>
     </div>
   `;
 
@@ -1706,11 +2077,22 @@ window.renderPackageUI = function(pkg) {
     window.updatePackingProgress();
   }
 
+  // Điền dữ liệu cho thẻ mở khóa ở Bước 4
   if (document.getElementById("revCityName")) document.getElementById("revCityName").innerText = pkg.reveal.city;
   if (document.getElementById("revComboTitle")) document.getElementById("revComboTitle").innerText = pkg.reveal.title;
   if (document.getElementById("revSlaCode")) document.getElementById("revSlaCode").innerText = pkg.reveal.sla;
   if (document.getElementById("revTransport")) document.getElementById("revTransport").innerText = pkg.reveal.transport;
   if (document.getElementById("revHotel")) document.getElementById("revHotel").innerText = pkg.reveal.hotel;
+  if (document.getElementById("revRoomType")) document.getElementById("revRoomType").innerText = pkg.reveal.room_type || "Deluxe Suite View Đẹp";
+  if (document.getElementById("revPassengerName")) {
+    const custName = document.getElementById("custName")?.value || pkg.customerName || "QUY KHACH WANDERMATCH";
+    document.getElementById("revPassengerName").innerText = window.normVN(custName).toUpperCase();
+  }
+  if (document.getElementById("revDestAirportCode")) {
+    const city = pkg.reveal.city || "";
+    const codeMap = { "Phú Quốc": "PQC", "Đà Lạt": "DLI", "Nha Trang": "CXR", "Quy Nhơn": "UIH", "Huế": "HUI", "Măng Đen": "PXU / Măng Đen", "Đà Nẵng": "DAD" };
+    document.getElementById("revDestAirportCode").innerText = (codeMap[city] || "PQC") + " (" + city + ")";
+  }
   if (document.getElementById("revRetailPrice")) document.getElementById("revRetailPrice").innerText = window.formatVND(pkg.reveal.retail);
   if (document.getElementById("revPaidPrice")) document.getElementById("revPaidPrice").innerText = window.formatVND(pkg.reveal.paid);
   if (document.getElementById("revSavings")) document.getElementById("revSavings").innerText = "+" + window.formatVND(pkg.reveal.savings);
@@ -1828,11 +2210,43 @@ window.confirmAndLockBooking = async function() {
   const qrContainer = document.getElementById("qrCardsContainer");
   if (qrContainer) {
     qrContainer.innerHTML = pkg.qrs.map(q => `
-      <div class="bg-slate-900/90 p-4 rounded-2xl border border-white/10 text-center space-y-2 shadow-lg">
-        <span class="text-xs font-bold text-teal-400 block uppercase tracking-wider">Hành khách #${q.idx}</span>
-        <img src="${q.url}" class="w-44 h-44 mx-auto rounded-xl bg-white p-1.5 shadow" alt="VietQR" />
-        <p class="text-sm font-extrabold text-white font-mono">${window.formatVND(q.amount)}</p>
-        <p class="text-[11px] text-slate-400">Nội dung chuyển khoản: <strong class="text-teal-300 font-mono">${q.memo}</strong></p>
+      <div class="relative bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 p-5 rounded-3xl border border-teal-500/30 text-center space-y-3.5 shadow-2xl hover:border-teal-400/60 transition group overflow-hidden">
+        <!-- Huy hiệu góc & Logo Napas 24/7 -->
+        <div class="flex items-center justify-between border-b border-white/10 pb-2.5 text-xs">
+          <span class="px-2.5 py-1 rounded-full bg-teal-500/20 text-teal-300 font-extrabold text-[10px] tracking-wider uppercase flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>
+            Hành Khách #${q.idx}
+          </span>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-slate-300 font-bold">Napas 24/7</span>
+        </div>
+
+        <!-- Khung QR code sang trọng -->
+        <div class="relative mx-auto w-48 h-48 bg-white p-2 rounded-2xl shadow-xl flex items-center justify-center border border-white/20">
+          <img src="${q.url}" class="w-full h-full object-contain rounded-lg" alt="VietQR Hành khách ${q.idx}" />
+        </div>
+
+        <!-- Số tiền VNĐ và nút copy -->
+        <div class="bg-slate-950/80 p-2.5 rounded-xl border border-white/5 space-y-1">
+          <span class="text-[10px] text-slate-400 block font-semibold uppercase">Số tiền ký quỹ</span>
+          <div class="flex items-center justify-center gap-2">
+            <strong class="text-base font-black text-teal-300 font-mono">${window.formatVND(q.amount)}</strong>
+            <button type="button" onclick="window.copyToClipboard('${q.amount}', this)" class="px-2 py-0.5 rounded bg-teal-500/20 hover:bg-teal-500/30 text-teal-300 text-[10px] font-bold border border-teal-500/30 transition cursor-pointer">Chép</button>
+          </div>
+        </div>
+
+        <!-- Nội dung chuyển khoản và nút copy -->
+        <div class="bg-slate-950/80 p-2.5 rounded-xl border border-white/5 space-y-1">
+          <span class="text-[10px] text-slate-400 block font-semibold uppercase">Nội dung đối soát</span>
+          <div class="flex items-center justify-center gap-2">
+            <strong class="text-xs font-black text-amber-300 font-mono tracking-wider">${q.memo}</strong>
+            <button type="button" onclick="window.copyToClipboard('${q.memo}', this)" class="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[10px] font-bold border border-amber-500/30 transition cursor-pointer">Chép</button>
+          </div>
+        </div>
+
+        <!-- Hướng dẫn 3 bước -->
+        <p class="text-[10px] text-slate-400 leading-tight pt-1 border-t border-white/5">
+          Quét bằng ứng dụng ngân hàng bất kỳ để xác thực ký quỹ tức thì.
+        </p>
       </div>
     `).join("");
   }
@@ -2113,7 +2527,29 @@ window.revealDestinationNow = function() {
   if (pkg) {
     pkg.isRevealed = true;
     window.saveStore("wm_draft_prod", pkg);
-    window.showToast(`Chúc mừng! Điểm đến bí mật của bạn là: ${pkg.reveal.city}!`);
+    
+    // Kích hoạt pháo hoa chúc mừng
+    window.launchConfetti();
+    
+    // Thêm hiệu ứng highlight chữ vàng kim cho tên thành phố
+    const cityEl = document.getElementById("revCityName");
+    if (cityEl) {
+      cityEl.innerText = pkg.reveal.city;
+      cityEl.className = "text-3xl md:text-4xl font-black golden-reveal-text mt-1.5 font-heading";
+    }
+
+    // Cập nhật tên hành khách và mã sân bay trên Boarding pass
+    const custName = document.getElementById("custName")?.value || pkg.customerName || "QUY KHACH WANDERMATCH";
+    const passNameEl = document.getElementById("revPassengerName");
+    if (passNameEl) passNameEl.innerText = window.normVN(custName).toUpperCase();
+
+    const destCodeEl = document.getElementById("revDestAirportCode");
+    if (destCodeEl) {
+      const codeMap = { "Phú Quốc": "PQC", "Đà Lạt": "DLI", "Nha Trang": "CXR", "Quy Nhơn": "UIH", "Huế": "HUI", "Măng Đen": "PXU / Măng Đen", "Đà Nẵng": "DAD" };
+      destCodeEl.innerText = (codeMap[pkg.reveal.city] || "PQC") + " (" + pkg.reveal.city + ")";
+    }
+
+    window.showToast(`🎉 CHÚC MỪNG! Điểm đến bí mật chính thức của bạn là: ${pkg.reveal.city}!`, "success");
   }
 };
 

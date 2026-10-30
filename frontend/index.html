@@ -9,7 +9,7 @@
   <script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=11.0">
+  <link rel="stylesheet" href="styles.css?v=12.0">
   <style>
     :root {
       --font-heading: 'Outfit', sans-serif;
@@ -664,23 +664,72 @@
             <span class="text-[10px] font-extrabold px-2.5 py-1 rounded-md bg-teal-500/20 text-teal-300 uppercase tracking-wider">
               Điểm Đến Chính Thức Đã Mở Khóa
             </span>
-            <h3 id="revCityName" class="text-3xl font-extrabold text-white mt-1.5 font-heading">---</h3>
+            <h3 id="revCityName" class="text-3xl md:text-4xl font-extrabold text-white mt-1.5 font-heading">---</h3>
             <p id="revComboTitle" class="text-xs text-teal-300 mt-0.5 font-medium"></p>
           </div>
           <div class="text-right bg-slate-950 p-3 rounded-2xl border border-amber-400/40">
-            <span class="text-[10px] text-slate-400 block font-semibold">Mã Đặt Phòng Resort SLA</span>
+            <span class="text-[10px] text-slate-400 block font-semibold">Mã Đặt Chỗ SLA</span>
             <strong id="revSlaCode" class="text-sm font-extrabold text-amber-400 font-mono">---</strong>
           </div>
         </div>
 
-        <div class="grid sm:grid-cols-2 gap-3.5 text-xs bg-slate-950 p-4 rounded-2xl border border-white/10">
-          <div>
-            <span class="text-slate-400 block font-semibold">Chuyến bay khứ hồi:</span>
-            <strong id="revTransport" class="text-white block mt-0.5">---</strong>
+        <!-- THẺ VÉ MÁY BAY ĐIỆN TỬ (E-BOARDING PASS) -->
+        <div class="bg-slate-950/80 p-4 rounded-2xl border border-white/10 space-y-3">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-teal-400 font-extrabold text-xs uppercase tracking-wider flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                Vé Máy Bay Điện Tử (E-Boarding Pass)
+              </span>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 font-mono font-bold">Hạng SkyBoss / Premium</span>
           </div>
-          <div>
-            <span class="text-slate-400 block font-semibold">Resort lưu trú cao cấp:</span>
-            <strong id="revHotel" class="text-white block mt-0.5">---</strong>
+
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div>
+              <span class="text-[10px] text-slate-400 block font-semibold uppercase">Hành Khách (Passenger)</span>
+              <strong id="revPassengerName" class="text-white font-mono text-xs block font-bold">QUY KHACH WANDERMATCH</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block font-semibold uppercase">Chuyến Bay (Flight)</span>
+              <strong id="revTransport" class="text-teal-300 block text-xs font-bold font-mono">---</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block font-semibold uppercase">Khởi Hành (From)</span>
+              <strong class="text-white font-mono text-xs block font-bold">SGN (TP. Hồ Chí Minh)</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block font-semibold uppercase">Hạ Cánh (To Destination)</span>
+              <strong id="revDestAirportCode" class="text-amber-300 font-mono text-xs block font-black">---</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block font-semibold uppercase">Cửa Bay / Ghế Ngồi</span>
+              <strong class="text-white font-mono text-xs block">Gate 06 • Ghế 12A (Cửa sổ)</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block font-semibold uppercase">Giờ Lên Máy Bay</span>
+              <strong class="text-teal-300 font-mono text-xs block">07:15 (Khởi hành 08:00)</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- VOUCHER NGHỈ DƯỠNG RESORT 5 SAO -->
+        <div class="bg-slate-950/80 p-4 rounded-2xl border border-white/10 space-y-2.5">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <span class="text-amber-400 font-extrabold text-xs uppercase tracking-wider flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+              Voucher Nghỉ Dưỡng Resort 5 Sao
+            </span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono font-bold">Check-in: 14:00</span>
+          </div>
+
+          <div class="space-y-1">
+            <strong id="revHotel" class="text-white font-extrabold text-sm block">---</strong>
+            <div class="flex flex-wrap items-center justify-between text-xs text-slate-300 pt-0.5">
+              <span>Hạng phòng: <strong id="revRoomType" class="text-teal-300">Deluxe View Đẹp</strong></span>
+              <span class="text-emerald-400 font-semibold">✓ Đã bao gồm Buffet Sáng 2 khách</span>
+            </div>
+            <p class="text-[11px] text-slate-400">Đặc quyền VIP: Xe buggy đón tiễn sân bay, Welcome drink & Quản gia hỗ trợ 24/7.</p>
           </div>
         </div>
 
@@ -869,7 +918,7 @@
     window.WM_CONFIG = { GOOGLE_CLIENT_ID: "", FACEBOOK_APP_ID: "" };
   </script>
   <script src="supabaseClient.js"></script>
-  <script src="app.js?v=11.0"></script>
+  <script src="app.js?v=12.0"></script>
 
 
 </body>

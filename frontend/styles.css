@@ -1371,3 +1371,52 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .modal-content-animated {
   animation: modalZoomIn 0.3s var(--ease-spring) forwards;
 }
+
+/* ============================================================================
+   7. LUXURY INNER UI & ROYAL WAX SEAL EXTENSIONS
+   ============================================================================ */
+
+.wax-seal-stamp {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #e11d48 0%, #9f1239 60%, #4c0519 100%);
+  border: 2px solid #f59e0b;
+  box-shadow: 0 4px 14px rgba(225, 29, 72, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.35), inset 0 -3px 6px rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: \'Outfit\', sans-serif;
+  font-weight: 900;
+  color: #fde68a;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+  letter-spacing: -0.5px;
+  flex-shrink: 0;
+  transition: transform 0.3s var(--ease-spring);
+}
+
+.wax-seal-stamp:hover {
+  transform: scale(1.08) rotate(-4deg);
+}
+
+.golden-reveal-text {
+  background: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #fbbf24 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: goldenPulse 2.5s infinite alternate ease-in-out;
+}
+
+@keyframes goldenPulse {
+  0% {
+    filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.35));
+    transform: scale(1);
+  }
+  100% {
+    filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.75));
+    transform: scale(1.015);
+  }
+}
+
+.fade-img-transition {
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
