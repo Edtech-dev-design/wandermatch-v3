@@ -939,11 +939,71 @@ window.getFormInputs = function() {
   };
 };
 
+
+// ============================================================================
+// BỘ VẼ BIỂU ĐỒ RADAR SVG 5D TRAVEL DNA (ALGORITHMIC VECTOR VISUALIZER)
+// ============================================================================
+window.generateTravelRadarSVG = function(userVec, hotelVec, size = 260) {
+  const keys = ['healing', 'nature', 'solitude', 'comfort', 'culture'];
+  const labels = ['Chữa Lành', 'Thiên Nhiên', 'Riêng Tư', 'Resort 5★', 'Văn Hóa'];
+  const cx = size / 2, cy = size / 2, r = size * 0.36;
+  const angles = [0, 1, 2, 3, 4].map(i => i * 2 * Math.PI / 5 - Math.PI / 2);
+
+  let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" class="mx-auto select-none radar-svg-container">`;
+  
+  // Concentric pentagons
+  [0.2, 0.4, 0.6, 0.8, 1.0].forEach(level => {
+    const pts = angles.map(a => `${(cx + r * level * Math.cos(a)).toFixed(1)},${(cy + r * level * Math.sin(a)).toFixed(1)}`).join(' ');
+    svg += `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
+  });
+
+  // Axis rays
+  angles.forEach(a => {
+    svg += `<line x1="${cx}" y1="${cy}" x2="${(cx + r * Math.cos(a)).toFixed(1)}" y2="${(cy + r * Math.sin(a)).toFixed(1)}" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>`;
+  });
+
+  // Destination Polygon (Amber / Gold Dashed)
+  const hPts = keys.map((k, i) => {
+    const val = (hotelVec && hotelVec[k] ? hotelVec[k] : 85) / 100;
+    return `${(cx + r * val * Math.cos(angles[i])).toFixed(1)},${(cy + r * val * Math.sin(angles[i])).toFixed(1)}`;
+  }).join(' ');
+  svg += `<polygon points="${hPts}" fill="rgba(245, 158, 11, 0.20)" stroke="#F59E0B" stroke-width="2" stroke-dasharray="4,3" class="transition-all duration-500"/>`;
+
+  // User Traveler DNA Polygon (Teal Neon Solid)
+  const uPts = keys.map((k, i) => {
+    const val = (userVec && userVec[k] ? userVec[k] : 80) / 100;
+    return `${(cx + r * val * Math.cos(angles[i])).toFixed(1)},${(cy + r * val * Math.sin(angles[i])).toFixed(1)}`;
+  }).join(' ');
+  svg += `<polygon points="${uPts}" fill="rgba(45, 212, 191, 0.35)" stroke="#2DD4BF" stroke-width="2.5" class="transition-all duration-500"/>`;
+
+  // Corner point dots for user
+  keys.forEach((k, i) => {
+    const val = (userVec && userVec[k] ? userVec[k] : 80) / 100;
+    const px = (cx + r * val * Math.cos(angles[i])).toFixed(1);
+    const py = (cy + r * val * Math.sin(angles[i])).toFixed(1);
+    svg += `<circle cx="${px}" cy="${py}" r="3.5" fill="#2DD4BF" stroke="#0F172A" stroke-width="1.5"/>`;
+  });
+
+  // Labels
+  labels.forEach((l, i) => {
+    const a = angles[i];
+    const lx = cx + (r + 28) * Math.cos(a);
+    const ly = cy + (r + 14) * Math.sin(a);
+    let anchor = "middle";
+    if (Math.cos(a) > 0.3) anchor = "start";
+    else if (Math.cos(a) < -0.3) anchor = "end";
+    svg += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="${anchor}" fill="#94A3B8" font-size="10" font-weight="700" font-family="'Plus Jakarta Sans', sans-serif">${l}</text>`;
+  });
+
+  svg += '</svg>';
+  return svg;
+};
+
 window.runBlindTravelEngine = function(avoidRepeat = true) {
   const inp = window.getFormInputs();
   const history = window.loadStore("wm_history_prod", []);
 
-  // 1. Lọc tuyến bay
+  // 1. Lọc tuyến bay khả thi
   let flights = window.FLIGHTS_DB.filter(f => f.origin === inp.origin && f.price <= inp.budget * 0.65);
   if (!flights.length) flights = window.FLIGHTS_DB.filter(f => f.origin === inp.origin) || window.FLIGHTS_DB;
 
@@ -967,11 +1027,17 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
           nH += h.vec[k] ** 2;
         });
         let sim = (dot / (Math.sqrt(nU) * Math.sqrt(nH))) * 100;
-        h.kw.forEach(w => { if (inp.prompt.includes(w)) sim += 4.5; });
+        h.kw.forEach(w => { if (inp.prompt && inp.prompt.toLowerCase().includes(w.toLowerCase())) sim += 4.5; });
         sim = Math.min(99.6, Math.round(sim * 10) / 10);
 
+        // Hiệu suất Knapsack
         const knapsackRatio = Math.min(100, Math.round((unitCost / inp.budget) * 1000) / 10);
-        const util = Math.round(((sim * 0.50) + ((h.rating / 5) * 100 * 0.25) + (knapsackRatio * 0.25)) * 10) / 10;
+        
+        // Chỉ số thặng dư bán buôn OTA Wholesale
+        const wholesaleSurplus = Math.round(((unitRetail - unitCost) / unitRetail) * 100);
+
+        // Hàm mục tiêu đa tiêu chí Pareto Utility
+        const util = Math.round(((sim * 0.40) + ((h.rating / 5) * 100 * 0.25) + (knapsackRatio * 0.20) + (wholesaleSurplus * 0.15)) * 10) / 10;
         
         combos.push({ 
           comboId: `${f.id}_${h.id}`, 
@@ -981,7 +1047,8 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
           unitRetail, 
           sim, 
           util,
-          knapsackRatio
+          knapsackRatio,
+          wholesaleSurplus
         });
       }
     });
@@ -994,15 +1061,16 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
       f, 
       h, 
       unitCost: inp.budget, 
-      unitRetail: Math.round(inp.budget * 1.30), 
-      sim: 96.0, 
+      unitRetail: Math.round(inp.budget * 1.35), 
+      sim: 96.5, 
       util: 95.0,
-      knapsackRatio: 100.0
+      knapsackRatio: 98.0,
+      wholesaleSurplus: 35
     });
   }
   combos.sort((a, b) => b.util - a.util);
 
-  // Thu thập top 3 combo tiêu biểu khác nhau về thành phố/resort để so sánh
+  // Thu thập top 3 combo tiêu biểu khác nhau về thành phố/resort để làm ứng viên lựa chọn
   let topCombos = [];
   const seenCitySet = new Set();
   combos.forEach(c => {
@@ -1044,6 +1112,20 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
 
   const reasoningLog = `[Thuật toán Knapsack + Cosine Matching]: Đã tối ưu gói ngân sách ${window.formatVND(inp.budget)}/khách ➔ Khớp cặp vé máy bay khứ hồi ${chosen.f.airline} + 2 đêm nghỉ dưỡng tại Resort ${chosen.h.rating}★ chuẩn SLA quốc tế (Đã niêm phong tên đến sân bay). Điểm Utility đạt ${chosen.util}/100, tương thích 5 chiều cảm xúc đạt ${chosen.sim}%. Tiết kiệm ngay ${window.formatVND(savings)} nhờ quỹ phòng ẩn danh OTA Wholesale.`;
 
+  // Tạo ứng viên cho UI
+  const candidates = topCombos.map((tc, idx) => ({
+    idx,
+    comboId: tc.comboId,
+    sim: tc.sim,
+    util: tc.util,
+    temp: tc.h.temp,
+    weather: tc.h.weather,
+    mysteryTheme: tc.h.mysteryTheme || "Thiên Nhiên & Nghỉ Dưỡng",
+    airline: tc.f.airline,
+    unitCost: tc.unitCost,
+    savings: (tc.unitRetail - tc.unitCost) * inp.groupSize
+  }));
+
   return {
     code, 
     comboId: chosen.comboId, 
@@ -1052,6 +1134,7 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
     matchScore: chosen.sim, 
     utilityScore: chosen.util,
     knapsackRatio: chosen.knapsackRatio,
+    wholesaleSurplus: chosen.wholesaleSurplus,
     reasoningLog,
     temp: chosen.h.temp, 
     weather: chosen.h.weather,
@@ -1064,6 +1147,8 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
     flight: chosen.f,
     hotel: chosen.h,
     qrs,
+    candidates,
+    activeCandidateIndex: topCombos.findIndex(tc => tc.comboId === chosen.comboId),
     flightLabel: `Khứ hồi ${chosen.f.airline} (Khởi hành từ ${inp.origin || 'HAN'} ✈️ Sân bay bí mật)`,
     hotelLabel: `Resort ${chosen.h.rating}★ tiêu chuẩn quốc tế (Kèm buffet sáng & xe đưa đón)`,
     reveal: {
@@ -1083,6 +1168,85 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
     }
   };
 };
+
+// Hàm chọn nhanh ứng viên trong top 3 của thuật toán
+window.selectBlindTravelCandidate = function(candidateIdx) {
+  if (!window.currentTopCombos || !window.currentTopCombos[candidateIdx]) return;
+  const chosen = window.currentTopCombos[candidateIdx];
+  const inp = window.getFormInputs();
+  const code = "WM" + Math.floor(10000 + Math.random() * 90000);
+  const totalPaid = chosen.unitCost * inp.groupSize;
+  const totalRetail = chosen.unitRetail * inp.groupSize;
+  const savings = totalRetail - totalPaid;
+
+  const qrs = Array.from({ length: inp.groupSize }, (_, i) => ({
+    idx: i + 1,
+    amount: chosen.unitCost,
+    memo: `${code} KH${i + 1}`,
+    url: `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${chosen.unitCost}&addInfo=${encodeURIComponent(`${code} KH${i + 1}`)}&accountName=${encodeURIComponent("CONG TY TNHH WANDERMATCH VN")}`
+  }));
+
+  const candidates = window.currentTopCombos.map((tc, idx) => ({
+    idx,
+    comboId: tc.comboId,
+    sim: tc.sim,
+    util: tc.util,
+    temp: tc.h.temp,
+    weather: tc.h.weather,
+    mysteryTheme: tc.h.mysteryTheme || "Thiên Nhiên & Nghỉ Dưỡng",
+    airline: tc.f.airline,
+    unitCost: tc.unitCost,
+    savings: (tc.unitRetail - tc.unitCost) * inp.groupSize
+  }));
+
+  const newPkg = {
+    code,
+    comboId: chosen.comboId,
+    isLocked: false,
+    isRevealed: false,
+    matchScore: chosen.sim,
+    utilityScore: chosen.util,
+    knapsackRatio: chosen.knapsackRatio,
+    wholesaleSurplus: chosen.wholesaleSurplus,
+    reasoningLog: `[Đã chuyển sang Ứng Viên #${candidateIdx + 1}]: Khớp ${chosen.f.airline} + Resort ${chosen.h.rating}★ SLA. Khớp gu ${chosen.sim}%.`,
+    temp: chosen.h.temp,
+    weather: chosen.h.weather,
+    hint: chosen.h.hint,
+    packing: chosen.h.packing,
+    food: chosen.h.food,
+    days: chosen.h.mysteryDays || chosen.h.days,
+    realDays: chosen.h.days,
+    reviews: chosen.h.reviews || [],
+    flight: chosen.f,
+    hotel: chosen.h,
+    qrs,
+    candidates,
+    activeCandidateIndex: candidateIdx,
+    flightLabel: `Khứ hồi ${chosen.f.airline} (Khởi hành từ ${inp.origin || 'HAN'} ✈️ Sân bay bí mật)`,
+    hotelLabel: `Resort ${chosen.h.rating}★ tiêu chuẩn quốc tế (Kèm buffet sáng & xe đưa đón)`,
+    reveal: {
+      city: chosen.h.city,
+      title: chosen.h.title,
+      sla: chosen.h.sla,
+      room_type: chosen.h.room_type,
+      img: chosen.h.img,
+      gallery: chosen.h.gallery || [chosen.h.img],
+      room_specs: chosen.h.room_specs,
+      amenities: chosen.h.amenities,
+      transport: `${chosen.f.id} - ${chosen.f.airline} (${chosen.f.time})`,
+      hotel: chosen.h.name,
+      paid: totalPaid,
+      retail: totalRetail,
+      savings
+    }
+  };
+
+  window.saveStore("wm_draft_prod", newPkg);
+  window.renderPackageUI(newPkg);
+  window.updatePersonaUI();
+  window.showToast(`✦ Đã chuyển sang Ứng viên #${candidateIdx + 1}: ${chosen.h.mysteryTheme || 'Kỳ Nghỉ Bí Mật'} (Khớp gu ${chosen.sim}%)`, "success");
+};
+
 
 // ============================================================================
 // HỆ THỐNG PHÂN TÍCH THỊ HIẾU DU KHÁCH BÍ MẬT (TRAVELER PERSONA & TASTE DISCOVERY ENGINE)
@@ -1750,9 +1914,125 @@ window.renderPackageUI = function(pkg) {
         </div>
       </div>
 
-      <!-- NHẬT KÝ THUẬT TOÁN LOG (DIAGNOSTIC REASONING LOG) -->
-      <div class="bg-slate-900/90 border border-teal-500/30 p-3.5 rounded-2xl font-mono text-[11px] leading-relaxed text-teal-200">
-        <span class="text-amber-400 font-bold">⚙️ [AI REASONING LOG]:</span> ${pkg.reasoningLog}
+      <!-- HÀNG 3 ỨNG VIÊN DU LỊCH MÙ CHỌN LỌC (TOP 3 BLIND TRAVEL CANDIDATES) -->
+      ${pkg.candidates && pkg.candidates.length > 1 ? `
+        <div class="space-y-2 pt-1 pb-1">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="text-xs font-black uppercase tracking-wider text-amber-300 flex items-center gap-1.5 font-heading">
+              <span>🏆</span> Top 3 Điểm Đến Bí Mật Được Thuật Toán Khớp Lệnh Riêng Cho Bạn:
+            </span>
+            <span class="text-[10px] text-slate-400 font-mono">✦ 100% Niêm phong danh tính đến sân bay</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            ${pkg.candidates.map((c, i) => `
+              <button type="button" onclick="window.selectBlindTravelCandidate(${i})" class="candidate-pill text-left p-3 rounded-2xl border transition ${pkg.activeCandidateIndex === i ? 'active bg-teal-500/20 border-teal-400 text-white shadow-xl' : 'bg-slate-900/80 border-white/10 text-slate-300 hover:border-white/30 hover:bg-slate-900'}">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded-full ${pkg.activeCandidateIndex === i ? 'bg-teal-400 text-slate-950 font-black' : 'bg-white/10 text-slate-300 font-bold'}">Ứng Viên #${i + 1}</span>
+                  <span class="text-[11px] font-black text-amber-300 font-mono">${c.sim}% Gu</span>
+                </div>
+                <strong class="text-xs text-white block truncate font-heading">✦ ${c.mysteryTheme}</strong>
+                <span class="text-[10px] text-slate-400 block mt-0.5">${c.temp}°C • ${c.weather} • ${c.airline}</span>
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      ` : ''}
+
+      <!-- TRUNG TÂM PHÂN TÍCH THUẬT TOÁN TOÁN HỌC & RADAR CHART 5D -->
+      <div class="bg-slate-950/90 border border-teal-500/35 rounded-3xl p-5 md:p-6 space-y-4 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-slate-950 font-black text-sm shadow">
+              ∑
+            </div>
+            <div>
+              <h4 class="text-sm font-extrabold text-white font-heading tracking-wide uppercase">
+                Ma Trận Thuật Toán Ghép Đôi AI & Tối Ưu Hóa Knapsack
+              </h4>
+              <p class="text-[11px] text-slate-400">
+                Mô hình quy hoạch đa mục tiêu Pareto Frontier kết hợp Cosine Vector 5D & Kiểm toán Opaque Wholesale
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="window.generateNewRecommendation()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-teal-500/20 hover:bg-teal-500/30 text-teal-300 border border-teal-500/40 transition flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              <span>Tái Lập Thuật Toán (Shuffle AI)</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-12 gap-5 items-center">
+          <!-- CỘT TRÁI: BIỂU ĐỒ RADAR CHART SVG 5D -->
+          <div class="md:col-span-5 flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-900/60 border border-white/5">
+            <div class="flex items-center gap-4 text-[10px] font-bold mb-2">
+              <span class="flex items-center gap-1.5 text-teal-300">
+                <span class="w-2.5 h-2.5 rounded-full bg-teal-400 shadow"></span> Gu Du Khách (${pkg.matchScore}%)
+              </span>
+              <span class="flex items-center gap-1.5 text-amber-300">
+                <span class="w-2.5 h-0.5 bg-amber-400 border border-amber-300"></span> Điểm Đến Bí Mật
+              </span>
+            </div>
+            ${window.generateTravelRadarSVG(window.getFormInputs().vec, pkg.hotel.vec, 230)}
+            <span class="text-[10px] text-slate-400 italic mt-1 font-mono">Biểu đồ Radar ngũ giác tương thích 5 chiều DNA</span>
+          </div>
+
+          <!-- CỘT PHẢI: 4 THẺ CHỈ SỐ LƯỢNG HÓA TOÁN HỌC -->
+          <div class="md:col-span-7 grid grid-cols-2 gap-2.5">
+            <div class="algorithm-metric-card p-3 rounded-2xl space-y-1">
+              <div class="flex items-center justify-between text-slate-400 text-[11px]">
+                <span class="font-bold flex items-center gap-1">🎯 Cosine Similarity</span>
+                <span class="font-mono text-teal-300 font-extrabold">${pkg.matchScore}%</span>
+              </div>
+              <strong class="text-xs text-white block">Tương Đồng 5 Trục Cảm Xúc</strong>
+              <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-white/5">
+                <div class="bg-teal-400 h-full rounded-full" style="width: ${pkg.matchScore}%"></div>
+              </div>
+              <p class="text-[10px] text-slate-400 leading-tight">Khớp góc Vector giữa DNA du khách và đặc thù địa phương.</p>
+            </div>
+
+            <div class="algorithm-metric-card p-3 rounded-2xl space-y-1">
+              <div class="flex items-center justify-between text-slate-400 text-[11px]">
+                <span class="font-bold flex items-center gap-1">🎒 Knapsack Ratio</span>
+                <span class="font-mono text-sky-300 font-extrabold">${pkg.knapsackRatio}%</span>
+              </div>
+              <strong class="text-xs text-white block">Hiệu Suất Cái Túi Ngân Sách</strong>
+              <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-white/5">
+                <div class="bg-sky-400 h-full rounded-full" style="width: ${pkg.knapsackRatio}%"></div>
+              </div>
+              <p class="text-[10px] text-slate-400 leading-tight">Tối ưu hóa trọn gói vé bay & resort 5★ sát trần ngân sách.</p>
+            </div>
+
+            <div class="algorithm-metric-card p-3 rounded-2xl space-y-1">
+              <div class="flex items-center justify-between text-slate-400 text-[11px]">
+                <span class="font-bold flex items-center gap-1">🏷️ Opaque Surplus</span>
+                <span class="font-mono text-amber-300 font-extrabold">+${pkg.wholesaleSurplus || 38}%</span>
+              </div>
+              <strong class="text-xs text-white block">Thặng Dư Giá Trị Bán Buôn</strong>
+              <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-white/5">
+                <div class="bg-amber-400 h-full rounded-full" style="width: ${pkg.wholesaleSurplus || 38}%"></div>
+              </div>
+              <p class="text-[10px] text-slate-400 leading-tight">Tiết kiệm ${window.formatVND(pkg.reveal.savings)} so với mua lẻ tự túc.</p>
+            </div>
+
+            <div class="algorithm-metric-card p-3 rounded-2xl space-y-1">
+              <div class="flex items-center justify-between text-slate-400 text-[11px]">
+                <span class="font-bold flex items-center gap-1">✈️ Punctuality OTP</span>
+                <span class="font-mono text-purple-300 font-extrabold">${(pkg.flight && pkg.flight.otp) || '98.9%'}</span>
+              </div>
+              <strong class="text-xs text-white block truncate">${(pkg.flight && pkg.flight.airline) || 'Vietnam Airlines'}</strong>
+              <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-white/5">
+                <div class="bg-purple-400 h-full rounded-full" style="width: 98.9%"></div>
+              </div>
+              <p class="text-[10px] text-slate-400 leading-tight">Tỷ lệ đúng giờ chuẩn hàng không, bay thẳng không quá cảnh.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- REASONING LOG -->
+        <div class="bg-slate-900/90 border border-teal-500/20 p-3 rounded-2xl font-mono text-[11px] leading-relaxed text-teal-200">
+          <span class="text-amber-400 font-bold">⚙️ [AI REASONING LOG]:</span> ${pkg.reasoningLog}
+        </div>
       </div>
 
       <!-- THÔNG SỐ KỸ THUẬT CHI TIẾT (FLIGHT SPECS & ROOM SPECS) -->
@@ -2598,7 +2878,7 @@ window.initScratchCanvas = function() {
   c.ontouchmove = scratch;
 };
 
-window.revealDestinationNow = function() {
+window.revealDestinationNow = window.revealMysteryTrip = function() {
   const c = document.getElementById("scratchCanvas");
   if (c) c.style.display = "none";
   const pkg = window.loadStore("wm_draft_prod", null);
