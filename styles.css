@@ -991,3 +991,383 @@ html, body {
   }
 }
 
+
+
+/* ============================================================================
+   WANDERMATCH 3.5 — LUXURY TRAVEL DESIGN SYSTEM & TRANSITION SUITE
+   Inspired by leading global travel platforms (Aman, Pack Up + Go, Traveloka, Agoda)
+   Typography: Outfit (Display & Headings) + Plus Jakarta Sans (Body & UI)
+   ============================================================================ */
+
+:root {
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Luxury Dark Palette */
+  --bg-canvas: #070b14;
+  --bg-surface: #0c1322;
+  --bg-surface-elevated: #111b30;
+  
+  --primary-teal: #0d9488;
+  --primary-teal-light: #14b8a6;
+  --primary-teal-glow: rgba(20, 184, 166, 0.35);
+  
+  --gold-accent: #f59e0b;
+  --gold-light: #fbbf24;
+  --gold-glow: rgba(245, 158, 11, 0.35);
+
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.14);
+  --border-glow-teal: rgba(20, 184, 166, 0.45);
+  --border-glow-gold: rgba(245, 158, 11, 0.45);
+
+  /* Glassmorphism */
+  --glass-bg: rgba(15, 23, 42, 0.72);
+  --glass-bg-hover: rgba(22, 34, 60, 0.85);
+  --glass-blur: blur(20px);
+
+  /* Easing curves */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --transition-fast: 0.18s var(--ease-smooth);
+  --transition-normal: 0.32s var(--ease-spring);
+  --transition-slow: 0.5s var(--ease-spring);
+}
+
+/* ============================================================================
+   1. KEYFRAMES & TRANSITION SUITE
+   ============================================================================ */
+
+/* Step content fade & slide-in */
+@keyframes stepFadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-step-in {
+  animation: stepFadeSlideIn 0.42s var(--ease-spring) forwards;
+}
+
+/* Smooth Tab Fade */
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-tab-in {
+  animation: tabFadeIn 0.35s var(--ease-smooth) forwards;
+}
+
+/* Shimmer Light Bar across CTAs */
+@keyframes shimmerWave {
+  0% { transform: translateX(-150%) skewX(-20deg); }
+  50%, 100% { transform: translateX(250%) skewX(-20deg); }
+}
+
+.shimmer-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+  animation: shimmerWave 3.5s infinite;
+  pointer-events: none;
+}
+
+/* Floating Pulsing Glow */
+@keyframes glowPulseTeal {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(20, 184, 166, 0.25), 0 0 35px rgba(20, 184, 166, 0.12);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(20, 184, 166, 0.45), 0 0 50px rgba(20, 184, 166, 0.25);
+  }
+}
+
+.glow-teal-pulse {
+  animation: glowPulseTeal 3s ease-in-out infinite;
+}
+
+/* Radar Scan Wave for Escrow / Webhook */
+@keyframes radarPulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.9;
+  }
+  70% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+.radar-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 2px solid var(--primary-teal-light);
+  animation: radarPulse 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  pointer-events: none;
+}
+
+/* Gold Gradient Text */
+.gold-text-gradient {
+  background: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Teal Gradient Text */
+.teal-text-gradient {
+  background: linear-gradient(135deg, #a7f3d0 0%, #14b8a6 50%, #0d9488 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ============================================================================
+   2. LUXURY STEPPER NAVIGATION (FLOATING PROGRESS TRACK)
+   ============================================================================ */
+
+.stepper-track-container {
+  position: relative;
+  border-radius: 1.5rem;
+  padding: 0.35rem;
+  background: rgba(12, 19, 34, 0.75);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: var(--glass-blur);
+}
+
+.stepper-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  border-radius: 1.5rem;
+  background: linear-gradient(90deg, rgba(13, 148, 136, 0.15), rgba(20, 184, 166, 0.25));
+  transition: width 0.45s var(--ease-spring);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.step-nav-item {
+  position: relative;
+  z-index: 1;
+  transition: all 0.28s var(--ease-smooth);
+}
+
+.step-nav-item:hover {
+  transform: translateY(-1px);
+}
+
+.step-nav-item.active {
+  background: rgba(20, 184, 166, 0.14);
+  border-color: rgba(20, 184, 166, 0.55);
+  box-shadow: 0 4px 20px -2px rgba(20, 184, 166, 0.25);
+}
+
+/* ============================================================================
+   3. CHIPS & INTERACTIVE CONTROLS
+   ============================================================================ */
+
+.vibe-chip {
+  transition: all 0.22s var(--ease-spring);
+  cursor: pointer;
+  user-select: none;
+}
+
+.vibe-chip:hover {
+  transform: translateY(-2px);
+  border-color: rgba(20, 184, 166, 0.4);
+  background: rgba(20, 184, 166, 0.08);
+}
+
+.vibe-chip.selected {
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.3), rgba(20, 184, 166, 0.2));
+  border-color: #14b8a6;
+  color: #5eead4;
+  box-shadow: 0 0 16px rgba(20, 184, 166, 0.3);
+  transform: scale(1.03);
+}
+
+/* Range Slider Styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  outline: none;
+  transition: background 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #14b8a6;
+  border: 3px solid #090d16;
+  box-shadow: 0 0 10px rgba(20, 184, 166, 0.6);
+  cursor: pointer;
+  transition: transform 0.15s var(--ease-spring), box-shadow 0.15s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.22);
+  box-shadow: 0 0 16px rgba(20, 184, 166, 0.9);
+}
+
+/* ============================================================================
+   4. TIMELINE CARDS & ACCORDION
+   ============================================================================ */
+
+.timeline-item {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: 0.45rem;
+  top: 0.6rem;
+  bottom: -1rem;
+  width: 2px;
+  background: linear-gradient(180deg, #14b8a6 0%, rgba(20, 184, 166, 0.15) 100%);
+}
+
+.timeline-item:last-child::before {
+  display: none;
+}
+
+.timeline-bullet {
+  position: absolute;
+  left: 0;
+  top: 0.45rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: #090d16;
+  border: 2px solid #14b8a6;
+  box-shadow: 0 0 8px rgba(20, 184, 166, 0.6);
+}
+
+/* Accordion Smooth Height */
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.38s var(--ease-spring), opacity 0.25s;
+  opacity: 0;
+}
+
+.accordion-content.expanded {
+  max-height: 800px;
+  opacity: 1;
+}
+
+.accordion-chevron {
+  transition: transform 0.3s var(--ease-spring);
+}
+
+.accordion-chevron.rotated {
+  transform: rotate(180deg);
+}
+
+/* ============================================================================
+   5. BOARDING PASS & MYSTERY ENVELOPE
+   ============================================================================ */
+
+.boarding-pass-card {
+  position: relative;
+  background: linear-gradient(145deg, rgba(17, 27, 48, 0.88), rgba(9, 15, 28, 0.95));
+  border: 1px solid var(--border-medium);
+  border-radius: 1.75rem;
+  backdrop-filter: var(--glass-blur);
+  overflow: hidden;
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.5), 0 0 25px -5px rgba(20, 184, 166, 0.15);
+}
+
+.boarding-pass-notch-left,
+.boarding-pass-notch-right {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: var(--bg-canvas);
+  border-radius: 50%;
+  top: 55%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.boarding-pass-notch-left {
+  left: -12px;
+  box-shadow: inset -3px 0 5px rgba(0, 0, 0, 0.4);
+}
+
+.boarding-pass-notch-right {
+  right: -12px;
+  box-shadow: inset 3px 0 5px rgba(0, 0, 0, 0.4);
+}
+
+.ticket-divider-line {
+  border-top: 2px dashed rgba(255, 255, 255, 0.15);
+  position: relative;
+}
+
+/* ============================================================================
+   6. TOAST ALERTS & MODAL ANIMATIONS
+   ============================================================================ */
+
+@keyframes toastSlideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 25px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+.toast-container {
+  animation: toastSlideUp 0.35s var(--ease-spring) forwards;
+}
+
+@keyframes modalZoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-content-animated {
+  animation: modalZoomIn 0.3s var(--ease-spring) forwards;
+}

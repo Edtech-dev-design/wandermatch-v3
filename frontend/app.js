@@ -765,11 +765,13 @@ window.applyUserSession = function() {
   const gatekeeper = document.getElementById("gatekeeperLanding");
   const b2cTab = document.getElementById("tab-b2c");
 
+  // Tab B2C luôn luôn hiển thị để khách khám phá và trải nghiệm du lịch mọi lúc
+  if (b2cTab) b2cTab.style.display = "block";
+
   if (session && session.email) {
     if (outBox) outBox.style.display = "none";
     if (inBox) inBox.style.display = "flex";
     if (gatekeeper) gatekeeper.style.display = "none";
-    if (b2cTab) b2cTab.style.display = "block";
 
     const nameEl = document.getElementById("userDisplayName");
     const emailEl = document.getElementById("userDisplayEmail");
@@ -2112,10 +2114,10 @@ window.startEnvelopeCountdown = function() {
 window.switchTab = function(tab) {
   const session = window.loadStore("wm_session_prod", null);
   
-  // BẮT BUỘC: Chưa đăng nhập thì KHÔNG mở bất kỳ tab nào, bật modal yêu cầu đăng nhập
-  if (!session || !session.email) {
+  // Tab Hành Trình Của Tôi cần tài khoản để xem vé cá nhân
+  if (tab === "saved" && (!session || !session.email)) {
     window.openUnifiedAuthModal();
-    return window.showToast("Vui lòng đăng nhập hoặc kết nối tài khoản để mở khóa thuật toán gợi ý chuyến đi bí mật!", "warn");
+    return window.showToast("Vui lòng đăng nhập để xem các chuyến đi và hợp đồng đã lưu của bạn!", "info");
   }
 
   ["b2c", "saved", "b2b"].forEach(t => {
@@ -2133,26 +2135,150 @@ window.switchTab = function(tab) {
   if (tab === "b2b") window.renderB2BTab();
 };
 
+// ============================================================================
+// CHUYỂN CẢNH MƯỢT MÀ 4 BƯỚC (LUXURY STEPPER TRANSITIONS)
+// ============================================================================
 window.goToStep = function(s) {
   [1, 2, 3, 4].forEach(n => {
     const panel = document.getElementById("step-panel-" + n);
     const nav = document.getElementById("step-nav-" + n);
-    if (panel) panel.style.display = (n === s) ? "block" : "none";
+    const icon = document.getElementById("step-nav-icon-" + n);
+
+    if (panel) {
+      if (n === s) {
+        panel.style.display = "block";
+        panel.classList.remove("animate-step-in");
+        void panel.offsetWidth; // Trigger reflow for CSS animation restart
+        panel.classList.add("animate-step-in");
+      } else {
+        panel.style.display = "none";
+      }
+    }
+
     if (nav) {
-      nav.className = (n === s)
-        ? "p-4 rounded-2xl border border-teal-400/50 bg-teal-500/15 text-left transition relative overflow-hidden group shadow-lg"
-        : "p-4 rounded-2xl border border-white/10 bg-slate-900/60 text-left transition relative overflow-hidden group";
-      
-      const bar = nav.querySelector("div");
-      if (bar) bar.className = (n === s) ? "absolute bottom-0 left-0 right-0 h-1 bg-teal-400" : "absolute bottom-0 left-0 right-0 h-1 bg-transparent group-hover:bg-teal-500/50";
+      if (n === s) {
+        nav.className = "step-nav-item active p-3 md:p-3.5 rounded-2xl border border-teal-400/50 text-left transition flex items-center gap-3";
+        if (icon) {
+          icon.className = "w-8 h-8 rounded-xl bg-teal-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0 shadow-md ring-2 ring-teal-400/40";
+          icon.innerText = String(n);
+        }
+      } else if (n < s) {
+        // Đã hoàn thành bước trước
+        nav.className = "step-nav-item p-3 md:p-3.5 rounded-2xl border border-emerald-500/30 text-left transition flex items-center gap-3 bg-emerald-500/5";
+        if (icon) {
+          icon.className = "w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold flex items-center justify-center text-xs shrink-0";
+          icon.innerText = "✓";
+        }
+      } else {
+        // Bước tiếp theo
+        nav.className = "step-nav-item p-3 md:p-3.5 rounded-2xl border border-white/10 text-left transition flex items-center gap-3 opacity-80 hover:opacity-100";
+        if (icon) {
+          icon.className = "w-8 h-8 rounded-xl bg-slate-800 text-slate-400 font-bold flex items-center justify-center text-xs shrink-0";
+          icon.innerText = String(n);
+        }
+      }
     }
   });
+
+  // Cập nhật thanh ray tiến trình (Progress Bar Track)
+  const progressBar = document.getElementById("stepperProgressBar");
+  if (progressBar) {
+    const widths = { 1: "25%", 2: "50%", 3: "75%", 4: "100%" };
+    progressBar.style.width = widths[s] || "25%";
+  }
+
+  // Cuộn mượt mà lên đầu phần nội dung
+  const b2cTab = document.getElementById("tab-b2c");
+  if (b2cTab && s > 1) {
+    b2cTab.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   if (s === 4) {
     setTimeout(() => {
       window.initScratchCanvas();
       window.startEnvelopeCountdown();
-    }, 60);
+    }, 80);
+  }
+};
+
+// ============================================================================
+// CHỌN NHANH PHONG CÁCH DU LỊCH (QUICK VIBE SELECTOR)
+// ============================================================================
+window.selectQuickVibe = function(vibe) {
+  const configs = {
+    BEACH: { healing: 85, nature: 95, solitude: 75, comfort: 90, culture: 60, name: "Biển Đảo Nghỉ Dưỡng" },
+    FOOD: { healing: 60, nature: 65, solitude: 50, comfort: 80, culture: 95, name: "Ẩm Thực & Phố Đêm" },
+    HEALING: { healing: 95, nature: 90, solitude: 90, comfort: 85, culture: 70, name: "Chữa Lành & Retreat" },
+    PHOTO: { healing: 70, nature: 90, solitude: 65, comfort: 90, culture: 85, name: "Check-in Sống Ảo" },
+    CULTURE: { healing: 75, nature: 70, solitude: 70, comfort: 80, culture: 95, name: "Di Sản & Lịch Sử" },
+    ROMANTIC: { healing: 90, nature: 85, solitude: 95, comfort: 95, culture: 75, name: "Lãng Mạn Đôi Lứa" }
+  };
+
+  const cfg = configs[vibe] || configs.BEACH;
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  };
+
+  setVal("qHealing", cfg.healing);
+  setVal("qNature", cfg.nature);
+  setVal("qSolitude", cfg.solitude);
+  setVal("qComfort", cfg.comfort);
+  setVal("qCulture", cfg.culture);
+
+  // Cập nhật trạng thái active của các chip
+  document.querySelectorAll("#quickVibeChips .vibe-chip").forEach(btn => {
+    const txt = btn.innerText;
+    if (txt.includes(cfg.name.split(" ")[0])) {
+      btn.classList.add("selected");
+    } else {
+      btn.classList.remove("selected");
+    }
+  });
+
+  window.onFormChange();
+  window.showToast(`Đã áp dụng thông số gu: ${cfg.name}`);
+};
+
+// ============================================================================
+// TIỆN ÍCH 1-CHẠM SAO CHÉP (1-CLICK CLIPBOARD COPY)
+// ============================================================================
+window.copyToClipboard = function(text, btnElement) {
+  if (!text) return;
+  const originalHtml = btnElement ? btnElement.innerHTML : "";
+  
+  const showSuccess = () => {
+    if (btnElement) {
+      btnElement.innerHTML = "Đã chép! ✓";
+      btnElement.classList.add("bg-emerald-500/30", "text-emerald-300", "border-emerald-400");
+      setTimeout(() => {
+        btnElement.innerHTML = originalHtml;
+        btnElement.classList.remove("bg-emerald-500/30", "text-emerald-300", "border-emerald-400");
+      }, 1500);
+    }
+    window.showToast(`Đã sao chép: ${text}`);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(showSuccess).catch(() => {
+      // Fallback
+      fallbackCopy(text);
+      showSuccess();
+    });
+  } else {
+    fallbackCopy(text);
+    showSuccess();
+  }
+
+  function fallbackCopy(val) {
+    const ta = document.createElement("textarea");
+    ta.value = val;
+    ta.style.position = "fixed";
+    ta.style.left = "-9999px";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
   }
 };
 
