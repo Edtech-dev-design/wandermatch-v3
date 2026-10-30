@@ -9,7 +9,7 @@
   <script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=12.0">
+  <link rel="stylesheet" href="styles.css?v=13.0">
   <style>
     :root {
       --font-heading: 'Outfit', sans-serif;
@@ -144,20 +144,20 @@
 
         <!-- TRẠNG THÁI: ĐÃ ĐĂNG NHẬP -->
         <div id="authLoggedInBox" style="display:none;" class="flex items-center gap-3 bg-slate-900/95 border border-teal-500/35 p-1.5 pl-3 rounded-2xl shadow-xl">
-          <div class="relative">
+          <div class="relative cursor-pointer" onclick="window.openUserProfileModal()" title="Xem hồ sơ & ký quỹ Escrow">
             <div id="userAvatarContainer" class="w-8 h-8 rounded-xl overflow-hidden border border-teal-400 flex items-center justify-center font-bold text-xs bg-slate-800 text-teal-300">
               <img id="userAvatarImg" src="" alt="Avatar" class="w-full h-full object-cover" />
             </div>
             <span class="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-900"></span>
           </div>
-          <div class="text-xs leading-tight pr-1">
+          <div class="text-xs leading-tight pr-1 cursor-pointer" onclick="window.openUserProfileModal()" title="Xem hồ sơ & ký quỹ Escrow">
             <div class="flex items-center gap-1.5">
               <strong id="userDisplayName" class="text-white font-bold block max-w-[130px] truncate">---</strong>
               <span id="userProviderBadge" class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 font-mono">---</span>
             </div>
             <span id="userDisplayEmail" class="text-slate-400 text-[10px] block max-w-[140px] truncate">---</span>
           </div>
-          <button onclick="window.logoutUser()" title="Đăng xuất khỏi phiên hiện tại" class="text-xs px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 font-bold border border-rose-500/30 transition">
+          <button onclick="window.logoutUser()" title="Đăng xuất khỏi phiên hiện tại" class="text-xs px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 font-bold border border-rose-500/30 transition cursor-pointer">
             Thoát
           </button>
         </div>
@@ -812,37 +812,98 @@
   <!-- ========================================================================= -->
   <main id="tab-saved" style="display:none;" class="max-w-6xl mx-auto px-4 mt-6 space-y-6">
     <div class="glass-card rounded-3xl p-6 md:p-8 space-y-6">
-      <div class="border-b border-white/10 pb-4">
-        <h2 class="text-xl font-extrabold text-white font-heading">
-          Danh Sách Hành Trình Đã Lưu & Đơn Đặt Chỗ Của Bạn
-        </h2>
-        <p class="text-xs text-slate-400 mt-0.5">Toàn bộ dữ liệu được liên kết và đồng bộ vĩnh viễn với tài khoản cá nhân của bạn.</p>
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+        <div>
+          <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-teal-500/20 text-teal-300 uppercase tracking-widest font-black">Digital Travel Vault</span>
+          <h2 class="text-xl md:text-2xl font-extrabold text-white font-heading mt-1">
+            Hộ Chiếu Du Lịch Bí Mật & Lịch Sử Đặt Chỗ
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Toàn bộ hợp đồng, mã PNR vé bay và voucher resort được lưu trữ an toàn trong kho dữ liệu cá nhân.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs px-3.5 py-1.5 rounded-xl bg-teal-500/15 text-teal-300 border border-teal-500/30 font-mono font-bold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+            Bảo Chứng Napas 24/7
+          </span>
+        </div>
       </div>
 
-      <div class="grid md:grid-cols-2 gap-6 text-xs">
-        <div class="bg-slate-950/70 p-5 rounded-2xl border border-white/10 space-y-3">
-          <strong class="text-amber-400 block uppercase tracking-wider font-extrabold">Hành Trình Yêu Thích Đã Lưu</strong>
-          <div id="savedWishlistContainer" class="space-y-3"></div>
+      <div class="grid lg:grid-cols-2 gap-6 text-xs">
+        <!-- CỘT 1: ĐƠN ĐẶT CHỖ KÝ QUỸ CHÍNH THỨC -->
+        <div class="bg-slate-950/70 p-5 md:p-6 rounded-3xl border border-teal-500/30 space-y-4">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2.5">
+            <strong class="text-teal-300 block uppercase tracking-wider font-extrabold flex items-center gap-2">
+              <span>✈️</span> Đơn Đặt Chỗ Ký Quỹ & Vé Máy Bay
+            </strong>
+            <span class="text-[10px] text-slate-400 font-mono">Escrow Backed 200%</span>
+          </div>
+          <div id="savedBookingsContainer" class="space-y-4"></div>
         </div>
 
-        <div class="bg-slate-950/70 p-5 rounded-2xl border border-white/10 space-y-3">
-          <strong class="text-teal-400 block uppercase tracking-wider font-extrabold">Đơn Đặt Chỗ Ký Quỹ Chính Thức</strong>
-          <div id="savedBookingsContainer" class="space-y-3"></div>
+        <!-- CỘT 2: HÀNH TRÌNH YÊU THÍCH ĐÃ LƯU -->
+        <div class="bg-slate-950/70 p-5 md:p-6 rounded-3xl border border-white/10 space-y-4">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2.5">
+            <strong class="text-amber-400 block uppercase tracking-wider font-extrabold flex items-center gap-2">
+              <span>★</span> Hành Trình Yêu Thích Đang Lưu
+            </strong>
+            <span class="text-[10px] text-slate-400">Tự do kích hoạt</span>
+          </div>
+          <div id="savedWishlistContainer" class="space-y-4"></div>
         </div>
       </div>
     </div>
   </main>
 
   <!-- ========================================================================= -->
-  <!-- 4. TAB: ĐỐI TÁC RESORT (B2B INVENTORY) -->
+  <!-- 4. TAB: ĐỐI TÁC RESORT (B2B INVENTORY & WHOLESALE EXTRANET) -->
   <!-- ========================================================================= -->
   <main id="tab-b2b" style="display:none;" class="max-w-6xl mx-auto px-4 mt-6 space-y-6">
     <div class="glass-card rounded-3xl p-6 md:p-8 space-y-6">
-      <div class="border-b border-white/10 pb-4">
-        <h2 class="text-xl font-extrabold text-teal-400 font-heading">
-          Hệ Thống Quỹ Phòng Liên Kết Đối Tác (B2B Inventory)
-        </h2>
-        <p class="text-xs text-slate-400 mt-0.5">Giá độc quyền phân phối trực tiếp từ chuỗi Resort 4-5 sao ký kết cam kết SLA với WanderMatch.</p>
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
+        <div>
+          <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-teal-500/20 text-teal-300 uppercase tracking-widest font-black">B2B Wholesale Extranet</span>
+          <h2 class="text-xl md:text-2xl font-extrabold text-teal-300 font-heading mt-1">
+            Hệ Thống Quỹ Phòng Liên Kết Đối Tác B2B Phút Chót
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Giá phân phối sỉ trực tiếp từ các chuỗi Resort 4-5 sao ký kết cam kết bảo lãnh SLA với WanderMatch.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs px-3.5 py-1.5 rounded-xl bg-amber-500/15 text-amber-300 border border-amber-400/30 font-mono font-bold">
+            Tiết Kiệm -35% Đến -50% Wholesale
+          </span>
+        </div>
+      </div>
+
+      <!-- THANH THỐNG KÊ NHANH (KPI METRICS BAR) -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+        <div class="bg-slate-950/70 p-3.5 rounded-2xl border border-white/10">
+          <span class="text-[10px] text-slate-400 block font-semibold">Resort Đối Tác SLA</span>
+          <strong class="text-base text-white font-heading mt-0.5 block">6 Chuỗi 5 Sao</strong>
+        </div>
+        <div class="bg-slate-950/70 p-3.5 rounded-2xl border border-white/10">
+          <span class="text-[10px] text-slate-400 block font-semibold">Quỹ Phòng Phút Chót</span>
+          <strong class="text-base text-teal-300 font-heading mt-0.5 block">28 Phòng Trống</strong>
+        </div>
+        <div class="bg-slate-950/70 p-3.5 rounded-2xl border border-white/10">
+          <span class="text-[10px] text-slate-400 block font-semibold">Bảo Chứng Ký Quỹ</span>
+          <strong class="text-base text-amber-300 font-heading mt-0.5 block">200% Escrow MB</strong>
+        </div>
+        <div class="bg-slate-950/70 p-3.5 rounded-2xl border border-white/10">
+          <span class="text-[10px] text-slate-400 block font-semibold">Cập Nhật Trực Tuyến</span>
+          <strong class="text-base text-emerald-400 font-heading mt-0.5 block">Đồng Bộ Real-time</strong>
+        </div>
+      </div>
+
+      <!-- BỘ LỌC THEO THÀNH PHỐ -->
+      <div class="flex flex-wrap items-center gap-2 pt-1">
+        <span class="text-xs font-bold text-slate-400 mr-1">Lọc điểm đến:</span>
+        <button onclick="window.filterB2BByCity('ALL')" id="b2bFilter_ALL" class="b2b-chip px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-teal-500 text-slate-950 border border-teal-300 shadow transition cursor-pointer">Tất Cả (6)</button>
+        <button onclick="window.filterB2BByCity('Đà Lạt')" id="b2bFilter_Đà Lạt" class="b2b-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 border border-white/10 hover:border-white/30 transition cursor-pointer">Đà Lạt</button>
+        <button onclick="window.filterB2BByCity('Măng Đen')" id="b2bFilter_Măng Đen" class="b2b-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 border border-white/10 hover:border-white/30 transition cursor-pointer">Măng Đen</button>
+        <button onclick="window.filterB2BByCity('Quy Nhơn')" id="b2bFilter_Quy Nhơn" class="b2b-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 border border-white/10 hover:border-white/30 transition cursor-pointer">Quy Nhơn</button>
+        <button onclick="window.filterB2BByCity('Huế')" id="b2bFilter_Huế" class="b2b-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 border border-white/10 hover:border-white/30 transition cursor-pointer">Huế</button>
+        <button onclick="window.filterB2BByCity('Phú Quốc')" id="b2bFilter_Phú Quốc" class="b2b-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 border border-white/10 hover:border-white/30 transition cursor-pointer">Phú Quốc</button>
+        <button onclick="window.filterB2BByCity('Nha Trang')" id="b2bFilter_Nha Trang" class="b2b-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 border border-white/10 hover:border-white/30 transition cursor-pointer">Nha Trang</button>
       </div>
 
       <div id="b2bInventoryList" class="grid sm:grid-cols-2 md:grid-cols-3 gap-5"></div>
@@ -910,7 +971,65 @@
         </button>
       </form>
     </div>
+  <
+
+  <!-- ========================================================================= -->
+  <!-- MODAL HỒ SƠ DU KHÁCH & QUẢN LÝ KÝ QUỸ ESCROW -->
+  <!-- ========================================================================= -->
+  <div id="userProfileModal" style="display:none;" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-teal-500/40 rounded-3xl max-w-lg w-full p-6 md:p-8 space-y-5 text-xs shadow-2xl relative modal-content-animated">
+      <div class="flex justify-between items-center border-b border-white/10 pb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-8 h-8 rounded-xl bg-teal-500/20 text-teal-300 flex items-center justify-center text-sm border border-teal-500/40">👤</span>
+          <div>
+            <h3 class="text-base font-extrabold text-white font-heading">Hồ Sơ Du Khách & Ký Quỹ Escrow</h3>
+            <span class="text-[10px] text-slate-400">Xác thực tài khoản chính danh</span>
+          </div>
+        </div>
+        <button onclick="window.closeUserProfileModal()" class="text-slate-400 hover:text-white font-bold text-lg px-2 cursor-pointer">✕</button>
+      </div>
+
+      <!-- THẺ THÔNG TIN TÀI KHOẢN -->
+      <div class="flex items-center gap-4 bg-slate-950/80 p-4 rounded-2xl border border-white/10">
+        <div id="profAvatarBox" class="w-14 h-14 rounded-2xl overflow-hidden border-2 border-teal-400 bg-slate-800 shrink-0">
+          <img id="profAvatarImg" src="" alt="Avatar" class="w-full h-full object-cover" />
+        </div>
+        <div class="space-y-1 flex-1">
+          <div class="flex items-center gap-2">
+            <strong id="profFullName" class="text-white text-sm font-bold">---</strong>
+            <span id="profProviderTag" class="text-[9px] px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 font-mono font-bold">---</span>
+          </div>
+          <span id="profEmail" class="text-slate-400 text-xs block font-mono">---</span>
+          <span class="text-[10px] text-amber-300 font-bold block">✦ Hạng Thành Viên: Luxury Connoisseur (VIP)</span>
+        </div>
+      </div>
+
+      <!-- THÔNG TIN KÝ QUỸ ESCROW VÀ HOÀN TIỀN -->
+      <div class="bg-slate-950/80 p-4 rounded-2xl border border-teal-500/30 space-y-2.5">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-300 font-semibold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            Tài Khoản Ký Quỹ Escrow MB Bank
+          </span>
+          <span class="text-emerald-300 font-mono font-bold">Đang Bảo Vệ 200%</span>
+        </div>
+        <p class="text-[11px] text-slate-400 leading-relaxed">
+          Tất cả các khoản tiền ký quỹ của bạn được phong tỏa an toàn tại tài khoản ủy thác MB Bank. Nếu chuyến đi có bất kỳ sai lệch nào về cam kết SLA, hệ thống hoàn tiền 100% tự động qua Napas 24/7 trong 2 phút.
+        </p>
+      </div>
+
+      <!-- NÚT THAO TÁC -->
+      <div class="flex flex-wrap justify-between items-center gap-3 pt-2 border-t border-white/10">
+        <button onclick="window.switchTab('saved'); window.closeUserProfileModal();" class="px-4 py-2.5 rounded-xl bg-teal-500/20 hover:bg-teal-500/30 text-teal-300 font-bold text-xs border border-teal-500/30 transition flex items-center gap-1.5 cursor-pointer">
+          <span>📁</span> Xem Chuyến Đi Của Tôi
+        </button>
+        <button onclick="window.logoutUser(); window.closeUserProfileModal();" class="px-4 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-bold text-xs border border-rose-500/30 transition flex items-center gap-1.5 cursor-pointer">
+          <span>🚪</span> Đăng Xuất An Toàn
+        </button>
+      </div>
+    </div>
   </div>
+/div>
 
   <script>
     // CẤU HÌNH ĐĂNG NHẬP THẬT: điền Client ID / App ID do chính bạn đăng ký.
@@ -918,7 +1037,7 @@
     window.WM_CONFIG = { GOOGLE_CLIENT_ID: "", FACEBOOK_APP_ID: "" };
   </script>
   <script src="supabaseClient.js"></script>
-  <script src="app.js?v=12.0"></script>
+  <script src="app.js?v=13.0"></script>
 
 
 </body>

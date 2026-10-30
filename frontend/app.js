@@ -2851,16 +2851,39 @@ window.renderSavedTab = function() {
   const wishContainer = document.getElementById("savedWishlistContainer");
   if (wishContainer) {
     wishContainer.innerHTML = wList.length === 0
-      ? `<p class="text-slate-400 italic p-4 text-center">Chưa có hành trình yêu thích nào được lưu.</p>`
+      ? `<div class="p-8 text-center text-slate-400 space-y-2"><span class="text-3xl block">📁</span><p class="text-xs italic">Bạn chưa lưu hành trình yêu thích nào. Hãy dùng thanh lọc và nhấn "Lưu" để lưu lại các gói ưng ý.</p></div>`
       : wList.map(x => `
-        <div class="p-4 rounded-2xl bg-slate-900 border border-white/10 flex justify-between items-center hover:border-teal-500/40 transition">
-          <div>
-            <strong class="text-amber-300 block text-sm font-heading">Gói #${x.code} (Khớp gu ${x.matchScore}%)</strong>
-            <span class="text-slate-400 text-xs">${window.formatVND(x.reveal.paid)} — Khí hậu ${x.temp}°C</span>
+        <div class="relative bg-slate-900/90 rounded-3xl border border-white/10 p-5 shadow-xl space-y-3.5 hover:border-teal-500/40 transition">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2.5">
+            <span class="text-xs font-extrabold text-amber-300 flex items-center gap-1.5 font-heading">
+              <span>★</span> Hành Trình #${x.code} (Khớp gu ${x.matchScore}%)
+            </span>
+            <span class="text-[10px] font-mono px-2.5 py-0.5 rounded bg-white/10 text-slate-300 font-bold">
+              ${x.temp}°C • ${x.weather}
+            </span>
           </div>
-          <button onclick="window.openSavedItem('${x.code}', 2)" class="px-4 py-2 rounded-xl bg-teal-500 text-slate-950 font-extrabold hover:bg-teal-400 transition">
-            Đặt Ngay →
-          </button>
+
+          <div class="flex gap-3.5 items-center">
+            <div class="w-16 h-16 rounded-2xl overflow-hidden shrink-0 border border-white/10 shadow">
+              <img src="${(x.reveal && x.reveal.img) || 'https://images.unsplash.com/photo-1540555700478-4be289fbecef'}" class="w-full h-full object-cover" alt="Preview" />
+            </div>
+            <div class="space-y-0.5 flex-1 text-xs">
+              <strong class="text-white block font-heading">${x.reveal.title || 'Kỳ nghỉ bí mật 3N2Đ'}</strong>
+              <div class="flex items-center gap-2">
+                <span class="text-teal-300 font-extrabold font-mono text-sm">${window.formatVND(x.reveal.paid)}</span>
+                <span class="text-[10px] text-amber-400 font-bold">(Tiết kiệm ${window.formatVND(x.reveal.savings)})</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-2 border-t border-white/10 text-xs">
+            <button onclick="window.removeWishlistItem('${x.code}')" class="text-rose-400 hover:text-rose-300 font-semibold text-[11px] flex items-center gap-1 transition cursor-pointer">
+              <span>✕</span> Bỏ lưu
+            </button>
+            <button onclick="window.openSavedItem('${x.code}', 2)" class="px-4 py-2 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-black shadow transition flex items-center gap-1.5 cursor-pointer">
+              <span>Đặt Kỳ Nghỉ Này →</span>
+            </button>
+          </div>
         </div>
       `).join("");
   }
@@ -2868,19 +2891,69 @@ window.renderSavedTab = function() {
   const bookContainer = document.getElementById("savedBookingsContainer");
   if (bookContainer) {
     bookContainer.innerHTML = bList.length === 0
-      ? `<p class="text-slate-400 italic p-4 text-center">Chưa có đơn đặt chỗ ký quỹ nào.</p>`
+      ? `<div class="p-8 text-center text-slate-400 space-y-2"><span class="text-3xl block">🎟️</span><p class="text-xs italic">Chưa có đơn ký quỹ chính thức nào. Khi bạn đặt chỗ ở Bước 2, hồ sơ hợp đồng sẽ xuất hiện tại đây.</p></div>`
       : bList.map(x => `
-        <div class="p-4 rounded-2xl bg-slate-900 border border-teal-500/30 flex justify-between items-center hover:border-teal-400 transition">
-          <div>
-            <strong class="text-teal-300 block text-sm font-heading">Đơn #${x.code} — ${x.customerName}</strong>
-            <span class="text-white text-xs">${x.isRevealed ? x.reveal.city : "Điểm đến đang niêm phong"} (${window.formatVND(x.reveal.paid)})</span>
+        <div class="relative bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 rounded-3xl border border-teal-500/35 p-5 md:p-6 shadow-2xl space-y-4 hover:border-teal-400 transition group overflow-hidden">
+          <div class="absolute -right-6 -bottom-6 w-36 h-36 bg-teal-500/5 rounded-full blur-xl pointer-events-none"></div>
+
+          <!-- Header Passport -->
+          <div class="flex items-center justify-between border-b border-white/10 pb-3">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-teal-500/20 text-teal-300 font-black flex items-center justify-center text-xs border border-teal-500/40">
+                ✈️
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-400 font-mono uppercase tracking-widest block font-bold">DIGITAL TRAVEL PASSPORT</span>
+                <strong class="text-white font-mono text-sm block">Đơn #${x.code}</strong>
+              </div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${x.isPaid ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse'}">
+              ${x.isPaid ? '✓ ĐÃ KÝ QUỸ NAPAS 24/7' : '⏳ CHỜ QUÉT VIETQR'}
+            </span>
           </div>
-          <button onclick="window.openSavedItem('${x.code}', 4)" class="px-4 py-2 rounded-xl btn-glow-gold text-slate-950 font-extrabold transition">
-            Xem Vé & Mở Khóa →
-          </button>
+
+          <!-- Nội dung thẻ -->
+          <div class="flex flex-wrap sm:flex-nowrap gap-4 items-center">
+            <div class="w-20 h-20 rounded-2xl overflow-hidden shrink-0 border border-white/15 shadow">
+              <img src="${(x.reveal && x.reveal.img) || 'https://images.unsplash.com/photo-1566073771259-6a8506099945'}" class="w-full h-full object-cover" alt="Resort" />
+            </div>
+            <div class="space-y-1 flex-1">
+              <h4 class="text-white font-bold text-sm font-heading">${x.isRevealed ? x.reveal.city + ' — ' + x.reveal.hotel : 'Điểm Đến Bí Mật (Đã Niêm Phong)'}</h4>
+              <p class="text-slate-300 text-xs">${x.flightLabel || 'Chuyến bay khứ hồi chuẩn SLA'}</p>
+              <div class="flex flex-wrap items-center gap-3 text-[11px] text-slate-400 pt-0.5">
+                <span>Hành khách: <strong class="text-white">${x.customerName || 'Quý khách'}</strong></span>
+                <span>•</span>
+                <span>Tổng thanh toán: <strong class="text-teal-300 font-mono">${window.formatVND(x.reveal.paid)}</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3 Nút thao tác nhanh -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-white/10">
+            <button onclick="window.openSavedItem('${x.code}', 4)" class="px-4 py-2 rounded-xl text-xs font-black btn-glow-gold text-slate-950 flex items-center gap-1.5 shadow transition cursor-pointer">
+              <span>✦</span> Xem Vé & Thẻ Cào Mở Khóa →
+            </button>
+            <div class="flex gap-2">
+              <button onclick="window.openSavedItem('${x.code}', 4); setTimeout(() => window.printVoucher(), 400);" class="px-3 py-2 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white border border-white/15 transition flex items-center gap-1 cursor-pointer">
+                <span>🖨️</span> In Vé
+              </button>
+              <button onclick="window.openSavedItem('${x.code}', 4); setTimeout(() => window.exportTripCalendarICS(), 400);" class="px-3 py-2 rounded-xl text-xs font-bold bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30 transition flex items-center gap-1 cursor-pointer">
+                <span>📅</span> iCal
+              </button>
+            </div>
+          </div>
         </div>
       `).join("");
   }
+};
+
+window.removeWishlistItem = function(code) {
+  let saved = window.loadStore("wm_saved_prod", []);
+  saved = saved.filter(x => x.code !== code || x.isLocked);
+  window.saveStore("wm_saved_prod", saved);
+  window.updateSavedBadge();
+  window.renderSavedTab();
+  window.showToast(`Đã xóa hành trình #${code} khỏi danh sách lưu.`);
 };
 
 window.openSavedItem = function(code, step) {
@@ -2892,39 +2965,191 @@ window.openSavedItem = function(code, step) {
   window.goToStep(step);
 };
 
+// ============================================================================
+// CỔNG QUỸ PHÒNG ĐỐI TÁC RESORT (B2B WHOLESALE EXTRANET)
+// ============================================================================
+window.currentB2BCityFilter = "ALL";
+
+window.filterB2BByCity = function(city) {
+  window.currentB2BCityFilter = city;
+  
+  // Cập nhật trạng thái active của các chip lọc
+  document.querySelectorAll(".b2b-chip").forEach(btn => {
+    if (btn.id === `b2bFilter_${city}`) {
+      btn.className = "b2b-chip px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-teal-500 text-slate-950 border border-teal-300 shadow transition";
+    } else {
+      btn.className = "b2b-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 border border-white/10 hover:border-white/30 transition";
+    }
+  });
+
+  window.renderB2BTab();
+};
+
 window.renderB2BTab = function() {
   const b2bList = document.getElementById("b2bInventoryList");
   if (!b2bList) return;
-  b2bList.innerHTML = window.HOTELS_DB.map(h => `
-    <div class="bg-slate-900/90 rounded-2xl border border-white/10 overflow-hidden hover:border-teal-500/30 transition text-xs shadow-xl flex flex-col justify-between">
-      <div class="relative h-44 overflow-hidden">
-        <img src="${h.img}" alt="${h.name}" class="w-full h-full object-cover" />
-        <span class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full bg-slate-950/80 text-amber-400 font-bold backdrop-blur-md">
+
+  const city = window.currentB2BCityFilter || "ALL";
+  const filtered = city === "ALL"
+    ? window.HOTELS_DB
+    : window.HOTELS_DB.filter(h => h.city === city);
+
+  b2bList.innerHTML = filtered.map(h => `
+    <div class="bg-slate-900/90 rounded-3xl border border-white/10 overflow-hidden hover:border-teal-500/40 transition text-xs shadow-2xl flex flex-col justify-between group">
+      <div class="relative h-48 overflow-hidden">
+        <img src="${h.img}" alt="${h.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
+        <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-950/85 text-amber-300 font-extrabold backdrop-blur-md border border-amber-400/30 flex items-center gap-1 shadow">
           ★ ${h.rating} (${h.reviews_count} đánh giá)
         </span>
-        <span class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 font-mono font-bold backdrop-blur-md">
+        <span class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-teal-950/85 text-teal-300 font-mono font-bold backdrop-blur-md border border-teal-400/30 shadow">
           ${h.sla}
         </span>
-      </div>
-      <div class="p-4 space-y-3">
-        <div>
-          <span class="text-teal-400 font-extrabold uppercase text-[10px] tracking-wider">${h.city}</span>
-          <h4 class="font-extrabold text-white text-sm mt-0.5">${h.name}</h4>
-          <p class="text-slate-400 text-[11px] mt-0.5">${h.room_type}</p>
+        <div class="absolute bottom-3 left-3 right-3 flex justify-between items-center text-[10px]">
+          <span class="px-2.5 py-0.5 rounded-md bg-emerald-500/25 text-emerald-300 font-extrabold backdrop-blur-md border border-emerald-400/30">
+            Quỹ phòng: Còn 2-4 phòng trống
+          </span>
+          <span class="px-2 py-0.5 rounded-md bg-white/15 text-white font-mono backdrop-blur-md">
+            Khí hậu ${h.temp}°C
+          </span>
         </div>
-        <div class="pt-2 border-t border-white/10 flex justify-between items-end">
-          <div>
-            <span class="line-through text-slate-400 block text-[11px]">${window.formatVND(h.retail_night)}/đêm</span>
-            <span class="text-slate-300 text-[10px]">Giá bán lẻ OTA</span>
+      </div>
+
+      <div class="p-5 space-y-3.5 flex-1 flex flex-col justify-between">
+        <div class="space-y-1">
+          <span class="text-teal-400 font-extrabold uppercase text-[10px] tracking-wider block">${h.city}</span>
+          <h4 class="font-extrabold text-white text-sm font-heading leading-snug">${h.name}</h4>
+          <p class="text-slate-400 text-xs mt-0.5">${h.room_type}</p>
+          
+          <div class="flex flex-wrap gap-1.5 pt-1.5">
+            ${(h.amenities || []).slice(0, 3).map(a => `
+              <span class="text-[9px] px-2 py-0.5 rounded-md bg-white/5 text-slate-300 border border-white/10">${a}</span>
+            `).join("")}
           </div>
-          <div class="text-right">
-            <strong class="text-teal-300 text-sm font-extrabold block">${window.formatVND(h.night_price)}/đêm</strong>
-            <span class="text-amber-400 text-[10px] font-bold">Giá B2B Phút Chót</span>
+        </div>
+
+        <div class="pt-3 border-t border-white/10 space-y-3">
+          <div class="flex justify-between items-end">
+            <div>
+              <span class="line-through text-slate-400 block text-[11px] font-mono">${window.formatVND(h.retail_night)}/đêm</span>
+              <span class="text-slate-400 text-[10px]">Giá niêm yết lẻ OTA</span>
+            </div>
+            <div class="text-right">
+              <strong class="text-teal-300 text-base font-black font-mono block">${window.formatVND(h.night_price)}/đêm</strong>
+              <span class="text-amber-400 text-[10px] font-bold">Giá Sỉ B2B Phút Chót</span>
+            </div>
           </div>
+
+          <button onclick="window.createPackageFromB2B('${h.id}')" class="w-full py-2.5 px-3 rounded-xl font-black text-xs btn-glow-teal text-slate-950 flex items-center justify-center gap-1.5 shadow transition transform group-hover:scale-[1.02] cursor-pointer">
+            <span>✦</span> Tạo Gói Du Lịch Mù Từ Resort Này →
+          </button>
         </div>
       </div>
     </div>
   `).join("");
+};
+
+window.createPackageFromB2B = function(hotelId) {
+  const hotel = window.HOTELS_DB.find(h => h.id === hotelId);
+  if (!hotel) return;
+  const inp = window.getFormInputs();
+  let flight = window.FLIGHTS_DB.find(f => f.origin === inp.origin && f.city === hotel.city);
+  if (!flight) flight = window.FLIGHTS_DB.find(f => f.city === hotel.city) || window.FLIGHTS_DB[0];
+
+  const code = "WM" + Math.floor(10000 + Math.random() * 90000);
+  const unitCost = flight.price + (hotel.night_price * 2);
+  const unitRetail = flight.price + (hotel.retail_night * 2);
+  const totalPaid = unitCost * inp.groupSize;
+  const totalRetail = unitRetail * inp.groupSize;
+  const savings = totalRetail - totalPaid;
+
+  const qrs = Array.from({ length: inp.groupSize }, (_, i) => ({
+    idx: i + 1,
+    amount: unitCost,
+    memo: `${code} KH${i + 1}`,
+    url: `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${unitCost}&addInfo=${encodeURIComponent(`${code} KH${i + 1}`)}&accountName=${encodeURIComponent("CONG TY TNHH WANDERMATCH VN")}`
+  }));
+
+  const reasoningLog = `[Kích hoạt từ Quỹ phòng B2B Extranet]: Đã ghép nối trực tiếp Resort đối tác SLA ${hotel.rating}★ ${hotel.name} (${hotel.city}) cùng chuyến bay ${flight.airline}. Tối ưu tiết kiệm ${window.formatVND(savings)}.`;
+
+  const newPkg = {
+    code,
+    comboId: `${flight.id}_${hotel.id}`,
+    isLocked: false,
+    isRevealed: false,
+    matchScore: 98.5,
+    utilityScore: 96.0,
+    knapsackRatio: Math.min(100, Math.round((unitCost / inp.budget) * 100)),
+    reasoningLog,
+    temp: hotel.temp,
+    weather: hotel.weather,
+    hint: hotel.hint,
+    packing: hotel.packing,
+    food: hotel.food,
+    days: hotel.days,
+    reviews: hotel.reviews || [],
+    flight: flight,
+    hotel: hotel,
+    qrs,
+    flightLabel: `Khứ hồi ${flight.airline} (${flight.time})`,
+    hotelLabel: `Resort ${hotel.rating}★ tiêu chuẩn quốc tế (Kèm buffet sáng & xe đưa đón)`,
+    reveal: {
+      city: hotel.city,
+      title: hotel.title,
+      sla: hotel.sla,
+      room_type: hotel.room_type,
+      img: hotel.img,
+      gallery: hotel.gallery || [hotel.img],
+      room_specs: hotel.room_specs,
+      amenities: hotel.amenities,
+      transport: `${flight.id} - ${flight.airline} (${flight.time})`,
+      hotel: hotel.name,
+      paid: totalPaid,
+      retail: totalRetail,
+      savings
+    }
+  };
+
+  window.saveStore("wm_draft_prod", newPkg);
+  window.renderPackageUI(newPkg);
+  window.switchTab("b2c");
+  window.goToStep(1);
+  const resultBox = document.getElementById("recommendationResultBox");
+  if (resultBox) resultBox.scrollIntoView({ behavior: "smooth", block: "start" });
+  window.showToast(`🎉 Đã thiết lập thành công gói du lịch từ Quỹ phòng đối tác: ${hotel.name}!`);
+};
+
+// ============================================================================
+// MODAL HỒ SƠ DU KHÁCH & TRUNG TÂM BẢO CHỨNG ESCROW
+// ============================================================================
+window.openUserProfileModal = function() {
+  const session = window.loadStore("wm_session_prod", null);
+  if (!session || !session.email) {
+    window.openUnifiedAuthModal();
+    return;
+  }
+
+  const modal = document.getElementById("userProfileModal");
+  if (!modal) return;
+
+  const profName = document.getElementById("profFullName");
+  const profEmail = document.getElementById("profEmail");
+  const profTag = document.getElementById("profProviderTag");
+  const profImg = document.getElementById("profAvatarImg");
+
+  if (profName) profName.innerText = session.name || "Khách Hàng";
+  if (profEmail) profEmail.innerText = session.email;
+  if (profTag) profTag.innerText = (session.provider || "EMAIL").toUpperCase();
+  if (profImg) {
+    profImg.src = session.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(session.name || "WM")}&background=0D9488&color=fff&bold=true`;
+  }
+
+  modal.style.display = "flex";
+};
+
+window.closeUserProfileModal = function() {
+  const modal = document.getElementById("userProfileModal");
+  if (modal) modal.style.display = "none";
 };
 
 // Tương thích ngược nếu còn lời gọi cũ
