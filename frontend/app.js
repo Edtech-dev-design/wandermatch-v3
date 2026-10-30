@@ -2107,11 +2107,15 @@ window.renderPackageUI = function(pkg) {
     document.getElementById("aiMysteryHintText").innerText = `"${pkg.hint}"`;
   }
   if (document.getElementById("packingListContainer")) {
+    const customItems = window.customPackingItems || [];
     const categories = [
       { cat: "Giấy tờ & Công nghệ", icon: "📁", items: ["CCCD / Hộ chiếu bản gốc còn hạn", "Pin sạc dự phòng & cáp sạc điện thoại", "Vé bay điện tử đã lưu vào máy"] },
       { cat: "Trang phục vi khí hậu", icon: "🧣", items: pkg.packing },
       { cat: "Sức khỏe & Cá nhân", icon: "🧴", items: ["Kem chống nắng & kính râm", "Thuốc say xe & thuốc cá nhân", "Bình nước giữ nhiệt du lịch"] }
     ];
+    if (customItems.length) {
+      categories.push({ cat: "Món đồ cá nhân bạn đã thêm", icon: "🎒", items: customItems, isCustom: true });
+    }
 
     document.getElementById("packingListContainer").innerHTML = categories.map(c => `
       <div class="space-y-1.5 p-3 rounded-2xl bg-slate-900/70 border border-white/10">
@@ -2120,10 +2124,13 @@ window.renderPackageUI = function(pkg) {
         </span>
         <div class="space-y-1 pt-1">
           ${c.items.map(item => `
-            <label class="flex items-center gap-2 text-xs text-slate-200 p-2 rounded-xl bg-slate-950/60 border border-white/5 cursor-pointer hover:bg-slate-950 transition">
-              <input type="checkbox" checked onchange="window.updatePackingProgress()" class="accent-teal-400 w-4 h-4 rounded cursor-pointer" />
-              <span>${item}</span>
-            </label>
+            <div class="flex items-center justify-between gap-2 text-xs text-slate-200 p-2 rounded-xl bg-slate-950/60 border border-white/5 hover:bg-slate-950 transition">
+              <label class="flex items-center gap-2 cursor-pointer flex-1">
+                <input type="checkbox" checked onchange="window.updatePackingProgress()" class="accent-teal-400 w-4 h-4 rounded cursor-pointer" />
+                <span>${item}</span>
+              </label>
+              ${c.isCustom ? `<button onclick="window.removeCustomPackingItem('${item}')" title="Xóa món này" class="text-rose-400 hover:text-rose-300 text-[11px] px-1.5 py-0.5 rounded hover:bg-rose-500/10 transition cursor-pointer">✕</button>` : ''}
+            </div>
           `).join("")}
         </div>
       </div>
@@ -2929,10 +2936,41 @@ window.copyToClipboard = function(text, btnElement) {
   }
 };
 
+window.currentSavedFilter = "ALL";
+window.filterSavedTab = window.filterSavedTrips = function(filter) {
+  window.currentSavedFilter = filter;
+  document.querySelectorAll("#savedFilterTabs .saved-tab-chip").forEach(btn => {
+    if (btn.id === `savedFilter_${filter}`) {
+      btn.className = "saved-tab-chip px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-teal-500 text-slate-950 border border-teal-300 shadow cursor-pointer transition";
+    } else {
+      btn.className = "saved-tab-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 border border-white/10 hover:border-white/30 cursor-pointer transition";
+    }
+  });
+  window.renderSavedTab();
+};
+
 window.renderSavedTab = function() {
   const list = window.loadStore("wm_saved_prod", []);
-  const wList = list.filter(x => !x.isLocked);
-  const bList = list.filter(x => x.isLocked);
+  const filter = window.currentSavedFilter || "ALL";
+
+  let bList = list.filter(x => x.isLocked);
+  let wList = list.filter(x => !x.isLocked);
+
+  // Thống kê nhanh Metrics bar
+  const totalBookings = bList.length;
+  const sealedCount = bList.filter(x => !x.isRevealed).length;
+  const totalSavings = bList.reduce((acc, cur) => acc + ((cur.reveal && cur.reveal.savings) || 0), 0);
+
+  if (document.getElementById("savedMetricsBookings")) document.getElementById("savedMetricsBookings").innerText = `${totalBookings} chuyến`;
+  if (document.getElementById("savedMetricsSealed")) document.getElementById("savedMetricsSealed").innerText = `${sealedCount} chuyến`;
+  if (document.getElementById("savedMetricsSavings")) document.getElementById("savedMetricsSavings").innerText = window.formatVND(totalSavings);
+
+  // Áp dụng bộ lọc
+  if (filter === "SEALED") {
+    bList = bList.filter(x => !x.isRevealed);
+  } else if (filter === "REVEALED") {
+    bList = bList.filter(x => x.isRevealed);
+  }
 
   const wishContainer = document.getElementById("savedWishlistContainer");
   if (wishContainer) {
@@ -3229,6 +3267,12 @@ window.openUserProfileModal = function() {
   const profEmail = document.getElementById("profEmail");
   const profTag = document.getElementById("profProviderTag");
   const profImg = document.getElementById("profAvatarImg");
+  const actBookings = document.getElementById("profActiveBookingsCount");
+  const wishCount = document.getElementById("profSavedWishlistCount");
+
+  const savedList = window.loadStore("wm_saved_prod", []);
+  const bCount = savedList.filter(x => x.isLocked).length;
+  const wCount = savedList.filter(x => !x.isLocked).length;
 
   if (profName) profName.innerText = session.name || "Khách Hàng";
   if (profEmail) profEmail.innerText = session.email;
@@ -3236,8 +3280,47 @@ window.openUserProfileModal = function() {
   if (profImg) {
     profImg.src = session.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(session.name || "WM")}&background=0D9488&color=fff&bold=true`;
   }
+  if (actBookings) actBookings.innerText = `${bCount} chuyến`;
+  if (wishCount) wishCount.innerText = `${wCount} gói`;
+
+  // Nạp cấu hình sở thích đã lưu của người dùng
+  const users = window.loadStore("wm_users_prod", {});
+  const userRecord = users[session.email] || {};
+  const pref = userRecord.preferences || {};
+
+  const defOrigin = document.getElementById("profDefaultOrigin");
+  const defBudget = document.getElementById("profDefaultBudget");
+  const defBlacklist = document.getElementById("profDefaultBlacklist");
+
+  if (defOrigin) defOrigin.value = pref.origin || document.getElementById("originInput")?.value || "HAN";
+  if (defBudget) defBudget.value = pref.budget || document.getElementById("budgetInput")?.value || 5000000;
+  if (defBlacklist) defBlacklist.value = pref.blacklist || document.getElementById("blacklistInput")?.value || "";
 
   modal.style.display = "flex";
+};
+
+window.saveUserProfilePreferences = function() {
+  const session = window.loadStore("wm_session_prod", null);
+  if (!session || !session.email) return;
+
+  const origin = document.getElementById("profDefaultOrigin")?.value || "HAN";
+  const budget = parseInt(document.getElementById("profDefaultBudget")?.value || "5000000", 10);
+  const blacklist = document.getElementById("profDefaultBlacklist")?.value || "";
+
+  const users = window.loadStore("wm_users_prod", {});
+  if (!users[session.email]) {
+    users[session.email] = { name: session.name, email: session.email };
+  }
+  users[session.email].preferences = { origin, budget, blacklist };
+  window.saveStore("wm_users_prod", users);
+
+  // Áp dụng trực tiếp vào form Bước 1
+  if (document.getElementById("originInput")) document.getElementById("originInput").value = origin;
+  if (document.getElementById("budgetInput")) document.getElementById("budgetInput").value = budget;
+  if (document.getElementById("blacklistInput")) document.getElementById("blacklistInput").value = blacklist;
+
+  window.onFormChange();
+  window.showToast("✓ Đã lưu sở thích mặc định và áp dụng ngay vào bộ lọc chuyến đi!", "success");
 };
 
 window.closeUserProfileModal = function() {
@@ -3309,3 +3392,83 @@ if (document.readyState === "loading") {
 } else {
   window.initWanderMatchApp();
 }
+
+
+// ============================================================================
+// QUẢN LÝ DANH MỤC HÀNH LÝ NÂNG CAO (CUSTOM CHECKLIST & BATCH TOGGLE)
+// ============================================================================
+window.customPackingItems = window.loadStore("wm_custom_packing_prod", []);
+
+window.addCustomPackingItem = function() {
+  const input = document.getElementById("customPackingInput");
+  if (!input) return;
+  const val = input.value.trim();
+  if (!val) return window.showToast("Vui lòng nhập tên món đồ cần mang theo!", "warn");
+
+  if (!window.customPackingItems.includes(val)) {
+    window.customPackingItems.push(val);
+    window.saveStore("wm_custom_packing_prod", window.customPackingItems);
+  }
+  input.value = "";
+  
+  // Re-render packing list
+  const pkg = window.loadStore("wm_draft_prod", null);
+  if (pkg) window.renderPackageUI(pkg);
+  window.showToast(`Đã thêm món "${val}" vào danh sách hành lý!`, "success");
+};
+
+window.removeCustomPackingItem = function(item) {
+  window.customPackingItems = window.customPackingItems.filter(x => x !== item);
+  window.saveStore("wm_custom_packing_prod", window.customPackingItems);
+  const pkg = window.loadStore("wm_draft_prod", null);
+  if (pkg) window.renderPackageUI(pkg);
+  window.showToast(`Đã xóa món "${item}" khỏi danh mục.`);
+};
+
+window.toggleAllPacking = function(checked) {
+  const container = document.getElementById("packingListContainer");
+  if (!container) return;
+  container.querySelectorAll("input[type='checkbox']").forEach(cb => {
+    cb.checked = checked;
+  });
+  window.updatePackingProgress();
+};
+
+window.selectBankQuick = function(bankCode) {
+  const sel = document.getElementById("custBankCode");
+  if (sel) {
+    sel.value = bankCode;
+    window.updateBankQuickChips();
+  }
+};
+
+window.updateBankQuickChips = function() {
+  const sel = document.getElementById("custBankCode");
+  if (!sel) return;
+  const val = sel.value;
+  document.querySelectorAll("#quickBankChips .bank-chip").forEach(btn => {
+    if (btn.innerText === val) {
+      btn.className = "bank-chip px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/40 text-[10px] font-bold";
+    } else {
+      btn.className = "bank-chip px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-white/10 text-[10px]";
+    }
+  });
+};
+
+window.shareRevealedTrip = function() {
+  const pkg = window.loadStore("wm_draft_prod", null);
+  if (!pkg) return;
+  const city = pkg.isRevealed ? pkg.reveal.city : "Điểm Đến Bí Mật (Đang Niêm Phong Sáp)";
+  const hotel = pkg.isRevealed ? pkg.reveal.hotel : "Resort 5★ Tiêu Chuẩn Quốc Tế";
+  const shareText = `🎉 Chuyến Du Lịch Mù thượng lưu #${pkg.code} của tôi!\n✈️ Chuyến bay: ${pkg.flight?.airline || 'Vietnam Airlines'}\n🏨 Nghỉ dưỡng: ${hotel} (${city})\n💰 Tiết kiệm: ${window.formatVND(pkg.reveal.savings)} cùng WanderMatch.vn!`;
+  
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(shareText).then(() => {
+      window.showToast("✓ Đã sao chép nội dung chia sẻ hành trình vào Clipboard!", "success");
+    }).catch(() => {
+      window.showToast("✓ Đã chuẩn bị nội dung chia sẻ!", "success");
+    });
+  } else {
+    window.showToast("✓ Đã chuẩn bị nội dung chia sẻ!", "success");
+  }
+};
