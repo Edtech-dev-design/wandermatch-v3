@@ -1,3 +1,46 @@
+
+// ============================================================================
+// ĐIỀU KHIỂN LỊCH TRÌNH 3 NGÀY DẠNG TIMELINE TƯƠNG TÁC
+// ============================================================================
+window.activeItineraryDay = 0;
+window.switchItineraryDay = function(dayIdx) {
+  window.activeItineraryDay = dayIdx;
+  [0, 1, 2].forEach(i => {
+    const tabBtn = document.getElementById("itinDayTab_" + i);
+    const panel = document.getElementById("itinDayContent_" + i);
+    if (tabBtn) {
+      if (i === dayIdx) {
+        tabBtn.className = "flex-1 py-2.5 px-3 rounded-xl font-extrabold text-xs bg-teal-500 text-slate-950 border border-teal-300 shadow-lg shadow-teal-500/25 transition flex items-center justify-center gap-1.5";
+      } else {
+        tabBtn.className = "flex-1 py-2.5 px-3 rounded-xl font-semibold text-xs bg-slate-900/80 text-slate-400 hover:text-white border border-white/10 hover:border-white/20 transition flex items-center justify-center gap-1.5";
+      }
+    }
+    if (panel) {
+      if (i === dayIdx) {
+        panel.style.display = "block";
+        panel.classList.remove("animate-step-in");
+        void panel.offsetWidth;
+        panel.classList.add("animate-step-in");
+      } else {
+        panel.style.display = "none";
+      }
+    }
+  });
+};
+
+window.updatePackingProgress = function() {
+  const container = document.getElementById("packingListContainer");
+  if (!container) return;
+  const total = container.querySelectorAll("input[type='checkbox']").length;
+  const checked = container.querySelectorAll("input[type='checkbox']:checked").length;
+  const percent = total > 0 ? Math.round((checked / total) * 100) : 100;
+
+  const bar = document.getElementById("packingProgressBar");
+  const lbl = document.getElementById("packingProgressLabel");
+  if (bar) bar.style.width = percent + "%";
+  if (lbl) lbl.innerText = `Đã chuẩn bị ${checked}/${total} món (${percent}%)`;
+};
+
 // ============================================================================
 // WANDERMATCH PRODUCTION CONFIG & LIVE BACKEND API ENDPOINT
 // ============================================================================
@@ -1527,16 +1570,81 @@ window.renderPackageUI = function(pkg) {
         </div>
       </div>
 
-      <!-- LỊCH TRÌNH MẪU 3 NGÀY 2 ĐÊM ĐA SẮC THÁI -->
-      <div class="space-y-3">
-        <span class="text-xs font-bold text-slate-300 uppercase tracking-wider block">Lịch trình mẫu 3 Ngày 2 Đêm được thiết kế riêng:</span>
-        <div class="grid md:grid-cols-3 gap-4 text-xs">
-          ${pkg.days.map(d => `
-            <div class="bg-slate-900/90 p-4 rounded-2xl border border-white/10 space-y-2.5 hover:border-teal-500/40 transition">
-              <strong class="text-teal-400 block border-b border-white/10 pb-2 font-bold text-sm">${d.d}</strong>
-              <p class="leading-relaxed"><span class="px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 font-black mr-1 text-[11px]">SÁNG</span> <span class="text-slate-200">${d.m}</span></p>
-              <p class="leading-relaxed"><span class="px-1.5 py-0.5 rounded bg-sky-400/20 text-sky-300 font-black mr-1 text-[11px]">CHIỀU</span> <span class="text-slate-200">${d.a}</span></p>
-              <p class="leading-relaxed"><span class="px-1.5 py-0.5 rounded bg-purple-400/20 text-purple-300 font-black mr-1 text-[11px]">TỐI</span> <span class="text-slate-200">${d.e}</span></p>
+      <!-- LỊCH TRÌNH 3 NGÀY 2 ĐÊM DẠNG TIMELINE TƯƠNG TÁC CAO CẤP -->
+      <div class="space-y-4 pt-1">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+          <div>
+            <h4 class="text-sm font-extrabold text-white uppercase tracking-wider font-heading flex items-center gap-2">
+              <span class="text-teal-400">📅</span>
+              <span>Lịch Trình Chi Tiết Từng Ngày Được Thiết Kế Riêng</span>
+            </h4>
+            <p class="text-[11px] text-slate-400">Chọn từng ngày bên dưới để xem timeline hoạt động, gợi ý ẩm thực & bí kíp thổ địa.</p>
+          </div>
+          <span class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-teal-500/15 text-teal-300 border border-teal-500/30">
+            3 Ngày 2 Đêm • Nhịp Độ Tối Ưu
+          </span>
+        </div>
+
+        <!-- 3 TABS NGÀY PHONG CÁCH AIRBNB / LUXURY OTA -->
+        <div class="flex flex-wrap gap-2 p-1 bg-slate-900/90 rounded-2xl border border-white/10">
+          ${pkg.days.map((d, idx) => `
+            <button id="itinDayTab_${idx}" onclick="window.switchItineraryDay(${idx})" class="flex-1 py-2.5 px-3 rounded-xl font-${idx === 0 ? 'extrabold bg-teal-500 text-slate-950 border border-teal-300 shadow-md' : 'semibold bg-slate-900/80 text-slate-400 hover:text-white border border-white/10'} text-xs transition flex items-center justify-center gap-1.5">
+              <span>${idx === 0 ? '🌅' : (idx === 1 ? '🌟' : '🌿')}</span>
+              <span>${d.d.split(':')[0] || 'Ngày ' + (idx + 1)}</span>
+            </button>
+          `).join("")}
+        </div>
+
+        <!-- NỘI DUNG TIMELINE CỦA TỪNG NGÀY -->
+        <div class="space-y-3">
+          ${pkg.days.map((d, idx) => `
+            <div id="itinDayContent_${idx}" style="display: ${idx === 0 ? 'block' : 'none'};" class="space-y-4 p-5 bg-slate-900/90 rounded-2xl border border-teal-500/30 shadow-xl">
+              <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <strong class="text-teal-300 font-heading text-sm md:text-base flex items-center gap-2">
+                  <span>✦</span> ${d.d}
+                </strong>
+                <span class="text-[11px] text-amber-300 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-400/20 font-bold">
+                  Trọn Gói Hướng Dẫn
+                </span>
+              </div>
+
+              <div class="space-y-3.5 pt-1">
+                <!-- BUỔI SÁNG -->
+                <div class="timeline-item">
+                  <div class="timeline-bullet"></div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 font-extrabold text-[10px] tracking-wider">08:30 • BUỔI SÁNG</span>
+                    <strong class="text-xs text-white">Khởi đầu ngày mới & Trải nghiệm điểm nhấn</strong>
+                  </div>
+                  <p class="text-xs text-slate-200 leading-relaxed bg-slate-950/70 p-3 rounded-xl border border-white/5 ml-1">
+                    ${d.m}
+                  </p>
+                </div>
+
+                <!-- BUỔI CHIỀU -->
+                <div class="timeline-item">
+                  <div class="timeline-bullet"></div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="px-2 py-0.5 rounded-md bg-sky-400/20 text-sky-300 font-extrabold text-[10px] tracking-wider">14:00 • BUỔI CHIỀU</span>
+                    <strong class="text-xs text-white">Thư giãn, ngắm cảnh & khám phá bản địa</strong>
+                  </div>
+                  <p class="text-xs text-slate-200 leading-relaxed bg-slate-950/70 p-3 rounded-xl border border-white/5 ml-1">
+                    ${d.a}
+                  </p>
+                </div>
+
+                <!-- BUỔI TỐI -->
+                <div class="timeline-item">
+                  <div class="timeline-bullet"></div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="px-2 py-0.5 rounded-md bg-purple-400/20 text-purple-300 font-extrabold text-[10px] tracking-wider">19:00 • BUỔI TỐI</span>
+                    <strong class="text-xs text-white">Ẩm thực đêm thượng hạng & Thư thái nghỉ ngơi</strong>
+                  </div>
+                  <p class="text-xs text-slate-200 leading-relaxed bg-slate-950/70 p-3 rounded-xl border border-white/5 ml-1">
+                    ${d.e}
+                  </p>
+                </div>
+              </div>
             </div>
           `).join("")}
         </div>
@@ -1573,12 +1681,29 @@ window.renderPackageUI = function(pkg) {
     document.getElementById("aiMysteryHintText").innerText = `"${pkg.hint}"`;
   }
   if (document.getElementById("packingListContainer")) {
-    document.getElementById("packingListContainer").innerHTML = pkg.packing.map((x, i) => `
-      <label class="flex items-center gap-2.5 text-xs text-slate-200 p-2.5 rounded-xl bg-slate-900/60 border border-white/5 cursor-pointer hover:bg-slate-900 transition">
-        <input type="checkbox" checked class="accent-teal-400 w-4 h-4 rounded cursor-pointer" />
-        <span>${i + 1}. ${x}</span>
-      </label>
+    const categories = [
+      { cat: "Giấy tờ & Công nghệ", icon: "📁", items: ["CCCD / Hộ chiếu bản gốc còn hạn", "Pin sạc dự phòng & cáp sạc điện thoại", "Vé bay điện tử đã lưu vào máy"] },
+      { cat: "Trang phục vi khí hậu", icon: "🧣", items: pkg.packing },
+      { cat: "Sức khỏe & Cá nhân", icon: "🧴", items: ["Kem chống nắng & kính râm", "Thuốc say xe & thuốc cá nhân", "Bình nước giữ nhiệt du lịch"] }
+    ];
+
+    document.getElementById("packingListContainer").innerHTML = categories.map(c => `
+      <div class="space-y-1.5 p-3 rounded-2xl bg-slate-900/70 border border-white/10">
+        <span class="text-[11px] font-bold text-teal-300 flex items-center gap-1.5">
+          <span>${c.icon}</span> ${c.cat}
+        </span>
+        <div class="space-y-1 pt-1">
+          ${c.items.map(item => `
+            <label class="flex items-center gap-2 text-xs text-slate-200 p-2 rounded-xl bg-slate-950/60 border border-white/5 cursor-pointer hover:bg-slate-950 transition">
+              <input type="checkbox" checked onchange="window.updatePackingProgress()" class="accent-teal-400 w-4 h-4 rounded cursor-pointer" />
+              <span>${item}</span>
+            </label>
+          `).join("")}
+        </div>
+      </div>
     `).join("");
+
+    window.updatePackingProgress();
   }
 
   if (document.getElementById("revCityName")) document.getElementById("revCityName").innerText = pkg.reveal.city;
@@ -2377,7 +2502,7 @@ window.closeAuthModal = function() {
 // ============================================================================
 // 14. KHỞI TẠO HỆ THỐNG BAN ĐẦU & XỬ LÝ OAUTH CALLBACK
 // ============================================================================
-document.addEventListener("DOMContentLoaded", () => {
+window.initWanderMatchApp = function() {
   // 1. Khởi tạo Google Identity Services GIS
   window.initGoogleIdentity();
 
@@ -2423,11 +2548,10 @@ document.addEventListener("DOMContentLoaded", () => {
   window.saveStore("wm_draft_prod", draft);
   window.renderPackageUI(draft);
   window.updatePersonaUI();
-});
+};
 
-// Tự động kiểm tra callback OAuth khi vừa tải trang
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => window.checkOAuthRedirectCallback());
+  document.addEventListener("DOMContentLoaded", window.initWanderMatchApp);
 } else {
-  window.checkOAuthRedirectCallback();
+  window.initWanderMatchApp();
 }
