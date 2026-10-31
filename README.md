@@ -42,19 +42,26 @@ Tệp `database/schema_v3.sql` bao gồm đầy đủ 12 bảng chuẩn quan h�
 11. `ai_generated_itineraries`: 1–3 phương án lịch trình AI chi tiết theo khung giờ (`timeline_slots` JSONB) và cờ kích hoạt của khách.
 12. `poi_reviews`: Đánh giá của khách đã đi (điểm sao 1-5, nhãn kết luận `verdict_badge`, chi phí thực tế, trigger tự động cập nhật trung bình sao).
 
+Lõi Worker hiện lưu ledger đặt chỗ/thanh toán/hoàn tiền/tài khoản trong bảng runtime riêng `wm_worker_state` (migration bên dưới); schema 12 bảng là mô hình nghiệp vụ, chưa phải nơi Worker ghi trực tiếp. Runtime state này phù hợp cho bản demo/pilot nhỏ; cần chuyển sang thao tác giao dịch trên các bảng chuẩn hóa trước khi chạy tải cao.
+
 ---
 
 ## 🚀 HƯỚNG DẪN CHẠY VÀ TRẢI NGHIỆM
 
-### Cách 1: Khởi chạy Máy chủ Node.js Full-Stack (Khuyên dùng)
-Chạy lệnh sau tại thư mục gốc:
+### Khởi chạy ứng dụng cục bộ (Node.js 20+)
+Tại thư mục gốc, chạy:
 ```bash
-node server.js
+npm start
 ```
-Truy cập trình duyệt: **`http://localhost:3000`**
+Mở **`http://localhost:8787`**. Máy chủ phục vụ giao diện và chuyển các endpoint của ứng dụng tới cùng lõi Cloudflare Worker; do đó không cần chạy hai tiến trình riêng.
 
-### Cách 2: Mở trực tiếp trên Trình duyệt
-Bạn có thể mở trực tiếp file `index.html` bằng bất kỳ trình duyệt nào (Chrome, Edge, Safari, Firefox). Ứng dụng đã được đóng gói độc lập và hoạt động trơn tru 100%.
+`npm run dev:worker` chỉ chạy API Worker độc lập, không phục vụ giao diện. Không có cấu hình database thì dữ liệu chỉ tồn tại trong bộ nhớ của tiến trình. Để lưu bền vững qua lần khởi động lại, chạy migration `supabase/migrations/20261030000002_wm_worker_state.sql`, sau đó cấu hình `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` và `SESSION_SECRET` trong môi trường chạy. Không đưa service-role key hoặc session secret vào frontend hay commit vào Git.
+
+Với Vercel, khai báo các biến môi trường trên trong Project Settings. Với Cloudflare, cấu hình `SUPABASE_URL` và tạo các secret `SUPABASE_SERVICE_ROLE_KEY`, `SESSION_SECRET`, `PAYMENT_WEBHOOK_SECRET` bằng `wrangler secret put`. `GEMINI_API_KEY` là tùy chọn. Worker chỉ báo trạng thái Supabase là kho dữ liệu khi đủ URL và service-role key; các thao tác đọc/ghi lỗi sẽ trả lỗi thay vì giả lập thành công.
+
+Chạy bộ kiểm tra tích hợp bằng `npm test`. Thuật toán chỉ trả gợi ý khi tìm được combo thực sự nằm trong ngân sách; blacklist, điểm khởi hành và vector sở thích được truyền từ giao diện tới Worker.
+
+Các luồng QR, thanh toán, hoàn tiền, tài khoản mạng xã hội và dữ liệu AI cần thông tin xác thực từ nhà cung cấp. Ở chế độ demo, dữ liệu tuyến bay/khách sạn là dữ liệu mẫu; không xem phản hồi demo là xác nhận thanh toán hoặc lệnh chuyển tiền thực tế. Thanh toán chỉ được xác nhận bởi webhook ngân hàng có cấu hình `PAYMENT_WEBHOOK_SECRET`.
 
 ---
 

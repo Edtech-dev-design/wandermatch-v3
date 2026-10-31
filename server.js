@@ -5,15 +5,41 @@
  * Simulates Corporate VietQR Gateway, Napas 247 Lookup, Time-Tiered Refund & SLA Engine
  */
 
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const url = require('url');
-const { exec } = require('child_process');
-const autoSync = require('./auto-sync-github');
+import http from 'node:http';
+import fs from 'node:fs';
+import path from 'node:path';
+import url from 'node:url';
+import { fileURLToPath } from 'node:url';
+import worker from './worker.js';
 
-const PORT = process.env.PORT || 3000;
-const ROOT_DIR = __dirname;
+const PORT = Number(process.env.PORT || 8787);
+const ROOT_DIR = path.dirname(fileURLToPath(import.meta.url));
+const WORKER_API_PATHS = new Set([
+  '/api/health',
+  '/api/auth/login',
+  '/api/auth/register',
+  '/api/auth/me',
+  '/api/auth/social-login',
+  '/api/ai-recommend',
+  '/api/create-booking',
+  '/api/payment/webhook',
+  '/api/payment/check-status',
+  '/api/payment/confirm-receipt',
+  '/api/simulate-refund',
+  '/api/feedback',
+  '/api/admin-summary'
+]);
+const WORKER_ENV = {
+  SUPABASE_URL: process.env.SUPABASE_URL || '',
+  SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+  SESSION_SECRET: process.env.SESSION_SECRET || 'local-development-session-secret',
+  PAYMENT_WEBHOOK_SECRET: process.env.PAYMENT_WEBHOOK_SECRET || '',
+  AI_API_KEY: process.env.AI_API_KEY || '',
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
+  COMPANY_BANK_ID: process.env.COMPANY_BANK_ID || 'MB',
+  COMPANY_ACCOUNT_NO: process.env.COMPANY_ACCOUNT_NO || '0988888888',
+  COMPANY_ACCOUNT_NAME: process.env.COMPANY_ACCOUNT_NAME || 'CONG TY TNHH WANDERMATCH VN'
+};
 
 let DB = {
   escrowLedgers: [
@@ -68,6 +94,15 @@ function parseBody(req) {
   });
 }
 
+function readRawBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', chunk => chunks.push(chunk));
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
+}
+
 function sendJson(res, statusCode, data) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
@@ -89,6 +124,34 @@ const server = http.createServer(async (req, res) => {
       'Access-Control-Allow-Headers': 'Content-Type'
     });
     res.end();
+    return;
+  }
+
+  if (WORKER_API_PATHS.has(pathname)) {
+    try {
+      const headers = new Headers();
+      for (const name of ['content-type', 'authorization', 'x-webhook-secret']) {
+        const value = req.headers[name];
+        if (typeof value === 'string') headers.set(name, value);
+      }
+
+      const body = ['GET', 'HEAD'].includes(req.method) ? undefined : await readRawBody(req);
+      const workerRequest = new Request(`http://${req.headers.host || 'localhost'}${req.url}`, {
+        method: req.method,
+        headers,
+        body: body && body.length ? body : undefined
+      });
+      const workerResponse = await worker.fetch(workerRequest, WORKER_ENV);
+      const responseHeaders = {};
+      workerResponse.headers.forEach((value, name) => {
+        responseHeaders[name] = value;
+      });
+      res.writeHead(workerResponse.status, responseHeaders);
+      res.end(Buffer.from(await workerResponse.arrayBuffer()));
+    } catch (error) {
+      console.error('Worker API request failed:', error);
+      sendJson(res, 502, { success: false, error: 'Không thể xử lý yêu cầu API.' });
+    }
     return;
   }
 
@@ -682,20 +745,6 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
-  // 9. GitHub Auto-Sync Status & Manual Trigger
-  if (pathname === '/api/github/status' && req.method === 'GET') {
-    return sendJson(res, 200, {
-      syncStatus: autoSync.getSyncStatus()
-    });
-  }
-
-  if (pathname === '/api/github/sync' && req.method === 'POST') {
-    const syncRes = await autoSync.performGitSync('Manual-Modal-Trigger');
-    return sendJson(res, 200, {
-      syncStatus: syncRes
-    });
-  }
-
   // ==========================================================================
   // PRAGMATIC PILLARS API ROUTES (V3.1)
   // ==========================================================================
@@ -1207,8 +1256,6 @@ ${fullName}`;
 server.listen(PORT, () => {
   console.log(`====================================================================`);
   console.log(`🚀 WANDERMATCH 3.1 SERVER RUNNING AT: http://localhost:${PORT}`);
-  console.log(`📌 Trip Planner: Input Destination & Custom Budget Enabled`);
-  console.log(`🔄 GitHub Auto-Sync Watcher: ACTIVE (Auto commit & push on save)`);
+  console.log(`📌 Frontend and Worker API are served from the same origin.`);
   console.log(`====================================================================`);
-  autoSync.startFileWatcher();
 });

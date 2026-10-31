@@ -3,7 +3,13 @@
   "version": "3.0.0",
   "type": "module",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node --test",
     "dev:worker": "wrangler dev worker.js --port 8787",
     "deploy:worker": "wrangler deploy worker.js",
     "deploy": "wrangler deploy worker.js"

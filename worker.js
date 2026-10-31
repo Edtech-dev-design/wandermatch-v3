@@ -179,14 +179,22 @@ function normVN(str = "") {
 // LÕI 4 THUẬT TOÁN KHOA HỌC DỮ LIỆU ĐỘC LẬP
 // ============================================================================
 function executeOTABlindAlgorithms(payload, sessionId = "default") {
-  const {
-    personaVector = {},
-    blacklistedCities = [],
-    customPrompt = "",
-    budgetVnd = 5000000,
-    groupSize = 1,
-    origin = "HAN"
-  } = payload;
+  const personaVector = payload.userVector || payload.personaVector || {};
+  const blacklistedCities = payload.blacklistCities || payload.blacklistedCities || [];
+  const customPrompt = payload.customPrompt || "";
+  const budgetVnd = Number(payload.budgetVnd ?? 5000000);
+  const groupSize = Number(payload.groupSize ?? 1);
+  const origin = payload.origin || payload.originAirport || "HAN";
+
+  if (!Number.isFinite(budgetVnd) || budgetVnd <= 0) {
+    throw new Error("Ngân sách phải là số dương.");
+  }
+  if (!Number.isInteger(groupSize) || groupSize < 1 || groupSize > 10) {
+    throw new Error("Số người đi phải là số nguyên từ 1 đến 10.");
+  }
+  if (!Array.isArray(blacklistedCities)) {
+    throw new Error("Danh sách điểm đến loại trừ không hợp lệ.");
+  }
 
   const nights = 2; // Gói 3N2Đ chuẩn
   const blNorm = (blacklistedCities || []).map(x => normVN(x));
@@ -200,12 +208,14 @@ function executeOTABlindAlgorithms(payload, sessionId = "default") {
     cantho: "VCA", vca: "VCA",
     haiphong: "HPH", hph: "HPH"
   };
-  const targetOrigin = originMap[String(origin || "hochiminh").toLowerCase()] || origin || "SGN";
-  let originFlights = FLIGHTS_DB.filter(f => f.origin === targetOrigin);
-  if (!originFlights.length) originFlights = FLIGHTS_DB;
+  const originKey = String(origin).trim().toLowerCase();
+  const targetOrigin = originMap[originKey] || originKey.toUpperCase();
+  const originFlights = FLIGHTS_DB.filter(f => f.origin === targetOrigin);
+  if (!originFlights.length) {
+    throw new Error("Điểm khởi hành hiện chưa có tuyến bay được hỗ trợ.");
+  }
 
-  let feasibleFlights = originFlights.filter(f => f.price <= budgetVnd * 0.65);
-  if (!feasibleFlights.length) feasibleFlights = originFlights;
+  const feasibleFlights = originFlights.filter(f => f.price <= budgetVnd * 0.65);
 
   // THUẬT TOÁN 2 & 3: Cosine Similarity + Bài Toán Cái Túi (Knapsack Vé + Phòng sát ngân sách)
   const keys = ["healing", "nature", "solitude", "comfort", "culture"];
@@ -213,6 +223,7 @@ function executeOTABlindAlgorithms(payload, sessionId = "default") {
 
   feasibleFlights.forEach(flight => {
     const cityNorm = normVN(flight.city);
+    if (payload.preferredCity && cityNorm !== normVN(payload.preferredCity)) return;
     if (blNorm.some(b => b && (cityNorm.includes(b) || b.includes(cityNorm)))) return;
 
     const hotels = HOTELS_DB.filter(h => h.city === flight.city);
@@ -220,11 +231,12 @@ function executeOTABlindAlgorithms(payload, sessionId = "default") {
       const comboCostPerPerson = flight.price + (hotel.price_per_night * nights);
       const retailPerPerson = flight.price + (hotel.retail_per_night * nights);
 
-      if (comboCostPerPerson <= budgetVnd * 1.05) {
+      if (comboCostPerPerson <= budgetVnd) {
         // Tính Cosine Similarity 5 chiều
         let dot = 0, normU = 0, normH = 0;
         keys.forEach(k => {
-          const u = Number(personaVector[k] ?? 80);
+          const rawUserPreference = Number(personaVector[k] ?? 80);
+          const u = Number.isFinite(rawUserPreference) ? Math.min(100, Math.max(0, rawUserPreference)) : 80;
           const v = Number(hotel.vector[k] ?? 80);
           dot += u * v;
           normU += u * u;
@@ -260,18 +272,7 @@ function executeOTABlindAlgorithms(payload, sessionId = "default") {
   });
 
   if (!validCombos.length) {
-    const f = originFlights[0] || FLIGHTS_DB[0];
-    const h = HOTELS_DB.find(x => x.city === f.city) || HOTELS_DB[0];
-    validCombos.push({
-      comboId: `${f.flight_id}_${h.hotel_id}`,
-      flight: f,
-      hotel: h,
-      comboCostPerPerson: budgetVnd,
-      retailPerPerson: Math.round(budgetVnd * 1.28),
-      simScore: 94.5,
-      budgetUtilization: 96.0,
-      utilityScore: 95.2
-    });
+    throw new Error("Không tìm thấy chuyến đi phù hợp ngân sách và điểm đến loại trừ.");
   }
 
   validCombos.sort((a, b) => b.utilityScore - a.utilityScore);
@@ -448,7 +449,7 @@ Trả về ĐÚNG định dạng JSON sau:
 
     // EXECUTION 2: Chạy Google Gemini AI
     let mysteryCuration = null;
-    let geminiKey = (env && (env.AI_API_KEY || env.GEMINI_API_KEY)) || "QVEuQWI4Uk42Sm5ncWpsb0lQbmR1dFphb0ZzYkhDclNleU5vSm1Uem92NDVveFN0Z1Nnc1E=";
+    let geminiKey = (env && (env.AI_API_KEY || env.GEMINI_API_KEY)) || "";
     if (geminiKey && !geminiKey.startsWith("AQ.")) {
       try { geminiKey = atob(geminiKey); } catch (e) {}
     }
@@ -473,26 +474,6 @@ Trả về ĐÚNG định dạng JSON sau:
       } catch (e) {
         console.warn("Gemini Mystery Curator err:", e);
       }
-    }
-
-    // Relay fallback nếu Gemini hoặc Cloudflare AI cần trợ lực
-    if (!mysteryCuration) {
-      try {
-        const pRes = await fetch("https://text.pollinations.ai/openai", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model: "openai",
-            response_format: { type: "json_object" },
-            messages: [{ role: "user", content: geminiCuratorPrompt }]
-          })
-        });
-        if (pRes.ok) {
-          const pData = await pRes.json();
-          const pText = pData?.choices?.[0]?.message?.content;
-          if (pText) mysteryCuration = JSON.parse(pText);
-        }
-      } catch (e) {}
     }
 
     // Default Fallback dự phòng chất lượng cao
@@ -545,15 +526,49 @@ const STORAGE = {
 const enc = new TextEncoder();
 const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
 const unb64 = (s) => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const hasSupabaseStateStore = (env) => Boolean(env.SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY);
+const storageBackend = (env) => env.DB ? "CLOUDFLARE_KV" : hasSupabaseStateStore(env) ? "SUPABASE" : "IN_MEMORY_ONLY";
+
+function supabaseStateHeaders(env) {
+  const key = env.SUPABASE_SERVICE_ROLE_KEY;
+  return {
+    apikey: key,
+    Authorization: `Bearer ${key}`,
+    "Content-Type": "application/json"
+  };
+}
 
 async function hydrate(env) {
   STORAGE.users = STORAGE.users || {};
-  if (!env.DB) return;
-  const raw = await env.DB.get("store");
-  if (raw) { try { Object.assign(STORAGE, JSON.parse(raw)); } catch (e) {} }
+  if (env.DB) {
+    const raw = await env.DB.get("store");
+    if (raw) Object.assign(STORAGE, JSON.parse(raw));
+    return;
+  }
+  if (!hasSupabaseStateStore(env)) return;
+
+  const baseUrl = env.SUPABASE_URL.replace(/\/+$/, "");
+  const response = await fetch(`${baseUrl}/rest/v1/wm_worker_state?singleton=eq.true&select=state&limit=1`, {
+    headers: supabaseStateHeaders(env)
+  });
+  if (!response.ok) throw new Error(`Supabase state read failed (${response.status}).`);
+  const rows = await response.json();
+  if (rows[0]?.state) Object.assign(STORAGE, rows[0].state);
 }
 async function persist(env) {
-  if (env.DB) await env.DB.put("store", JSON.stringify(STORAGE));
+  if (env.DB) {
+    await env.DB.put("store", JSON.stringify(STORAGE));
+    return;
+  }
+  if (!hasSupabaseStateStore(env)) return;
+
+  const baseUrl = env.SUPABASE_URL.replace(/\/+$/, "");
+  const response = await fetch(`${baseUrl}/rest/v1/wm_worker_state?singleton=eq.true`, {
+    method: "PATCH",
+    headers: { ...supabaseStateHeaders(env), Prefer: "return=minimal" },
+    body: JSON.stringify({ state: STORAGE, updated_at: new Date().toISOString() })
+  });
+  if (!response.ok) throw new Error(`Supabase state write failed (${response.status}).`);
 }
 async function hashPassword(pw, saltB64) {
   const salt = saltB64 ? unb64(saltB64) : crypto.getRandomValues(new Uint8Array(16));
@@ -562,7 +577,8 @@ async function hashPassword(pw, saltB64) {
   return { salt: b64(salt), hash: b64(bits) };
 }
 async function hmac(data, env) {
-  const secret = env.SESSION_SECRET || "dev-only-secret-change-me";
+  const secret = env.SESSION_SECRET;
+  if (!secret) throw new Error("SESSION_SECRET chưa được cấu hình.");
   const key = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
   return b64(await crypto.subtle.sign("HMAC", key, enc.encode(data)));
 }
@@ -690,14 +706,10 @@ const handler = {
         engine: "Dual-Core OTA Blind Booking Engine v3.5",
         time: new Date().toISOString(),
         ecosystem: {
-          github: { status: "CONNECTED", branch: "main", repo: "wandermatch-v3", hook: "active" },
-          cloudflare: { status: "ACTIVE", runtime: "workerd", edge: true, latency_ms: 1.8 },
-          supabase: { 
-            status: env.SUPABASE_URL ? "CONNECTED" : "ACTIVE_LOCAL_SYNC", 
-            auth: "STRICT_SESSION", 
-            tables: ["users", "bookings", "payments", "refunds", "feedback"]
-          },
-          vercel: { status: "DEPLOYED", proxy: "/api/*", headers: "CORS_ENABLED" }
+          github: { status: "NOT_CHECKED" },
+          cloudflare: { status: "API_CORE_ACTIVE", runtime: env.DB ? "workerd" : "node-worker-adapter" },
+          storage: { backend: storageBackend(env), persistent: storageBackend(env) !== "IN_MEMORY_ONLY" },
+          vercel: { status: "API_ADAPTER_AVAILABLE", proxy: "/api/*", headers: "CORS_ENABLED" }
         },
         algorithms: [
           "1. Route & Flight Budget Filter (<= 65% per-person budget)",
@@ -720,50 +732,41 @@ const handler = {
         const clientSession = body.email || body.fullName || "guest_session";
         const result = executeOTABlindAlgorithms(body, clientSession);
 
-        const aiPayload = await runDualAIEngine(result, body, env);
-        if (aiPayload) {
-          result.aiEngineUsed = aiPayload.dualEngine;
-          result.tasteProfile = aiPayload.tasteProfile;
-          result.mysteryCuration = aiPayload.mysteryCuration;
-          result.aiCoPilotNote = `${aiPayload.tasteProfile?.archetype || "Du Khách Tinh Hoa"}: ${aiPayload.tasteProfile?.psychographic_analysis || ""}`;
-          result.mysteryHint = aiPayload.mysteryCuration?.mystery_riddle || result.mysteryHint;
-          result.aiReasoningLog += ` [Dual AI: ${result.aiCoPilotNote}]`;
-        } else {
-          result.aiCoPilotNote = "Đã tối ưu hóa chi phí & sở thích bằng bài toán Cái túi Knapsack kết hợp Cosine Vector.";
+        const isBookingRequest = url.pathname === "/api/create-booking";
+        if (!isBookingRequest) {
+          const aiPayload = await runDualAIEngine(result, body, env);
+          if (aiPayload) {
+            result.aiEngineUsed = aiPayload.dualEngine;
+            result.tasteProfile = aiPayload.tasteProfile;
+            result.mysteryCuration = aiPayload.mysteryCuration;
+            result.aiCoPilotNote = `${aiPayload.tasteProfile?.archetype || "Du Khách Tinh Hoa"}: ${aiPayload.tasteProfile?.psychographic_analysis || ""}`;
+            result.mysteryHint = aiPayload.mysteryCuration?.mystery_riddle || result.mysteryHint;
+            result.aiReasoningLog += ` [Dual AI: ${result.aiCoPilotNote}]`;
+          } else {
+            result.aiCoPilotNote = "Đã tối ưu hóa chi phí & sở thích bằng bài toán Cái túi Knapsack kết hợp Cosine Vector.";
+          }
         }
         
 
-        // Lưu bản ghi vào Storage & Thử sync Supabase
-        const bookingRecord = {
-          bookingCode: body.bookingCode || result.bookingCode,
-          customerName: body.fullName || "Khách Hàng Du Lịch",
-          customerEmail: body.email || "khachhang@wandermatch.vn",
-          customerPhone: body.phone || "0988 888 888",
-          budgetPaid: result.revealPackage ? result.revealPackage.budgetPaid : (body.budgetVnd || 4800000),
-          groupSize: body.groupSize || 2,
-          status: "LOCKED",
-          cityName: result.revealPackage ? result.revealPackage.cityName : "Đang Niêm Phong",
-          hotelName: result.revealPackage ? result.revealPackage.hotelName : "Resort 5 Sao SLA",
-          flightCode: result.revealPackage ? result.revealPackage.flightCode : "VN151",
-          mysteryHint: result.mysteryHint || "Khí hậu mát mẻ, cảnh sắc thiên nhiên tuyệt đẹp",
-          createdAt: new Date().toISOString()
-        };
-        STORAGE.bookings.unshift(bookingRecord);
-
-        // Async sync Supabase REST API nếu có cấu hình
-        if (env.SUPABASE_URL && env.SUPABASE_ANON_KEY) {
-          try {
-            fetch(`${env.SUPABASE_URL}/rest/v1/bookings`, {
-              method: "POST",
-              headers: {
-                "apikey": env.SUPABASE_ANON_KEY,
-                "Authorization": `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_ANON_KEY}`,
-                "Content-Type": "application/json",
-                "Prefer": "return=minimal"
-              },
-              body: JSON.stringify(bookingRecord)
-            }).catch(e => console.warn("Supabase bookings async sync notice:", e.message));
-          } catch (e) {}
+        if (isBookingRequest) {
+          if (body.bookingCode) result.bookingCode = String(body.bookingCode).trim().toUpperCase();
+          const groupSize = Number(body.groupSize ?? 1);
+          const bookingRecord = {
+            bookingCode: result.bookingCode,
+            customerName: body.fullName || "Khách Hàng Du Lịch",
+            customerEmail: body.email || "khachhang@wandermatch.vn",
+            customerPhone: body.phone || "",
+            budgetPaid: Number(body.budgetVnd) * groupSize,
+            packageCost: result.revealPackage.budgetPaid,
+            groupSize,
+            status: "LOCKED",
+            cityName: result.revealPackage.cityName,
+            hotelName: result.revealPackage.hotelName,
+            flightCode: result.comboId.split("_")[0],
+            mysteryHint: result.mysteryHint,
+            createdAt: new Date().toISOString()
+          };
+          STORAGE.bookings.unshift(bookingRecord);
         }
 
         return new Response(JSON.stringify(result), {
@@ -906,15 +909,11 @@ const handler = {
             bookingCode: bookingCode,
             refundAmount,
             penaltyFee: feeAmount,
-            payoutChannel: "NAPAS_247_DIRECT",
-            escrowPayoutStatus: "DISBURSED",
+            payoutChannel: "SIMULATION_ONLY",
+            escrowPayoutStatus: "SIMULATED",
             processedAt: new Date().toISOString()
           };
           STORAGE.refunds.unshift(refundTxn);
-
-          // Cập nhật trạng thái đơn sang REFUNDED
-          const matched = STORAGE.bookings.find(b => b.bookingCode === bookingCode);
-          if (matched) matched.status = "REFUNDED";
 
           if (env.SUPABASE_URL && env.SUPABASE_ANON_KEY) {
             try {
@@ -932,15 +931,16 @@ const handler = {
 
           return new Response(JSON.stringify({
             success: true,
-            status: "DISBURSED",
+            status: "SIMULATED",
+            isSimulation: true,
             scenario,
             totalPaid,
             refundAmount,
             feeAmount,
-            disbursementMethod: "Napas 247 Instant Transfer",
+            disbursementMethod: "Mô phỏng nội bộ — chưa chuyển tiền",
             transactionId: refundTxn.refundId,
             policyDescription: pol.desc,
-            message: `Lệnh giải ngân ${refundAmount.toLocaleString("vi-VN")}đ qua Napas 247 đã hoàn tất trong 2 giây!`,
+            message: "Đã ghi nhận mô phỏng. Chưa có khoản tiền nào được chuyển.",
             processedAt: refundTxn.processedAt
           }), { headers: { ...cors, "Content-Type": "application/json" } });
         }
@@ -1028,7 +1028,8 @@ const handler = {
 
         return new Response(JSON.stringify({
           success: true,
-          supabaseConnected: Boolean(env.SUPABASE_URL),
+          supabaseConnected: storageBackend(env) === "SUPABASE",
+          storageBackend: storageBackend(env),
           time: new Date().toISOString(),
           bookings: STORAGE.bookings,
           payments: STORAGE.payments,
@@ -1049,9 +1050,9 @@ const handler = {
     }
 
     return new Response(JSON.stringify({
-      status: "WanderMatch Cloudflare Dual-Core Engine Ready",
-      time: new Date().toISOString()
-    }), { headers: { ...cors, "Content-Type": "application/json" } });
+      success: false,
+      error: "API route not found."
+    }), { status: 404, headers: { ...cors, "Content-Type": "application/json" } });
   }
 };
 
@@ -1060,7 +1061,9 @@ export default {
   async fetch(request, env, ctx) {
     await hydrate(env);
     const res = await handler.fetch(request, env, ctx);
-    if (request.method === "POST") await persist(env);
+    if (request.method === "POST" && new URL(request.url).pathname !== "/api/ai-recommend") {
+      await persist(env);
+    }
     return res;
   }
 };

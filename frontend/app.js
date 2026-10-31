@@ -44,7 +44,7 @@ window.updatePackingProgress = function() {
 // ============================================================================
 // WANDERMATCH PRODUCTION CONFIG & LIVE BACKEND API ENDPOINT
 // ============================================================================
-window.API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") ? "http://localhost:8787" : "";
+window.API_BASE = window.location.origin;
 /**
  * WANDERMATCH — PRODUCTION LUXURY BLIND TRAVEL PLATFORM
  * Version 10.0 — Unified One-Step Auth, Live Google & Facebook OAuth Connectors,
@@ -2531,6 +2531,33 @@ window.confirmAndLockBooking = async function() {
   if (window.normVN(name) !== window.normVN(holder)) return window.showToast("Họ tên CCCD và Chủ tài khoản ngân hàng phải khớp nhau!", "error");
 
   let pkg = window.loadStore("wm_draft_prod", null) || window.runBlindTravelEngine(true);
+  const tripInputs = window.getFormInputs();
+  try {
+    const response = await fetch(`${window.API_BASE}/api/create-booking`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        bookingCode: pkg.code,
+        fullName: name,
+        email,
+        originAirport: tripInputs.origin,
+        preferredCity: pkg.reveal?.city,
+        budgetVnd: pkg.qrs && pkg.qrs[0] ? pkg.qrs[0].amount : 5000000,
+        groupSize: pkg.qrs.length,
+        userVector: tripInputs.vec,
+        blacklistCities: tripInputs.blacklist,
+        customPrompt: tripInputs.prompt
+      })
+    });
+    const booking = await response.json();
+    if (!response.ok || !booking.success || booking.bookingCode !== pkg.code) {
+      throw new Error(booking.error || "Máy chủ chưa xác nhận được đơn đặt chỗ.");
+    }
+  } catch (error) {
+    window.showToast(`Không thể tạo đơn đặt chỗ: ${error.message}`, "error");
+    return;
+  }
+
   pkg.isLocked = true;
   pkg.customerName = name;
   pkg.customerEmail = email;
@@ -2625,23 +2652,6 @@ window.confirmAndLockBooking = async function() {
     }
   }, 1000);
 
-    // Đồng bộ đơn hàng lên Backend Cloudflare Worker & Supabase Live
-  if (window.API_BASE) {
-    try {
-      fetch(`${window.API_BASE}/api/create-booking`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          bookingCode: pkg.code,
-          fullName: name,
-          email: email,
-          phone: acc,
-          budgetVnd: pkg.reveal ? pkg.reveal.paid : 5000000,
-          groupSize: pkg.qrs.length
-        })
-      }).catch(e => console.warn("Backend create-booking async notice:", e));
-    } catch(e) {}
-  }
   window.startPaymentPolling();
   window.updateSavedBadge();
   window.showToast(`Đã xuất mã VietQR ký quỹ cho chuyến đi #${pkg.code}!`);
@@ -2748,32 +2758,38 @@ window.submitSlaRefundTicket = async function(type, amount) {
   const pkg = window.loadStore("wm_draft_prod", null);
   const code = pkg ? pkg.code : "WM-88219";
 
-  if (window.API_BASE) {
-    try {
-      await fetch(`${window.API_BASE}/api/simulate-refund`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          scenario: type,
-          bookingCode: code,
-          totalPaid: pkg ? pkg.reveal.paid : 5000000,
-          action: "EXECUTE_REFUND"
-        })
-      });
-    } catch(e) {}
+  let refundResult;
+  try {
+    const response = await fetch(`${window.API_BASE}/api/simulate-refund`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        scenario: type,
+        bookingCode: code,
+        totalPaid: pkg ? pkg.reveal.paid : 5000000,
+        action: "EXECUTE_REFUND"
+      })
+    });
+    refundResult = await response.json();
+    if (!response.ok || !refundResult.success || !refundResult.isSimulation) {
+      throw new Error(refundResult.error || "Không thể ghi nhận mô phỏng hoàn tiền.");
+    }
+  } catch (error) {
+    window.showToast(`Không thể tạo phiếu mô phỏng: ${error.message}`, "error");
+    return;
   }
 
   const refundBox = document.getElementById("refundResultBox");
   if (refundBox) {
     refundBox.innerHTML = `
       <div class="bg-emerald-500/20 border border-emerald-500/40 p-4 rounded-xl space-y-1.5 text-emerald-200">
-        <strong class="block font-extrabold text-sm text-emerald-300">✓ Đã tạo phiếu hoàn tiền SLA thành công!</strong>
-        <p class="text-xs">Mã phiếu bảo chứng: <span class="font-mono font-bold text-white">REF-${code}-${Date.now().toString(36).toUpperCase()}</span></p>
-        <p class="text-[11px] text-slate-300">Số tiền <strong class="text-teal-300">${window.formatVND(amount)}</strong> sẽ được chuyển trực tiếp qua Napas 24/7 về tài khoản thụ hưởng trong vòng 10 phút.</p>
+        <strong class="block font-extrabold text-sm text-emerald-300">✓ Đã ghi nhận mô phỏng hoàn tiền SLA</strong>
+        <p class="text-xs">Mã mô phỏng: <span class="font-mono font-bold text-white">${refundResult.transactionId}</span></p>
+        <p class="text-[11px] text-slate-300">Khoản dự kiến <strong class="text-teal-300">${window.formatVND(amount)}</strong> chưa được chuyển. Cần tích hợp cổng thanh toán thật để thực hiện hoàn tiền.</p>
       </div>
     `;
   }
-  window.showToast(`Đã ghi nhận phiếu hoàn tiền cho đơn #${code}!`);
+  window.showToast(`Đã ghi nhận mô phỏng hoàn tiền cho đơn #${code}.`);
 };
 
 window.simulateRefund = window.calculateSlaRefund;

@@ -12,8 +12,9 @@ export default async function handler(req, res) {
     ALLOWED_ORIGIN: process.env.ALLOWED_ORIGIN || "*",
     SUPABASE_URL: process.env.SUPABASE_URL || "",
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+    SESSION_SECRET: process.env.SESSION_SECRET || "",
+    PAYMENT_WEBHOOK_SECRET: process.env.PAYMENT_WEBHOOK_SECRET || "",
     GEMINI_API_KEY: process.env.GEMINI_API_KEY || "",
-    ENCRYPTION_SECRET: process.env.ENCRYPTION_SECRET || "wandermatch-default-256-bit-secret-key"
   };
 
   // If invoked in an Edge-compatible environment where req is a standard Request
