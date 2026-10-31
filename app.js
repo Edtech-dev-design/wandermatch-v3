@@ -901,8 +901,8 @@ window.applyUserSession = function() {
   } else {
     if (outBox) outBox.style.display = "flex";
     if (inBox) inBox.style.display = "none";
-    if (gatekeeper) gatekeeper.style.display = "block";
-    if (b2cTab) b2cTab.style.display = "none";
+    if (gatekeeper) gatekeeper.style.display = "none";
+    if (b2cTab) b2cTab.style.display = "block";
     if (document.getElementById("tab-saved")) document.getElementById("tab-saved").style.display = "none";
     if (document.getElementById("tab-b2b")) document.getElementById("tab-b2b").style.display = "none";
   }
@@ -1114,9 +1114,11 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
 
   const reasoningLog = `[Thuật toán Knapsack + Cosine Matching]: Đã tối ưu gói ngân sách ${window.formatVND(inp.budget)}/khách ➔ Khớp cặp vé máy bay khứ hồi ${chosen.f.airline} + 2 đêm nghỉ dưỡng tại Resort ${chosen.h.rating}★ chuẩn SLA quốc tế (Đã niêm phong tên đến sân bay). Điểm Utility đạt ${chosen.util}/100, tương thích 5 chiều cảm xúc đạt ${chosen.sim}%. Tiết kiệm ngay ${window.formatVND(savings)} nhờ quỹ phòng ẩn danh OTA Wholesale.`;
 
-  // Tạo ứng viên cho UI
+  // Tạo ứng viên cho UI (Gợi ý cao nhất #1 và các ứng viên thay thế)
   const candidates = topCombos.map((tc, idx) => ({
     idx,
+    isHighest: idx === 0,
+    rankBadge: idx === 0 ? "👑 GỢI Ý CAO NHẤT" : `ỨNG VIÊN #${idx + 1}`,
     comboId: tc.comboId,
     sim: tc.sim,
     util: tc.util,
@@ -1128,11 +1130,15 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
     savings: (tc.unitRetail - tc.unitCost) * inp.groupSize
   }));
 
+  const isHighestMatch = chosen.comboId === topCombos[0]?.comboId;
+
   return {
     code, 
     comboId: chosen.comboId, 
     isLocked: false, 
     isRevealed: false,
+    isHighestMatch,
+    rankTitle: isHighestMatch ? "GỢI Ý DU LỊCH MÙ CAO NHẤT (PARETO OPTIMAL #1)" : `GỢI Ý ỨNG VIÊN #${topCombos.findIndex(tc => tc.comboId === chosen.comboId) + 1}`,
     matchScore: chosen.sim, 
     utilityScore: chosen.util,
     knapsackRatio: chosen.knapsackRatio,
@@ -1201,11 +1207,15 @@ window.selectBlindTravelCandidate = function(candidateIdx) {
     savings: (tc.unitRetail - tc.unitCost) * inp.groupSize
   }));
 
+  const isHighestMatch = candidateIdx === 0;
+
   const newPkg = {
     code,
     comboId: chosen.comboId,
     isLocked: false,
     isRevealed: false,
+    isHighestMatch,
+    rankTitle: isHighestMatch ? "GỢI Ý DU LỊCH MÙ CAO NHẤT (PARETO OPTIMAL #1)" : `GỢI Ý ỨNG VIÊN #${candidateIdx + 1}`,
     matchScore: chosen.sim,
     utilityScore: chosen.util,
     knapsackRatio: chosen.knapsackRatio,
@@ -1819,10 +1829,21 @@ window.renderPackageUI = function(pkg) {
       <div class="absolute -top-24 -right-24 w-72 h-72 bg-gradient-to-br from-teal-500/15 to-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
       <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-gradient-to-tr from-amber-500/15 to-rose-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      <!-- HEADER HỘP GỢI Ý ĐA SẮC THÁI -->
+      <!-- HEADER HỘP GỢI Ý DU LỊCH MÙ CAO NHẤT -->
       <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-5">
         <div>
-          <div class="flex flex-wrap items-center gap-2">
+          <div class="flex flex-wrap items-center gap-2 mb-2">
+            ${(pkg.isHighestMatch !== false && (!pkg.activeCandidateIndex || pkg.activeCandidateIndex === 0)) ? `
+              <span class="text-xs px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500/30 to-amber-600/20 text-amber-300 font-black border border-amber-400/60 shadow-lg flex items-center gap-1.5 animate-pulse">
+                <span class="text-sm">👑</span>
+                GỢI Ý DU LỊCH MÙ CAO NHẤT (PARETO OPTIMAL #1)
+              </span>
+            ` : `
+              <span class="text-xs px-3 py-1.5 rounded-full bg-teal-500/25 text-teal-300 font-black border border-teal-400/50 shadow-sm flex items-center gap-1.5">
+                <span>✦</span>
+                GỢI Ý ỨNG VIÊN #${(pkg.activeCandidateIndex || 0) + 1}
+              </span>
+            `}
             <span class="text-xs px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 font-extrabold border border-teal-500/40 shadow-sm flex items-center gap-1.5">
               <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
               Độ Khớp Gu: ${pkg.matchScore}%
@@ -1834,10 +1855,17 @@ window.renderPackageUI = function(pkg) {
               Knapsack: ${pkg.knapsackRatio}% ngân sách
             </span>
           </div>
-          <h3 class="text-xl md:text-2xl font-extrabold text-white mt-2 font-heading tracking-tight flex items-center gap-2">
-            <span>Gói Nghỉ Dưỡng Bí Mật 3N2Đ</span>
+          <h3 class="text-xl md:text-2xl font-black text-white font-heading tracking-tight flex items-center gap-2">
+            <span class="${(pkg.isHighestMatch !== false && (!pkg.activeCandidateIndex || pkg.activeCandidateIndex === 0)) ? 'gold-gradient-text' : 'text-white'}">
+              ${(pkg.isHighestMatch !== false && (!pkg.activeCandidateIndex || pkg.activeCandidateIndex === 0)) ? 'Hộp Du Lịch Mù Khuyên Dùng Hàng Đầu (Rank #1)' : `Hộp Du Lịch Mù Ứng Viên #${(pkg.activeCandidateIndex || 0) + 1}`}
+            </span>
             <span class="text-xs px-2.5 py-1 rounded-lg bg-white/10 text-amber-400 font-mono border border-amber-400/30">Mã: #${pkg.code}</span>
           </h3>
+          <p class="text-xs text-slate-300 mt-1">
+            ${(pkg.isHighestMatch !== false && (!pkg.activeCandidateIndex || pkg.activeCandidateIndex === 0))
+              ? `Thuật toán Pareto-Knapsack & Cosine 5D tuyển chọn gói tối ưu nhất: điểm Utility <strong>${pkg.utilityScore}/100</strong>, độ khớp gu <strong>${pkg.matchScore}%</strong>, vé bay <strong>${pkg.flight.airline}</strong> và resort 5★ SLA.`
+              : `Bạn đang chọn xem phương án du lịch mù ứng viên #${(pkg.activeCandidateIndex || 0) + 1} do thuật toán đề xuất.`}
+          </p>
         </div>
 
         <div class="text-right">
@@ -1936,22 +1964,25 @@ window.renderPackageUI = function(pkg) {
 
       <!-- HÀNG 3 ỨNG VIÊN DU LỊCH MÙ CHỌN LỌC (TOP 3 BLIND TRAVEL CANDIDATES) -->
       ${pkg.candidates && pkg.candidates.length > 1 ? `
-        <div class="space-y-2 pt-1 pb-1">
+        <div class="space-y-2.5 bg-slate-900/90 p-4 rounded-2xl border border-amber-500/30 shadow-lg">
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <span class="text-xs font-black uppercase tracking-wider text-amber-300 flex items-center gap-1.5 font-heading">
-              <span>🏆</span> Top 3 Điểm Đến Bí Mật Được Thuật Toán Khớp Lệnh Riêng Cho Bạn:
+            <span class="text-xs font-black uppercase tracking-wider text-amber-300 flex items-center gap-2 font-heading">
+              <span>🏆</span> Bộ Tuyển Chọn Top 3 Hộp Du Lịch Mù Do Thuật Toán Xếp Hạng:
             </span>
-            <span class="text-[10px] text-slate-400 font-mono">✦ 100% Niêm phong danh tính đến sân bay</span>
+            <span class="text-[10px] text-teal-300 font-mono font-bold">✦ 100% Niêm phong danh tính đến sân bay</span>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             ${pkg.candidates.map((c, i) => `
-              <button type="button" onclick="window.selectBlindTravelCandidate(${i})" class="candidate-pill text-left p-3 rounded-2xl border transition ${pkg.activeCandidateIndex === i ? 'active bg-teal-500/20 border-teal-400 text-white shadow-xl' : 'bg-slate-900/80 border-white/10 text-slate-300 hover:border-white/30 hover:bg-slate-900'}">
+              <button type="button" onclick="window.selectBlindTravelCandidate(${i})" class="candidate-pill text-left p-3.5 rounded-2xl border-2 transition relative overflow-hidden cursor-pointer ${pkg.activeCandidateIndex === i ? 'active bg-gradient-to-br from-teal-500/25 to-slate-900 border-teal-400 text-white shadow-2xl scale-[1.02]' : 'bg-slate-950/80 border-white/10 text-slate-300 hover:border-amber-400/40 hover:bg-slate-900'}">
                 <div class="flex items-center justify-between mb-1.5">
-                  <span class="text-[10px] font-mono px-2 py-0.5 rounded-full ${pkg.activeCandidateIndex === i ? 'bg-teal-400 text-slate-950 font-black' : 'bg-white/10 text-slate-300 font-bold'}">Ứng Viên #${i + 1}</span>
-                  <span class="text-[11px] font-black text-amber-300 font-mono">${c.sim}% Gu</span>
+                  <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full font-black ${i === 0 ? 'bg-amber-400 text-slate-950 shadow' : (pkg.activeCandidateIndex === i ? 'bg-teal-400 text-slate-950' : 'bg-white/10 text-slate-300')}">
+                    ${i === 0 ? '👑 GỢI Ý CAO NHẤT' : `ỨNG VIÊN #${i + 1}`}
+                  </span>
+                  <span class="text-xs font-black text-amber-300 font-mono">${c.sim}% Gu</span>
                 </div>
-                <strong class="text-xs text-white block truncate font-heading">✦ ${c.mysteryTheme}</strong>
-                <span class="text-[10px] text-slate-400 block mt-0.5">${c.temp}°C • ${c.weather} • ${c.airline}</span>
+                <strong class="text-xs text-white block truncate font-heading mt-1">✦ ${c.mysteryTheme}</strong>
+                <span class="text-[10px] text-slate-300 block mt-0.5">${c.temp}°C • ${c.weather} • ${c.airline}</span>
+                <span class="text-[10px] text-teal-300 font-bold block mt-1">Tiết kiệm ${window.formatVND(c.savings)}</span>
               </button>
             `).join("")}
           </div>
@@ -3697,8 +3728,11 @@ window.initWanderMatchApp = function() {
 
   // 4. Áp dụng phiên người dùng & khởi tạo gợi ý du lịch mù
   window.applyUserSession();
-  const draft = window.loadStore("wm_draft_prod", null) || window.runBlindTravelEngine(false);
-  window.saveStore("wm_draft_prod", draft);
+  let draft = window.loadStore("wm_draft_prod", null);
+  if (!draft || !draft.candidates || !draft.candidates.length) {
+    draft = window.runBlindTravelEngine(false);
+    window.saveStore("wm_draft_prod", draft);
+  }
   window.renderPackageUI(draft);
   window.updatePersonaUI();
 };
