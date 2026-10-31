@@ -1847,22 +1847,40 @@ window.renderPackageUI = function(pkg) {
         </div>
       </div>
 
-      <!-- GALLERY ẢNH RESORT ĐA GÓC NHÌN (INTERACTIVE THUMBNAIL SWITCHER KÈM NÚT ĐIỀU HƯỚNG) -->
+      <!-- KHUNG THỊ GIÁC BÍ MẬT: ATMOSPHERIC MYSTERY CAPSULE (PHONG ẤN SÁP HOÀNG GIA) -->
       <div class="space-y-3">
-        <div class="relative rounded-3xl overflow-hidden h-80 md:h-96 border border-white/15 shadow-2xl group">
-          <img id="resortHeroImg" src="${gallery[0]}" alt="Resort Preview" class="w-full h-full object-cover fade-img-transition group-hover:scale-105" />
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+        <div class="relative rounded-3xl overflow-hidden h-80 md:h-96 border-2 border-amber-500/30 shadow-2xl group">
+          <img id="resortHeroImg" src="${gallery[0]}" alt="Resort Preview" class="w-full h-full object-cover fade-img-transition filter blur-sm group-hover:blur-[2px] transition duration-500 scale-105" />
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/40"></div>
           
+          <!-- LỚP PHONG ẤN SÁP HOÀNG GIA CHÍNH GIỮA (ROYAL WAX SEAL EMBLEM) -->
+          <div class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center pointer-events-none z-10 space-y-2">
+            <div class="wax-seal-stamp w-14 h-14 md:w-16 md:h-16 text-base md:text-lg shadow-2xl border-2 border-amber-400 animate-pulse">
+              WM
+            </div>
+            <div class="space-y-1 max-w-lg">
+              <span class="text-[10px] md:text-xs font-mono uppercase tracking-widest text-amber-300 font-black px-3 py-1 rounded-full bg-slate-950/80 border border-amber-400/40 backdrop-blur-md inline-block shadow">
+                ✦ KHÔNG GIAN RESORT 5★ ĐANG ĐƯỢC NIÊM PHONG SÁP ✦
+              </span>
+              <p class="text-xs text-slate-200 drop-shadow-md">
+                Bầu không khí: <strong class="text-teal-300">${pkg.hotel.mysteryTheme || 'Nghỉ Dưỡng Thượng Lưu'}</strong> • Vi khí hậu: <strong class="text-amber-300">${pkg.temp}°C (${pkg.weather})</strong>
+              </p>
+              <p class="text-[11px] text-slate-400 italic">
+                (Hình ảnh không gian thực tế & tên resort 5★ sẽ mở khóa tại Cổng Sân Bay)
+              </p>
+            </div>
+          </div>
+
           <!-- NÚT PREV / NEXT TRÊN ẢNH CHÍNH -->
-          <button type="button" onclick="window.prevResortImage()" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/75 hover:bg-teal-500 hover:text-slate-950 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition shadow-xl z-10 cursor-pointer">
+          <button type="button" onclick="window.prevResortImage()" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-teal-500 hover:text-slate-950 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition shadow-xl z-20 cursor-pointer">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
           </button>
-          <button type="button" onclick="window.nextResortImage()" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/75 hover:bg-teal-500 hover:text-slate-950 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition shadow-xl z-10 cursor-pointer">
+          <button type="button" onclick="window.nextResortImage()" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-teal-500 hover:text-slate-950 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition shadow-xl z-20 cursor-pointer">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
           </button>
 
           <!-- BADGES GÓC TRÊN -->
-          <div class="absolute top-4 left-4 flex flex-wrap gap-2">
+          <div class="absolute top-4 left-4 flex flex-wrap gap-2 z-20">
             <span class="text-xs px-3.5 py-1.5 rounded-full bg-slate-950/85 text-amber-300 font-extrabold border border-amber-400/40 backdrop-blur-md flex items-center gap-1.5 shadow-lg">
               <span>★</span> ${(pkg.hotel && pkg.hotel.rating) || 4.95}/5 (Chuẩn 5 Sao Quốc Tế)
             </span>
@@ -1871,14 +1889,14 @@ window.renderPackageUI = function(pkg) {
             </span>
           </div>
 
-          <div class="absolute top-4 right-4">
+          <div class="absolute top-4 right-4 z-20">
             <span id="resortImageCounter" class="text-xs px-3.5 py-1.5 rounded-full bg-slate-950/85 text-slate-200 font-mono font-bold border border-white/20 backdrop-blur-md shadow-lg">
-              📷 1/${gallery.length} • Toàn Cảnh Resort & Cảnh Quan
+              📷 1/${gallery.length} • Manh Mối Không Gian & Cảnh Quan
             </span>
           </div>
 
           <!-- THÔNG TIN ĐÁY ẢNH & TIỆN ÍCH 5 SAO -->
-          <div class="absolute bottom-4 left-4 right-4 space-y-2">
+          <div class="absolute bottom-4 left-4 right-4 space-y-2 z-20">
             <div>
               <span class="text-[11px] text-teal-300 uppercase tracking-widest font-black block">Resort 5★ Bí Mật Đạt Chuẩn SLA Quốc Tế</span>
               <h4 class="text-xl md:text-2xl font-black text-white font-heading mt-0.5">✦ Resort 5★ Tiêu Chuẩn Quốc Tế SLA (Niêm Phong Tên Đến Sân Bay) ✦</h4>
@@ -1905,13 +1923,13 @@ window.renderPackageUI = function(pkg) {
         <!-- 3 NÚT CHỌN GÓC ẢNH CHỤP THỰC TẾ -->
         <div class="flex gap-2">
           <button id="thumbBtn_0" onclick="window.switchResortImage(0)" class="flex-1 py-2 px-3 rounded-xl text-xs font-black bg-teal-500 text-slate-950 border border-teal-300 shadow-lg transition flex items-center justify-center gap-1.5 transform scale-[1.02]">
-            <span>📷 Góc 1:</span> Toàn Cảnh Resort & Cảnh Quan
+            <span>📷 Manh Mối 1:</span> Không Gian Toàn Cảnh
           </button>
           <button id="thumbBtn_1" onclick="window.switchResortImage(1)" class="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-slate-900/90 text-slate-300 border border-white/10 hover:border-white/30 hover:bg-slate-800 transition flex items-center justify-center gap-1.5">
-            <span>🛏️ Góc 2:</span> Phòng Nghỉ Deluxe View Đẹp
+            <span>🛏️ Manh Mối 2:</span> Phòng Nghỉ Suite 5★
           </button>
           <button id="thumbBtn_2" onclick="window.switchResortImage(2)" class="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-slate-900/90 text-slate-300 border border-white/10 hover:border-white/30 hover:bg-slate-800 transition flex items-center justify-center gap-1.5">
-            <span>🏊 Góc 3:</span> Hồ Bơi & Tiện Ích Thư Giãn
+            <span>🏊 Manh Mối 3:</span> Hồ Bơi & Thư Giãn
           </button>
         </div>
       </div>

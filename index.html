@@ -264,32 +264,32 @@
         <button id="step-nav-1" onclick="window.goToStep(1)" class="step-nav-item active p-3 md:p-3.5 rounded-2xl border border-teal-400/50 text-left transition flex items-center gap-3">
           <div id="step-nav-icon-1" class="w-8 h-8 rounded-xl bg-teal-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0 shadow-md">1</div>
           <div class="min-w-0">
-            <span class="text-[10px] uppercase text-teal-300 font-extrabold tracking-wider block truncate">Bước 01 • Khảo Sát</span>
-            <strong class="text-xs md:text-sm text-white block truncate">Khớp Gói Du Lịch Mù</strong>
+            <span class="step-nav-label text-[10px] uppercase text-teal-300 font-extrabold tracking-wider block truncate">Bước 01 • Chọn Gu</span>
+            <strong class="step-nav-title text-xs md:text-sm text-white block truncate">Hồ Sơ Mù & Radar 5D</strong>
           </div>
         </button>
 
         <button id="step-nav-2" onclick="window.goToStep(2)" class="step-nav-item p-3 md:p-3.5 rounded-2xl border border-white/10 text-left transition flex items-center gap-3">
           <div id="step-nav-icon-2" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 font-bold flex items-center justify-center text-xs shrink-0">2</div>
           <div class="min-w-0">
-            <span class="text-[10px] uppercase text-slate-400 font-extrabold tracking-wider block truncate">Bước 02 • Ký Quỹ</span>
-            <strong class="text-xs md:text-sm text-slate-300 block truncate">Bảo Chứng MB Escrow</strong>
+            <span class="step-nav-label text-[10px] uppercase text-slate-400 font-extrabold tracking-wider block truncate">Bước 02 • Niêm Phong</span>
+            <strong class="step-nav-title text-xs md:text-sm text-slate-300 block truncate">Ký Quỹ MB Escrow 200%</strong>
           </div>
         </button>
 
         <button id="step-nav-3" onclick="window.goToStep(3)" class="step-nav-item p-3 md:p-3.5 rounded-2xl border border-white/10 text-left transition flex items-center gap-3">
           <div id="step-nav-icon-3" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 font-bold flex items-center justify-center text-xs shrink-0">3</div>
           <div class="min-w-0">
-            <span class="text-[10px] uppercase text-slate-400 font-extrabold tracking-wider block truncate">Bước 03 • Hành Trang</span>
-            <strong class="text-xs md:text-sm text-slate-300 block truncate">Vi Khí Hậu & Vali Bí Mật</strong>
+            <span class="step-nav-label text-[10px] uppercase text-slate-400 font-extrabold tracking-wider block truncate">Bước 03 • Chuẩn Bị</span>
+            <strong class="step-nav-title text-xs md:text-sm text-slate-300 block truncate">Hành Trang Theo Vi Khí Hậu</strong>
           </div>
         </button>
 
         <button id="step-nav-4" onclick="window.goToStep(4)" class="step-nav-item p-3 md:p-3.5 rounded-2xl border border-white/10 text-left transition flex items-center gap-3">
           <div id="step-nav-icon-4" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 font-bold flex items-center justify-center text-xs shrink-0">4</div>
           <div class="min-w-0">
-            <span class="text-[10px] uppercase text-slate-400 font-extrabold tracking-wider block truncate">Bước 04 • Nghi Thức</span>
-            <strong class="text-xs md:text-sm text-slate-300 block truncate">Cào Phong Ấn & Vé Bay</strong>
+            <span class="step-nav-label text-[10px] uppercase text-slate-400 font-extrabold tracking-wider block truncate">Bước 04 • Tại Sân Bay</span>
+            <strong class="step-nav-title text-xs md:text-sm text-slate-300 block truncate">Cào Sáp Mở Khóa Chuyến Đi</strong>
           </div>
         </button>
       </div>
@@ -464,11 +464,16 @@
     <!-- BƯỚC 2: HÀNH KHÁCH & VIETQR TẠM GIỮ -->
     <section id="step-panel-2" style="display:none;" class="glass-card rounded-3xl p-6 md:p-8 space-y-6">
       <div class="border-b border-white/10 pb-4">
-        <h2 class="text-xl font-extrabold text-white font-heading">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="wax-seal-stamp w-6 h-6 text-[8px] shadow-sm">WM</span>
+          <span class="text-[10px] font-mono uppercase tracking-widest text-teal-400 font-black">MB Bank Escrow Smart Contract</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 font-bold">Bảo Chứng Ký Quỹ 200%</span>
+        </div>
+        <h2 class="text-xl md:text-2xl font-extrabold text-white font-heading">
           Bước 2: Thông Tin Hành Khách & Ký Quỹ MB Bank Escrow Bảo Chứng 200%
         </h2>
-        <p class="text-xs text-slate-400 mt-0.5">
-          Bạn đang đặt một kỳ nghỉ du lịch mù. Tiền được phong tỏa an toàn tuyệt đối trong tài khoản Escrow của MB Bank. Mọi thông tin điểm đến được bảo mật nghiêm ngặt và chỉ mở khóa sau khi quét thẻ cào sáp.
+        <p class="text-xs text-slate-300 mt-0.5">
+          Bạn đang niêm phong kỳ nghỉ du lịch mù 5★. Tiền ký quỹ được phong tỏa an toàn tuyệt đối trong tài khoản Escrow bảo chứng của MB Bank. Mọi thông tin điểm đến được niêm phong sáp bí mật và chỉ mở khóa vào đúng nghi thức cào sáp tại sân bay.
         </p>
       </div>
 
@@ -521,7 +526,7 @@
           <span>✓</span> Xác Nhận Đặt Chỗ & Tạo Mã VietQR Ký Quỹ
         </button>
         <button onclick="window.goToStep(3)" class="px-5 py-3.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white border border-white/10 transition">
-          Sang Bước 3: Hành Lý & Chính Sách →
+          Sang Bước 3: Chuẩn Bị Vali Theo Vi Khí Hậu →
         </button>
       </div>
 
@@ -597,14 +602,21 @@
 
     <!-- BƯỚC 3: HÀNH LÝ & CHÍNH SÁCH HOÀN HỦY -->
     <section id="step-panel-3" style="display:none;" class="glass-card rounded-3xl p-6 md:p-8 space-y-6">
-      <div class="flex flex-wrap justify-between items-center border-b border-white/10 pb-4 gap-2">
+      <div class="flex flex-wrap justify-between items-center border-b border-white/10 pb-4 gap-3">
         <div>
-          <h2 class="text-xl font-extrabold text-white font-heading">
-            Bước 3: Chuẩn Bị Vali Theo Vi Khí Hậu & Cam Kết SLA Tự Động
+          <div class="flex items-center gap-2 mb-1">
+            <span class="wax-seal-stamp w-6 h-6 text-[8px] shadow-sm">WM</span>
+            <span class="text-[10px] font-mono uppercase tracking-widest text-teal-400 font-black">Zero Destination Leakage</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-teal-500/15 text-teal-300 border border-teal-400/30 font-bold">Vi Khí Hậu Vệ Tinh Trực Tiếp</span>
+          </div>
+          <h2 class="text-xl md:text-2xl font-extrabold text-white font-heading">
+            Bước 3: Chuẩn Bị Vali Theo Vi Khí Hậu & Giờ Bay Dự Kiến
           </h2>
-          <p class="text-xs text-slate-400 mt-0.5">Vì đây là chuyến đi bí mật, bạn không cần bận tâm nghiên cứu điểm đến. Hãy xếp vali theo đúng vi khí hậu và dải nhiệt độ chính xác do AI & Vệ tinh dự báo bên dưới!</p>
+          <p class="text-xs text-slate-300 mt-0.5">
+            Điểm đến tiếp tục được <strong>bảo mật 100%</strong>. Bạn không cần đau đầu nghiên cứu hay lập kế hoạch: chỉ cần xếp vali theo đúng vi khí hậu (°C), độ ẩm và gợi ý thông minh từ vệ tinh bên dưới.
+          </p>
         </div>
-        <span id="anonWeatherBox" class="text-xs font-bold px-4 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-400/30"></span>
+        <span id="anonWeatherBox" class="text-xs font-bold px-4 py-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-400/30 shadow"></span>
       </div>
 
       <div class="grid md:grid-cols-2 gap-6">
@@ -672,7 +684,7 @@
               ← Bước 2
             </button>
             <button onclick="window.goToStep(4)" class="flex-1 py-3.5 rounded-xl text-xs font-extrabold btn-glow-gold text-slate-950 flex items-center justify-center gap-2 shadow-lg">
-              <span>✦</span> Sang Bước 4: Mở Khóa Điểm Đến & Thẻ Cào →
+              <span>✦</span> Tôi Đã Ra Sân Bay: Sang Bước 4 Mở Phong Ấn →
             </button>
           </div>
         </div>
@@ -683,10 +695,17 @@
     <section id="step-panel-4" style="display:none;" class="glass-card rounded-3xl p-6 md:p-8 space-y-6">
       <div class="flex flex-wrap justify-between items-center border-b border-white/10 pb-4 gap-3">
         <div>
-          <h2 class="text-xl font-extrabold text-amber-400 font-heading">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="wax-seal-stamp w-6 h-6 text-[8px] shadow-sm">WM</span>
+            <span class="text-[10px] font-mono uppercase tracking-widest text-amber-400 font-black">Royal Airport Reveal Ceremony</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-400/30 font-bold">Đại Lễ Cào Phong Ấn Hoàng Gia</span>
+          </div>
+          <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 font-heading">
             Bước 4: Nghi Thức Cào Phong Ấn Bí Mật & Nhận Vé Bay Thật
           </h2>
-          <p class="text-xs text-slate-400 mt-0.5">Cào trực tiếp lớp phong ấn sáp kỹ thuật số bên dưới (khuyên dùng khi đã ra tới sân bay) để khám phá thành phố đích đến, thẻ lên tàu bay Boarding Pass và voucher resort 5 sao chính thức!</p>
+          <p class="text-xs text-slate-300 mt-0.5">
+            Khuyên dùng khi đã ra tới sân bay: Cào lớp phong ấn sáp kỹ thuật số bên dưới để chính thức mở khóa thành phố đích đến, thẻ lên máy bay Boarding Pass, và voucher Resort 5★!
+          </p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
           <button onclick="window.revealDestinationNow()" class="px-4 py-2.5 rounded-xl text-xs font-black btn-glow-gold text-slate-950 flex items-center gap-1.5 shadow-lg cursor-pointer">
@@ -867,7 +886,7 @@
       <!-- NÚT ĐIỀU HƯỚNG BƯỚC 4 -->
       <div class="flex flex-wrap justify-between items-center gap-3 pt-3">
         <button onclick="window.goToStep(3)" class="px-5 py-3 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-slate-300 border border-white/10 transition">
-          ← Quay Lại Bước 3 (Hành Trang & SLA)
+          ← Quay Lại Bước 3 (Hành Trang & Vi Khí Hậu)
         </button>
         <div class="flex gap-2">
           <button onclick="window.printVoucher()" class="px-5 py-3 rounded-xl text-xs font-extrabold btn-glow-gold text-slate-950 flex items-center gap-1.5 shadow-lg">

@@ -1183,9 +1183,35 @@ html, body {
 }
 
 .step-nav-item.active {
-  background: rgba(20, 184, 166, 0.14);
-  border-color: rgba(20, 184, 166, 0.55);
-  box-shadow: 0 4px 20px -2px rgba(20, 184, 166, 0.25);
+  background: rgba(20, 184, 166, 0.16);
+  border-color: rgba(20, 184, 166, 0.65);
+  box-shadow: 0 4px 24px -2px rgba(20, 184, 166, 0.35);
+}
+
+.step-nav-item .step-nav-label {
+  color: #94a3b8;
+  transition: color 0.25s ease;
+}
+
+.step-nav-item.active .step-nav-label {
+  color: #5eead4 !important;
+}
+
+.step-nav-item .step-nav-title {
+  color: #cbd5e1;
+  transition: color 0.25s ease;
+}
+
+.step-nav-item.active .step-nav-title {
+  color: #ffffff !important;
+}
+
+.step-nav-item.bg-emerald-500\/5 .step-nav-label {
+  color: #6ee7b7 !important;
+}
+
+.step-nav-item.bg-emerald-500\/5 .step-nav-title {
+  color: #f1f5f9 !important;
 }
 
 /* ============================================================================
