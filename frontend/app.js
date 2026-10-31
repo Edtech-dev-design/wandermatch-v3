@@ -44,7 +44,9 @@ window.updatePackingProgress = function() {
 // ============================================================================
 // WANDERMATCH PRODUCTION CONFIG & LIVE BACKEND API ENDPOINT
 // ============================================================================
-window.API_BASE = window.location.origin;
+window.API_BASE = (typeof window !== "undefined" && (window.location.port === "3000" || window.location.port === "5500"))
+  ? "http://127.0.0.1:8787"
+  : (typeof window !== "undefined" ? window.location.origin : "http://127.0.0.1:8787");
 /**
  * WANDERMATCH — PRODUCTION LUXURY BLIND TRAVEL PLATFORM
  * Version 10.0 — Unified One-Step Auth, Live Google & Facebook OAuth Connectors,
