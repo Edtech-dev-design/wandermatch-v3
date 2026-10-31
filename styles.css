@@ -1640,3 +1640,59 @@ input[type="range"]::-webkit-slider-thumb:hover {
     height: 56px;
   }
 }
+
+/* ============================================================================
+   10. FRENCH LUXURY HAUTE-COUTURE STYLING (KIỂU PHÁP & PHÓNG KHOÁNG)
+   ============================================================================ */
+
+.french-luxury-panel {
+  background: radial-gradient(circle at 50% 0%, rgba(22, 33, 56, 0.96) 0%, rgba(9, 14, 26, 0.98) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.85), 0 0 40px -5px rgba(245, 158, 11, 0.18);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+}
+
+.french-gold-heading {
+  font-family: 'Playfair Display', 'Outfit', Georgia, serif;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef08a 25%, #f59e0b 65%, #b45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.02em;
+}
+
+.french-input-field {
+  background: rgba(13, 20, 36, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.french-input-field:focus {
+  border-color: #f59e0b;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.28);
+  background: rgba(15, 23, 42, 0.96);
+}
+
+.french-badge-parisian {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.22) 0%, rgba(217, 119, 6, 0.12) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  color: #fef08a;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.french-btn-gold {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+  color: #020617;
+  font-weight: 800;
+  box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.french-btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px -5px rgba(245, 158, 11, 0.55);
+}
+
+.french-profile-card {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.92) 0%, rgba(8, 14, 26, 0.96) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
