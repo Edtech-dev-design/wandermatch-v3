@@ -178,7 +178,7 @@
   <!-- ========================================================================= -->
   <!-- 1. GIAO DIỆN KHÓA / GATEKEEPER LANDING (HIỂN THỊ KHI CHƯA ĐĂNG NHẬP) -->
   <!-- ========================================================================= -->
-  <section id="gatekeeperLanding" style="display:none;" class="max-w-6xl mx-auto px-4 pt-10 space-y-12">
+  <section id="gatekeeperLanding" style="display:block;" class="max-w-6xl mx-auto px-4 pt-10 space-y-12">
     <!-- HERO BANNER GIỚI THIỆU -->
     <div class="glass-card rounded-3xl p-8 md:p-12 text-center relative overflow-hidden space-y-6">
       <div class="absolute -top-32 -left-32 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -191,7 +191,7 @@
       </div>
 
       <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight max-w-4xl mx-auto font-heading">
-        Trải Nghiệm Du Lịch Mù Thượng Lưu <br />
+        Trải Nghiệm Du Lịch Mù Tiên Phong <br />
         <span class="gold-gradient-text">Tiết Kiệm Đến 45% Ngân Sách</span> Cùng Thuật Toán AI
       </h1>
 
@@ -254,7 +254,7 @@
   <!-- ========================================================================= -->
   <!-- 2. GIAO DIỆN CHÍNH: ENGINE ĐẶT CHUYẾN ĐI (MỞ KHÓA KHI ĐÃ ĐĂNG NHẬP) -->
   <!-- ========================================================================= -->
-  <main id="tab-b2c" style="display:block;" class="max-w-6xl mx-auto px-4 mt-6 space-y-6">
+  <main id="tab-b2c" style="display:none;" class="max-w-6xl mx-auto px-4 mt-6 space-y-6">
     <!-- THANH TIẾN TRÌNH 4 BƯỚC THƯƠNG MẠI NỐI LIỀN CAO CẤP -->
     <div class="stepper-track-container relative overflow-hidden p-2 shadow-2xl">
       <div id="stepperProgressBar" class="stepper-progress-bar" style="width: 25%;"></div>
@@ -303,7 +303,7 @@
             <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-400/30 font-bold">Niêm Phong Sáp Hoàng Gia</span>
           </div>
           <h2 class="text-xl md:text-2xl font-extrabold text-white font-heading">
-            Thiết Kế Kỳ Nghỉ Du Lịch Mù Thượng Lưu 3N2Đ
+            Thiết Kế Kỳ Nghỉ Du Lịch Mù 3N2Đ
           </h2>
           <p class="text-xs text-slate-300 mt-0.5">
             Điểm đến và resort 5 sao được <strong>niêm phong sáp bí mật 100%</strong> đến tận sân bay. Thuật toán Pareto-Knapsack & Cosine 5D tự động ghép cặp chuyến bay khứ hồi và resort 5★ đạt hiệu quả ngân sách và độ khớp gu cao nhất.
@@ -1055,93 +1055,100 @@
   <!-- MODAL XÁC THỰC DUY NHẤT (UNIFIED AUTH & OAUTH THẬT 100%) -->
   <!-- ========================================================================= -->
   <div id="unifiedAuthModal" style="display:none;" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4 overflow-y-auto">
-    <div class="french-luxury-panel rounded-3xl max-w-lg w-full p-6 md:p-8 space-y-5 text-xs shadow-2xl relative my-auto modal-content-animated border border-amber-400/40">
+    <div class="french-luxury-panel rounded-3xl max-w-md w-full p-6 md:p-8 space-y-4 text-xs shadow-2xl relative my-auto modal-content-animated border border-amber-400/40">
       
-      <!-- HEADER PHONG CÁCH ATELIER PARIS (1 MỤC DUY NHẤT) -->
-      <div class="flex justify-between items-start border-b border-white/10 pb-4">
+      <!-- HEADER -->
+      <div class="flex justify-between items-start border-b border-white/10 pb-3">
         <div class="flex items-center gap-3">
-          <div class="wax-seal-stamp w-11 h-11 text-xs shadow-xl border border-amber-400/60 shrink-0">WM</div>
+          <div class="wax-seal-stamp w-10 h-10 text-xs shadow-xl border border-amber-400/60 shrink-0">WM</div>
           <div>
             <div class="flex items-center gap-2 mb-0.5">
-              <span class="french-badge-parisian px-2 py-0.5 rounded-full text-[9px] font-black">Maison WanderMatch</span>
-              <span class="text-[9px] text-teal-300 font-mono font-bold">Atelier d'Accès Privilège</span>
+              <span id="authModalBadge" class="french-badge-parisian px-2 py-0.5 rounded-full text-[9px] font-black">WanderMatch ID</span>
+              <span class="text-[9px] text-teal-300 font-mono font-bold">Bậc Đồng • Bạc • Vàng</span>
             </div>
-            <h3 class="text-lg md:text-xl font-black text-white font-heading">
-              Cổng Xác Thực & Đăng Ký Thượng Lưu
+            <h3 id="authModalTitle" class="text-lg md:text-xl font-black text-white font-heading">
+              Đăng Nhập Tài Khoản
             </h3>
-            <p class="text-[11px] text-slate-300 mt-0.5">
-              Hệ thống 1 mục duy nhất: Tự động đăng nhập nếu đã có tài khoản, hoặc cấp thẻ hội viên VIP mới tức thì.
+            <p id="authModalSubtitle" class="text-[11px] text-slate-300 mt-0.5">
+              Đăng nhập để mở khóa giao diện đặt chuyến du lịch mù và quản lý hành trình.
             </p>
           </div>
         </div>
         <button onclick="window.closeUnifiedAuthModal()" class="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center font-bold text-sm cursor-pointer transition shrink-0 ml-2">✕</button>
       </div>
 
-      <!-- KẾT NỐI OAUTH THẬT GOOGLE & FACEBOOK -->
-      <div class="grid sm:grid-cols-2 gap-2.5">
-        <button type="button" onclick="window.loginWithGoogle()" class="py-3 px-4 rounded-xl font-extrabold text-xs bg-white hover:bg-slate-100 text-slate-900 transition shadow-lg flex items-center justify-center gap-2.5 cursor-pointer">
+      <!-- KẾT NỐI NHANH GOOGLE & FACEBOOK -->
+      <div class="grid grid-cols-2 gap-2.5">
+        <button type="button" onclick="window.loginWithGoogle()" class="py-2.5 px-3 rounded-xl font-extrabold text-xs bg-white hover:bg-slate-100 text-slate-900 transition shadow flex items-center justify-center gap-2 cursor-pointer">
           <svg class="w-4 h-4" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.65v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.14z"/>
             <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.15C3.26 21.36 7.33 24 12 24z"/>
             <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.15 0 9.92 0 12s.45 3.85 1.24 5.42l4.04-3.15z"/>
             <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
           </svg>
-          <span>Tiếp Tục Google</span>
+          <span>Google</span>
         </button>
 
-        <button type="button" onclick="window.loginWithFacebook()" class="py-3 px-4 rounded-xl font-extrabold text-xs bg-[#1877F2] hover:bg-[#166fe5] text-white transition shadow-lg shadow-[#1877F2]/25 flex items-center justify-center gap-2.5 cursor-pointer">
+        <button type="button" onclick="window.loginWithFacebook()" class="py-2.5 px-3 rounded-xl font-extrabold text-xs bg-[#1877F2] hover:bg-[#166fe5] text-white transition shadow shadow-[#1877F2]/25 flex items-center justify-center gap-2 cursor-pointer">
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
             <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
           </svg>
-          <span>Tiếp Tục Facebook</span>
+          <span>Facebook</span>
         </button>
       </div>
 
-      <!-- ĐƯỜNG PHÂN CÁCH NGHỆ THUẬT -->
-      <div class="relative flex py-1 items-center">
+      <div class="relative flex py-0.5 items-center">
         <div class="flex-grow border-t border-white/10"></div>
-        <span class="flex-shrink mx-3 text-slate-400 text-[10px] font-bold uppercase tracking-widest font-mono">Hoặc Xác Thực Bằng Email Cá Nhân</span>
+        <span class="flex-shrink mx-3 text-slate-400 text-[10px] font-bold uppercase tracking-widest font-mono">Hoặc Xác Thực Bằng Email</span>
         <div class="flex-grow border-t border-white/10"></div>
       </div>
 
-      <div id="unifiedAuthErrorBox" style="display:none;" class="p-3.5 rounded-xl bg-rose-500/20 border border-rose-500/50 text-rose-300 font-semibold leading-relaxed"></div>
+      <!-- HỘP THÔNG BÁO LỖI VÀ THÀNH CÔNG -->
+      <div id="unifiedAuthErrorBox" style="display:none;" class="p-3 rounded-xl bg-rose-500/20 border border-rose-500/50 text-rose-300 font-semibold leading-relaxed"></div>
+      <div id="unifiedAuthSuccessBox" style="display:none;" class="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 font-semibold leading-relaxed"></div>
 
-      <!-- FORM 1 MỤC LIỀN MẠCH (SINGLE UNIFIED FORM) -->
-      <form id="unifiedAuthForm" onsubmit="event.preventDefault(); window.submitUnifiedAuth();" class="space-y-3.5">
-        <div>
-          <label class="text-slate-300 font-semibold block mb-1 flex items-center justify-between">
-            <span>Địa chỉ Email của bạn (*)</span>
-            <span class="text-[10px] text-teal-400 font-mono">Bảo mật SSL 256-bit</span>
-          </label>
-          <input id="uniEmail" type="email" required placeholder="nhapemail@gmail.com" class="w-full french-input-field rounded-xl px-4 py-3 text-white outline-none font-medium" />
+      <!-- FORM AUTH DUY NHẤT VỚI 2 CHẾ ĐỘ CHUYỂN ĐỔI (LOGIN / REGISTER) -->
+      <form id="unifiedAuthForm" onsubmit="event.preventDefault(); window.handleAuthFormSubmit();" class="space-y-3">
+        <!-- TRƯỜNG HỌ TÊN (CHỈ HIỆN KHI ĐĂNG KÝ) -->
+        <div id="authFieldGroup_Name" style="display:none;">
+          <label class="text-slate-300 font-semibold block mb-1">Họ và tên thành viên (*)</label>
+          <input id="uniName" type="text" placeholder="Nguyễn Văn A" class="w-full french-input-field rounded-xl px-3.5 py-2.5 text-white outline-none font-medium" />
         </div>
 
+        <!-- TRƯỜNG EMAIL -->
         <div>
-          <label class="text-slate-300 font-semibold block mb-1 flex items-center justify-between">
-            <span>Họ và tên đầy đủ</span>
-            <span class="text-[10px] text-slate-400">Khớp CCCD để cấp vé máy bay</span>
-          </label>
-          <input id="uniName" type="text" placeholder="Nguyễn Văn A" class="w-full french-input-field rounded-xl px-4 py-3 text-white outline-none font-medium" />
+          <label class="text-slate-300 font-semibold block mb-1">Địa chỉ Email (*)</label>
+          <input id="uniEmail" type="email" required placeholder="nhapemail@gmail.com" class="w-full french-input-field rounded-xl px-3.5 py-2.5 text-white outline-none font-medium" />
         </div>
 
+        <!-- TRƯỜNG MẬT KHẨU -->
         <div>
-          <label class="text-slate-300 font-semibold block mb-1 flex items-center justify-between">
-            <span>Mật khẩu bảo mật (*)</span>
-            <span class="text-[10px] text-amber-300">Tối thiểu 6 ký tự</span>
-          </label>
-          <input id="uniPass" type="password" required placeholder="Nhập mật khẩu an toàn của bạn" class="w-full french-input-field rounded-xl px-4 py-3 text-white outline-none font-medium" />
+          <label class="text-slate-300 font-semibold block mb-1">Mật khẩu (*)</label>
+          <input id="uniPass" type="password" required placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)" class="w-full french-input-field rounded-xl px-3.5 py-2.5 text-white outline-none font-medium" />
         </div>
 
-        <button type="submit" class="w-full py-3.5 px-4 rounded-xl font-extrabold text-sm french-btn-gold text-slate-950 mt-4 flex items-center justify-center gap-2 cursor-pointer shadow-xl">
-          <span>✦</span> KÍCH HOẠT HỒ SƠ THƯỢNG LƯU / ĐĂNG NHẬP
+        <!-- TRƯỜNG XÁC NHẬN MẬT KHẨU (CHỈ HIỆN KHI ĐĂNG KÝ, BỎ MÃ OTP) -->
+        <div id="authFieldGroup_ConfirmPass" style="display:none;">
+          <label class="text-slate-300 font-semibold block mb-1">Xác nhận lại mật khẩu (*)</label>
+          <input id="uniPassConfirm" type="password" placeholder="Nhập lại mật khẩu vừa đặt" class="w-full french-input-field rounded-xl px-3.5 py-2.5 text-white outline-none font-medium" />
+        </div>
+
+        <!-- NÚT HÀNH ĐỘNG -->
+        <button id="btnAuthSubmit" type="submit" class="w-full py-3 px-4 rounded-xl font-extrabold text-xs french-btn-gold text-slate-950 mt-3 flex items-center justify-center gap-2 cursor-pointer shadow-lg">
+          <span>✓</span> Đăng Nhập Vào Hệ Thống
         </button>
       </form>
 
-      <!-- CAM KẾT PHÁP LÝ & BẢO CHỨNG THƯƠNG HIỆU -->
-      <div class="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-[10px] text-slate-400">
-        <span class="flex items-center gap-1.5"><strong class="text-teal-400">🛡️</strong> Bảo chứng MB Escrow 200%</span>
-        <span class="flex items-center gap-1.5"><strong class="text-amber-400">✦</strong> Niêm phong sáp bảo mật 100%</span>
-        <span class="flex items-center gap-1.5"><strong class="text-emerald-400">✓</strong> Miễn phí hủy trong 24h</span>
+      <!-- CHUYỂN ĐỔI GIỮA ĐĂNG NHẬP VÀ ĐĂNG KÝ -->
+      <div class="pt-2 text-center text-xs text-slate-300 border-t border-white/10">
+        <div id="authSwitchToRegisterBox">
+          Chưa có tài khoản? 
+          <button type="button" onclick="window.setAuthMode('register')" class="text-amber-300 hover:text-amber-200 font-bold underline cursor-pointer ml-1">Đăng Ký Thành Viên</button>
+        </div>
+        <div id="authSwitchToLoginBox" style="display:none;">
+          Đã có tài khoản? 
+          <button type="button" onclick="window.setAuthMode('login')" class="text-teal-300 hover:text-teal-200 font-bold underline cursor-pointer ml-1">Quay Lại Đăng Nhập</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1162,14 +1169,14 @@
               <span class="text-[9px] text-teal-300 font-mono font-bold">Dossier Privilège VIP</span>
             </div>
             <h3 class="text-base md:text-lg font-black text-white font-heading">
-              Trung Tâm Hồ Sơ Du Khách Thượng Lưu
+              Hồ Sơ Du Khách (Bậc Vàng • Bạc • Đồng)
             </h3>
           </div>
         </div>
         <button onclick="window.closeUserProfileModal()" class="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center font-bold text-sm cursor-pointer transition">✕</button>
       </div>
 
-      <!-- THẺ ĐỊNH DANH HỘ CHIẾU THƯỢNG LƯU (HAUTE CONNOISSEUR PASSPORT) -->
+      <!-- THẺ ĐỊNH DANH HỘ CHIẾU HỘI VIÊN BẬC VÀNG • BẠC • ĐỒNG (HAUTE CONNOISSEUR PASSPORT) -->
       <div class="french-profile-card p-5 rounded-2xl space-y-4 shadow-xl relative overflow-hidden">
         <div class="absolute -top-16 -right-16 w-36 h-36 bg-amber-500/15 rounded-full blur-2xl pointer-events-none"></div>
         <div class="flex items-center gap-4">
@@ -1179,12 +1186,14 @@
           <div class="space-y-1 flex-1 min-w-0">
             <div class="flex items-center gap-2">
               <strong id="profFullName" class="text-white text-base font-black truncate font-heading">---</strong>
-              <span id="profProviderTag" class="text-[9px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 font-mono font-bold shrink-0">---</span>
+              <span id="profProviderTag" class="text-[9px] px-2.5 py-0.5 rounded-full font-mono font-black shrink-0">---</span>
             </div>
             <span id="profEmail" class="text-slate-400 text-xs block font-mono truncate">---</span>
-            <div class="flex items-center gap-1.5 pt-0.5">
-              <span class="text-amber-400 text-xs">👑</span>
-              <span class="text-[11px] text-amber-300 font-extrabold tracking-wide">Luxury Connoisseur • Hạng Thượng Lưu 2026</span>
+            <div class="pt-0.5 space-y-0.5">
+              <div class="flex items-center gap-2">
+                <span id="profTierBadge" class="text-[11px] text-amber-300 font-extrabold tracking-wide">Hạng Thành Viên: 🥉 Bậc Đồng</span>
+              </div>
+              <p id="profTierDesc" class="text-[10px] text-slate-400 italic">Đặt chuyến để mở khóa Bậc Bạc và Bậc Vàng.</p>
             </div>
           </div>
         </div>
@@ -1268,7 +1277,7 @@
       <!-- NÚT ĐĂNG XUẤT DUY NHẤT TOÀN HỆ THỐNG (THE ONLY LOGOUT BUTTON) -->
       <div class="pt-2 border-t border-white/10">
         <button type="button" onclick="window.logoutUser(); window.closeUserProfileModal();" class="w-full py-3.5 px-4 rounded-2xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 hover:text-white font-extrabold text-xs border border-rose-500/40 hover:border-rose-500/60 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-rose-500/20 cursor-pointer">
-          <span>🚪</span> Đăng Xuất Khỏi Tài Khoản Thượng Lưu (Sign Out)
+          <span>🚪</span> Đăng Xuất Tài Khoản (Sign Out)
         </button>
       </div>
     </div>

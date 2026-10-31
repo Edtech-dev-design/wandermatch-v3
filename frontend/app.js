@@ -794,16 +794,24 @@ window.checkOAuthRedirectCallback = async function() {
 // ============================================================================
 // 6. FORM GỘP ĐĂNG NHẬP / ĐĂNG KÝ 1 BƯỚC DUY NHẤT (UNIFIED AUTH)
 // ============================================================================
-window.openUnifiedAuthModal = function() {
+window.openUnifiedAuthModal = function(initialMode = "login") {
   const emailInput = document.getElementById("uniEmail");
   const nameInput = document.getElementById("uniName");
   const passInput = document.getElementById("uniPass");
+  const passConfirmInput = document.getElementById("uniPassConfirm");
   if (emailInput) emailInput.value = "";
   if (nameInput) nameInput.value = "";
   if (passInput) passInput.value = "";
+  if (passConfirmInput) passConfirmInput.value = "";
   
   const errBox = document.getElementById("unifiedAuthErrorBox");
   if (errBox) errBox.style.display = "none";
+  const successBox = document.getElementById("unifiedAuthSuccessBox");
+  if (successBox) successBox.style.display = "none";
+
+  if (window.setAuthMode) {
+    window.setAuthMode(initialMode);
+  }
 
   const modal = document.getElementById("unifiedAuthModal");
   if (modal) modal.style.display = "flex";
@@ -816,38 +824,183 @@ window.closeUnifiedAuthModal = function() {
   if (errBox) errBox.style.display = "none";
 };
 
-window.submitUnifiedAuth = async function() {
+
+// ============================================================================
+// HỆ THỐNG PHÂN HẠNG THÀNH VIÊN: BẬC ĐỒNG • BẬC BẠC • BẬC VÀNG
+// ============================================================================
+window.getUserTierInfo = function(session) {
+  if (!session || !session.email) {
+    return {
+      tier: "ĐỒNG",
+      name: "Bậc Đồng",
+      badgeText: "🥉 Bậc Đồng",
+      badgeClass: "bg-amber-700/25 text-amber-300 border-amber-600/40",
+      desc: "Hạng khởi đầu mặc định khi tạo tài khoản. Đặt chuyến du lịch mù đầu tiên để mở khóa Bậc Bạc."
+    };
+  }
+  const savedList = window.loadStore("wm_saved_prod", []);
+  const bookingCount = savedList.filter(x => x.isLocked).length;
+
+  if (bookingCount >= 3) {
+    return {
+      tier: "VÀNG",
+      name: "Bậc Vàng",
+      badgeText: "🥇 Bậc Vàng",
+      badgeClass: "bg-amber-500/25 text-amber-300 border-amber-400/50 shadow-md",
+      desc: "Hạng Vàng thân thiết (Đã hoàn tất từ 3 chuyến trở lên). Ưu tiên quỹ phòng 5★ tốt nhất."
+    };
+  } else if (bookingCount >= 1) {
+    return {
+      tier: "BẠC",
+      name: "Bậc Bạc",
+      badgeText: "🥈 Bậc Bạc",
+      badgeClass: "bg-slate-300/25 text-slate-100 border-slate-300/50 shadow-sm",
+      desc: "Hạng Bạc trải nghiệm (Đã hoàn tất từ 1-2 chuyến). Đặt thêm chuyến để mở khóa Bậc Vàng."
+    };
+  } else {
+    return {
+      tier: "ĐỒNG",
+      name: "Bậc Đồng",
+      badgeText: "🥉 Bậc Đồng",
+      badgeClass: "bg-amber-700/25 text-amber-300 border-amber-600/40",
+      desc: "Hạng khởi đầu mặc định khi tạo tài khoản. Đặt chuyến du lịch mù đầu tiên để mở khóa Bậc Bạc."
+    };
+  }
+};
+
+window.currentAuthMode = "login";
+window.setAuthMode = function(mode) {
+  window.currentAuthMode = mode;
+  const nameGroup = document.getElementById("authFieldGroup_Name");
+  const confirmGroup = document.getElementById("authFieldGroup_ConfirmPass");
+  const submitBtn = document.getElementById("btnAuthSubmit");
+  const title = document.getElementById("authModalTitle");
+  const subtitle = document.getElementById("authModalSubtitle");
+  const toRegBox = document.getElementById("authSwitchToRegisterBox");
+  const toLoginBox = document.getElementById("authSwitchToLoginBox");
+  const errBox = document.getElementById("unifiedAuthErrorBox");
+  const successBox = document.getElementById("unifiedAuthSuccessBox");
+
+  if (errBox) errBox.style.display = "none";
+  if (successBox) successBox.style.display = "none";
+
+  if (mode === "register") {
+    if (nameGroup) nameGroup.style.display = "block";
+    if (confirmGroup) confirmGroup.style.display = "block";
+    if (title) title.innerText = "Đăng Ký Thành Viên Mới";
+    if (subtitle) subtitle.innerText = "Tạo tài khoản nhận ngay Bậc Đồng và mở khóa trải nghiệm du lịch mù.";
+    if (submitBtn) submitBtn.innerHTML = "<span>✓</span> Hoàn Tất Đăng Ký Tài Khoản";
+    if (toRegBox) toRegBox.style.display = "none";
+    if (toLoginBox) toLoginBox.style.display = "block";
+  } else {
+    if (nameGroup) nameGroup.style.display = "none";
+    if (confirmGroup) confirmGroup.style.display = "none";
+    if (title) title.innerText = "Đăng Nhập Tài Khoản";
+    if (subtitle) subtitle.innerText = "Đăng nhập để mở khóa giao diện đặt chuyến và quản lý hành trình du lịch mù.";
+    if (submitBtn) submitBtn.innerHTML = "<span>✓</span> Đăng Nhập Vào Hệ Thống";
+    if (toRegBox) toRegBox.style.display = "block";
+    if (toLoginBox) toLoginBox.style.display = "none";
+  }
+};
+
+window.handleAuthFormSubmit = async function() {
+  const mode = window.currentAuthMode || "login";
   const email = window.cleanEmail(document.getElementById("uniEmail")?.value || "");
-  const nameInput = (document.getElementById("uniName")?.value || "").trim();
   const pass = document.getElementById("uniPass")?.value || "";
   const errBox = document.getElementById("unifiedAuthErrorBox");
-  const setUniError = (msg) => { if (errBox) { errBox.innerText = msg; errBox.style.display = "block"; } };
+  const successBox = document.getElementById("unifiedAuthSuccessBox");
 
-  if (!window.isValidEmail(email)) return setUniError("Địa chỉ Email không hợp lệ (Không dùng tên miền có số như .com2)!");
+  const setErr = (msg) => {
+    if (successBox) successBox.style.display = "none";
+    if (errBox) { errBox.innerText = msg; errBox.style.display = "block"; }
+  };
+  const setSuccess = (msg) => {
+    if (errBox) errBox.style.display = "none";
+    if (successBox) { successBox.innerText = msg; successBox.style.display = "block"; }
+  };
+
+  if (!window.isValidEmail(email)) return setErr("Địa chỉ Email không hợp lệ!");
+  if (!pass || pass.length < 6) return setErr("Mật khẩu phải có tối thiểu 6 ký tự!");
 
   const call = async (path, body) => {
-    const res = await fetch(`${window.API_BASE}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const res = await fetch(`${window.API_BASE}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
     return { status: res.status, data: await res.json().catch(() => ({})) };
   };
 
-  let r;
-  try {
-    r = await call("/api/auth/login", { email, password: pass });
-    if (r.status === 404) {
-      if (pass.length < 6) return setUniError("Mật khẩu tài khoản mới phải có tối thiểu 6 ký tự!");
-      r = await call("/api/auth/register", { email, password: pass, name: nameInput });
-    }
-  } catch (e) {
-    return setUniError("Không kết nối được máy chủ. Hãy chắc chắn backend đang chạy rồi thử lại.");
-  }
-  if (!r.data.success) return setUniError(r.data.error || "Xác thực thất bại");
+  if (mode === "register") {
+    const name = (document.getElementById("uniName")?.value || "").trim();
+    const passConfirm = document.getElementById("uniPassConfirm")?.value || "";
+    if (!name) return setErr("Vui lòng nhập Họ và tên của bạn!");
+    if (pass !== passConfirm) return setErr("Xác nhận mật khẩu không trùng khớp với mật khẩu đã nhập!");
 
-  const u = r.data.user;
+    try {
+      const regRes = await call("/api/auth/register", { email, password: pass, name });
+      if (!regRes.data.success && regRes.status !== 409) {
+        return setErr(regRes.data.error || "Đăng ký không thành công!");
+      }
+      if (regRes.status === 409) {
+        return setErr("Email này đã được đăng ký! Vui lòng chuyển sang Đăng Nhập.");
+      }
+    } catch (e) {
+      // Local fallback
+      const users = window.loadStore("wm_users_prod", {});
+      if (users[email]) return setErr("Email này đã tồn tại trong hệ thống! Vui lòng đăng nhập.");
+      users[email] = { email, name, provider: "email", createdAt: new Date().toISOString() };
+      window.saveStore("wm_users_prod", users);
+    }
+
+    // ĐĂNG KÝ XONG: TẮT CHỨC NĂNG ĐĂNG KÝ VÀ CHUYỂN LẠI VÀO ĐĂNG NHẬP
+    window.setAuthMode("login");
+    setSuccess("✓ Đăng ký tài khoản thành công! Chức năng đăng ký đã tắt. Vui lòng nhập mật khẩu để đăng nhập.");
+    const passInput = document.getElementById("uniPass");
+    if (passInput) {
+      passInput.value = "";
+      passInput.focus();
+    }
+    return;
+  }
+
+  // MODE LOGIN
+  let loginRes;
+  try {
+    loginRes = await call("/api/auth/login", { email, password: pass });
+  } catch (e) {
+    // Offline local fallback
+    const users = window.loadStore("wm_users_prod", {});
+    if (users[email]) {
+      loginRes = { status: 200, data: { success: true, user: users[email], token: "local-token" } };
+    } else {
+      return setErr("Không kết nối được máy chủ và tài khoản chưa tồn tại cục bộ!");
+    }
+  }
+
+  if (!loginRes.data.success) {
+    return setErr(loginRes.data.error || "Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu!");
+  }
+
+  const u = loginRes.data.user;
   const users = window.loadStore("wm_users_prod", {});
-  users[u.email] = { ...(users[u.email] || {}), name: u.name, email: u.email, provider: "email", avatar: u.avatar || "", lastLoginAt: new Date().toISOString(),
-    preferences: (users[u.email] || {}).preferences || window.getFormInputs(), bookings: (users[u.email] || {}).bookings || [], wishlist: (users[u.email] || {}).wishlist || [] };
+  users[u.email] = {
+    ...(users[u.email] || {}),
+    name: u.name,
+    email: u.email,
+    provider: "email",
+    avatar: u.avatar || "",
+    lastLoginAt: new Date().toISOString()
+  };
   window.saveStore("wm_users_prod", users);
-  window.saveStore("wm_session_prod", { name: u.name, email: u.email, provider: "email", avatar: u.avatar || "", token: r.data.token });
+  window.saveStore("wm_session_prod", {
+    name: u.name,
+    email: u.email,
+    provider: "email",
+    avatar: u.avatar || "",
+    token: loginRes.data.token
+  });
+
   window.applyUserSession();
   window.closeUnifiedAuthModal();
   window.showToast(`Chào mừng ${u.name}! Đã đăng nhập thành công.`);
@@ -863,20 +1016,25 @@ window.applyUserSession = function() {
   const gatekeeper = document.getElementById("gatekeeperLanding");
   const b2cTab = document.getElementById("tab-b2c");
 
-  // Tab B2C luôn luôn hiển thị để khách khám phá và trải nghiệm du lịch mọi lúc
-  if (b2cTab) b2cTab.style.display = "block";
-
   if (session && session.email) {
+    // ĐÃ ĐĂNG NHẬP / ĐĂNG KÝ: MỞ KHÓA THÔNG TIN BÊN TRONG CỦA WEB!
     if (outBox) outBox.style.display = "none";
     if (inBox) inBox.style.display = "flex";
     if (gatekeeper) gatekeeper.style.display = "none";
+    if (b2cTab) b2cTab.style.display = "block";
 
     const nameEl = document.getElementById("userDisplayName");
     const emailEl = document.getElementById("userDisplayEmail");
     const badgeEl = document.getElementById("userProviderBadge");
+    
+    // ÁP DỤNG PHÂN HẠNG THÀNH VIÊN: BẬC ĐỒNG • BẬC BẠC • BẬC VÀNG
+    const tier = window.getUserTierInfo(session);
     if (nameEl) nameEl.innerText = session.name || "Hành khách";
     if (emailEl) emailEl.innerText = session.email;
-    if (badgeEl) badgeEl.innerText = (session.provider || "EMAIL").toUpperCase();
+    if (badgeEl) {
+      badgeEl.innerText = tier.badgeText;
+      badgeEl.className = `text-[9px] font-black uppercase px-2 py-0.5 rounded font-mono ${tier.badgeClass}`;
+    }
     
     const avatarImg = document.getElementById("userAvatarImg");
     const avatarContainer = document.getElementById("userAvatarContainer");
@@ -899,10 +1057,11 @@ window.applyUserSession = function() {
     if (document.getElementById("custName")) document.getElementById("custName").value = session.name;
     window.syncBankHolderName();
   } else {
+    // CHƯA ĐĂNG KÝ VÀ ĐĂNG NHẬP: KHÔNG THẤY THÔNG TIN BÊN TRONG CỦA WEB!
     if (outBox) outBox.style.display = "flex";
     if (inBox) inBox.style.display = "none";
-    if (gatekeeper) gatekeeper.style.display = "none";
-    if (b2cTab) b2cTab.style.display = "block";
+    if (gatekeeper) gatekeeper.style.display = "block";
+    if (b2cTab) b2cTab.style.display = "none";
     if (document.getElementById("tab-saved")) document.getElementById("tab-saved").style.display = "none";
     if (document.getElementById("tab-b2b")) document.getElementById("tab-b2b").style.display = "none";
   }
@@ -917,6 +1076,7 @@ window.logoutUser = function() {
   if (window.supabaseClient && window.supabaseClient.auth) {
     try { window.supabaseClient.auth.signOut(); } catch (e) {}
   }
+  if (window.closeUserProfileModal) window.closeUserProfileModal();
   window.applyUserSession();
   window.showToast("Bạn đã đăng xuất an toàn. 100% dữ liệu tài khoản vẫn được lưu trữ vĩnh viễn.");
 };
@@ -1271,7 +1431,7 @@ window.computeTravelerPersona = function(vec, budget, groupSize) {
     return {
       code: "ARCH-LUX-RETREAT",
       title: "Luxury Retreat Connoisseur",
-      viTitle: "Bậc Thầy Nghỉ Dưỡng Thượng Lưu",
+      viTitle: "Bậc Thầy Nghỉ Dưỡng Cao Cấp",
       icon: "💎",
       badgeColor: "from-amber-500/25 to-yellow-500/10 border-amber-400/50 text-amber-300",
       tagline: "Đẳng cấp 5 sao quốc tế, dịch vụ quản gia riêng & không gian tinh tuyển",
@@ -1279,7 +1439,7 @@ window.computeTravelerPersona = function(vec, budget, groupSize) {
       traits: [
         { label: "Tiêu Chuẩn Tiện Nghi 5★", val: v.comfort, color: "bg-amber-400" },
         { label: "Đặc Quyền Quản Gia & Đưa Đón", val: Math.min(100, Math.round(v.comfort * 0.95)), color: "bg-yellow-400" },
-        { label: "Sức Bật Trải Nghiệm Thượng Lưu", val: Math.min(100, Math.round((b / 8000000) * 100)), color: "bg-teal-400" }
+        { label: "Sức Bật Trải Nghiệm Đẳng Cấp", val: Math.min(100, Math.round((b / 8000000) * 100)), color: "bg-teal-400" }
       ],
       recommendation: "Gợi ý hệ thống: Biệt thự biển kèm hồ bơi vô cực hoặc resort thung lũng cổ điển, xe sang đón tiễn sân bay trọn gói.",
       mysteryEcosystems: ["Resort 5★ Quốc Tế", "Biển Đảo Nhiệt Đới 28°C", "Hồ Bơi Vô Cực Nước Mặn"]
@@ -1891,7 +2051,7 @@ window.renderPackageUI = function(pkg) {
                 ✦ KHÔNG GIAN RESORT 5★ ĐANG ĐƯỢC NIÊM PHONG SÁP ✦
               </span>
               <p class="text-xs text-slate-200 drop-shadow-md">
-                Bầu không khí: <strong class="text-teal-300">${pkg.hotel.mysteryTheme || 'Nghỉ Dưỡng Thượng Lưu'}</strong> • Vi khí hậu: <strong class="text-amber-300">${pkg.temp}°C (${pkg.weather})</strong>
+                Bầu không khí: <strong class="text-teal-300">${pkg.hotel.mysteryTheme || 'Nghỉ Dưỡng 5 Sao'}</strong> • Vi khí hậu: <strong class="text-amber-300">${pkg.temp}°C (${pkg.weather})</strong>
               </p>
               <p class="text-[11px] text-slate-400 italic">
                 (Hình ảnh không gian thực tế & tên resort 5★ sẽ mở khóa tại Cổng Sân Bay)
@@ -3115,10 +3275,10 @@ window.startEnvelopeCountdown = function() {
 window.switchTab = function(tab) {
   const session = window.loadStore("wm_session_prod", null);
   
-  // Tab Hành Trình Của Tôi cần tài khoản để xem vé cá nhân
-  if (tab === "saved" && (!session || !session.email)) {
-    window.openUnifiedAuthModal();
-    return window.showToast("Vui lòng đăng nhập để xem các chuyến đi và hợp đồng đã lưu của bạn!", "info");
+  // Chưa đăng ký / đăng nhập: khóa toàn bộ thông tin bên trong của hệ thống
+  if (!session || !session.email) {
+    if (window.openUnifiedAuthModal) window.openUnifiedAuthModal("login");
+    return window.showToast("Vui lòng đăng ký hoặc đăng nhập tài khoản để mở khóa toàn bộ thông tin bên trong của hệ thống!", "info");
   }
 
   ["b2c", "saved", "b2b"].forEach(t => {
@@ -3621,9 +3781,21 @@ window.openUserProfileModal = function() {
   const bCount = savedList.filter(x => x.isLocked).length;
   const wCount = savedList.filter(x => !x.isLocked).length;
 
+  const tier = window.getUserTierInfo(session);
   if (profName) profName.innerText = session.name || "Khách Hàng";
   if (profEmail) profEmail.innerText = session.email;
-  if (profTag) profTag.innerText = (session.provider || "EMAIL").toUpperCase();
+  if (profTag) {
+    profTag.innerText = tier.badgeText;
+    profTag.className = `text-[9px] px-2.5 py-0.5 rounded-full font-mono font-black shrink-0 ${tier.badgeClass}`;
+  }
+  const tierBadgeEl = document.getElementById("profTierBadge");
+  if (tierBadgeEl) {
+    tierBadgeEl.innerText = `Hạng Hội Viên: ${tier.badgeText}`;
+  }
+  const tierDescEl = document.getElementById("profTierDesc");
+  if (tierDescEl) {
+    tierDescEl.innerText = tier.desc;
+  }
   if (profImg) {
     profImg.src = session.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(session.name || "WM")}&background=0D9488&color=fff&bold=true`;
   }
@@ -3810,7 +3982,7 @@ window.shareRevealedTrip = function() {
   if (!pkg) return;
   const city = pkg.isRevealed ? pkg.reveal.city : "Điểm Đến Bí Mật (Đang Niêm Phong Sáp)";
   const hotel = pkg.isRevealed ? pkg.reveal.hotel : "Resort 5★ Tiêu Chuẩn Quốc Tế";
-  const shareText = `🎉 Chuyến Du Lịch Mù thượng lưu #${pkg.code} của tôi!\n✈️ Chuyến bay: ${pkg.flight?.airline || 'Vietnam Airlines'}\n🏨 Nghỉ dưỡng: ${hotel} (${city})\n💰 Tiết kiệm: ${window.formatVND(pkg.reveal.savings)} cùng WanderMatch.vn!`;
+  const shareText = `🎉 Chuyến Du Lịch Mù 5 Sao #${pkg.code} của tôi!\n✈️ Chuyến bay: ${pkg.flight?.airline || 'Vietnam Airlines'}\n🏨 Nghỉ dưỡng: ${hotel} (${city})\n💰 Tiết kiệm: ${window.formatVND(pkg.reveal.savings)} cùng WanderMatch.vn!`;
   
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(shareText).then(() => {
