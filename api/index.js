@@ -14,6 +14,7 @@ export default async function handler(req, res) {
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
     SESSION_SECRET: process.env.SESSION_SECRET || "",
     PAYMENT_WEBHOOK_SECRET: process.env.PAYMENT_WEBHOOK_SECRET || "",
+    ADMIN_EMAILS: process.env.ADMIN_EMAILS || "",
     GEMINI_API_KEY: process.env.GEMINI_API_KEY || "",
   };
 

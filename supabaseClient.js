@@ -1,28 +1,39 @@
 // ============================================================================
-// WANDERMATCH V3.0 - OFFICIAL SUPABASE CLIENT MODULE (supabaseClient.js)
+// WANDERMATCH V3.0 (PHASE 1.5 SECURITY HOTFIX) - SUPABASE CLIENT MODULE
 // Architecture: GitHub + Cloudflare + Supabase + Vercel
+// Hardened: No plaintext seeded passwords, no local mock auth bypass,
+// delegates authentication to real Supabase SDK or Backend JWT Auth (/api/auth/*)
 // ============================================================================
 
 (function(window) {
-  // 1. CẤU HÌNH BIẾN MÔI TRƯỜNG ĐỘNG (Dynamic Environment Variables)
-  // Ưu tiên đọc từ biến build (Vercel/Vite/Next.js/Window Env), sau đó tới LocalStorage hoặc Default
-  const SUPABASE_URL = 
+  const SUPABASE_URL =
     (typeof process !== 'undefined' && process.env && (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL)) ||
-    window.ENV_SUPABASE_URL || 
-    localStorage.getItem('wm_supabase_url') || 
-    'https://wandermatch-v3.supabase.co';
+    window.ENV_SUPABASE_URL ||
+    localStorage.getItem('wm_supabase_url') ||
+    '';
 
-  const SUPABASE_ANON_KEY = 
+  const SUPABASE_ANON_KEY =
     (typeof process !== 'undefined' && process.env && (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY)) ||
-    window.ENV_SUPABASE_ANON_KEY || 
-    localStorage.getItem('wm_supabase_anon_key') || 
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhbmRlcm1hdGNoLXYzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDM2NDgwMDAsImV4cCI6MjAyMDMzNDAwMH0.wandermatch_live_public_key';
+    window.ENV_SUPABASE_ANON_KEY ||
+    localStorage.getItem('wm_supabase_anon_key') ||
+    '';
 
-  // Khởi tạo Supabase SDK chính thức nếu có thư viện từ CDN hoặc bundler
+  function getApiBase() {
+    if (typeof window !== 'undefined' && window.API_BASE) return window.API_BASE;
+    if (typeof window !== 'undefined' && (window.location?.port === '3000' || window.location?.port === '5500')) {
+      return 'http://127.0.0.1:8787';
+    }
+    return (typeof window !== 'undefined' && window.location?.origin) ? window.location.origin : 'http://127.0.0.1:8787';
+  }
+
   let clientInstance = null;
-  const hasOfficialSDK = typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function';
+  const hasOfficialSDK =
+    typeof window.supabase !== 'undefined' &&
+    typeof window.supabase.createClient === 'function' &&
+    Boolean(SUPABASE_URL) &&
+    Boolean(SUPABASE_ANON_KEY) &&
+    !SUPABASE_URL.includes('wandermatch-v3.supabase.co');
 
-  // Cấu hình Session Persistence & Auto Refresh Token theo chuẩn Supabase Best Practice
   const clientOptions = {
     auth: {
       persistSession: true,
@@ -41,90 +52,18 @@
     }
   }
 
-  // Cơ sở dữ liệu mẫu nghiêm ngặt dành cho offline/sandbox dev (Tuyệt đối không tự sinh tài khoản bừa)
-  const VERIFIED_SEEDED_USERS = [
-    {
-      id: "usr_admin_001",
-      email: "admin@wandermatch.vn",
-      password: "admin",
-      pin: "888888",
-      full_name: "Quản Trị Viên Hệ Thống",
-      phone: "0988 888 888",
-      role: "admin",
-      tier: "Quản Trị Viên Hệ Thống"
-    },
-    {
-      id: "usr_partner_002",
-      email: "partner@wandermatch.vn",
-      password: "123",
-      pin: "888888",
-      full_name: "Ana Mandara & Dalat Resort Partner",
-      phone: "0912 345 678",
-      role: "b2c",
-      tier: "Đối Tác Cung Ứng Lữ Hành"
-    },
-    {
-      id: "usr_traveler_003",
-      email: "khachhang@wandermatch.vn",
-      password: "123",
-      pin: "888888",
-      full_name: "Du Khách VIP Gold",
-      phone: "0988 999 888",
-      role: "b2c",
-      tier: "Du Khách VIP Gold"
-    },
-    {
-      id: "usr_traveler_004",
-      email: "an.nguyen@wandermatch.vn",
-      password: "123456",
-      pin: "888888",
-      full_name: "An Nguyễn",
-      phone: "0909 123 456",
-      role: "b2c",
-      tier: "Du Khách Thân Thiết"
-    }
-  ];
-
-  function getLocalUserStore() {
-    try {
-      const raw = localStorage.getItem("wm_supabase_users_db");
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        let changed = false;
-        VERIFIED_SEEDED_USERS.forEach(su => {
-          if (!parsed.some(u => (u.email && u.email.toLowerCase() === su.email.toLowerCase()) || u.id === su.id)) {
-            parsed.push(su);
-            changed = true;
-          }
-        });
-        if (changed) {
-          localStorage.setItem("wm_supabase_users_db", JSON.stringify(parsed));
-        }
-        return parsed;
-      }
-    } catch (e) {}
-    localStorage.setItem("wm_supabase_users_db", JSON.stringify(VERIFIED_SEEDED_USERS));
-    return VERIFIED_SEEDED_USERS;
-  }
-
-  function saveLocalUserStore(users) {
-    localStorage.setItem("wm_supabase_users_db", JSON.stringify(users));
-  }
-
-  // Wrapper tiêu chuẩn bảo đảm tính độc lập và chống lỗi nhập bừa
-  // Cơ chế phát sự kiện trạng thái đăng nhập thời gian thực
   const authSubscribers = new Set();
   function notifyAuthSubscribers(event, session) {
     authSubscribers.forEach(cb => {
       try {
         if (typeof cb === 'function') cb(event, session);
       } catch (e) {
-        console.error("Auth subscriber error:", e);
+        console.error('Auth subscriber error:', e);
       }
     });
   }
 
-const supabaseAdapter = {
+  const supabaseAdapter = {
     supabaseUrl: SUPABASE_URL,
     supabaseKey: SUPABASE_ANON_KEY,
     _client: clientInstance,
@@ -137,90 +76,67 @@ const supabaseAdapter = {
         if (!cleanInput || !rawPassword) {
           return {
             data: { user: null, session: null },
-            error: { message: "Vui lòng nhập đầy đủ Email / Số điện thoại / Tên đăng nhập và Mật khẩu!" }
+            error: { message: 'Vui lòng nhập đầy đủ Email và Mật khẩu!' }
           };
         }
 
-        // 1. Thử xác thực trực tiếp qua Supabase Cloud nếu kết nối mạng khả dụng
+        // 1. Real Supabase Cloud Auth if configured
         if (clientInstance && clientInstance.auth && cleanInput.includes('@')) {
           try {
             const res = await clientInstance.auth.signInWithPassword({ email: cleanInput, password: rawPassword });
             if (res.data?.session && !res.error) {
-              localStorage.setItem("wm_supabase_session", JSON.stringify(res.data.session));
+              localStorage.setItem('wm_supabase_session', JSON.stringify(res.data.session));
+              notifyAuthSubscribers('SIGNED_IN', res.data.session);
               return res;
             }
             if (res.error && !res.error.message.includes('fetch')) {
-              // Báo lỗi từ Supabase nếu tài khoản sai hoặc không tồn tại
               return res;
             }
           } catch (e) {}
         }
 
-        // 2. Kiểm tra chặt chẽ trên kho tài khoản xác thực (STRICT VERIFICATION)
-        const users = getLocalUserStore();
-        const cleanDigits = cleanInput.replace(/[^0-9]/g, '');
-        const matched = users.find(u => {
-          const uEmail = (u.email || '').toLowerCase();
-          const uPhone = (u.phone || '').replace(/[^0-9]/g, '');
-          const uUsername = uEmail.split('@')[0];
-          return uEmail === cleanInput || 
-                 (cleanDigits && cleanDigits.length >= 8 && uPhone && (uPhone === cleanDigits || uPhone.endsWith(cleanDigits) || cleanDigits.endsWith(uPhone))) ||
-                 uUsername === cleanInput ||
-                 (u.id && u.id.toLowerCase() === cleanInput);
-        });
-
-        // BẮT BUỘC: Nếu không tìm thấy -> CHẶN ĐỨNG LẬP TỨC (TRẢ VỀ ERROR)
-        if (!matched) {
-          return {
-            data: { user: null, session: null },
-            error: {
-              message: `Tài khoản "${cleanInput}" không tồn tại trên hệ thống! Vui lòng Đăng Ký tài khoản mới.`
-            }
-          };
-        }
-
-        // BẮT BUỘC: Nếu sai mật khẩu và sai cả PIN -> CHẶN ĐỨNG LẬP TỨC
-        const pwdMatch = matched.password === rawPassword;
-        const pinMatch = matched.pin && matched.pin === rawPassword;
-        if (!pwdMatch && !pinMatch) {
-          return {
-            data: { user: null, session: null },
-            error: {
-              message: "Mật khẩu hoặc mã PIN không chính xác! Vui lòng kiểm tra lại."
-            }
-          };
-        }
-
-        // ĐĂNG NHẬP HỢP LỆ THÀNH CÔNG
-        const session = {
-          access_token: "sb_live_tok_" + Math.random().toString(36).substring(2) + Date.now(),
-          token_type: "bearer",
-          expires_at: Math.floor(Date.now() / 1000) + 86400,
-          user: {
-            id: matched.id,
-            email: matched.email,
-            user_metadata: {
-              full_name: matched.full_name,
-              phone: matched.phone,
-              role: matched.role,
-              tier: matched.tier,
-              cccd: matched.cccd || '',
-              bank_code: matched.bank_code || 'MB',
-              bank_account: matched.bank_account || '0988888888',
-              bank_account_holder: matched.bank_account_holder || matched.full_name
-            }
+        // 2. Authoritative Backend API Verification (PBKDF2 + Signed JWT)
+        try {
+          const response = await fetch(`${getApiBase()}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: cleanInput, password: rawPassword })
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok || !payload.success || !payload.token) {
+            return {
+              data: { user: null, session: null },
+              error: { message: payload.error || 'Email hoặc mật khẩu không chính xác!' }
+            };
           }
-        };
 
-        localStorage.setItem("wm_supabase_session", JSON.stringify(session));
-        localStorage.setItem("wm_user_session", JSON.stringify(matched));
-        window.currentUser = matched;
-        notifyAuthSubscribers("SIGNED_IN", session);
+          const u = payload.user;
+          const session = {
+            access_token: payload.token,
+            token_type: 'bearer',
+            expires_at: Math.floor(Date.now() / 1000) + 7 * 86400,
+            user: {
+              id: u.email,
+              email: u.email,
+              user_metadata: {
+                full_name: u.name,
+                role: u.role || 'b2c'
+              }
+            }
+          };
 
-        return {
-          data: { user: session.user, session },
-          error: null
-        };
+          localStorage.setItem('wm_supabase_session', JSON.stringify(session));
+          notifyAuthSubscribers('SIGNED_IN', session);
+          return {
+            data: { user: session.user, session },
+            error: null
+          };
+        } catch (err) {
+          return {
+            data: { user: null, session: null },
+            error: { message: 'Không thể kết nối máy chủ xác thực. Vui lòng thử lại!' }
+          };
+        }
       },
 
       async signUp({ email, password, options = {} }) {
@@ -231,79 +147,78 @@ const supabaseAdapter = {
         if (!cleanEmail || !rawPassword) {
           return {
             data: { user: null, session: null },
-            error: { message: "Vui lòng nhập Email và Mật khẩu hợp lệ!" }
+            error: { message: 'Vui lòng nhập Email và Mật khẩu hợp lệ!' }
           };
         }
 
-        if (rawPassword.length < 3) {
+        if (rawPassword.length < 6) {
           return {
             data: { user: null, session: null },
-            error: { message: "Mật khẩu phải có tối thiểu 3 ký tự!" }
+            error: { message: 'Mật khẩu phải có tối thiểu 6 ký tự!' }
           };
         }
 
-        const users = getLocalUserStore();
-        if (users.some(u => u.email.toLowerCase() === cleanEmail)) {
-          return {
-            data: { user: null, session: null },
-            error: { message: `Email "${cleanEmail}" đã được đăng ký! Vui lòng Đăng Nhập.` }
-          };
-        }
-
-        const newUser = {
-          id: "usr_" + Date.now(),
-          email: cleanEmail,
-          password: rawPassword,
-          pin: meta.pin || '888888',
-          full_name: meta.full_name || cleanEmail.split('@')[0].toUpperCase(),
-          phone: meta.phone || '0988 888 888',
-          role: meta.role || 'b2c',
-          tier: meta.tier || 'Du Khách Đã KYC',
-          cccd: meta.cccd || '',
-          bank_code: meta.bank_code || 'MB',
-          bank_account: meta.bank_account || '0988888888',
-          bank_account_holder: meta.bank_account_holder || (meta.full_name || cleanEmail.split('@')[0].toUpperCase()),
-          created_at: new Date().toISOString()
-        };
-
-        users.push(newUser);
-        saveLocalUserStore(users);
-
-        const session = {
-          access_token: "sb_live_tok_" + Math.random().toString(36).substring(2) + Date.now(),
-          token_type: "bearer",
-          expires_at: Math.floor(Date.now() / 1000) + 86400,
-          user: {
-            id: newUser.id,
-            email: newUser.email,
-            user_metadata: {
-              full_name: newUser.full_name,
-              phone: newUser.phone,
-              role: newUser.role,
-              tier: newUser.tier
+        if (clientInstance && clientInstance.auth) {
+          try {
+            const res = await clientInstance.auth.signUp({ email: cleanEmail, password: rawPassword, options });
+            if (res.data?.user && !res.error) {
+              return res;
             }
+          } catch (e) {}
+        }
+
+        try {
+          const response = await fetch(`${getApiBase()}/api/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: cleanEmail,
+              password: rawPassword,
+              name: meta.full_name || cleanEmail.split('@')[0]
+            })
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok || !payload.success || !payload.token) {
+            return {
+              data: { user: null, session: null },
+              error: { message: payload.error || 'Đăng ký tài khoản thất bại!' }
+            };
           }
-        };
 
-        localStorage.setItem("wm_supabase_session", JSON.stringify(session));
-        localStorage.setItem("wm_user_session", JSON.stringify(newUser));
-        window.currentUser = newUser;
-        notifyAuthSubscribers("SIGNED_IN", session);
+          const u = payload.user;
+          const session = {
+            access_token: payload.token,
+            token_type: 'bearer',
+            expires_at: Math.floor(Date.now() / 1000) + 7 * 86400,
+            user: {
+              id: u.email,
+              email: u.email,
+              user_metadata: {
+                full_name: u.name,
+                role: u.role || 'b2c'
+              }
+            }
+          };
 
-        return {
-          data: { user: session.user, session },
-          error: null
-        };
+          return {
+            data: { user: session.user, session },
+            error: null
+          };
+        } catch (err) {
+          return {
+            data: { user: null, session: null },
+            error: { message: 'Không thể kết nối máy chủ đăng ký. Vui lòng thử lại!' }
+          };
+        }
       },
 
-            async signInWithOAuth({ provider, options = {} }) {
+      async signInWithOAuth({ provider, options = {} }) {
         if (!provider) {
-          return { data: null, error: { message: "Vui lòng chọn nhà cung cấp OAuth (google hoặc facebook)!" } };
+          return { data: null, error: { message: 'Vui lòng chọn nhà cung cấp OAuth (google hoặc facebook)!' } };
         }
         const cleanProvider = String(provider).toLowerCase();
         const redirectTo = (options && options.redirectTo) || (typeof window !== 'undefined' && window.location && window.location.origin) || 'http://localhost:3000';
 
-        // 1. Thử gọi Supabase Real OAuth nếu SDK sẵn sàng
         if (clientInstance && clientInstance.auth && typeof clientInstance.auth.signInWithOAuth === 'function') {
           try {
             const res = await clientInstance.auth.signInWithOAuth({ provider: cleanProvider, options: { redirectTo } });
@@ -314,11 +229,10 @@ const supabaseAdapter = {
               return res;
             }
           } catch (e) {
-            console.warn("Supabase SDK OAuth error:", e);
+            console.warn('Supabase SDK OAuth error:', e);
           }
         }
 
-        // 2. Nếu có Supabase URL thực tế (không phải default placeholder), điều hướng trực tiếp tới endpoint OAuth của Supabase
         if (SUPABASE_URL && !SUPABASE_URL.includes('wandermatch-v3.supabase.co')) {
           const authUrl = `${SUPABASE_URL}/auth/v1/authorize?provider=${cleanProvider}&redirect_to=${encodeURIComponent(redirectTo)}`;
           if (typeof window !== 'undefined' && window.location) {
@@ -327,184 +241,9 @@ const supabaseAdapter = {
           return { data: { provider: cleanProvider, url: authUrl }, error: null };
         }
 
-        // 3. Khởi tạo phiên đăng nhập Social OAuth chuẩn xác (Google / Facebook)
-        // Cho phép nhận email và họ tên từ options hoặc người dùng chọn
-        const defaultName = cleanProvider === 'facebook' ? 'Hành Khách Facebook' : 'Hành Khách Google VIP';
-        const defaultEmail = cleanProvider === 'facebook' ? 'traveler.fb@facebook.user.vn' : 'traveler.google@gmail.com';
-        
-        const socialEmail = (options && (options.email || options.data?.email)) || defaultEmail;
-        const socialName = (options && (options.fullName || options.name || options.data?.full_name)) || defaultName;
-
-        const users = getLocalUserStore();
-        let matched = users.find(u => u.email.toLowerCase() === socialEmail.toLowerCase());
-        if (!matched) {
-          matched = {
-            id: `usr_${cleanProvider}_${Date.now()}`,
-            email: socialEmail,
-            full_name: socialName,
-            phone: '0988 999 888',
-            role: 'b2c',
-            tier: `Hội Viên ${cleanProvider === 'facebook' ? 'Facebook Diamond' : 'Google VIP Gold'}`,
-            provider: cleanProvider,
-            created_at: new Date().toISOString()
-          };
-          users.push(matched);
-          saveLocalUserStore(users);
-        }
-
-        const session = {
-          access_token: `sb_oauth_${cleanProvider}_` + Math.random().toString(36).substring(2) + Date.now(),
-          token_type: "bearer",
-          expires_at: Math.floor(Date.now() / 1000) + 86400,
-          provider: cleanProvider,
-          user: {
-            id: matched.id,
-            email: matched.email,
-            app_metadata: { provider: cleanProvider },
-            user_metadata: {
-              full_name: matched.full_name,
-              phone: matched.phone,
-              role: matched.role,
-              tier: matched.tier,
-              avatar_url: cleanProvider === 'facebook' 
-                ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80'
-                : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'
-            }
-          }
-        };
-
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem("wm_supabase_session", JSON.stringify(session));
-          localStorage.setItem("wm_user_session", JSON.stringify(matched));
-        }
-        window.currentUser = matched;
-        notifyAuthSubscribers("SIGNED_IN", session);
-
         return {
-          data: { provider: cleanProvider, url: null, session, user: session.user },
-          error: null
-        };
-      },
-
-      async signInWithOtp({ email, options = {} }) {
-        const cleanEmail = (email || '').trim().toLowerCase();
-        if (!cleanEmail || !cleanEmail.includes('@')) {
-          return {
-            data: { user: null, session: null },
-            error: { message: "Vui lòng nhập địa chỉ Email hợp lệ để nhận mã xác thực OTP!" }
-          };
-        }
-
-        // 1. Thử gửi qua Real Supabase nếu có
-        if (clientInstance && clientInstance.auth && typeof clientInstance.auth.signInWithOtp === 'function') {
-          try {
-            await clientInstance.auth.signInWithOtp({ email: cleanEmail, options });
-          } catch (e) {}
-        }
-
-        // 2. Tạo mã OTP 6 số xác thực
-        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-        let pendingOtps = {};
-        try {
-          pendingOtps = JSON.parse(localStorage.getItem("wm_pending_otps") || "{}");
-        } catch (e) {}
-        pendingOtps[cleanEmail] = {
-          code: otpCode,
-          expires_at: Date.now() + 10 * 60 * 1000 // 10 phút
-        };
-        localStorage.setItem("wm_pending_otps", JSON.stringify(pendingOtps));
-
-        return {
-          data: { email: cleanEmail, demoOtpCode: otpCode },
-          error: null
-        };
-      },
-
-      async verifyOtp({ email, token, type = 'email' }) {
-        const cleanEmail = (email || '').trim().toLowerCase();
-        const cleanToken = (token || '').trim();
-
-        if (!cleanEmail || !cleanToken) {
-          return {
-            data: { user: null, session: null },
-            error: { message: "Vui lòng nhập đầy đủ Email và Mã xác thực OTP 6 số!" }
-          };
-        }
-
-        // 1. Thử xác thực với Supabase Cloud
-        if (clientInstance && clientInstance.auth && typeof clientInstance.auth.verifyOtp === 'function') {
-          try {
-            const res = await clientInstance.auth.verifyOtp({ email: cleanEmail, token: cleanToken, type: type || 'email' });
-            if (res && res.data?.session && !res.error) {
-              localStorage.setItem("wm_supabase_session", JSON.stringify(res.data.session));
-              return res;
-            }
-          } catch (e) {}
-        }
-
-        // 2. Kiểm tra mã OTP trong store
-        let pendingOtps = {};
-        try {
-          pendingOtps = JSON.parse(localStorage.getItem("wm_pending_otps") || "{}");
-        } catch (e) {}
-        const entry = pendingOtps[cleanEmail];
-
-        const isMatched = (entry && entry.code === cleanToken && Date.now() <= entry.expires_at) || cleanToken === "888888";
-
-        if (!isMatched) {
-          return {
-            data: { user: null, session: null },
-            error: { message: "Mã OTP không chính xác hoặc đã hết hạn! Vui lòng bấm Gửi lại mã OTP." }
-          };
-        }
-
-        if (entry) {
-          delete pendingOtps[cleanEmail];
-          localStorage.setItem("wm_pending_otps", JSON.stringify(pendingOtps));
-        }
-
-        const users = getLocalUserStore();
-        let matched = users.find(u => u.email.toLowerCase() === cleanEmail);
-        if (!matched) {
-          const namePart = cleanEmail.split('@')[0].replace(/[._-]/g, ' ').toUpperCase();
-          matched = {
-            id: "usr_otp_" + Date.now(),
-            email: cleanEmail,
-            password: "",
-            full_name: namePart,
-            phone: "0988 888 888",
-            role: "b2c",
-            tier: "Du Khách Xác Thực Email OTP",
-            created_at: new Date().toISOString()
-          };
-          users.push(matched);
-          saveLocalUserStore(users);
-        }
-
-        const session = {
-          access_token: "sb_otp_tok_" + Math.random().toString(36).substring(2) + Date.now(),
-          token_type: "bearer",
-          expires_at: Math.floor(Date.now() / 1000) + 86400,
-          user: {
-            id: matched.id,
-            email: matched.email,
-            user_metadata: {
-              full_name: matched.full_name,
-              phone: matched.phone,
-              role: matched.role,
-              tier: matched.tier
-            }
-          }
-        };
-
-        localStorage.setItem("wm_supabase_session", JSON.stringify(session));
-        localStorage.setItem("wm_user_session", JSON.stringify(matched));
-        window.currentUser = matched;
-        notifyAuthSubscribers("SIGNED_IN", session);
-
-        return {
-          data: { user: session.user, session },
-          error: null
+          data: null,
+          error: { message: 'Nhà cung cấp OAuth chưa được cấu hình trên môi trường này.' }
         };
       },
 
@@ -512,11 +251,11 @@ const supabaseAdapter = {
         if (clientInstance && clientInstance.auth) {
           try { await clientInstance.auth.signOut(); } catch (e) {}
         }
-        localStorage.removeItem("wm_supabase_session");
-        localStorage.removeItem("wm_user_session");
-        localStorage.removeItem("sb-wandermatch-v3-auth-token");
+        localStorage.removeItem('wm_supabase_session');
+        localStorage.removeItem('wm_user_session');
+        localStorage.removeItem('sb-wandermatch-v3-auth-token');
         window.currentUser = null;
-        notifyAuthSubscribers("SIGNED_OUT", null);
+        notifyAuthSubscribers('SIGNED_OUT', null);
         return { error: null };
       },
 
@@ -528,10 +267,27 @@ const supabaseAdapter = {
           } catch (e) {}
         }
         try {
-          const raw = localStorage.getItem("wm_supabase_session");
+          const raw = localStorage.getItem('wm_supabase_session');
           if (raw) {
             const session = JSON.parse(raw);
-            if (session && session.user) return { data: { session }, error: null };
+            if (session && session.access_token && session.user) {
+              const res = await fetch(`${getApiBase()}/api/auth/me`, {
+                method: 'GET',
+                headers: { Authorization: `Bearer ${session.access_token}` }
+              });
+              if (res.ok) {
+                const body = await res.json().catch(() => ({}));
+                if (body && body.success && body.user) {
+                  session.user.user_metadata = {
+                    ...(session.user.user_metadata || {}),
+                    full_name: body.user.name,
+                    role: body.user.role || 'b2c'
+                  };
+                  return { data: { session }, error: null };
+                }
+              }
+              localStorage.removeItem('wm_supabase_session');
+            }
           }
         } catch (e) {}
         return { data: { session: null }, error: null };
@@ -547,7 +303,7 @@ const supabaseAdapter = {
           authSubscribers.add(callback);
           this.getSession().then(({ data }) => {
             try {
-              callback(data.session ? "INITIAL_SESSION" : "INITIAL_EMPTY", data.session);
+              callback(data.session ? 'INITIAL_SESSION' : 'INITIAL_EMPTY', data.session);
             } catch (e) {}
           });
         }
@@ -561,75 +317,9 @@ const supabaseAdapter = {
           }
         };
       }
-    },
-
-    from(tableName) {
-      return {
-        select(cols = "*") {
-          return {
-            eq(col, val) {
-              return {
-                async single() {
-                  let list = [];
-                  if (tableName === "customer_profiles" || tableName === "profiles") {
-                    list = getLocalUserStore();
-                  } else {
-                    try {
-                      const raw = localStorage.getItem(`wm_table_${tableName}`);
-                      if (raw) list = JSON.parse(raw);
-                    } catch (e) {}
-                  }
-                  const item = list.find(u => u[col] === val || u.email === val || u.id === val || u.booking_code === val);
-                  return { data: item || null, error: item ? null : { message: "Not found" } };
-                },
-                async then(resolve) {
-                  const users = getLocalUserStore();
-                  const items = users.filter(u => u[col] === val);
-                  resolve({ data: items, error: null });
-                }
-              };
-            },
-            async then(resolve) {
-              const users = getLocalUserStore();
-              resolve({ data: users, error: null });
-            }
-          };
-        },
-        insert(records) {
-          return {
-            async select() {
-              const items = Array.isArray(records) ? records : [records];
-              let stored = [];
-              try {
-                const raw = localStorage.getItem(`wm_table_${tableName}`);
-                if (raw) stored = JSON.parse(raw);
-              } catch (e) {}
-              stored.unshift(...items);
-              localStorage.setItem(`wm_table_${tableName}`, JSON.stringify(stored));
-              return { data: items, error: null };
-            },
-            async then(resolve) {
-              const res = await this.select();
-              resolve(res);
-            }
-          };
-        },
-        update(updates) {
-          return {
-            eq(col, val) {
-              return {
-                async then(resolve) {
-                  resolve({ data: updates, error: null });
-                }
-              };
-            }
-          };
-        }
-      };
     }
   };
 
-  // Đăng ký toàn cục
   window.supabase = supabaseAdapter;
   window.supabaseClient = supabaseAdapter;
   if (typeof module !== 'undefined' && module.exports) {

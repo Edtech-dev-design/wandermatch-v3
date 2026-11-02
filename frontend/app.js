@@ -442,57 +442,72 @@ window.HOTELS_DB = [
   }
 ];
 
-const DEFAULT_SEEDED_USERS = {
-  "admin@wandermatch.vn": {
-    name: "Quản Trị Viên Hệ Thống",
-    email: "admin@wandermatch.vn",
-    passHash: "pw_wm_prod_admin",
-    provider: "email",
-    avatar: "",
-    registeredAt: "2026-01-01T00:00:00.000Z",
-    lastLoginAt: new Date().toISOString()
-  },
-  "khachhang@wandermatch.vn": {
-    name: "Du Khách VIP Gold",
-    email: "khachhang@wandermatch.vn",
-    passHash: "pw_wm_prod_123",
-    provider: "email",
-    avatar: "",
-    registeredAt: "2026-01-01T00:00:00.000Z",
-    lastLoginAt: new Date().toISOString()
+const DEFAULT_SEEDED_USERS = {};
+
+window.sealUnrevealedPackage = function(pkg) {
+  if (!pkg || typeof pkg !== "object" || pkg.isRevealed) return pkg;
+  const copy = { ...pkg };
+  delete copy.realDays;
+  if (copy.reveal && typeof copy.reveal === "object") {
+    copy.reveal = {
+      ...copy.reveal,
+      city: "✦ ĐIỂM ĐẾN NIÊM PHONG SÁP ✦",
+      hotel: "Resort 4-5★ Tiêu Chuẩn Quốc Tế SLA (Niêm Phong Tên)",
+      title: (copy.hotel && copy.hotel.mysteryTitle) || "Kỳ Nghỉ Bí Mật 3N2Đ (Niêm Phong Danh Tính)",
+      transport: copy.flightLabel || "Chuyến bay khứ hồi chuẩn SLA (✈️ Sân bay bí mật)"
+    };
   }
+  if (copy.hotel && typeof copy.hotel === "object") {
+    copy.hotel = {
+      ...copy.hotel,
+      city: "ĐIỂM ĐẾN BÍ MẬT",
+      name: copy.hotel.mysteryStayLabel || "Resort 4-5★ Tiêu Chuẩn Quốc Tế SLA",
+      title: copy.hotel.mysteryTitle || "Kỳ Nghỉ Bí Mật 3N2Đ",
+      days: copy.hotel.mysteryDays || []
+    };
+  }
+  if (copy.flight && typeof copy.flight === "object") {
+    copy.flight = {
+      ...copy.flight,
+      city: "SÂN BAY BÍ MẬT",
+      id: "SEALED"
+    };
+  }
+  return copy;
+};
+
+window.getAuthHeaders = function(extra = {}) {
+  const headers = { ...extra };
+  try {
+    const session = window.loadStore("wm_session_prod", null);
+    if (session && session.token && session.token !== "local-token") {
+      headers["Authorization"] = `Bearer ${session.token}`;
+    }
+  } catch (e) {}
+  return headers;
 };
 
 window.loadStore = function(k, def) {
   try {
     const r = localStorage.getItem(k);
     if (r) {
-      const parsed = JSON.parse(r);
-      if (k === "wm_users_prod") {
-        let updated = false;
-        Object.keys(DEFAULT_SEEDED_USERS).forEach(em => {
-          if (!parsed[em]) {
-            parsed[em] = DEFAULT_SEEDED_USERS[em];
-            updated = true;
-          }
-        });
-        if (updated) localStorage.setItem(k, JSON.stringify(parsed));
-      }
-      return parsed;
+      return JSON.parse(r);
     }
     const m = document.cookie.match(new RegExp("(?:^|;\\s*)" + k + "=([^;]*)"));
     if (m && m[1]) return JSON.parse(decodeURIComponent(m[1]));
-    if (k === "wm_users_prod") {
-      localStorage.setItem(k, JSON.stringify(DEFAULT_SEEDED_USERS));
-      return { ...DEFAULT_SEEDED_USERS };
-    }
     return def;
   } catch (e) { return def; }
 };
 
 window.saveStore = function(k, v) {
   try {
-    const s = JSON.stringify(v);
+    let valToSave = v;
+    if (k === "wm_draft_prod" && v && typeof v === "object") {
+      valToSave = window.sealUnrevealedPackage(v);
+    } else if (k === "wm_saved_prod" && Array.isArray(v)) {
+      valToSave = v.map(item => window.sealUnrevealedPackage(item));
+    }
+    const s = JSON.stringify(valToSave);
     localStorage.setItem(k, s);
     if (k === "wm_users_prod" || k === "wm_session_prod") {
       document.cookie = `${k}=${encodeURIComponent(s)}; path=/; max-age=31536000; SameSite=Lax`;
@@ -630,7 +645,11 @@ window.fbAsyncInit = function() {
 };
 
 // Xử lý đăng nhập OAuth thành công (Google hoặc Facebook)
-window.processOAuthLoginSuccess = function({ name, email, avatar, provider }) {
+window.processOAuthLoginSuccess = function({ name, email, avatar, provider, token, role }) {
+  if (!token) {
+    window.showToast("Phiên OAuth thiếu chứng chỉ xác thực từ máy chủ!", "error");
+    return;
+  }
   const users = window.loadStore("wm_users_prod", {});
   const existing = users[email] || {};
   users[email] = {
@@ -639,7 +658,6 @@ window.processOAuthLoginSuccess = function({ name, email, avatar, provider }) {
     email,
     provider,
     avatar: avatar || (provider === "google" ? "https://lh3.googleusercontent.com/a/default-user=s96-c" : "https://graph.facebook.com/v18.0/me/picture"),
-    passHash: existing.passHash || window.hashPw("social_pass_123"),
     lastLoginAt: new Date().toISOString(),
     registeredAt: existing.registeredAt || new Date().toISOString(),
     preferences: existing.preferences || window.getFormInputs(),
@@ -652,18 +670,10 @@ window.processOAuthLoginSuccess = function({ name, email, avatar, provider }) {
     name: users[email].name,
     email,
     provider,
-    avatar: users[email].avatar
+    avatar: users[email].avatar,
+    token,
+    role: role || "b2c"
   });
-
-  // Đồng bộ Supabase Client
-  if (window.supabaseClient && window.supabaseClient.auth) {
-    try {
-      window.supabaseClient.auth.signInWithOAuth({
-        provider,
-        options: { email, fullName: users[email].name }
-      });
-    } catch(e) {}
-  }
 
   window.closeUnifiedAuthModal();
   window.applyUserSession();
@@ -682,8 +692,8 @@ window.verifyWithBackend = async function(provider, token) {
     body: JSON.stringify({ provider, accessToken: token })
   });
   const data = await res.json();
-  if (!res.ok || !data.success) throw new Error(data.error || "Máy chủ từ chối xác thực");
-  return data.user;
+  if (!res.ok || !data.success || !data.token) throw new Error(data.error || "Máy chủ từ chối xác thực");
+  return { ...data.user, token: data.token };
 };
 
 window.loginWithGoogle = async function() {
@@ -697,7 +707,7 @@ window.loginWithGoogle = async function() {
       if (!resp || !resp.access_token) return window.showToast("Google không cấp quyền truy cập.", "error");
       try {
         const u = await window.verifyWithBackend("google", resp.access_token);
-        window.processOAuthLoginSuccess({ name: u.name, email: u.email, avatar: u.avatar, provider: "google" });
+        window.processOAuthLoginSuccess({ name: u.name, email: u.email, avatar: u.avatar, provider: "google", token: u.token, role: u.role });
       } catch (e) { window.showToast("Xác thực Google thất bại: " + e.message, "error"); }
     }
   });
@@ -713,7 +723,7 @@ window.loginWithFacebook = async function() {
     if (!r || !r.authResponse) return window.showToast("Bạn đã huỷ đăng nhập Facebook.", "warn");
     try {
       const u = await window.verifyWithBackend("facebook", r.authResponse.accessToken);
-      window.processOAuthLoginSuccess({ name: u.name, email: u.email, avatar: u.avatar, provider: "facebook" });
+      window.processOAuthLoginSuccess({ name: u.name, email: u.email, avatar: u.avatar, provider: "facebook", token: u.token, role: u.role });
     } catch (e) { window.showToast("Xác thực Facebook thất bại: " + e.message, "error"); }
   }, { scope: "email,public_profile" });
 };
@@ -946,11 +956,7 @@ window.handleAuthFormSubmit = async function() {
         return setErr("Email này đã được đăng ký! Vui lòng chuyển sang Đăng Nhập.");
       }
     } catch (e) {
-      // Local fallback
-      const users = window.loadStore("wm_users_prod", {});
-      if (users[email]) return setErr("Email này đã tồn tại trong hệ thống! Vui lòng đăng nhập.");
-      users[email] = { email, name, provider: "email", createdAt: new Date().toISOString() };
-      window.saveStore("wm_users_prod", users);
+      return setErr("Không thể kết nối máy chủ xác thực để đăng ký tài khoản. Vui lòng thử lại!");
     }
 
     // ĐĂNG KÝ XONG: TẮT CHỨC NĂNG ĐĂNG KÝ VÀ CHUYỂN LẠI VÀO ĐĂNG NHẬP
@@ -964,21 +970,15 @@ window.handleAuthFormSubmit = async function() {
     return;
   }
 
-  // MODE LOGIN
+  // MODE LOGIN — Authoritative backend authentication only (no offline password bypass)
   let loginRes;
   try {
     loginRes = await call("/api/auth/login", { email, password: pass });
   } catch (e) {
-    // Offline local fallback
-    const users = window.loadStore("wm_users_prod", {});
-    if (users[email]) {
-      loginRes = { status: 200, data: { success: true, user: users[email], token: "local-token" } };
-    } else {
-      return setErr("Không kết nối được máy chủ và tài khoản chưa tồn tại cục bộ!");
-    }
+    return setErr("Không kết nối được máy chủ xác thực. Vui lòng kiểm tra kết nối và thử lại!");
   }
 
-  if (!loginRes.data.success) {
+  if (!loginRes.data.success || !loginRes.data.token) {
     return setErr(loginRes.data.error || "Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu!");
   }
 
@@ -998,12 +998,45 @@ window.handleAuthFormSubmit = async function() {
     email: u.email,
     provider: "email",
     avatar: u.avatar || "",
-    token: loginRes.data.token
+    token: loginRes.data.token,
+    role: u.role || "b2c"
   });
 
   window.applyUserSession();
   window.closeUnifiedAuthModal();
   window.showToast(`Chào mừng ${u.name}! Đã đăng nhập thành công.`);
+};
+
+window.verifySessionWithBackend = async function() {
+  const session = window.loadStore("wm_session_prod", null);
+  if (!session || !session.email) return;
+  if (!session.token || session.token === "local-token") {
+    window.logoutUser();
+    return;
+  }
+  try {
+    const res = await fetch(`${window.API_BASE}/api/auth/me`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${session.token}` }
+    });
+    if (res.status === 401) {
+      window.logoutUser();
+      window.showToast("Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại!", "warn");
+      return;
+    }
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (data && data.success && data.user) {
+        const updatedSession = {
+          ...session,
+          name: data.user.name || session.name,
+          email: data.user.email,
+          role: data.user.role || "b2c"
+        };
+        window.saveStore("wm_session_prod", updatedSession);
+      }
+    }
+  } catch (e) {}
 };
 
 // ============================================================================
@@ -1016,7 +1049,7 @@ window.applyUserSession = function() {
   const gatekeeper = document.getElementById("gatekeeperLanding");
   const b2cTab = document.getElementById("tab-b2c");
 
-  if (session && session.email) {
+  if (session && session.email && session.token && session.token !== "local-token") {
     // ĐÃ ĐĂNG NHẬP / ĐĂNG KÝ: MỞ KHÓA THÔNG TIN BÊN TRONG CỦA WEB!
     if (outBox) outBox.style.display = "none";
     if (inBox) inBox.style.display = "flex";
@@ -1310,7 +1343,6 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
     packing: chosen.h.packing, 
     food: chosen.h.food, 
     days: chosen.h.mysteryDays || chosen.h.days,
-    realDays: chosen.h.days, 
     reviews: chosen.h.reviews || [],
     flight: chosen.f,
     hotel: chosen.h,
@@ -1319,17 +1351,19 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
     activeCandidateIndex: topCombos.findIndex(tc => tc.comboId === chosen.comboId),
     flightLabel: `Khứ hồi ${chosen.f.airline} (Khởi hành từ ${inp.origin || 'HAN'} ✈️ Sân bay bí mật)`,
     hotelLabel: `Resort ${chosen.h.rating}★ tiêu chuẩn quốc tế (Kèm buffet sáng & xe đưa đón)`,
+    expectedAmount: totalPaid,
+    packageCost: totalPaid,
     reveal: {
-      city: chosen.h.city, 
-      title: chosen.h.title, 
+      city: "✦ ĐIỂM ĐẾN NIÊM PHONG SÁP ✦", 
+      title: chosen.h.mysteryTitle || "Kỳ Nghỉ Bí Mật 3N2Đ", 
       sla: chosen.h.sla,
       room_type: chosen.h.room_type,
       img: chosen.h.img,
       gallery: chosen.h.gallery || [chosen.h.img],
       room_specs: chosen.h.room_specs,
       amenities: chosen.h.amenities,
-      transport: `${chosen.f.id} - ${chosen.f.airline} (${chosen.f.time})`,
-      hotel: chosen.h.name, 
+      transport: `Chuyến bay khứ hồi ${chosen.f.airline} (✈️ Sân bay bí mật)`,
+      hotel: "Resort 4-5★ Tiêu Chuẩn Quốc Tế SLA (Niêm Phong Tên)", 
       paid: totalPaid, 
       retail: totalRetail, 
       savings
@@ -1337,57 +1371,133 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
   };
 };
 
+window.serverTop3Curated = [];
+window.currentRecommendationId = null;
+
+window.applyServerRecommendationData = function(pkg, data) {
+  if (!pkg || !data || !data.success) return pkg;
+  pkg.recommendationId = data.recommendationId || pkg.recommendationId;
+  pkg.packageId = data.packageId || pkg.packageId;
+  window.currentRecommendationId = pkg.recommendationId || null;
+  if (Array.isArray(data.top3Curated) && data.top3Curated.length) {
+    window.serverTop3Curated = data.top3Curated;
+    if (Array.isArray(pkg.candidates)) {
+      pkg.candidates = pkg.candidates.map((c, idx) => {
+        const sc = data.top3Curated[idx];
+        return sc ? {
+          ...c,
+          packageId: sc.packageId,
+          bookingCode: sc.bookingCode,
+          unitCost: sc.costPerPerson || c.unitCost,
+          expectedAmount: sc.expectedAmount,
+          savings: sc.savingsVnd || c.savings,
+          sim: sc.matchScore || c.sim,
+          util: sc.utilityScore || c.util,
+          temp: sc.weatherTempC || c.temp,
+          weather: sc.weatherDesc || c.weather,
+          airline: sc.airline || c.airline
+        } : c;
+      });
+    }
+  }
+  if (data.bookingCode) pkg.code = data.bookingCode;
+  if (data.expectedAmount) {
+    pkg.expectedAmount = data.expectedAmount;
+    pkg.packageCost = data.expectedAmount;
+    if (pkg.reveal) {
+      pkg.reveal.paid = data.expectedAmount;
+      if (data.retailValue) pkg.reveal.retail = data.retailValue;
+      if (data.savingsVnd) pkg.reveal.savings = data.savingsVnd;
+    }
+  }
+  if (Array.isArray(data.splitQrs) && data.splitQrs.length) {
+    pkg.qrs = data.splitQrs.map((sq, i) => ({
+      idx: sq.memberIndex || (i + 1),
+      amount: sq.amountVnd,
+      memo: sq.transferNote,
+      url: sq.qrImageUrl
+    }));
+  }
+  pkg.aiEngineUsed = data.aiEngineUsed || pkg.aiEngineUsed;
+  pkg.aiCoPilotNote = data.aiCoPilotNote || pkg.aiCoPilotNote;
+  pkg.tasteProfile = data.tasteProfile;
+  pkg.mysteryCuration = data.mysteryCuration;
+  if (data.mysteryHint) pkg.hint = data.mysteryHint;
+  if (data.packingChecklist) pkg.packing = data.packingChecklist;
+  if (data.itinerary) pkg.days = data.itinerary;
+  if (data.matchScore) pkg.matchScore = data.matchScore;
+  if (data.utilityScore) pkg.utilityScore = data.utilityScore;
+  return pkg;
+};
+
 // Hàm chọn nhanh ứng viên trong top 3 của thuật toán
 window.selectBlindTravelCandidate = function(candidateIdx) {
   if (!window.currentTopCombos || !window.currentTopCombos[candidateIdx]) return;
   const chosen = window.currentTopCombos[candidateIdx];
+  const serverCand = (window.serverTop3Curated && window.serverTop3Curated[candidateIdx]) || null;
   const inp = window.getFormInputs();
-  const code = "WM" + Math.floor(10000 + Math.random() * 90000);
-  const totalPaid = chosen.unitCost * inp.groupSize;
-  const totalRetail = chosen.unitRetail * inp.groupSize;
-  const savings = totalRetail - totalPaid;
+  const code = (serverCand && serverCand.bookingCode) || ("WM" + Math.floor(10000 + Math.random() * 90000));
+  const unitCost = (serverCand && serverCand.costPerPerson) || chosen.unitCost;
+  const totalPaid = (serverCand && serverCand.expectedAmount) || (unitCost * inp.groupSize);
+  const totalRetail = (serverCand && serverCand.retailValue) || (chosen.unitRetail * inp.groupSize);
+  const savings = (serverCand && serverCand.savingsVnd) || (totalRetail - totalPaid);
 
-  const qrs = Array.from({ length: inp.groupSize }, (_, i) => ({
-    idx: i + 1,
-    amount: chosen.unitCost,
-    memo: `${code} KH${i + 1}`,
-    url: `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${chosen.unitCost}&addInfo=${encodeURIComponent(`${code} KH${i + 1}`)}&accountName=${encodeURIComponent("CONG TY TNHH WANDERMATCH VN")}`
-  }));
+  const qrs = (serverCand && Array.isArray(serverCand.splitQrs) && serverCand.splitQrs.length)
+    ? serverCand.splitQrs.map((sq, i) => ({
+        idx: sq.memberIndex || (i + 1),
+        amount: sq.amountVnd,
+        memo: sq.transferNote,
+        url: sq.qrImageUrl
+      }))
+    : Array.from({ length: inp.groupSize }, (_, i) => ({
+        idx: i + 1,
+        amount: unitCost,
+        memo: `${code} KH${i + 1}`,
+        url: `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${unitCost}&addInfo=${encodeURIComponent(`${code} KH${i + 1}`)}&accountName=${encodeURIComponent("CONG TY TNHH WANDERMATCH VN")}`
+      }));
 
-  const candidates = window.currentTopCombos.map((tc, idx) => ({
-    idx,
-    comboId: tc.comboId,
-    sim: tc.sim,
-    util: tc.util,
-    temp: tc.h.temp,
-    weather: tc.h.weather,
-    mysteryTheme: tc.h.mysteryTheme || "Thiên Nhiên & Nghỉ Dưỡng",
-    airline: tc.f.airline,
-    unitCost: tc.unitCost,
-    savings: (tc.unitRetail - tc.unitCost) * inp.groupSize
-  }));
+  const candidates = window.currentTopCombos.map((tc, idx) => {
+    const sc = (window.serverTop3Curated && window.serverTop3Curated[idx]) || null;
+    return {
+      idx,
+      packageId: sc ? sc.packageId : undefined,
+      bookingCode: sc ? sc.bookingCode : undefined,
+      comboId: tc.comboId,
+      sim: sc ? sc.matchScore : tc.sim,
+      util: sc ? sc.utilityScore : tc.util,
+      temp: sc ? sc.weatherTempC : tc.h.temp,
+      weather: sc ? sc.weatherDesc : tc.h.weather,
+      mysteryTheme: tc.h.mysteryTheme || "Thiên Nhiên & Nghỉ Dưỡng",
+      airline: sc ? sc.airline : tc.f.airline,
+      unitCost: sc ? sc.costPerPerson : tc.unitCost,
+      savings: sc ? sc.savingsVnd : (tc.unitRetail - tc.unitCost) * inp.groupSize
+    };
+  });
 
   const isHighestMatch = candidateIdx === 0;
 
   const newPkg = {
     code,
+    recommendationId: window.currentRecommendationId || undefined,
+    packageId: serverCand ? serverCand.packageId : undefined,
+    expectedAmount: totalPaid,
+    packageCost: totalPaid,
     comboId: chosen.comboId,
     isLocked: false,
     isRevealed: false,
     isHighestMatch,
     rankTitle: isHighestMatch ? "GỢI Ý DU LỊCH MÙ CAO NHẤT (PARETO OPTIMAL #1)" : `GỢI Ý ỨNG VIÊN #${candidateIdx + 1}`,
-    matchScore: chosen.sim,
-    utilityScore: chosen.util,
+    matchScore: serverCand ? serverCand.matchScore : chosen.sim,
+    utilityScore: serverCand ? serverCand.utilityScore : chosen.util,
     knapsackRatio: chosen.knapsackRatio,
     wholesaleSurplus: chosen.wholesaleSurplus,
-    reasoningLog: `[Đã chuyển sang Ứng Viên #${candidateIdx + 1}]: Khớp ${chosen.f.airline} + Resort ${chosen.h.rating}★ SLA. Khớp gu ${chosen.sim}%.`,
-    temp: chosen.h.temp,
-    weather: chosen.h.weather,
-    hint: chosen.h.hint,
-    packing: chosen.h.packing,
+    reasoningLog: `[Đã chuyển sang Ứng Viên #${candidateIdx + 1}]: Khớp ${chosen.f.airline} + Resort ${chosen.h.rating}★ SLA. Khớp gu ${serverCand ? serverCand.matchScore : chosen.sim}%.`,
+    temp: serverCand ? serverCand.weatherTempC : chosen.h.temp,
+    weather: serverCand ? serverCand.weatherDesc : chosen.h.weather,
+    hint: (serverCand && serverCand.mysteryHint) || chosen.h.hint,
+    packing: (serverCand && serverCand.packingChecklist) || chosen.h.packing,
     food: chosen.h.food,
-    days: chosen.h.mysteryDays || chosen.h.days,
-    realDays: chosen.h.days,
+    days: (serverCand && serverCand.itinerary) || chosen.h.mysteryDays || chosen.h.days,
     reviews: chosen.h.reviews || [],
     flight: chosen.f,
     hotel: chosen.h,
@@ -1397,16 +1507,16 @@ window.selectBlindTravelCandidate = function(candidateIdx) {
     flightLabel: `Khứ hồi ${chosen.f.airline} (Khởi hành từ ${inp.origin || 'HAN'} ✈️ Sân bay bí mật)`,
     hotelLabel: `Resort ${chosen.h.rating}★ tiêu chuẩn quốc tế (Kèm buffet sáng & xe đưa đón)`,
     reveal: {
-      city: chosen.h.city,
-      title: chosen.h.title,
+      city: "✦ ĐIỂM ĐẾN NIÊM PHONG SÁP ✦",
+      title: chosen.h.mysteryTitle || "Kỳ Nghỉ Bí Mật 3N2Đ",
       sla: chosen.h.sla,
       room_type: chosen.h.room_type,
       img: chosen.h.img,
       gallery: chosen.h.gallery || [chosen.h.img],
       room_specs: chosen.h.room_specs,
       amenities: chosen.h.amenities,
-      transport: `${chosen.f.id} - ${chosen.f.airline} (${chosen.f.time})`,
-      hotel: chosen.h.name,
+      transport: `Chuyến bay khứ hồi ${chosen.f.airline} (✈️ Sân bay bí mật)`,
+      hotel: "Resort 4-5★ Tiêu Chuẩn Quốc Tế SLA (Niêm Phong Tên)",
       paid: totalPaid,
       retail: totalRetail,
       savings
@@ -1416,7 +1526,7 @@ window.selectBlindTravelCandidate = function(candidateIdx) {
   window.saveStore("wm_draft_prod", newPkg);
   window.renderPackageUI(newPkg);
   window.updatePersonaUI();
-  window.showToast(`✦ Đã chuyển sang Ứng viên #${candidateIdx + 1}: ${chosen.h.mysteryTheme || 'Kỳ Nghỉ Bí Mật'} (Khớp gu ${chosen.sim}%)`, "success");
+  window.showToast(`✦ Đã chuyển sang Ứng viên #${candidateIdx + 1}: ${chosen.h.mysteryTheme || 'Kỳ Nghỉ Bí Mật'} (Khớp gu ${newPkg.matchScore}%)`, "success");
 };
 
 
@@ -1602,7 +1712,7 @@ window.onFormChange = function() {
       try {
         const res = await fetch(`${window.API_BASE}/api/ai-recommend`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: window.getAuthHeaders({ "Content-Type": "application/json" }),
           body: JSON.stringify({
             originAirport: inp.origin,
             budgetVnd: inp.budget,
@@ -1615,16 +1725,7 @@ window.onFormChange = function() {
         if (res.ok) {
           const data = await res.json();
           if (data && data.success) {
-            pkg.aiEngineUsed = data.aiEngineUsed || pkg.aiEngineUsed;
-            pkg.aiCoPilotNote = data.aiCoPilotNote || pkg.aiCoPilotNote;
-            pkg.tasteProfile = data.tasteProfile;
-            pkg.mysteryCuration = data.mysteryCuration;
-            if (data.mysteryHint) pkg.hint = data.mysteryHint;
-            if (data.packingChecklist) pkg.packing = data.packingChecklist;
-            if (data.antiTouristTrapGuide) pkg.food = data.antiTouristTrapGuide;
-            if (data.itinerary) pkg.days = data.itinerary;
-            if (data.matchScore) pkg.matchScore = data.matchScore;
-            if (data.utilityScore) pkg.utilityScore = data.utilityScore;
+            window.applyServerRecommendationData(pkg, data);
             window.saveStore("wm_draft_prod", pkg);
             window.renderPackageUI(pkg);
             window.updatePersonaUI();
@@ -1658,7 +1759,7 @@ window.generateNewRecommendation = async function() {
       const inp = window.getFormInputs();
       const res = await fetch(`${window.API_BASE}/api/ai-recommend`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: window.getAuthHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({
           originAirport: inp.origin,
           budgetVnd: inp.budget,
@@ -1671,17 +1772,7 @@ window.generateNewRecommendation = async function() {
       if (res.ok) {
         const data = await res.json();
         if (data && data.success) {
-          pkg.aiEngineUsed = data.aiEngineUsed || pkg.aiEngineUsed;
-          pkg.aiCoPilotNote = data.aiCoPilotNote || pkg.aiCoPilotNote;
-          pkg.tasteProfile = data.tasteProfile;
-          pkg.mysteryCuration = data.mysteryCuration;
-          if (data.mysteryHint) pkg.hint = data.mysteryHint;
-          if (data.packingChecklist) pkg.packing = data.packingChecklist;
-          if (data.antiTouristTrapGuide) pkg.food = data.antiTouristTrapGuide;
-          if (data.itinerary) pkg.days = data.itinerary;
-          if (data.matchScore) pkg.matchScore = data.matchScore;
-          if (data.utilityScore) pkg.utilityScore = data.utilityScore;
-
+          window.applyServerRecommendationData(pkg, data);
           window.saveStore("wm_draft_prod", pkg);
           window.renderPackageUI(pkg);
           window.updatePersonaUI();
@@ -2744,25 +2835,61 @@ window.confirmAndLockBooking = async function() {
   let pkg = window.loadStore("wm_draft_prod", null) || window.runBlindTravelEngine(true);
   const tripInputs = window.getFormInputs();
   try {
+    if (!pkg.packageId) {
+      const recRes = await fetch(`${window.API_BASE}/api/ai-recommend`, {
+        method: "POST",
+        headers: window.getAuthHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify({
+          originAirport: tripInputs.origin,
+          budgetVnd: tripInputs.budget,
+          groupSize: tripInputs.groupSize,
+          customPrompt: tripInputs.prompt,
+          userVector: tripInputs.vec,
+          blacklistCities: tripInputs.blacklist
+        })
+      });
+      const recData = await recRes.json();
+      if (!recRes.ok || !recData.success || !recData.packageId) {
+        throw new Error(recData.error || "Không thể khởi tạo phiên đề xuất trên máy chủ.");
+      }
+      window.applyServerRecommendationData(pkg, recData);
+    }
+
     const response = await fetch(`${window.API_BASE}/api/create-booking`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: window.getAuthHeaders({ "Content-Type": "application/json" }),
       body: JSON.stringify({
         bookingCode: pkg.code,
+        packageId: pkg.packageId,
+        recommendationId: pkg.recommendationId,
         fullName: name,
         email,
         originAirport: tripInputs.origin,
-        preferredCity: pkg.reveal?.city,
-        budgetVnd: pkg.qrs && pkg.qrs[0] ? pkg.qrs[0].amount : 5000000,
-        groupSize: pkg.qrs.length,
+        budgetVnd: tripInputs.budget,
+        groupSize: tripInputs.groupSize,
         userVector: tripInputs.vec,
         blacklistCities: tripInputs.blacklist,
         customPrompt: tripInputs.prompt
       })
     });
     const booking = await response.json();
-    if (!response.ok || !booking.success || booking.bookingCode !== pkg.code) {
+    if (!response.ok || !booking.success) {
       throw new Error(booking.error || "Máy chủ chưa xác nhận được đơn đặt chỗ.");
+    }
+    pkg.code = booking.bookingCode || pkg.code;
+    pkg.packageId = booking.packageId || pkg.packageId;
+    if (booking.expectedAmount) {
+      pkg.expectedAmount = booking.expectedAmount;
+      pkg.packageCost = booking.expectedAmount;
+      if (pkg.reveal) pkg.reveal.paid = booking.expectedAmount;
+    }
+    if (Array.isArray(booking.splitQrs) && booking.splitQrs.length) {
+      pkg.qrs = booking.splitQrs.map((sq, i) => ({
+        idx: sq.memberIndex || (i + 1),
+        amount: sq.amountVnd,
+        memo: sq.transferNote,
+        url: sq.qrImageUrl
+      }));
     }
   } catch (error) {
     window.showToast(`Không thể tạo đơn đặt chỗ: ${error.message}`, "error");
@@ -2876,15 +3003,27 @@ window.verifyAndConfirmPayment = async function(silent) {
 
   let st = null;
   try {
-    const res = await fetch(`${window.API_BASE}/api/payment/check-status?bookingCode=${encodeURIComponent(pkg.code)}`);
+    const res = await fetch(`${window.API_BASE}/api/payment/check-status?bookingCode=${encodeURIComponent(pkg.code)}`, {
+      headers: window.getAuthHeaders()
+    });
     st = await res.json();
   } catch (e) {
     if (!silent) window.showToast("Không kết nối được máy chủ đối soát.", "error");
   }
   if (btn) { btn.disabled = false; btn.innerText = "Tôi Đã Chuyển Khoản — Kiểm Tra Giao Dịch Ngay"; }
 
+  if (st && st.status === "UNDERPAID") {
+    if (!silent) {
+      window.showToast(
+        `Giao dịch chuyển thiếu! Đã nhận ${window.formatVND(st.paidAmount)} / ${window.formatVND(st.expectedAmount)}. Vui lòng chuyển thêm ${window.formatVND(st.amountDue)}.`,
+        "warn"
+      );
+    }
+    return false;
+  }
+
   if (!st || !st.isPaid) {
-    if (!silent) window.showToast("Chưa nhận được tiền từ ngân hàng. Vui lòng chuyển đúng số tiền & nội dung, hệ thống tự kiểm tra mỗi 5 giây.", "warn");
+    if (!silent) window.showToast("Chưa nhận được đủ tiền từ ngân hàng. Vui lòng chuyển đúng số tiền & nội dung, hệ thống tự kiểm tra mỗi 5 giây.", "warn");
     return false;
   }
 
@@ -3105,17 +3244,64 @@ window.initScratchCanvas = function() {
   c.ontouchmove = scratch;
 };
 
-window.revealDestinationNow = window.revealMysteryTrip = function() {
-  const c = document.getElementById("scratchCanvas");
-  if (c) c.style.display = "none";
+window.isRevealingInProgress = false;
+window.revealDestinationNow = window.revealMysteryTrip = async function() {
+  if (window.isRevealingInProgress) return;
   const pkg = window.loadStore("wm_draft_prod", null);
-  if (pkg) {
+  if (!pkg) return;
+
+  window.isRevealingInProgress = true;
+  try {
+    const res = await fetch(`${window.API_BASE}/api/bookings/reveal`, {
+      method: "POST",
+      headers: window.getAuthHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({ bookingCode: pkg.code })
+    });
+    const resData = await res.json().catch(() => ({}));
+    if (!res.ok || !resData.success || !resData.revealPackage) {
+      window.scratchStrokeCount = 0;
+      window.initScratchCanvas();
+      window.showToast(
+        resData.error || "Chưa đủ điều kiện mở khóa điểm đến! Đơn đặt chỗ phải được thanh toán đủ (PAID) và thuộc quyền sở hữu của bạn.",
+        "error"
+      );
+      return;
+    }
+
+    const rev = resData.revealPackage;
+    const c = document.getElementById("scratchCanvas");
+    if (c) c.style.display = "none";
+
     pkg.isRevealed = true;
+    pkg.reveal = {
+      ...(pkg.reveal || {}),
+      city: rev.cityName,
+      title: rev.comboTitle || pkg.reveal?.title,
+      hotel: rev.hotelName,
+      transport: rev.transport,
+      sla: rev.slaCode || pkg.reveal?.sla,
+      paid: rev.expectedAmount || rev.budgetPaid || pkg.reveal?.paid,
+      retail: rev.retailValue || pkg.reveal?.retail,
+      savings: rev.savingsVnd || pkg.reveal?.savings
+    };
+    if (Array.isArray(rev.antiTouristTrapGuide) && rev.antiTouristTrapGuide.length) {
+      pkg.food = rev.antiTouristTrapGuide;
+    }
+    if (Array.isArray(rev.realItinerary) && rev.realItinerary.length) {
+      pkg.days = rev.realItinerary;
+    }
     window.saveStore("wm_draft_prod", pkg);
-    
+
+    const saved = window.loadStore("wm_saved_prod", []);
+    const sIdx = saved.findIndex(x => x.code === pkg.code);
+    if (sIdx >= 0) {
+      saved[sIdx] = pkg;
+      window.saveStore("wm_saved_prod", saved);
+    }
+
     // Kích hoạt pháo hoa chúc mừng
     window.launchConfetti();
-    
+
     // Thêm hiệu ứng highlight chữ vàng kim cho tên thành phố
     const cityEl = document.getElementById("revCityName");
     if (cityEl) {
@@ -3133,7 +3319,7 @@ window.revealDestinationNow = window.revealMysteryTrip = function() {
     if (transportEl) transportEl.innerText = pkg.reveal.transport;
 
     const foodEl = document.getElementById("revFoodGuide");
-    if (foodEl) foodEl.innerHTML = pkg.food.map(f => `<li>${f}</li>`).join("");
+    if (foodEl && Array.isArray(pkg.food)) foodEl.innerHTML = pkg.food.map(f => `<li>${f}</li>`).join("");
 
     // Cập nhật tên hành khách và mã sân bay trên Boarding pass
     const custName = document.getElementById("custName")?.value || pkg.customerName || "QUY KHACH WANDERMATCH";
@@ -3142,7 +3328,7 @@ window.revealDestinationNow = window.revealMysteryTrip = function() {
 
     const destCodeEl = document.getElementById("revDestAirportCode");
     if (destCodeEl) {
-      const codeMap = { "Phú Quốc": "PQC", "Đà Lạt": "DLI", "Nha Trang": "CXR", "Quy Nhơn": "UIH", "Huế": "HUI", "Măng Đen": "PXU / Măng Đen", "Đà Nẵng": "DAD" };
+      const codeMap = { "Phú Quốc": "PQC", "Đà Lạt": "DLI", "Nha Trang": "CXR", "Quy Nhơn": "UIH", "Huế": "HUI", "Măng Đen": "PXU / Măng Đen", "Đà Nẵng": "DAD", "Sapa": "HAN / Sapa", "Côn Đảo": "VCS" };
       destCodeEl.innerText = (codeMap[pkg.reveal.city] || "PQC") + " (" + pkg.reveal.city + ")";
     }
 
@@ -3150,6 +3336,12 @@ window.revealDestinationNow = window.revealMysteryTrip = function() {
     window.renderSavedTab();
 
     window.showToast(`🎉 CHÚC MỪNG! Điểm đến bí mật chính thức của bạn là: ${pkg.reveal.city}!`, "success");
+  } catch (err) {
+    window.scratchStrokeCount = 0;
+    window.initScratchCanvas();
+    window.showToast("Không thể kết nối máy chủ để xác thực mở khóa điểm đến!", "error");
+  } finally {
+    window.isRevealingInProgress = false;
   }
 };
 
@@ -3898,8 +4090,9 @@ window.initWanderMatchApp = function() {
     } catch (e) {}
   }
 
-  // 4. Áp dụng phiên người dùng & khởi tạo gợi ý du lịch mù
+  // 4. Áp dụng phiên người dùng, xác thực token phía backend & khởi tạo gợi ý du lịch mù
   window.applyUserSession();
+  window.verifySessionWithBackend();
   let draft = window.loadStore("wm_draft_prod", null);
   if (!draft || !draft.candidates || !draft.candidates.length) {
     draft = window.runBlindTravelEngine(false);
@@ -3907,6 +4100,27 @@ window.initWanderMatchApp = function() {
   }
   window.renderPackageUI(draft);
   window.updatePersonaUI();
+  if (!draft.packageId && window.API_BASE) {
+    const inp = window.getFormInputs();
+    fetch(`${window.API_BASE}/api/ai-recommend`, {
+      method: "POST",
+      headers: window.getAuthHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({
+        originAirport: inp.origin,
+        budgetVnd: inp.budget,
+        groupSize: inp.groupSize,
+        customPrompt: inp.prompt,
+        userVector: inp.vec,
+        blacklistCities: inp.blacklist
+      })
+    }).then(r => r.ok ? r.json() : null).then(data => {
+      if (data && data.success) {
+        window.applyServerRecommendationData(draft, data);
+        window.saveStore("wm_draft_prod", draft);
+        window.renderPackageUI(draft);
+      }
+    }).catch(() => {});
+  }
 };
 
 if (document.readyState === "loading") {
