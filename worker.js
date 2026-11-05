@@ -699,12 +699,15 @@ async function hydrate(env) {
   if (!hasSupabaseStateStore(env)) return;
 
   const baseUrl = env.SUPABASE_URL.replace(/\/+$/, "");
-  const response = await fetch(`${baseUrl}/rest/v1/wm_worker_state?singleton=eq.true&select=state&limit=1`, {
+  const response = await fetch(`${baseUrl}/rest/v1/wm_worker_state?singleton=eq.true&select=state,updated_at&limit=1`, {
     headers: supabaseStateHeaders(env)
   });
   if (!response.ok) throw new Error(`Supabase state read failed (${response.status}).`);
   const rows = await response.json();
-  if (rows[0]?.state) mergeStorageSnapshot(rows[0].state);
+  if (rows[0]?.state) {
+    mergeStorageSnapshot(rows[0].state);
+    STORAGE._lastSyncedUpdatedAt = rows[0].updated_at || null;
+  }
 }
 
 async function persist(env) {
@@ -715,12 +718,65 @@ async function persist(env) {
   if (!hasSupabaseStateStore(env)) return;
 
   const baseUrl = env.SUPABASE_URL.replace(/\/+$/, "");
-  const response = await fetch(`${baseUrl}/rest/v1/wm_worker_state?singleton=eq.true`, {
-    method: "PATCH",
-    headers: { ...supabaseStateHeaders(env), Prefer: "return=minimal" },
-    body: JSON.stringify({ state: STORAGE, updated_at: new Date().toISOString() })
-  });
-  if (!response.ok) throw new Error(`Supabase state write failed (${response.status}).`);
+  const maxAttempts = 3;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const newUpdatedAt = new Date().toISOString();
+    const expectedPrevUpdatedAt = STORAGE._lastSyncedUpdatedAt;
+    const queryFilter = expectedPrevUpdatedAt
+      ? `singleton=eq.true&updated_at=eq.${encodeURIComponent(expectedPrevUpdatedAt)}`
+      : `singleton=eq.true`;
+
+    const response = await fetch(`${baseUrl}/rest/v1/wm_worker_state?${queryFilter}`, {
+      method: "PATCH",
+      headers: { ...supabaseStateHeaders(env), Prefer: "return=representation" },
+      body: JSON.stringify({ state: STORAGE, updated_at: newUpdatedAt })
+    });
+    if (!response.ok) throw new Error(`Supabase state write failed (${response.status}).`);
+
+    // If PostgREST returns the updated row array, check whether CAS matched (non-empty array)
+    let updatedRows = null;
+    try {
+      const text = await response.text();
+      updatedRows = text ? JSON.parse(text) : null;
+    } catch {
+      updatedRows = null;
+    }
+
+    if (!expectedPrevUpdatedAt || !Array.isArray(updatedRows) || updatedRows.length > 0) {
+      STORAGE._lastSyncedUpdatedAt = newUpdatedAt;
+      return;
+    }
+
+    // CAS mismatch across distributed Worker isolates: re-hydrate remote state, merge monotonically, and retry PATCH
+    await hydrate(env);
+  }
+}
+
+async function invokeV4RpcWithPostgresRouting(env, v4db, { rpcName, args = {}, role = "authenticated", uid = null, bearerToken = null }) {
+  if (env && env.SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY && String(env.USE_V4_POSTGRES_RPC).toLowerCase() === "true") {
+    const baseUrl = env.SUPABASE_URL.replace(/\/+$/, "");
+    const authHeader = role === "service_role" || !bearerToken
+      ? `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`
+      : `Bearer ${bearerToken}`;
+    const res = await fetch(`${baseUrl}/rest/v1/rpc/${rpcName}`, {
+      method: "POST",
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: authHeader,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(args)
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const err = new Error(data.message || data.error || `PostgreSQL RPC ${rpcName} failed`);
+      err.code = data.code || "P0001";
+      err.httpStatus = res.status;
+      throw err;
+    }
+    return data;
+  }
+  return v4db.callRpcAsRole({ role, uid, rpcName, args, env });
 }
 
 // ============================================================================
@@ -1776,22 +1832,168 @@ const handler = {
     }
 
     // 13. V4.0 Relational Engine Endpoints (/api/v4/*)
+    // Authoritative PostgreSQL RPC routing when SUPABASE_URL + USE_V4_POSTGRES_RPC="true"
     if (url.pathname.startsWith("/api/v4/")) {
       if (!globalThis.__WM_V4_DB__) {
-        globalThis.__WM_V4_DB__ = new V4RelationalDatabase(env);
+        globalThis.__WM_V4_DB__ = new V4RelationalDatabase("default");
       }
       const v4db = globalThis.__WM_V4_DB__;
       const authUser = await authenticateRequest(request, env);
+      const authHeader = request.headers.get("Authorization") || "";
+      const bearerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
 
       try {
+        if (url.pathname === "/api/v4/recommendations" && request.method === "POST") {
+          if (!authUser) return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), { status: 401, headers: J });
+          const body = await request.json();
+          const result = await v4db.createRecommendationSessionAndPackages({
+            userId: authUser.userId || "00000000-0000-4000-8000-000000000001",
+            originAirport: body.originAirport || "SGN",
+            budgetPerPersonVnd: Number(body.budgetPerPersonVnd || 5500000),
+            groupSize: Number(body.groupSize || 2),
+            departureDate: body.departureDate || "2026-11-15",
+            durationDays: Number(body.durationDays || 3),
+            userPreferences: body.userPreferences || {},
+            blacklistedSlugs: body.blacklistedSlugs || [],
+            comfortLocks: body.comfortLocks || {}
+          });
+          return new Response(JSON.stringify({ success: true, ...result }), { status: 200, headers: J });
+        }
+
+        if (url.pathname === "/api/v4/bookings" && request.method === "POST") {
+          if (!authUser) return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), { status: 401, headers: J });
+          const body = await request.json();
+          const data = await invokeV4RpcWithPostgresRouting(env, v4db, {
+            rpcName: "create_booking_with_hold_v4",
+            role: "authenticated",
+            uid: authUser.userId,
+            bearerToken,
+            args: {
+              p_package_id: body.packageId || body.p_package_id,
+              p_booking_code: body.bookingCode || body.p_booking_code || null,
+              p_departure_date: body.departureDate || body.p_departure_date || "2026-11-15",
+              p_duration_days: Number(body.durationDays || body.p_duration_days || 3),
+              p_travelers: body.travelers || body.p_travelers || []
+            }
+          });
+          return new Response(JSON.stringify({ success: true, ...data }), { status: 200, headers: J });
+        }
+
+        if (url.pathname === "/api/v4/webhooks/payment" && request.method === "POST") {
+          const sigAuth = await verifyWebhookAuthentication(request, env);
+          if (!sigAuth.ok) {
+            return new Response(JSON.stringify({ success: false, error: sigAuth.error }), { status: sigAuth.status, headers: J });
+          }
+          const body = await request.json();
+          const data = await invokeV4RpcWithPostgresRouting(env, v4db, {
+            rpcName: "process_payment_webhook_v4",
+            role: "service_role",
+            uid: null,
+            args: {
+              p_provider: body.provider || "SEPAY",
+              p_provider_event_id: String(body.providerEventId || body.id || body.transactionId || ""),
+              p_external_tx_id: String(body.externalTransactionId || body.transactionId || body.id || ""),
+              p_booking_code: body.bookingCode || "",
+              p_transfer_amount: Number(body.transferAmount || body.amount || 0),
+              p_transfer_content: body.content || body.transferContent || "",
+              p_bank_code: body.gateway || body.bankCode || "MB",
+              p_raw_payload: body
+            }
+          });
+          return new Response(JSON.stringify(data), { status: data.http_status || 200, headers: J });
+        }
+
+        if (url.pathname === "/api/v4/bookings/reveal" && request.method === "POST") {
+          if (!authUser) return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), { status: 401, headers: J });
+          const body = await request.json();
+          const data = await invokeV4RpcWithPostgresRouting(env, v4db, {
+            rpcName: "reveal_blind_booking_v4",
+            role: "authenticated",
+            uid: authUser.userId,
+            bearerToken,
+            args: {
+              p_booking_code: body.bookingCode || body.p_booking_code
+            }
+          });
+          return new Response(JSON.stringify({ success: true, ...data }), { status: 200, headers: J });
+        }
+
+        if (url.pathname === "/api/v4/refunds/request" && request.method === "POST") {
+          if (!authUser) return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), { status: 401, headers: J });
+          const body = await request.json();
+          const data = await invokeV4RpcWithPostgresRouting(env, v4db, {
+            rpcName: "request_refund_v4",
+            role: "authenticated",
+            uid: authUser.userId,
+            bearerToken,
+            args: {
+              p_booking_code: body.bookingCode || body.p_booking_code,
+              p_mode: body.mode || body.p_mode || "REQUEST",
+              p_tier: body.tier || body.p_tier || "EARLY_72H",
+              p_reason: body.reason || body.p_reason || null,
+              p_evidence_url: body.evidenceUrl || body.p_evidence_url || null,
+              p_idempotency_key: body.idempotencyKey || body.p_idempotency_key || null
+            }
+          });
+          return new Response(JSON.stringify({ success: true, ...data }), { status: 200, headers: J });
+        }
+
+        if (url.pathname === "/api/v4/refunds/approve" && request.method === "POST") {
+          if (!authUser) return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), { status: 401, headers: J });
+          if (authUser.role !== "admin") return new Response(JSON.stringify({ success: false, error: "Forbidden" }), { status: 403, headers: J });
+          const body = await request.json();
+          const data = await invokeV4RpcWithPostgresRouting(env, v4db, {
+            rpcName: "approve_refund_v4",
+            role: "authenticated",
+            uid: authUser.userId,
+            bearerToken,
+            args: {
+              p_refund_id: body.refundId || body.p_refund_id,
+              p_decision: body.decision || body.p_decision || "APPROVE",
+              p_review_note: body.reviewNote || body.p_review_note || null
+            }
+          });
+          return new Response(JSON.stringify({ success: true, ...data }), { status: 200, headers: J });
+        }
+
+        if (url.pathname === "/api/v4/pii/masked" && request.method === "GET") {
+          if (!authUser) return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), { status: 401, headers: J });
+          const data = await invokeV4RpcWithPostgresRouting(env, v4db, {
+            rpcName: "get_my_masked_pii_v4",
+            role: "authenticated",
+            uid: authUser.userId,
+            bearerToken,
+            args: {}
+          });
+          return new Response(JSON.stringify({ success: true, ...data }), { status: 200, headers: J });
+        }
+
         if (url.pathname === "/api/v4/reconciliation" && request.method === "GET") {
           if (!authUser) return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), { status: 401, headers: J });
           if (authUser.role !== "admin") return new Response(JSON.stringify({ success: false, error: "Forbidden" }), { status: 403, headers: J });
-          const checks = v4db.rpcRunReconciliationChecks();
+          const checks = await invokeV4RpcWithPostgresRouting(env, v4db, {
+            rpcName: "run_v4_reconciliation_checks",
+            role: "service_role",
+            uid: authUser.userId,
+            args: {}
+          });
           return new Response(JSON.stringify({ success: true, checks }), { status: 200, headers: J });
         }
+
+        if (url.pathname === "/api/v4/reconciliation/settlement" && request.method === "POST") {
+          if (!authUser) return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), { status: 401, headers: J });
+          if (authUser.role !== "admin") return new Response(JSON.stringify({ success: false, error: "Forbidden" }), { status: 403, headers: J });
+          const body = await request.json();
+          const settlement = await invokeV4RpcWithPostgresRouting(env, v4db, {
+            rpcName: "reconcile_external_settlement_v4",
+            role: "service_role",
+            uid: authUser.userId,
+            args: { p_settlement_records: body.records || body.p_settlement_records || [] }
+          });
+          return new Response(JSON.stringify({ success: true, settlement }), { status: 200, headers: J });
+        }
       } catch (e) {
-        return new Response(JSON.stringify({ success: false, error: e.message, code: e.code }), { status: e.status || 400, headers: J });
+        return new Response(JSON.stringify({ success: false, error: e.message, code: e.code }), { status: e.httpStatus || e.status || 400, headers: J });
       }
     }
 

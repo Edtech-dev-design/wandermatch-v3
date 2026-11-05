@@ -489,7 +489,14 @@ test("WanderMatch V4.0 — Quantitative Acceptance Test Matrix (T-01 through T-2
       refunds: []
     };
 
-    await db.migrateV3StateToV4(v3Snapshot);
+    const firstMig = await db.migrateV3StateToV4(v3Snapshot);
+    assert.equal(firstMig.migrated_bookings, 1);
+
+    // Running migrateV3StateToV4 a second time must be 100% idempotent (0 duplicates, 1 skipped)
+    const secondMig = await db.migrateV3StateToV4(v3Snapshot);
+    assert.equal(secondMig.migrated_bookings, 0);
+    assert.equal(secondMig.skipped_duplicate_bookings, 1);
+
     const reconResults = await db.rpcRunReconciliationChecks(v3Snapshot);
     assert.equal(reconResults.recon_1_orphan_bookings, 0);
     assert.equal(reconResults.recon_2_amount_mismatch, 0);
@@ -663,7 +670,12 @@ test("WanderMatch V4.0 — Quantitative Acceptance Test Matrix (T-01 through T-2
     assert.equal(afterFail.attempt_count, 1);
     assert.equal(afterFail.status, "PENDING");
 
-    // Fast-forward time and process successfully
+    // Simulate worker crash while event is stuck in PROCESSING with an expired lease (locked_until in the past)
+    afterFail.status = "PROCESSING";
+    afterFail.locked_by = "crashed-worker-0";
+    afterFail.locked_until = new Date(Date.now() - 1000).toISOString();
+
+    // Fast-forward time and process successfully (reclaiming crashed PROCESSING lease)
     const futureMs = Date.now() + 10000;
     const deliveredKeys = new Set();
     let sideEffectCount = 0;
@@ -767,7 +779,7 @@ test("WanderMatch V4.0 — Quantitative Acceptance Test Matrix (T-01 through T-2
       p_booking_code: "WM20261601"
     });
 
-    // Webhook with non-existent booking code in transfer_content -> 404 FAILED_UNMATCHED
+    // Webhook with non-existent booking code in transfer_content -> 404 UNMATCHED_BOOKING_CODE
     const unmatched = await db.rpcProcessPaymentWebhook({
       p_provider: "SEPAY",
       p_external_tx_id: "SEP-UNMATCHED-16",
@@ -775,6 +787,17 @@ test("WanderMatch V4.0 — Quantitative Acceptance Test Matrix (T-01 through T-2
       p_transfer_amount: book.expected_amount_vnd
     });
     assert.equal(unmatched.http_status, 404);
+    assert.equal(unmatched.status, "UNMATCHED_BOOKING_CODE");
+
+    // Webhook with AMBIGUOUS (> 1) booking codes in transfer_content -> 404 UNMATCHED_BOOKING_CODE
+    const ambig = await db.rpcProcessPaymentWebhook({
+      p_provider: "SEPAY",
+      p_external_tx_id: "SEP-AMBIG-16",
+      p_transfer_content: "Thanh toan WM20261601 va WM20269999",
+      p_transfer_amount: book.expected_amount_vnd
+    });
+    assert.equal(ambig.http_status, 404);
+    assert.equal(ambig.status, "UNMATCHED_BOOKING_CODE");
     assert.equal(db.tables.bookings.find((b) => b.id === book.booking_id).paid_amount_vnd, 0);
   });
 
@@ -873,6 +896,20 @@ test("WanderMatch V4.0 — Quantitative Acceptance Test Matrix (T-01 through T-2
       p_transfer_amount: book1.expected_amount_vnd
     });
     assert.equal(pSepayDup.idempotent_replay, true);
+
+    // Recon #8: External Settlement Reconciliation detects exact match vs discrepancy
+    const settlementOk = await db.rpcReconcileExternalSettlement([
+      { provider: "SEPAY", external_transaction_id: "TX-900", amount_vnd: book1.expected_amount_vnd, direction: "INFLOW" },
+      { provider: "CASSO", external_transaction_id: "TX-900", amount_vnd: book2.expected_amount_vnd, direction: "INFLOW" }
+    ]);
+    assert.equal(settlementOk.total_settlement_discrepancy, 0);
+
+    const settlementDiff = await db.rpcReconcileExternalSettlement([
+      { provider: "SEPAY", external_transaction_id: "TX-900", amount_vnd: book1.expected_amount_vnd - 500000, direction: "INFLOW" },
+      { provider: "SEPAY", external_transaction_id: "TX-GHOST-1", amount_vnd: 2000000, direction: "INFLOW" }
+    ]);
+    assert.equal(settlementDiff.amount_mismatch_count, 1);
+    assert.equal(settlementDiff.missing_in_db_count, 1);
   });
 
   await t.test("T-19: Hold Expiry Sweeper vs Concurrent Payment Lock Serialization", async () => {

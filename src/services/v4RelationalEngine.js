@@ -63,7 +63,9 @@ const SERVICE_ROLE_ONLY_RPCS = new Set([
   "expire_stale_holds_v4",
   "claim_refund_for_processing_v4",
   "finalize_refund_payout_v4",
-  "run_v4_reconciliation_checks"
+  "claim_due_outbox_events_v4",
+  "run_v4_reconciliation_checks",
+  "reconcile_external_settlement_v4"
 ]);
 
 const VALID_BOOKING_TRANSITIONS = {
@@ -495,10 +497,16 @@ if (!globalThis.__WANDERMATCH_V4_PG_CLUSTERS__) {
 }
 
 export class V4RelationalDatabase {
-  constructor(clusterName = "default") {
-    this.clusterName = clusterName;
-    if (!globalThis.__WANDERMATCH_V4_PG_CLUSTERS__.has(clusterName)) {
-      globalThis.__WANDERMATCH_V4_PG_CLUSTERS__.set(clusterName, {
+  constructor(clusterNameOrEnv = "default") {
+    if (typeof clusterNameOrEnv === "object" && clusterNameOrEnv !== null) {
+      this.env = clusterNameOrEnv;
+      this.clusterName = String(clusterNameOrEnv.V4_CLUSTER_NAME || "default");
+    } else {
+      this.env = {};
+      this.clusterName = String(clusterNameOrEnv || "default");
+    }
+    if (!globalThis.__WANDERMATCH_V4_PG_CLUSTERS__.has(this.clusterName)) {
+      globalThis.__WANDERMATCH_V4_PG_CLUSTERS__.set(this.clusterName, {
         tables: createDefaultSeedCatalog(),
         txMutex: Promise.resolve(),
         bookingSeq: 20260001
@@ -600,6 +608,9 @@ export class V4RelationalDatabase {
     }
 
     // 1. Table-level privilege check (REVOKE ALL FROM PUBLIC, anon, authenticated)
+    if (role === "anon") {
+      throw makeSqlError(`permission denied for table ${table}`, "42501", 403);
+    }
     if (SERVICE_ROLE_ONLY_TABLES.has(table) && role !== "service_role") {
       if (table === "user_sensitive_pii") {
         throw makeSqlError("permission denied for table user_sensitive_pii", "42501", 403);
@@ -690,6 +701,14 @@ export class V4RelationalDatabase {
 
     if (action === "UPDATE") {
       return this.withTransaction(async (t) => {
+        if (table === "profiles" && role !== "service_role" && !isAdmin && payload) {
+          const forbiddenCols = ["loyalty_tier", "loyalty_points", "email", "id"];
+          for (const col of forbiddenCols) {
+            if (Object.prototype.hasOwnProperty.call(payload, col)) {
+              throw makeSqlError("permission denied for table profiles", "42501", 403);
+            }
+          }
+        }
         const updated = [];
         for (let i = 0; i < t[table].length; i++) {
           const row = t[table][i];
@@ -832,8 +851,12 @@ export class V4RelationalDatabase {
         return this.rpcClaimRefundForProcessing(args.p_refund_id);
       case "finalize_refund_payout_v4":
         return this.rpcFinalizeRefundPayout(args);
+      case "claim_due_outbox_events_v4":
+        return this.rpcClaimDueOutboxEvents(args);
       case "run_v4_reconciliation_checks":
-        return this.rpcRunReconciliationChecks();
+        return this.rpcRunReconciliationChecks(args.p_v3_snapshot || null);
+      case "reconcile_external_settlement_v4":
+        return this.rpcReconcileExternalSettlement(args.p_settlement_records || []);
       default:
         throw makeSqlError(`function public.${rpcName} does not exist`, "42883", 404);
     }
@@ -1326,9 +1349,17 @@ export class V4RelationalDatabase {
 
       // Extract booking code from p_booking_code or p_transfer_content supporting both V4 ^WM[0-9]{8}$ and legacy V3 codes
       let resolvedCode = String(p_booking_code || "").trim().toUpperCase();
+      let isAmbiguousMemo = false;
       if (!resolvedCode && p_transfer_content) {
-        const m = String(p_transfer_content).match(/\b(WM(?:-?[A-Z0-9]{4,16})+)\b/i);
-        if (m) resolvedCode = m[1].toUpperCase();
+        const matches = [...String(p_transfer_content).matchAll(/\b(WM(?:-?[A-Z0-9]{4,16})+)\b/gi)].map(
+          m => m[1].toUpperCase()
+        );
+        const uniqueCodes = [...new Set(matches)];
+        if (uniqueCodes.length === 1) {
+          resolvedCode = uniqueCodes[0];
+        } else if (uniqueCodes.length > 1) {
+          isAmbiguousMemo = true;
+        }
       }
 
       // Upsert webhook inbox record
@@ -1374,6 +1405,18 @@ export class V4RelationalDatabase {
         };
       }
 
+      if (isAmbiguousMemo || !resolvedCode) {
+        whEvent.processing_status = "FAILED_UNMATCHED";
+        whEvent.error_message = `Ambiguous or missing booking code in transfer content: ${p_transfer_content}`;
+        whEvent.processed_at = new Date().toISOString();
+        return {
+          success: false,
+          status: "UNMATCHED_BOOKING_CODE",
+          http_status: 404,
+          error: "Ambiguous or missing booking code in transfer content."
+        };
+      }
+
       const booking = t.bookings.find(b => b.booking_code === resolvedCode);
       if (!booking) {
         whEvent.processing_status = "FAILED_UNMATCHED";
@@ -1381,6 +1424,7 @@ export class V4RelationalDatabase {
         whEvent.processed_at = new Date().toISOString();
         return {
           success: false,
+          status: "UNMATCHED_BOOKING_CODE",
           http_status: 404,
           error: "Booking code not found."
         };
@@ -1779,15 +1823,25 @@ export class V4RelationalDatabase {
       }
 
       const pay = t.payments.find(p => p.booking_id === bk.id);
+      let effectiveTier = String(p_tier || "EARLY_72H").trim().toUpperCase();
+      if (effectiveTier === "FORCE_MAJEURE_A") effectiveTier = "FORCE_MAJEURE";
+      else if (effectiveTier === "LATE_24_72H") effectiveTier = "WINDOW_24_72H";
+      else if (effectiveTier === "LAST_MINUTE_24H") effectiveTier = "LATE_OR_REVEALED";
+
       let feeRate = 1.0, partnerRate = 0.75;
       if (bk.status === "PAID_HOLD_CONFLICT") {
+        effectiveTier = "HOLD_CONFLICT_FULL";
         feeRate = 0.0; partnerRate = 0.0;
-      } else if (bk.is_revealed && p_tier !== "FORCE_MAJEURE") {
+      } else if (bk.is_revealed && effectiveTier !== "FORCE_MAJEURE") {
+        effectiveTier = "LATE_OR_REVEALED";
         feeRate = 1.0; partnerRate = 0.75;
-      } else if (p_tier === "EARLY_72H" || p_tier === "FORCE_MAJEURE") {
+      } else if (effectiveTier === "EARLY_72H" || effectiveTier === "FORCE_MAJEURE") {
         feeRate = 0.10; partnerRate = 0.0;
-      } else if (p_tier === "WINDOW_24_72H") {
+      } else if (effectiveTier === "WINDOW_24_72H") {
         feeRate = 0.35; partnerRate = 0.25;
+      } else {
+        effectiveTier = "LATE_OR_REVEALED";
+        feeRate = 1.0; partnerRate = 0.75;
       }
 
       const feeVnd = Math.round(bk.paid_amount_vnd * feeRate);
@@ -1798,6 +1852,7 @@ export class V4RelationalDatabase {
         return {
           mode: "QUOTE",
           booking_code: bk.booking_code,
+          tier_applied: effectiveTier,
           paid_snapshot_vnd: bk.paid_amount_vnd,
           cancellation_fee_vnd: feeVnd,
           partner_comp_vnd: partnerVnd,
@@ -1823,7 +1878,7 @@ export class V4RelationalDatabase {
         requested_by: uid,
         reviewed_by: null,
         idempotency_key: idemKey,
-        tier_applied: p_tier,
+        tier_applied: effectiveTier,
         paid_snapshot_vnd: bk.paid_amount_vnd,
         cancellation_fee_vnd: feeVnd,
         partner_comp_vnd: partnerVnd,
@@ -2127,14 +2182,56 @@ export class V4RelationalDatabase {
   }
 
   /**
-   * Transactional Outbox Poller with Exponential Backoff, Dead-Letter, and Bank Timeout Protection (T-12, T-13)
+   * RPC #12: claim_due_outbox_events_v4 (FOR UPDATE SKIP LOCKED + Lease Expiry Crash Recovery)
+   */
+  async rpcClaimDueOutboxEvents({
+    p_worker_id = "outbox-worker-1",
+    p_batch_limit = 20,
+    p_lease_seconds = 30,
+    p_now_ms = Date.now()
+  } = {}) {
+    return this.withTransaction(async (t) => {
+      const nowMs = Number(p_now_ms || Date.now());
+      const due = t.outbox_events
+        .filter(
+          e =>
+            (e.status === "PENDING" &&
+              new Date(e.next_attempt_at).getTime() <= nowMs &&
+              (!e.locked_until || new Date(e.locked_until).getTime() <= nowMs)) ||
+            (e.status === "PROCESSING" &&
+              e.locked_until &&
+              new Date(e.locked_until).getTime() <= nowMs)
+        )
+        .sort((a, b) => new Date(a.next_attempt_at).getTime() - new Date(b.next_attempt_at).getTime())
+        .slice(0, p_batch_limit);
+
+      const claimed = [];
+      const leaseUntil = new Date(nowMs + Math.max(5, Number(p_lease_seconds || 30)) * 1000).toISOString();
+      for (const evt of due) {
+        evt.status = "PROCESSING";
+        evt.locked_by = p_worker_id;
+        evt.locked_until = leaseUntil;
+        claimed.push(structuredClone(evt));
+      }
+      return {
+        claimed_count: claimed.length,
+        events: claimed
+      };
+    });
+  }
+
+  /**
+   * Transactional Outbox Poller with Exponential Backoff, Dead-Letter, Lease Recovery, and Bank Timeout Protection (T-12, T-13)
    */
   async processOutboxBatch({ bankGatewayFn, workerId = "outbox-worker-1", nowMs = Date.now() }) {
     const dueEvents = this.tables.outbox_events.filter(
       e =>
-        e.status === "PENDING" &&
-        new Date(e.next_attempt_at).getTime() <= nowMs &&
-        (!e.locked_until || new Date(e.locked_until).getTime() <= nowMs)
+        (e.status === "PENDING" &&
+          new Date(e.next_attempt_at).getTime() <= nowMs &&
+          (!e.locked_until || new Date(e.locked_until).getTime() <= nowMs)) ||
+        (e.status === "PROCESSING" &&
+          e.locked_until &&
+          new Date(e.locked_until).getTime() <= nowMs)
     );
 
     const results = [];
@@ -2248,26 +2345,49 @@ export class V4RelationalDatabase {
 
   /**
    * ETL Migration: Migrate V3.0 JSONB state into the 27-table V4.0 Relational Schema (T-10, T-19)
+   * 100% Idempotent: Running twice on the same v3State will NOT duplicate rows or throw PK/UNIQUE errors.
    */
   async migrateV3StateToV4(v3State = {}) {
     return this.withTransaction(async (t) => {
       let migratedBookings = 0;
       let migratedPayments = 0;
       let migratedRefunds = 0;
+      let skippedDuplicateBookings = 0;
 
       const defaultDest = t.destinations[0];
       const defaultHotel = t.hotels[0];
       const defaultFlight = t.flights[0];
 
+      const mapLegacyStatus = (rawStatus, paidAmt, expectedAmt, isRevealed) => {
+        const norm = String(rawStatus || "").trim().toUpperCase();
+        if (isRevealed) return "REVEALED";
+        if (norm === "CONFIRMED" || norm === "PAID") {
+          return paidAmt > expectedAmt ? "OVERPAID" : "PAID";
+        }
+        if (norm === "LOCKED" || norm === "PENDING_PAYMENT" || !norm) {
+          return paidAmt > 0 && paidAmt < expectedAmt ? "UNDERPAID" : "PENDING_PAYMENT";
+        }
+        if (VALID_BOOKING_TRANSITIONS[norm]) return norm;
+        return paidAmt >= expectedAmt && expectedAmt > 0 ? "PAID" : "PENDING_PAYMENT";
+      };
+
       for (const v3Bk of v3State.bookings || []) {
+        const bookingCode = String(v3Bk.bookingCode || "").trim().toUpperCase();
+        if (!bookingCode) continue;
+
+        // Idempotency guard: if this booking_code was already migrated, reuse existing records
+        let bkRow = t.bookings.find(b => b.booking_code === bookingCode);
+        let paymentRow = bkRow ? t.payments.find(p => p.booking_id === bkRow.id) : null;
+        let profile = null;
+
         const rawEmail = String(v3Bk.ownerEmail || v3Bk.customerEmail || "").trim().toLowerCase();
         // Remap legacy guest@wandermatch.vn to an isolated unclaimed legacy profile email
         const safeEmail =
           !rawEmail || rawEmail === "guest@wandermatch.vn"
-            ? `legacy.migrated.${String(v3Bk.bookingCode).toLowerCase()}@wandermatch.invalid`
+            ? `legacy.migrated.${bookingCode.toLowerCase()}@wandermatch.invalid`
             : rawEmail;
 
-        let profile = t.profiles.find(p => p.email === safeEmail);
+        profile = t.profiles.find(p => p.email === safeEmail);
         if (!profile) {
           profile = {
             id: crypto.randomUUID(),
@@ -2290,148 +2410,202 @@ export class V4RelationalDatabase {
           });
         }
 
-        const sessId = crypto.randomUUID();
         const groupSize = Math.max(1, Number(v3Bk.groupSize || 1));
-        const expectedAmount = Number(v3Bk.expectedAmount || v3Bk.packageCost || 5000000);
+        const expectedAmount = Number(
+          v3Bk.expectedAmount ?? v3Bk.packageCost ?? v3Bk.budgetPaid ?? 5000000
+        );
+        const paidAmount = Number(
+          v3Bk.paidAmount ??
+            (["PAID", "CONFIRMED", "REVEALED"].includes(String(v3Bk.status || "").toUpperCase())
+              ? expectedAmount
+              : 0)
+        );
         const unitPrice = Math.round(expectedAmount / groupSize);
 
-        t.recommendation_sessions.push({
-          id: sessId,
-          user_id: profile.id,
-          origin_airport: "SGN",
-          budget_per_person_vnd: Math.max(1000000, unitPrice),
-          group_size: groupSize,
-          departure_date: "2026-11-15",
-          duration_days: 3,
-          trip_purpose: "LEGACY_MIGRATED",
-          vec_healing: 80,
-          vec_nature: 80,
-          vec_solitude: 80,
-          vec_comfort: 80,
-          vec_culture: 80,
-          blacklisted_city_slugs: [],
-          comfort_locks: {},
-          ai_archetype_label: "Legacy Traveler",
-          created_at: v3Bk.createdAt || new Date().toISOString()
-        });
+        if (!bkRow) {
+          const sessId = crypto.randomUUID();
+          t.recommendation_sessions.push({
+            id: sessId,
+            user_id: profile.id,
+            origin_airport: "SGN",
+            budget_per_person_vnd: Math.max(1000000, unitPrice),
+            group_size: groupSize,
+            departure_date: "2026-11-15",
+            duration_days: 3,
+            trip_purpose: "LEGACY_MIGRATED",
+            vec_healing: 80,
+            vec_nature: 80,
+            vec_solitude: 80,
+            vec_comfort: 80,
+            vec_culture: 80,
+            blacklisted_city_slugs: [],
+            comfort_locks: {},
+            ai_archetype_label: "Legacy Traveler",
+            created_at: v3Bk.createdAt || new Date().toISOString()
+          });
 
-        const pkgId = crypto.randomUUID();
-        t.packages.push({
-          id: pkgId,
-          session_id: sessId,
-          user_id: profile.id,
-          rank_order: 1,
-          is_top_pick: true,
-          secret_destination_id: defaultDest.id,
-          secret_hotel_id: defaultHotel.id,
-          secret_flight_id: defaultFlight.id,
-          blind_code_alias: "LEGACY-MYSTERY-01",
-          climate_bucket_id: defaultDest.climate_bucket_id,
-          climate_zone_label: defaultDest.climate_zone_label,
-          temp_range_label: defaultDest.temp_range_label,
-          anonymized_hint: "Gói du lịch chuyển đổi từ phiên bản V3.0.",
-          packing_checklist: [],
-          hotel_star_tier: 5,
-          vibe_tier_alias: "Boutique Sanctuary & Spa",
-          flight_time_band: "MORNING",
-          mood_illustration_key: "MOOD_COOL_MIST_HIGHLAND",
-          display_price_band_vnd: "5.000.000đ - 5.500.000đ",
-          k_anonymity_count: 3,
-          group_size: groupSize,
-          unit_price_vnd: unitPrice,
-          expected_amount_vnd: expectedAmount,
-          retail_value_vnd: Math.round(expectedAmount * 1.25),
-          net_cost_vnd: Math.round(expectedAmount * 0.8),
-          similarity_score: 90,
-          total_score: 90,
-          score_breakdown: {},
-          status: "LOCKED_IN_BOOKING",
-          expires_at: new Date(Date.now() + 3600000).toISOString(),
-          created_at: v3Bk.createdAt || new Date().toISOString()
-        });
+          const pkgId = crypto.randomUUID();
+          t.packages.push({
+            id: pkgId,
+            session_id: sessId,
+            user_id: profile.id,
+            rank_order: 1,
+            is_top_pick: true,
+            secret_destination_id: defaultDest.id,
+            secret_hotel_id: defaultHotel.id,
+            secret_flight_id: defaultFlight.id,
+            blind_code_alias: "LEGACY-MYSTERY-01",
+            climate_bucket_id: defaultDest.climate_bucket_id,
+            climate_zone_label: defaultDest.climate_zone_label,
+            temp_range_label: defaultDest.temp_range_label,
+            anonymized_hint: "Gói du lịch chuyển đổi từ phiên bản V3.0.",
+            packing_checklist: [],
+            hotel_star_tier: 5,
+            vibe_tier_alias: "Boutique Sanctuary & Spa",
+            flight_time_band: "MORNING",
+            mood_illustration_key: "MOOD_COOL_MIST_HIGHLAND",
+            display_price_band_vnd: "5.000.000đ - 5.500.000đ",
+            k_anonymity_count: 3,
+            group_size: groupSize,
+            unit_price_vnd: unitPrice,
+            expected_amount_vnd: expectedAmount,
+            retail_value_vnd: Math.round(expectedAmount * 1.25),
+            net_cost_vnd: Math.round(expectedAmount * 0.8),
+            similarity_score: 90,
+            total_score: 90,
+            score_breakdown: {},
+            status: "LOCKED_IN_BOOKING",
+            expires_at: new Date(Date.now() + 3600000).toISOString(),
+            created_at: v3Bk.createdAt || new Date().toISOString()
+          });
 
-        const bkId = crypto.randomUUID();
-        const paidAmount = Number(v3Bk.paidAmount || 0);
-        const bkRow = {
-          id: bkId,
-          booking_code: String(v3Bk.bookingCode).toUpperCase(),
-          is_legacy_migrated: true,
-          user_id: profile.id,
-          package_id: pkgId,
-          group_size: groupSize,
-          expected_amount_vnd: expectedAmount,
-          paid_amount_vnd: paidAmount,
-          amount_due_vnd: Math.max(0, expectedAmount - paidAmount),
-          overpaid_amount_vnd: Math.max(0, paidAmount - expectedAmount),
-          status: v3Bk.status || "PENDING_PAYMENT",
-          is_revealed: Boolean(v3Bk.isRevealed),
-          revealed_at: v3Bk.revealedAt || null,
-          departure_date: "2026-11-15",
-          return_date: "2026-11-18",
-          hold_expires_at: v3Bk.holdExpiresAt || new Date(Date.now() + 1800000).toISOString(),
-          created_at: v3Bk.createdAt || new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-        this._enforceBookingTriggers(null, bkRow, t);
-        t.bookings.push(bkRow);
-        migratedBookings++;
+          const bkId = crypto.randomUUID();
+          const mappedStatus = mapLegacyStatus(
+            v3Bk.status,
+            paidAmount,
+            expectedAmount,
+            Boolean(v3Bk.isRevealed)
+          );
+          bkRow = {
+            id: bkId,
+            booking_code: bookingCode,
+            is_legacy_migrated: true,
+            user_id: profile.id,
+            package_id: pkgId,
+            group_size: groupSize,
+            expected_amount_vnd: expectedAmount,
+            paid_amount_vnd: paidAmount,
+            amount_due_vnd: Math.max(0, expectedAmount - paidAmount),
+            overpaid_amount_vnd: Math.max(0, paidAmount - expectedAmount),
+            status: mappedStatus,
+            is_revealed: Boolean(v3Bk.isRevealed),
+            revealed_at: v3Bk.revealedAt || (v3Bk.isRevealed ? new Date().toISOString() : null),
+            departure_date: "2026-11-15",
+            return_date: "2026-11-18",
+            hold_expires_at: v3Bk.holdExpiresAt || new Date(Date.now() + 1800000).toISOString(),
+            created_at: v3Bk.createdAt || new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          this._enforceBookingTriggers(null, bkRow, t);
+          t.bookings.push(bkRow);
+          migratedBookings++;
 
-        const payId = crypto.randomUUID();
-        const paymentRow = {
-          id: payId,
-          booking_id: bkId,
-          expected_amount_vnd: expectedAmount,
-          paid_amount_vnd: paidAmount,
-          refunded_amount_vnd: 0,
-          payment_status:
-            paidAmount === 0
-              ? "UNPAID"
-              : paidAmount < expectedAmount
-              ? "UNDERPAID"
-              : paidAmount === expectedAmount
-              ? "PAID"
-              : "OVERPAID",
-          last_transaction_at: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-        t.payments.push(paymentRow);
+          const payId = crypto.randomUUID();
+          paymentRow = {
+            id: payId,
+            booking_id: bkId,
+            expected_amount_vnd: expectedAmount,
+            paid_amount_vnd: paidAmount,
+            refunded_amount_vnd: 0,
+            payment_status:
+              paidAmount === 0
+                ? "UNPAID"
+                : paidAmount < expectedAmount
+                ? "UNDERPAID"
+                : paidAmount === expectedAmount
+                ? "PAID"
+                : "OVERPAID",
+            last_transaction_at: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          t.payments.push(paymentRow);
+        } else {
+          skippedDuplicateBookings++;
+        }
 
-        // Migrate associated V3 payments
+        // Migrate associated V3 payments idempotently
         const matchingV3Payments = (v3State.payments || []).filter(
           p => String(p.bookingCode).toUpperCase() === bkRow.booking_code
         );
+        let migratedInflowSum = 0;
         for (const p of matchingV3Payments) {
-          t.payment_transactions.push({
-            id: crypto.randomUUID(),
-            payment_id: payId,
-            booking_id: bkId,
-            webhook_event_id: null,
-            payment_provider: "SEPAY",
-            external_transaction_id: String(p.transactionId),
-            amount_vnd: Number(p.amount),
-            direction: "INFLOW",
-            bank_code: "MB",
-            transfer_content: `Migrated ${bkRow.booking_code}`,
-            created_at: p.verifiedAt || new Date().toISOString()
-          });
-          migratedPayments++;
+          const extTxId = String(p.transactionId);
+          const alreadyExists = t.payment_transactions.some(
+            tx => tx.payment_provider === "SEPAY" && tx.external_transaction_id === extTxId
+          );
+          migratedInflowSum += Number(p.amount || 0);
+          if (!alreadyExists) {
+            t.payment_transactions.push({
+              id: crypto.randomUUID(),
+              payment_id: paymentRow.id,
+              booking_id: bkRow.id,
+              webhook_event_id: null,
+              payment_provider: "SEPAY",
+              external_transaction_id: extTxId,
+              amount_vnd: Number(p.amount),
+              direction: "INFLOW",
+              bank_code: "MB",
+              transfer_content: `Migrated ${bkRow.booking_code}`,
+              created_at: p.verifiedAt || new Date().toISOString()
+            });
+            migratedPayments++;
+          }
         }
 
-        // Migrate associated V3 refunds
+        // Synthesize Opening Balance INFLOW transaction if a legacy paid booking lacks payment rows
+        if (paidAmount > migratedInflowSum) {
+          const openingDelta = paidAmount - migratedInflowSum;
+          const openingTxId = `MIG-OPENING-${bkRow.booking_code}`;
+          const hasOpeningTx = t.payment_transactions.some(
+            tx => tx.payment_provider === "SEPAY" && tx.external_transaction_id === openingTxId
+          );
+          if (!hasOpeningTx) {
+            t.payment_transactions.push({
+              id: crypto.randomUUID(),
+              payment_id: paymentRow.id,
+              booking_id: bkRow.id,
+              webhook_event_id: null,
+              payment_provider: "SEPAY",
+              external_transaction_id: openingTxId,
+              amount_vnd: openingDelta,
+              direction: "INFLOW",
+              bank_code: "MB",
+              transfer_content: `Opening balance migration ${bkRow.booking_code}`,
+              created_at: v3Bk.createdAt || new Date().toISOString()
+            });
+            migratedPayments++;
+          }
+        }
+
+        // Migrate associated V3 refunds idempotently
         const matchingV3Refunds = (v3State.refunds || []).filter(
           r => String(r.bookingCode).toUpperCase() === bkRow.booking_code
         );
         for (const r of matchingV3Refunds) {
+          const idemKey = `MIG-REF-${r.refundId}`;
+          if (t.refunds.some(existingRef => existingRef.idempotency_key === idemKey)) {
+            continue;
+          }
           const refAmt = Number(r.refundAmount || 0);
-          const feeAmt = Number(r.penaltyFee || 0);
+          const feeAmt = Number(r.penaltyFee ?? Math.max(0, paidAmount - refAmt));
           t.refunds.push({
             id: crypto.randomUUID(),
-            booking_id: bkId,
-            payment_id: payId,
+            booking_id: bkRow.id,
+            payment_id: paymentRow.id,
             requested_by: profile.id,
             reviewed_by: null,
-            idempotency_key: `MIG-REF-${r.refundId}`,
+            idempotency_key: idemKey,
             tier_applied: "EARLY_72H",
             paid_snapshot_vnd: paidAmount,
             cancellation_fee_vnd: feeAmt,
@@ -2449,6 +2623,10 @@ export class V4RelationalDatabase {
             updated_at: new Date().toISOString()
           });
           paymentRow.refunded_amount_vnd += refAmt;
+          paymentRow.payment_status =
+            paymentRow.refunded_amount_vnd >= paymentRow.paid_amount_vnd
+              ? "REFUNDED"
+              : "PARTIALLY_REFUNDED";
           migratedRefunds++;
         }
       }
@@ -2456,7 +2634,8 @@ export class V4RelationalDatabase {
       return {
         migrated_bookings: migratedBookings,
         migrated_payments: migratedPayments,
-        migrated_refunds: migratedRefunds
+        migrated_refunds: migratedRefunds,
+        skipped_duplicate_bookings: skippedDuplicateBookings
       };
     });
   }
@@ -2565,6 +2744,91 @@ export class V4RelationalDatabase {
       recon_6_unprocessed_webhooks: recon6,
       recon_7_ownership_mismatch: recon7,
       total_discrepancy: totalDiscrepancy
+    };
+  }
+
+  /**
+   * RPC #13: reconcile_external_settlement_v4 (Recon #8 — External Payment Gateway Settlement vs DB)
+   */
+  async rpcReconcileExternalSettlement(settlementRecords = []) {
+    const records = Array.isArray(settlementRecords) ? settlementRecords : [];
+    const t = this.tables;
+    const discrepancies = [];
+
+    let missingInDb = 0;
+    let missingAtProvider = 0;
+    let amountMismatch = 0;
+
+    // 1. Check each provider settlement record against payment_transactions
+    for (const sr of records) {
+      const provider = String(sr.payment_provider || sr.provider || "SEPAY").toUpperCase();
+      const extTxId = String(sr.external_transaction_id || "").trim();
+      const settledAmt = Number(sr.amount_vnd || 0);
+      const direction = String(sr.direction || "INFLOW").toUpperCase();
+
+      const dbTx = t.payment_transactions.find(
+        tx => tx.payment_provider === provider && tx.external_transaction_id === extTxId
+      );
+
+      if (!dbTx) {
+        missingInDb++;
+        discrepancies.push({
+          discrepancy_type: "MISSING_IN_DB",
+          provider,
+          external_transaction_id: extTxId,
+          settled_amount_vnd: settledAmt,
+          db_amount_vnd: 0,
+          direction,
+          booking_code: sr.booking_code || null
+        });
+      } else if (Number(dbTx.amount_vnd) !== settledAmt || dbTx.direction !== direction) {
+        amountMismatch++;
+        const bk = t.bookings.find(b => b.id === dbTx.booking_id);
+        discrepancies.push({
+          discrepancy_type: "AMOUNT_MISMATCH",
+          provider,
+          external_transaction_id: extTxId,
+          settled_amount_vnd: settledAmt,
+          db_amount_vnd: Number(dbTx.amount_vnd),
+          direction,
+          booking_code: bk ? bk.booking_code : sr.booking_code || null
+        });
+      }
+    }
+
+    // 2. Check DB transactions for any scoped provider that are missing in the provider settlement batch
+    const scopedProviders = new Set(records.map(r => String(r.payment_provider || r.provider || "SEPAY").toUpperCase()));
+    if (scopedProviders.size > 0) {
+      for (const dbTx of t.payment_transactions) {
+        if (!scopedProviders.has(dbTx.payment_provider)) continue;
+        const inSettlement = records.some(
+          sr =>
+            String(sr.payment_provider || sr.provider || "SEPAY").toUpperCase() === dbTx.payment_provider &&
+            String(sr.external_transaction_id || "").trim() === dbTx.external_transaction_id
+        );
+        if (!inSettlement) {
+          missingAtProvider++;
+          const bk = t.bookings.find(b => b.id === dbTx.booking_id);
+          discrepancies.push({
+            discrepancy_type: "MISSING_AT_PROVIDER",
+            provider: dbTx.payment_provider,
+            external_transaction_id: dbTx.external_transaction_id,
+            settled_amount_vnd: 0,
+            db_amount_vnd: Number(dbTx.amount_vnd),
+            direction: dbTx.direction,
+            booking_code: bk ? bk.booking_code : null
+          });
+        }
+      }
+    }
+
+    return {
+      statement_count: records.length,
+      missing_in_db_count: missingInDb,
+      missing_at_provider_count: missingAtProvider,
+      amount_mismatch_count: amountMismatch,
+      total_settlement_discrepancy: missingInDb + missingAtProvider + amountMismatch,
+      discrepancies
     };
   }
 }

@@ -341,6 +341,8 @@ SET search_path = pg_catalog, public
 AS $$
 DECLARE
     v_provider VARCHAR(30) := COALESCE(NULLIF(trim(p_provider), ''), 'SEPAY');
+    v_resolved_code VARCHAR(30) := NULLIF(upper(trim(COALESCE(p_booking_code, ''))), '');
+    v_code_matches TEXT[];
     v_booking public.bookings%ROWTYPE;
     v_payment public.payments%ROWTYPE;
     v_old_booking_status VARCHAR(35);
@@ -357,6 +359,23 @@ BEGIN
         RAISE EXCEPTION 'INVALID_AMOUNT: Transfer amount must be positive.' USING ERRCODE = '22023';
     END IF;
 
+    -- Extract and validate booking code from p_transfer_content when p_booking_code is omitted
+    SELECT ARRAY(
+        SELECT DISTINCT upper(m[1])
+        FROM regexp_matches(COALESCE(p_transfer_content, ''), '\m(WM(?:-?[A-Za-z0-9]{4,16})+)\M', 'gi') AS m
+    ) INTO v_code_matches;
+
+    IF v_resolved_code IS NULL THEN
+        IF COALESCE(array_length(v_code_matches, 1), 0) = 1 THEN
+            v_resolved_code := v_code_matches[1];
+        ELSIF COALESCE(array_length(v_code_matches, 1), 0) > 1 THEN
+            -- Ambiguous multiple booking codes in transfer memo must be rejected safely
+            v_resolved_code := '__AMBIGUOUS__';
+        END IF;
+    ELSIF COALESCE(array_length(v_code_matches, 1), 0) > 1 THEN
+        v_resolved_code := '__AMBIGUOUS__';
+    END IF;
+
     -- 1. Check if this provider-scoped bank transaction was already processed
     SELECT id INTO v_tx_id
     FROM public.payment_transactions
@@ -365,12 +384,12 @@ BEGIN
     LIMIT 1;
 
     IF v_tx_id IS NOT NULL THEN
-        SELECT * INTO v_booking FROM public.bookings WHERE booking_code = p_booking_code;
+        SELECT * INTO v_booking FROM public.bookings WHERE booking_code = v_resolved_code;
         RETURN jsonb_build_object(
             'success', TRUE,
             'http_status', 200,
             'idempotent_replay', TRUE,
-            'booking_code', COALESCE(v_booking.booking_code, p_booking_code),
+            'booking_code', COALESCE(v_booking.booking_code, v_resolved_code),
             'status', COALESCE(v_booking.status, 'UNKNOWN'),
             'expected_amount_vnd', COALESCE(v_booking.expected_amount_vnd, 0),
             'paid_amount_vnd', COALESCE(v_booking.paid_amount_vnd, 0),
@@ -383,7 +402,7 @@ BEGIN
     INSERT INTO public.payment_webhook_events (
         provider, provider_event_id, raw_payload, processing_status
     ) VALUES (
-        v_provider, p_provider_event_id, p_raw_payload, 'RECEIVED'
+        v_provider, COALESCE(NULLIF(trim(p_provider_event_id), ''), p_external_tx_id), COALESCE(p_raw_payload, '{}'::jsonb), 'RECEIVED'
     )
     ON CONFLICT (provider, provider_event_id) DO UPDATE
         SET raw_payload = EXCLUDED.raw_payload
@@ -392,20 +411,21 @@ BEGIN
     -- 3. Lock target Booking row FOR UPDATE
     SELECT * INTO v_booking
     FROM public.bookings
-    WHERE booking_code = p_booking_code
+    WHERE booking_code = v_resolved_code
     FOR UPDATE;
 
     IF NOT FOUND THEN
         UPDATE public.payment_webhook_events
         SET processing_status = 'FAILED_UNMATCHED',
-            error_message = 'Booking code not found: ' || COALESCE(p_booking_code, 'NULL'),
+            error_message = 'Booking code not found or ambiguous: ' || COALESCE(v_resolved_code, 'NULL'),
             processed_at = NOW()
         WHERE id = v_webhook_id;
 
         RETURN jsonb_build_object(
             'success', FALSE,
             'http_status', 404,
-            'error', 'Booking code not found.'
+            'status', 'UNMATCHED_BOOKING_CODE',
+            'error', 'Booking code not found or ambiguous.'
         );
     END IF;
 
@@ -844,6 +864,7 @@ DECLARE
     v_caller_uid UUID := auth.uid();
     v_bk public.bookings%ROWTYPE;
     v_pay public.payments%ROWTYPE;
+    v_effective_tier VARCHAR(30);
     v_fee_rate NUMERIC(5,2);
     v_partner_rate NUMERIC(5,2);
     v_fee_vnd BIGINT;
@@ -870,15 +891,27 @@ BEGIN
 
     SELECT * INTO v_pay FROM public.payments WHERE booking_id = v_bk.id FOR UPDATE;
 
+    -- Normalize tier aliases and enforce post-reveal / hold-conflict tier overrides
+    v_effective_tier := CASE
+        WHEN p_tier IN ('FORCE_MAJEURE', 'FORCE_MAJEURE_A') THEN 'FORCE_MAJEURE'
+        WHEN p_tier IN ('WINDOW_24_72H', 'LATE_24_72H') THEN 'WINDOW_24_72H'
+        WHEN p_tier = 'EARLY_72H' THEN 'EARLY_72H'
+        WHEN p_tier = 'HOLD_CONFLICT_FULL' THEN 'HOLD_CONFLICT_FULL'
+        ELSE 'LATE_OR_REVEALED'
+    END;
+
     IF v_bk.status = 'PAID_HOLD_CONFLICT' THEN
+        v_effective_tier := 'HOLD_CONFLICT_FULL';
         v_fee_rate := 0.00; v_partner_rate := 0.00;
-    ELSIF v_bk.is_revealed AND p_tier <> 'FORCE_MAJEURE' THEN
+    ELSIF v_bk.is_revealed AND v_effective_tier <> 'FORCE_MAJEURE' THEN
+        v_effective_tier := 'LATE_OR_REVEALED';
         v_fee_rate := 1.00; v_partner_rate := 0.75;
-    ELSIF p_tier = 'EARLY_72H' OR p_tier = 'FORCE_MAJEURE' THEN
+    ELSIF v_effective_tier = 'EARLY_72H' OR v_effective_tier = 'FORCE_MAJEURE' THEN
         v_fee_rate := 0.10; v_partner_rate := 0.00;
-    ELSIF p_tier = 'WINDOW_24_72H' THEN
+    ELSIF v_effective_tier = 'WINDOW_24_72H' THEN
         v_fee_rate := 0.35; v_partner_rate := 0.25;
     ELSE
+        v_effective_tier := 'LATE_OR_REVEALED';
         v_fee_rate := 1.00; v_partner_rate := 0.75;
     END IF;
 
@@ -890,6 +923,7 @@ BEGIN
         RETURN jsonb_build_object(
             'mode', 'QUOTE',
             'booking_code', v_bk.booking_code,
+            'tier_applied', v_effective_tier,
             'paid_snapshot_vnd', v_bk.paid_amount_vnd,
             'cancellation_fee_vnd', v_fee_vnd,
             'partner_comp_vnd', v_partner_vnd,
@@ -905,7 +939,7 @@ BEGIN
     ) VALUES (
         v_bk.id, v_pay.id, v_caller_uid,
         COALESCE(p_idempotency_key, 'REQ-' || v_bk.booking_code || '-' || extract(epoch from now())::bigint),
-        p_tier, v_bk.paid_amount_vnd, v_fee_vnd,
+        v_effective_tier, v_bk.paid_amount_vnd, v_fee_vnd,
         v_partner_vnd, v_refund_vnd, p_reason, p_evidence_url,
         'REQUESTED', NOW()
     ) RETURNING * INTO v_refund;
@@ -921,7 +955,9 @@ BEGIN
     RETURN jsonb_build_object(
         'mode', 'REQUEST',
         'refund_id', v_refund.id,
+        'tier_applied', v_refund.tier_applied,
         'status', v_refund.status,
+        'cancellation_fee_vnd', v_refund.cancellation_fee_vnd,
         'refund_amount_vnd', v_refund.refund_amount_vnd
     );
 END;
@@ -1180,4 +1216,63 @@ $$;
 
 REVOKE ALL ON FUNCTION public.finalize_refund_payout_v4(UUID, VARCHAR, VARCHAR, TEXT) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.finalize_refund_payout_v4(UUID, VARCHAR, VARCHAR, TEXT) TO service_role;
+
+-- ============================================================================
+-- 12. SERVICE-ROLE RPC: claim_due_outbox_events_v4
+-- Atomically claims due PENDING or stale-locked PROCESSING outbox events using
+-- FOR UPDATE SKIP LOCKED (prevents duplicate worker execution and recovers after crash).
+-- ============================================================================
+CREATE OR REPLACE FUNCTION public.claim_due_outbox_events_v4(
+    p_worker_id VARCHAR,
+    p_batch_limit INT DEFAULT 20,
+    p_lease_seconds INT DEFAULT 30
+) RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog, public
+AS $$
+DECLARE
+    v_evt public.outbox_events%ROWTYPE;
+    v_claimed JSONB := '[]'::jsonb;
+BEGIN
+    FOR v_evt IN
+        SELECT * FROM public.outbox_events
+        WHERE (
+            (status = 'PENDING' AND next_attempt_at <= NOW() AND (locked_until IS NULL OR locked_until <= NOW()))
+            OR
+            (status = 'PROCESSING' AND locked_until IS NOT NULL AND locked_until <= NOW())
+        )
+        ORDER BY next_attempt_at ASC
+        LIMIT p_batch_limit
+        FOR UPDATE SKIP LOCKED
+    LOOP
+        -- Skip REFUND_PAYOUT_REQUESTED if the underlying refund is locked in RECONCILIATION_REQUIRED
+        IF v_evt.event_type = 'REFUND_PAYOUT_REQUESTED' AND EXISTS (
+            SELECT 1 FROM public.refunds r
+            WHERE r.id = v_evt.aggregate_id
+              AND r.status = 'RECONCILIATION_REQUIRED'
+        ) THEN
+            CONTINUE;
+        END IF;
+
+        UPDATE public.outbox_events
+        SET status = 'PROCESSING',
+            locked_by = COALESCE(NULLIF(trim(p_worker_id), ''), 'outbox-worker'),
+            locked_until = NOW() + make_interval(secs => GREATEST(5, p_lease_seconds))
+        WHERE id = v_evt.id
+        RETURNING * INTO v_evt;
+
+        v_claimed := v_claimed || jsonb_build_array(to_jsonb(v_evt));
+    END LOOP;
+
+    RETURN jsonb_build_object(
+        'claimed_count', jsonb_array_length(v_claimed),
+        'events', v_claimed
+    );
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.claim_due_outbox_events_v4(VARCHAR, INT, INT) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.claim_due_outbox_events_v4(VARCHAR, INT, INT) TO service_role;
+
 

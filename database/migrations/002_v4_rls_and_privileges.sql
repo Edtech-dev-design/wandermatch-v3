@@ -32,15 +32,52 @@ ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.system_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.outbox_events ENABLE ROW LEVEL SECURITY;
 
--- 2. STRICT TABLE-LEVEL PRIVILEGE ISOLATION FOR PII VAULT & TRANSACTIONAL OUTBOX
-REVOKE ALL ON TABLE public.user_sensitive_pii FROM PUBLIC, anon, authenticated;
-GRANT ALL ON TABLE public.user_sensitive_pii TO service_role;
+-- 2. STRICT TABLE-LEVEL PRIVILEGE ISOLATION (DEFAULT-DENY FOR MUTATIONS)
+REVOKE ALL ON ALL TABLES IN SCHEMA public FROM PUBLIC, anon, authenticated;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO service_role;
 
-REVOKE ALL ON TABLE public.outbox_events FROM PUBLIC, anon, authenticated;
-GRANT ALL ON TABLE public.outbox_events TO service_role;
+-- Read-only SELECT privileges for authenticated (governed by RLS policies below)
+-- Note: public.user_sensitive_pii has ZERO table grants for anon/authenticated!
+GRANT SELECT ON TABLE
+  public.profiles,
+  public.user_roles,
+  public.user_preferences,
+  public.destinations,
+  public.travel_providers,
+  public.hotels,
+  public.flights,
+  public.partner_inventories,
+  public.recommendation_sessions,
+  public.packages,
+  public.package_items,
+  public.bookings,
+  public.booking_items,
+  public.booking_travelers,
+  public.inventory_holds,
+  public.booking_status_history,
+  public.payments,
+  public.payment_webhook_events,
+  public.payment_transactions,
+  public.refunds,
+  public.reviews,
+  public.saved_packages,
+  public.notifications,
+  public.audit_logs,
+  public.system_settings,
+  public.outbox_events
+TO authenticated;
 
-REVOKE ALL ON TABLE public.payment_webhook_events FROM PUBLIC, anon, authenticated;
-GRANT ALL ON TABLE public.payment_webhook_events TO service_role;
+-- Public read-only access for anon on public reviews and public system_settings (governed by RLS)
+GRANT SELECT ON TABLE public.reviews, public.system_settings TO anon;
+
+-- Strict column-level & self-service mutation grants for authenticated (governed by RLS)
+-- Users may only update non-privileged profile fields (blocks loyalty_tier, loyalty_points, email tampering)
+GRANT UPDATE (full_name, phone, avatar_url, updated_at) ON TABLE public.profiles TO authenticated;
+GRANT INSERT, UPDATE, DELETE ON TABLE public.user_preferences, public.saved_packages TO authenticated;
+GRANT INSERT ON TABLE public.reviews TO authenticated;
+GRANT UPDATE (is_read) ON TABLE public.notifications TO authenticated;
+GRANT UPDATE ON TABLE public.travel_providers, public.partner_inventories TO authenticated;
+GRANT INSERT, UPDATE, DELETE ON TABLE public.user_roles, public.system_settings TO authenticated;
 
 -- 3. RLS POLICIES FOR ALL 27 TABLES
 

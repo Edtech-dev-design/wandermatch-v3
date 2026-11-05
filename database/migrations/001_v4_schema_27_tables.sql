@@ -12,39 +12,9 @@ REVOKE CREATE ON SCHEMA public FROM PUBLIC, anon, authenticated;
 GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
 
 -- ============================================================================
--- 2. HELPER FUNCTIONS FOR RLS & IMMUTABLE AUDIT PROTECTION
--- (All SECURITY DEFINER functions strictly use SET search_path = pg_catalog, public)
+-- 2. HELPER FUNCTION FOR IMMUTABLE AUDIT PROTECTION
+-- (All functions strictly use SET search_path = pg_catalog, public)
 -- ============================================================================
-CREATE OR REPLACE FUNCTION public.is_admin(p_uid UUID DEFAULT auth.uid())
-RETURNS BOOLEAN
-LANGUAGE sql
-SECURITY DEFINER
-SET search_path = pg_catalog, public
-STABLE
-AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM public.user_roles
-    WHERE user_id = p_uid
-      AND role IN ('admin', 'super_admin')
-      AND is_active = TRUE
-  );
-$$;
-
-CREATE OR REPLACE FUNCTION public.is_super_admin(p_uid UUID DEFAULT auth.uid())
-RETURNS BOOLEAN
-LANGUAGE sql
-SECURITY DEFINER
-SET search_path = pg_catalog, public
-STABLE
-AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM public.user_roles
-    WHERE user_id = p_uid
-      AND role = 'super_admin'
-      AND is_active = TRUE
-  );
-$$;
-
 CREATE OR REPLACE FUNCTION public.prevent_immutable_modification()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -107,6 +77,43 @@ CREATE TABLE IF NOT EXISTS public.user_roles (
     CONSTRAINT uq_user_roles_pair UNIQUE (user_id, role)
 );
 CREATE INDEX IF NOT EXISTS idx_user_roles_user_active ON public.user_roles(user_id, is_active);
+
+-- HELPER FUNCTIONS FOR RBAC & RLS (Created after public.user_roles exists)
+CREATE OR REPLACE FUNCTION public.is_admin(p_uid UUID DEFAULT auth.uid())
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = pg_catalog, public
+STABLE
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.user_roles
+    WHERE user_id = p_uid
+      AND role IN ('admin', 'super_admin')
+      AND is_active = TRUE
+  );
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_super_admin(p_uid UUID DEFAULT auth.uid())
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = pg_catalog, public
+STABLE
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.user_roles
+    WHERE user_id = p_uid
+      AND role = 'super_admin'
+      AND is_active = TRUE
+  );
+$$;
+
+REVOKE ALL ON FUNCTION public.is_admin(UUID) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.is_admin(UUID) TO anon, authenticated, service_role;
+
+REVOKE ALL ON FUNCTION public.is_super_admin(UUID) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.is_super_admin(UUID) TO anon, authenticated, service_role;
 
 -- TABLE #4: user_preferences
 CREATE TABLE IF NOT EXISTS public.user_preferences (

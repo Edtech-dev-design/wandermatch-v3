@@ -448,30 +448,57 @@ window.sealUnrevealedPackage = function(pkg) {
   if (!pkg || typeof pkg !== "object" || pkg.isRevealed) return pkg;
   const copy = { ...pkg };
   delete copy.realDays;
+  delete copy.comboId;
+  delete copy.food;
+  delete copy.secret_destination_id;
+  delete copy.secret_hotel_id;
+  delete copy.secret_flight_id;
   if (copy.reveal && typeof copy.reveal === "object") {
     copy.reveal = {
       ...copy.reveal,
       city: "✦ ĐIỂM ĐẾN NIÊM PHONG SÁP ✦",
       hotel: "Resort 4-5★ Tiêu Chuẩn Quốc Tế SLA (Niêm Phong Tên)",
       title: (copy.hotel && copy.hotel.mysteryTitle) || "Kỳ Nghỉ Bí Mật 3N2Đ (Niêm Phong Danh Tính)",
-      transport: copy.flightLabel || "Chuyến bay khứ hồi chuẩn SLA (✈️ Sân bay bí mật)"
+      transport: copy.flightLabel || "Chuyến bay khứ hồi chuẩn SLA (✈️ Sân bay bí mật)",
+      sla: "SLA-SEALED-UNTIL-REVEAL"
     };
   }
   if (copy.hotel && typeof copy.hotel === "object") {
     copy.hotel = {
-      ...copy.hotel,
       city: "ĐIỂM ĐẾN BÍ MẬT",
       name: copy.hotel.mysteryStayLabel || "Resort 4-5★ Tiêu Chuẩn Quốc Tế SLA",
       title: copy.hotel.mysteryTitle || "Kỳ Nghỉ Bí Mật 3N2Đ",
-      days: copy.hotel.mysteryDays || []
+      region: copy.hotel.region || "Miền Bí Mật",
+      climate: copy.hotel.climate || "Khí hậu dễ chịu",
+      temp: copy.hotel.temp || "18°C - 26°C",
+      hint: copy.hotel.hint || "Không gian nghỉ dưỡng tuyển chọn nghiêm ngặt theo tiêu chuẩn SLA.",
+      packing: Array.isArray(copy.hotel.packing) ? copy.hotel.packing : [],
+      mysteryTitle: copy.hotel.mysteryTitle || "Kỳ Nghỉ Bí Mật 3N2Đ",
+      mysteryStayLabel: copy.hotel.mysteryStayLabel || "Resort 4-5★ Tiêu Chuẩn Quốc Tế SLA",
+      mysteryDays: Array.isArray(copy.hotel.mysteryDays) ? copy.hotel.mysteryDays : [],
+      days: Array.isArray(copy.hotel.mysteryDays) ? copy.hotel.mysteryDays : [],
+      vibe: copy.hotel.vibe ? { ...copy.hotel.vibe } : undefined,
+      rating: copy.hotel.rating || "4.9",
+      room_type: "Hạng phòng Deluxe / Suite Tiêu Chuẩn SLA (Niêm phong)",
+      room_specs: "Không gian nghỉ dưỡng chuẩn 4-5★, tầm nhìn thiên nhiên khoáng đạt (Chi tiết mở khóa khi Reveal)",
+      amenities: ["Spa & Wellness chuẩn SLA", "Ẩm thực bản địa tinh tuyển", "Không gian riêng tư yên tĩnh"]
     };
+    delete copy.hotel.id;
+    delete copy.hotel.sla;
+    delete copy.hotel.food;
+    delete copy.hotel.realDays;
   }
   if (copy.flight && typeof copy.flight === "object") {
     copy.flight = {
-      ...copy.flight,
       city: "SÂN BAY BÍ MẬT",
-      id: "SEALED"
+      id: "SEALED",
+      airline: "Hãng Hàng Không Chuẩn SLA (Mở khóa khi Reveal)",
+      time: "Khung giờ bay tiêu chuẩn (Sáng / Trưa)",
+      bag: copy.flight.bag || "23kg Ký gửi + 07kg Xách tay"
     };
+  }
+  if (Array.isArray(copy.candidates)) {
+    copy.candidates = copy.candidates.map(c => window.sealUnrevealedPackage(c));
   }
   return copy;
 };

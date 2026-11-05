@@ -185,3 +185,96 @@ $$;
 REVOKE ALL ON FUNCTION public.run_v4_reconciliation_checks() FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.run_v4_reconciliation_checks() TO service_role;
 
+-- ============================================================================
+-- 3. EXTERNAL PAYMENT PROVIDER SETTLEMENT RECONCILIATION (Recon #8)
+-- Compares bank/gateway settlement statement rows against public.payment_transactions
+-- to detect MISSING_IN_DB, MISSING_AT_PROVIDER, and AMOUNT_MISMATCH discrepancies.
+-- ============================================================================
+CREATE OR REPLACE FUNCTION public.reconcile_external_settlement_v4(p_settlement_records JSONB)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog, public
+STABLE
+AS $$
+DECLARE
+    v_missing_in_db BIGINT := 0;
+    v_missing_at_provider BIGINT := 0;
+    v_amount_mismatch BIGINT := 0;
+    v_anomalies JSONB := '[]'::jsonb;
+BEGIN
+    IF p_settlement_records IS NULL OR jsonb_typeof(p_settlement_records) <> 'array' THEN
+        RAISE EXCEPTION 'INVALID_SETTLEMENT_PAYLOAD: Expected JSONB array.' USING ERRCODE = '22023';
+    END IF;
+
+    -- 1. Transactions present in Bank Settlement Statement but missing in DB
+    SELECT COUNT(*), COALESCE(jsonb_agg(jsonb_build_object(
+        'anomaly_type', 'MISSING_IN_DB',
+        'payment_provider', UPPER(COALESCE(s->>'payment_provider', s->>'provider', 'SEPAY')),
+        'external_transaction_id', s->>'external_transaction_id',
+        'statement_amount_vnd', (s->>'amount_vnd')::BIGINT
+    )), '[]'::jsonb)
+    INTO v_missing_in_db, v_anomalies
+    FROM jsonb_array_elements(p_settlement_records) s
+    LEFT JOIN public.payment_transactions tx
+      ON tx.payment_provider = UPPER(COALESCE(s->>'payment_provider', s->>'provider', 'SEPAY'))
+     AND tx.external_transaction_id = (s->>'external_transaction_id')
+    WHERE tx.id IS NULL;
+
+    -- 2. Transactions present in both, but amount_vnd or direction differs
+    WITH mismatches AS (
+        SELECT
+            UPPER(COALESCE(s->>'payment_provider', s->>'provider', 'SEPAY')) AS payment_provider,
+            s->>'external_transaction_id' AS external_transaction_id,
+            (s->>'amount_vnd')::BIGINT AS statement_amount_vnd,
+            tx.amount_vnd AS db_amount_vnd
+        FROM jsonb_array_elements(p_settlement_records) s
+        JOIN public.payment_transactions tx
+          ON tx.payment_provider = UPPER(COALESCE(s->>'payment_provider', s->>'provider', 'SEPAY'))
+         AND tx.external_transaction_id = (s->>'external_transaction_id')
+        WHERE tx.amount_vnd <> (s->>'amount_vnd')::BIGINT
+           OR COALESCE(UPPER(s->>'direction'), 'INFLOW') <> tx.direction
+    )
+    SELECT COUNT(*), v_anomalies || COALESCE(jsonb_agg(jsonb_build_object(
+        'anomaly_type', 'AMOUNT_MISMATCH',
+        'payment_provider', m.payment_provider,
+        'external_transaction_id', m.external_transaction_id,
+        'statement_amount_vnd', m.statement_amount_vnd,
+        'db_amount_vnd', m.db_amount_vnd
+    )), '[]'::jsonb)
+    INTO v_amount_mismatch, v_anomalies
+    FROM mismatches m;
+
+    -- 3. Transactions recorded in DB for the providers in statement, but missing from statement
+    WITH db_unmatched AS (
+        SELECT tx.payment_provider, tx.external_transaction_id, tx.amount_vnd
+        FROM public.payment_transactions tx
+        WHERE NOT EXISTS (
+            SELECT 1 FROM jsonb_array_elements(p_settlement_records) s
+            WHERE UPPER(COALESCE(s->>'payment_provider', s->>'provider', 'SEPAY')) = tx.payment_provider
+              AND (s->>'external_transaction_id') = tx.external_transaction_id
+        )
+    )
+    SELECT COUNT(*), v_anomalies || COALESCE(jsonb_agg(jsonb_build_object(
+        'anomaly_type', 'MISSING_AT_PROVIDER',
+        'payment_provider', u.payment_provider,
+        'external_transaction_id', u.external_transaction_id,
+        'db_amount_vnd', u.amount_vnd
+    )), '[]'::jsonb)
+    INTO v_missing_at_provider, v_anomalies
+    FROM db_unmatched u;
+
+    RETURN jsonb_build_object(
+        'missing_in_db_count', v_missing_in_db,
+        'missing_at_provider_count', v_missing_at_provider,
+        'amount_mismatch_count', v_amount_mismatch,
+        'total_settlement_discrepancy', (v_missing_in_db + v_missing_at_provider + v_amount_mismatch),
+        'anomalies', v_anomalies
+    );
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.reconcile_external_settlement_v4(JSONB) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.reconcile_external_settlement_v4(JSONB) TO service_role;
+
+
