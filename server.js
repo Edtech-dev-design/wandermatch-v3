@@ -35,7 +35,7 @@ const WORKER_ENV = {
   SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
   SESSION_SECRET: process.env.SESSION_SECRET || 'local-development-session-secret',
   PAYMENT_WEBHOOK_SECRET: process.env.PAYMENT_WEBHOOK_SECRET || '',
-  ADMIN_EMAILS: process.env.ADMIN_EMAILS || 'admin@wandermatch.vn',
+  ADMIN_EMAILS: process.env.ADMIN_EMAILS || '',
   AI_API_KEY: process.env.AI_API_KEY || '',
   GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
   COMPANY_BANK_ID: process.env.COMPANY_BANK_ID || 'MB',
@@ -129,7 +129,15 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  if (WORKER_API_PATHS.has(pathname)) {
+  if (['/api/planner/generate', '/api/reveal', '/api/escrow/ledgers', '/api/customer/profile'].includes(pathname)) {
+    return sendJson(res, 410, {
+      success: false,
+      code: 'ENDPOINT_DECOMMISSIONED_V4',
+      error: 'Legacy V3 endpoint decommissioned in WanderMatch V4.0. Use /api/v4/* or /api/*.'
+    });
+  }
+
+  if (WORKER_API_PATHS.has(pathname) || pathname.startsWith('/api/v4/')) {
     try {
       const headers = new Headers();
       for (const name of ['content-type', 'authorization', 'x-webhook-secret']) {

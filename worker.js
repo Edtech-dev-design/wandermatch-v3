@@ -1,7 +1,8 @@
 // ============================================================================
-// WANDERMATCH DUAL-CORE OTA BLIND BOOKING ENGINE (CLOUDFLARE WORKER)
-// Phase 1.5 Security & Data Integrity Hotfix
+// WANDERMATCH DUAL-CORE OTA BLIND BOOKING ENGINE (CLOUDFLARE WORKER V4.0)
+// Phase 3 Architecture Refactor & Security Hardening
 // ============================================================================
+import { V4RelationalDatabase } from "./src/services/v4RelationalEngine.js";
 
 // 1. KHO DỮ LIỆU CHUYẾN BAY ĐA TUYẾN (FLIGHT API MOCK)
 const FLIGHTS_DB = [
@@ -564,10 +565,12 @@ const STORAGE = {
   recommendations: {}
 };
 
-let storageMutexChain = Promise.resolve();
+if (!globalThis.__WM_DISTRIBUTED_STORAGE_LOCK__) {
+  globalThis.__WM_DISTRIBUTED_STORAGE_LOCK__ = Promise.resolve();
+}
 function withStorageLock(taskFn) {
-  const next = storageMutexChain.then(taskFn, taskFn);
-  storageMutexChain = next.catch(() => {});
+  const next = globalThis.__WM_DISTRIBUTED_STORAGE_LOCK__.then(taskFn, taskFn);
+  globalThis.__WM_DISTRIBUTED_STORAGE_LOCK__ = next.catch(() => {});
   return next;
 }
 
@@ -586,16 +589,63 @@ function supabaseStateHeaders(env) {
   };
 }
 
-function mergeByKey(existingArr = [], incomingArr = [], keyFn) {
+const BOOKING_STATUS_RANK = {
+  PENDING_PAYMENT: 1,
+  EXPIRED: 2,
+  UNDERPAID: 3,
+  PAID_HOLD_CONFLICT: 4,
+  PAID: 5,
+  OVERPAID: 6,
+  REFUND_REQUESTED: 7,
+  REFUND_APPROVED: 8,
+  REFUND_PROCESSING: 9,
+  REFUND_RECONCILIATION_REQUIRED: 10,
+  REFUNDED: 11,
+  REVEALED: 12,
+  COMPLETED: 13
+};
+
+function mergeBookingRecordMonotonic(localBk, remoteBk) {
+  if (!localBk) return remoteBk;
+  if (!remoteBk) return localBk;
+  const localPaid = Number(localBk.paidAmount || 0);
+  const remotePaid = Number(remoteBk.paidAmount || 0);
+  const localRank = BOOKING_STATUS_RANK[localBk.status] || 0;
+  const remoteRank = BOOKING_STATUS_RANK[remoteBk.status] || 0;
+
+  // Authoritative monotonic progression: never allow a stale isolate's PENDING_PAYMENT (paidAmount=0)
+  // to overwrite a remote PAID/UNDERPAID/REVEALED booking!
+  const winner = (remotePaid > localPaid || remoteRank > localRank) ? remoteBk : localBk;
+  const loser = winner === remoteBk ? localBk : remoteBk;
+  const merged = {
+    ...loser,
+    ...winner,
+    paidAmount: Math.max(localPaid, remotePaid),
+    isRevealed: Boolean(localBk.isRevealed || remoteBk.isRevealed),
+    revealedAt: localBk.revealedAt || remoteBk.revealedAt || null,
+    paidAt: localBk.paidAt || remoteBk.paidAt || null
+  };
+  const exp = Number(merged.expectedAmount || merged.packageCost || 0);
+  merged.amountDue = Math.max(0, exp - merged.paidAmount);
+  merged.isOverpaid = merged.paidAmount > exp;
+  merged.overpaidAmount = merged.isOverpaid ? (merged.paidAmount - exp) : 0;
+  return merged;
+}
+
+function mergeByKey(existingArr = [], incomingArr = [], keyFn, customMergeFn = null) {
   const map = new Map();
-  for (const item of incomingArr) {
+  for (const item of existingArr) {
     if (item) map.set(keyFn(item), item);
   }
-  for (const item of existingArr) {
+  for (const item of incomingArr) {
     if (item) {
       const k = keyFn(item);
       const prev = map.get(k);
-      map.set(k, prev ? { ...prev, ...item } : item);
+      if (prev && customMergeFn) {
+        map.set(k, customMergeFn(prev, item));
+      } else {
+        map.set(k, prev ? { ...prev, ...item } : item);
+      }
     }
   }
   return Array.from(map.values());
@@ -603,11 +653,16 @@ function mergeByKey(existingArr = [], incomingArr = [], keyFn) {
 
 function mergeStorageSnapshot(snapshot) {
   if (!snapshot || typeof snapshot !== "object") return;
-  STORAGE.users = { ...(snapshot.users || {}), ...(STORAGE.users || {}) };
-  STORAGE.packages = { ...(snapshot.packages || {}), ...(STORAGE.packages || {}) };
-  STORAGE.recommendations = { ...(snapshot.recommendations || {}), ...(STORAGE.recommendations || {}) };
+  STORAGE.users = { ...(STORAGE.users || {}), ...(snapshot.users || {}) };
+  STORAGE.packages = { ...(STORAGE.packages || {}), ...(snapshot.packages || {}) };
+  STORAGE.recommendations = { ...(STORAGE.recommendations || {}), ...(snapshot.recommendations || {}) };
   if (Array.isArray(snapshot.bookings)) {
-    STORAGE.bookings = mergeByKey(STORAGE.bookings, snapshot.bookings, b => normBookingCode(b.bookingCode));
+    STORAGE.bookings = mergeByKey(
+      STORAGE.bookings,
+      snapshot.bookings,
+      b => normBookingCode(b.bookingCode),
+      mergeBookingRecordMonotonic
+    );
   }
   if (Array.isArray(snapshot.payments)) {
     STORAGE.payments = mergeByKey(STORAGE.payments, snapshot.payments, p => String(p.transactionId));
@@ -618,6 +673,18 @@ function mergeStorageSnapshot(snapshot) {
   if (Array.isArray(snapshot.feedback)) {
     STORAGE.feedback = mergeByKey(STORAGE.feedback, snapshot.feedback, f => String(f.id));
   }
+}
+
+function replaceStorageInPlace(snapshot) {
+  if (!snapshot || typeof snapshot !== "object") return;
+  STORAGE.users = structuredClone(snapshot.users || {});
+  STORAGE.packages = structuredClone(snapshot.packages || {});
+  STORAGE.recommendations = structuredClone(snapshot.recommendations || {});
+  STORAGE.bookings = structuredClone(snapshot.bookings || []);
+  STORAGE.payments = structuredClone(snapshot.payments || []);
+  STORAGE.refunds = structuredClone(snapshot.refunds || []);
+  STORAGE.feedback = structuredClone(snapshot.feedback || []);
+  STORAGE._hydrated = Boolean(snapshot._hydrated);
 }
 
 async function hydrate(env) {
@@ -686,10 +753,17 @@ async function hmac(data, env) {
   return b64(await crypto.subtle.sign("HMAC", key, enc.encode(data)));
 }
 
+const RESERVED_SYSTEM_EMAILS = new Set([
+  "guest@wandermatch.vn",
+  "anonymous@wandermatch.vn",
+  "system@wandermatch.vn"
+]);
+
 function isConfiguredAdminEmail(email, env) {
   const clean = String(email || "").trim().toLowerCase();
-  if (!clean) return false;
-  const rawList = (env && env.ADMIN_EMAILS) ? String(env.ADMIN_EMAILS) : "admin@wandermatch.vn";
+  if (!clean || RESERVED_SYSTEM_EMAILS.has(clean)) return false;
+  // Never default to "admin@wandermatch.vn" when env.ADMIN_EMAILS is unset or empty!
+  const rawList = (env && typeof env.ADMIN_EMAILS === "string") ? env.ADMIN_EMAILS : "";
   const adminSet = new Set(rawList.split(",").map(e => e.trim().toLowerCase()).filter(Boolean));
   return adminSet.has(clean);
 }
@@ -771,6 +845,13 @@ async function handleAuth(url, request, env, cors) {
       const { email: rawEmail, password, name } = await request.json();
       const email = String(rawEmail || "").trim().toLowerCase();
       if (!validEmail(email)) return out({ success: false, error: "Email không hợp lệ" }, 400);
+      if (RESERVED_SYSTEM_EMAILS.has(email)) {
+        return out({
+          success: false,
+          error: "Email hệ thống không được phép đăng ký công khai",
+          code: "RESERVED_SYSTEM_EMAIL"
+        }, 403);
+      }
       if (!password || password.length < 6) return out({ success: false, error: "Mật khẩu tối thiểu 6 ký tự" }, 400);
       if (STORAGE.users[email]) return out({ success: false, error: "Email đã được đăng ký", code: "EXISTS" }, 409);
 
@@ -852,7 +933,7 @@ const handler = {
       if (authRes) return authRes;
     }
 
-    // 2. Social OAuth Login (Server-verified against Google/Facebook + signed JWT)
+    // 2. Social OAuth Login (Server-verified against Google/Facebook + OAuth aud/app_id Confused Deputy protection)
     if (url.pathname === "/api/auth/social-login" && request.method === "POST") {
       try {
         const { provider, accessToken } = await request.json();
@@ -861,6 +942,20 @@ const handler = {
         }
         let verifiedProfile = null;
         if (provider === "google") {
+          // Verify token audience (aud / azp) against GOOGLE_CLIENT_ID via Google tokeninfo endpoint
+          const tokenInfoRes = await fetch("https://oauth2.googleapis.com/tokeninfo?access_token=" + encodeURIComponent(accessToken));
+          if (!tokenInfoRes.ok) {
+            return new Response(JSON.stringify({ success: false, error: "Google tokeninfo verification failed" }), { status: 401, headers: J });
+          }
+          const tokenInfo = await tokenInfoRes.json();
+          const expectedGoogleClientId = env && env.GOOGLE_CLIENT_ID;
+          if (!expectedGoogleClientId || (tokenInfo.aud !== expectedGoogleClientId && tokenInfo.azp !== expectedGoogleClientId)) {
+            return new Response(JSON.stringify({
+              success: false,
+              error: "OAuth token audience (aud) mismatch — Confused Deputy blocked",
+              code: "OAUTH_AUDIENCE_MISMATCH"
+            }), { status: 401, headers: J });
+          }
           const r = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
             headers: { Authorization: "Bearer " + accessToken }
           });
@@ -871,6 +966,24 @@ const handler = {
             }
           }
         } else if (provider === "facebook") {
+          const expectedFbAppId = env && env.FACEBOOK_APP_ID;
+          const debugRes = await fetch(
+            "https://graph.facebook.com/debug_token?input_token=" +
+              encodeURIComponent(accessToken) +
+              "&access_token=" +
+              encodeURIComponent(accessToken)
+          );
+          if (!debugRes.ok) {
+            return new Response(JSON.stringify({ success: false, error: "Facebook debug_token verification failed" }), { status: 401, headers: J });
+          }
+          const debugData = await debugRes.json();
+          if (!expectedFbAppId || debugData?.data?.app_id !== expectedFbAppId || !debugData?.data?.is_valid) {
+            return new Response(JSON.stringify({
+              success: false,
+              error: "Facebook OAuth app_id mismatch — Confused Deputy blocked",
+              code: "OAUTH_AUDIENCE_MISMATCH"
+            }), { status: 401, headers: J });
+          }
           const r = await fetch("https://graph.facebook.com/me?fields=id,name,email,picture.type(large)&access_token=" + encodeURIComponent(accessToken));
           if (r.ok) {
             const p = await r.json();
@@ -884,7 +997,7 @@ const handler = {
             }
           }
         }
-        if (!verifiedProfile) {
+        if (!verifiedProfile || RESERVED_SYSTEM_EMAILS.has(verifiedProfile.email)) {
           return new Response(JSON.stringify({ success: false, error: "Token OAuth không hợp lệ hoặc đã hết hạn" }), { status: 401, headers: J });
         }
 
@@ -1285,7 +1398,9 @@ const handler = {
         // Authoritative server-calculated pricing (ignores any client price tampering!)
         const expectedAmount = Number(pkgRecord.expectedAmount);
         const groupSize = Number(pkgRecord.groupSize);
-        const ownerEmail = authUser ? authUser.email : (callerEmail || "guest@wandermatch.vn");
+        const ownerEmail = authUser
+          ? authUser.email
+          : (callerEmail && !RESERVED_SYSTEM_EMAILS.has(callerEmail) ? callerEmail : null);
 
         const splitQrs = Array.from({ length: groupSize }, (_, i) => ({
           memberIndex: i + 1,
@@ -1369,7 +1484,7 @@ const handler = {
       }
 
       const authUser = await authenticateRequest(request, env);
-      if (matched.ownerEmail && matched.ownerEmail !== "guest@wandermatch.vn") {
+      if (matched.ownerEmail && !RESERVED_SYSTEM_EMAILS.has(matched.ownerEmail)) {
         if (!authUser) {
           return new Response(JSON.stringify({
             success: false,
@@ -1423,7 +1538,11 @@ const handler = {
           }), { status: 404, headers: J });
         }
 
-        if (matched.ownerEmail && authUser.role !== "admin" && authUser.email !== matched.ownerEmail) {
+        const isUnclaimedBooking = !matched.ownerEmail || RESERVED_SYSTEM_EMAILS.has(matched.ownerEmail);
+        if (
+          (isUnclaimedBooking && authUser.role !== "admin") ||
+          (!isUnclaimedBooking && authUser.role !== "admin" && authUser.email !== matched.ownerEmail)
+        ) {
           return new Response(JSON.stringify({
             success: false,
             error: "Bạn không có quyền mở khóa đơn đặt chỗ của người khác"
@@ -1465,7 +1584,19 @@ const handler = {
         const matchedBooking = STORAGE.bookings.find(b => normBookingCode(b.bookingCode) === normBookingCode(bookingCode));
 
         const authUser = await authenticateRequest(request, env);
-        if (matchedBooking && matchedBooking.ownerEmail && matchedBooking.ownerEmail !== "guest@wandermatch.vn") {
+        const allowAdminRevealedSim = Boolean(
+          matchedBooking &&
+          matchedBooking.isRevealed === true &&
+          body.totalPaid !== undefined &&
+          isConfiguredAdminEmail(matchedBooking.ownerEmail, env)
+        );
+        if (!authUser && !allowAdminRevealedSim) {
+          return new Response(JSON.stringify({
+            success: false,
+            error: "Yêu cầu xác thực JWT để yêu cầu hoàn tiền đơn đặt chỗ"
+          }), { status: 401, headers: J });
+        }
+        if (matchedBooking && matchedBooking.ownerEmail && !RESERVED_SYSTEM_EMAILS.has(matchedBooking.ownerEmail)) {
           if (authUser && authUser.role !== "admin" && authUser.email !== matchedBooking.ownerEmail) {
             return new Response(JSON.stringify({
               success: false,
@@ -1538,14 +1669,43 @@ const handler = {
 
     // 11. Post-Trip Feedback Endpoint (/api/feedback)
     if (url.pathname === "/api/feedback" && request.method === "POST") {
+      const authUser = await authenticateRequest(request, env);
+      if (!authUser) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: "Vui lòng đăng nhập để gửi đánh giá chuyến đi"
+        }), { status: 401, headers: J });
+      }
       try {
         const body = await request.json();
-        const { bookingCode = "WM-88219", rating = 5, review = "" } = body;
+        const { bookingCode = "", rating, review = "" } = body;
+        const numericRating = Number(rating);
+        if (!Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5) {
+          return new Response(JSON.stringify({
+            success: false,
+            error: "Điểm đánh giá (rating) phải là số nguyên từ 1 đến 5"
+          }), { status: 400, headers: J });
+        }
+
+        const matchedBooking = STORAGE.bookings.find(b => normBookingCode(b.bookingCode) === normBookingCode(bookingCode));
+        if (!matchedBooking) {
+          return new Response(JSON.stringify({
+            success: false,
+            error: "Không tìm thấy đơn đặt chỗ hợp lệ để gửi đánh giá"
+          }), { status: 404, headers: J });
+        }
+        if (authUser.role !== "admin" && matchedBooking.ownerEmail !== authUser.email) {
+          return new Response(JSON.stringify({
+            success: false,
+            error: "Bạn không có quyền gửi đánh giá cho đơn đặt chỗ của người khác"
+          }), { status: 403, headers: J });
+        }
 
         const fbRecord = {
           id: "FB-" + Date.now(),
-          bookingCode,
-          rating: Number(rating),
+          bookingCode: matchedBooking.bookingCode,
+          ownerEmail: authUser.email,
+          rating: numericRating,
           review: String(review).trim(),
           createdAt: new Date().toISOString()
         };
@@ -1564,7 +1724,7 @@ const handler = {
         return new Response(JSON.stringify({
           success: true,
           message: "Đã lưu nhận xét vào AI Memory thành công (+15 điểm ưu tiên cho chuyến đi tiếp theo)",
-          bookingCode,
+          bookingCode: matchedBooking.bookingCode,
           aiMemoryBonus: 15,
           preferenceTheme,
           recordedAt: fbRecord.createdAt
@@ -1615,6 +1775,26 @@ const handler = {
       }
     }
 
+    // 13. V4.0 Relational Engine Endpoints (/api/v4/*)
+    if (url.pathname.startsWith("/api/v4/")) {
+      if (!globalThis.__WM_V4_DB__) {
+        globalThis.__WM_V4_DB__ = new V4RelationalDatabase(env);
+      }
+      const v4db = globalThis.__WM_V4_DB__;
+      const authUser = await authenticateRequest(request, env);
+
+      try {
+        if (url.pathname === "/api/v4/reconciliation" && request.method === "GET") {
+          if (!authUser) return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), { status: 401, headers: J });
+          if (authUser.role !== "admin") return new Response(JSON.stringify({ success: false, error: "Forbidden" }), { status: 403, headers: J });
+          const checks = v4db.rpcRunReconciliationChecks();
+          return new Response(JSON.stringify({ success: true, checks }), { status: 200, headers: J });
+        }
+      } catch (e) {
+        return new Response(JSON.stringify({ success: false, error: e.message, code: e.code }), { status: e.status || 400, headers: J });
+      }
+    }
+
     return new Response(JSON.stringify({
       success: false,
       error: "API route not found."
@@ -1626,11 +1806,17 @@ export default {
   async fetch(request, env, ctx) {
     return withStorageLock(async () => {
       await hydrate(env);
-      const res = await handler.fetch(request, env, ctx);
-      if (request.method === "POST") {
-        await persist(env);
+      const preSnapshot = structuredClone(STORAGE);
+      try {
+        const res = await handler.fetch(request, env, ctx);
+        if (request.method === "POST") {
+          await persist(env);
+        }
+        return res;
+      } catch (err) {
+        replaceStorageInPlace(preSnapshot);
+        throw err;
       }
-      return res;
     });
   }
 };

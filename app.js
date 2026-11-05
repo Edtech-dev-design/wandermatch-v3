@@ -448,13 +448,16 @@ window.sealUnrevealedPackage = function(pkg) {
   if (!pkg || typeof pkg !== "object" || pkg.isRevealed) return pkg;
   const copy = { ...pkg };
   delete copy.realDays;
+  delete copy.comboId;
+  delete copy.food;
   if (copy.reveal && typeof copy.reveal === "object") {
     copy.reveal = {
       ...copy.reveal,
       city: "✦ ĐIỂM ĐẾN NIÊM PHONG SÁP ✦",
       hotel: "Resort 4-5★ Tiêu Chuẩn Quốc Tế SLA (Niêm Phong Tên)",
       title: (copy.hotel && copy.hotel.mysteryTitle) || "Kỳ Nghỉ Bí Mật 3N2Đ (Niêm Phong Danh Tính)",
-      transport: copy.flightLabel || "Chuyến bay khứ hồi chuẩn SLA (✈️ Sân bay bí mật)"
+      transport: copy.flightLabel || "Chuyến bay khứ hồi chuẩn SLA (✈️ Sân bay bí mật)",
+      sla: "SLA-SEALED-UNTIL-REVEAL"
     };
   }
   if (copy.hotel && typeof copy.hotel === "object") {
@@ -465,6 +468,10 @@ window.sealUnrevealedPackage = function(pkg) {
       title: copy.hotel.mysteryTitle || "Kỳ Nghỉ Bí Mật 3N2Đ",
       days: copy.hotel.mysteryDays || []
     };
+    delete copy.hotel.id;
+    delete copy.hotel.sla;
+    delete copy.hotel.food;
+    delete copy.hotel.realDays;
   }
   if (copy.flight && typeof copy.flight === "object") {
     copy.flight = {
@@ -472,6 +479,9 @@ window.sealUnrevealedPackage = function(pkg) {
       city: "SÂN BAY BÍ MẬT",
       id: "SEALED"
     };
+  }
+  if (Array.isArray(copy.candidates)) {
+    copy.candidates = copy.candidates.map(c => window.sealUnrevealedPackage(c));
   }
   return copy;
 };

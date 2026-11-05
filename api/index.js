@@ -15,6 +15,11 @@ export default async function handler(req, res) {
     SESSION_SECRET: process.env.SESSION_SECRET || "",
     PAYMENT_WEBHOOK_SECRET: process.env.PAYMENT_WEBHOOK_SECRET || "",
     ADMIN_EMAILS: process.env.ADMIN_EMAILS || "",
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
+    FACEBOOK_APP_ID: process.env.FACEBOOK_APP_ID || "",
+    PII_MASTER_KEYS_JSON: process.env.PII_MASTER_KEYS_JSON || "",
+    PII_ACTIVE_KEY_VERSION: process.env.PII_ACTIVE_KEY_VERSION || "1",
+    PII_BLIND_INDEX_PEPPER: process.env.PII_BLIND_INDEX_PEPPER || "",
     GEMINI_API_KEY: process.env.GEMINI_API_KEY || "",
   };
 
