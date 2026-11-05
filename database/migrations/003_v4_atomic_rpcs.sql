@@ -1180,3 +1180,4 @@ $$;
 
 REVOKE ALL ON FUNCTION public.finalize_refund_payout_v4(UUID, VARCHAR, VARCHAR, TEXT) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.finalize_refund_payout_v4(UUID, VARCHAR, VARCHAR, TEXT) TO service_role;
+

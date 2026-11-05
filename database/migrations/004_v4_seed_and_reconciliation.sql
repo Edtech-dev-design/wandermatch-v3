@@ -184,3 +184,4 @@ $$;
 
 REVOKE ALL ON FUNCTION public.run_v4_reconciliation_checks() FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.run_v4_reconciliation_checks() TO service_role;
+

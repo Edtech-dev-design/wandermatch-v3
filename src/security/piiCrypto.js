@@ -131,3 +131,4 @@ export function extractLast4Digits(value) {
   if (digits.length < 4) throw new Error("VALUE_TOO_SHORT_FOR_LAST4");
   return digits.slice(-4);
 }
+

@@ -695,3 +695,4 @@ CREATE TABLE IF NOT EXISTS public.outbox_events (
 CREATE INDEX IF NOT EXISTS idx_outbox_poll ON public.outbox_events(status, next_attempt_at ASC)
     WHERE status IN ('PENDING', 'PROCESSING');
 CREATE INDEX IF NOT EXISTS idx_outbox_aggregate ON public.outbox_events(aggregate_type, aggregate_id);
+

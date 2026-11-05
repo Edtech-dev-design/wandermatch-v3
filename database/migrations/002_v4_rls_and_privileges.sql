@@ -246,3 +246,4 @@ CREATE POLICY pol_settings_super_admin_all ON public.system_settings FOR ALL
 DROP POLICY IF EXISTS pol_outbox_admin_select ON public.outbox_events;
 CREATE POLICY pol_outbox_admin_select ON public.outbox_events FOR SELECT
   USING (public.is_admin(auth.uid()));
+
