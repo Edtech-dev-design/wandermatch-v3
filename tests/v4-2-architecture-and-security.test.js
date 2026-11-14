@@ -11,6 +11,7 @@ import {
   assertStagingNotConnectedToProduction
 } from "../frontend/config/environments.js";
 import { getSyncStatus } from "../auto-sync-github.js";
+import { invokePostgresRpc } from "../src/services/supabase/postgresRpcClient.js";
 
 function makeDevEnv(overrides = {}) {
   return {
@@ -395,5 +396,43 @@ test("V4.2 Architecture & Security Suite", async (t) => {
 
     const syncStat = getSyncStatus();
     assert.equal(typeof syncStat.state, "string");
+  });
+
+  await t.test("V4.2-05: invokePostgresRpc maps PostgREST HTTP 400 (P0001) domain exceptions to canonical 402/409/410 statuses", async () => {
+    const rpcEnv = makeDevEnv({
+      USE_V4_POSTGRES_RPC: "true",
+      SUPABASE_URL: "http://127.0.0.1:54321",
+      SUPABASE_SERVICE_ROLE_KEY: "test-dev-service-role-key"
+    });
+    const cases = [
+      { rpcName: "reveal_blind_booking_v4", role: "authenticated", message: "PAYMENT_REQUIRED: Booking is not eligible for reveal (status=PENDING_PAYMENT).", expectedStatus: 402 },
+      { rpcName: "reveal_blind_booking_v4", role: "authenticated", message: "PAYMENT_RECONCILIATION_FAILED: Verified inflows (0) are less than expected (12000000).", expectedStatus: 402 },
+      { rpcName: "reveal_blind_booking_v4", role: "authenticated", message: "HOLD_CONFLICT: Booking has an unresolved inventory hold conflict.", expectedStatus: 409 },
+      { rpcName: "create_booking_with_hold_v4", role: "authenticated", message: "INSUFFICIENT_INVENTORY: Not enough available slots for item HOTEL.", expectedStatus: 409 },
+      { rpcName: "create_booking_with_hold_v4", role: "authenticated", message: "GONE: Package quote has expired.", expectedStatus: 410 }
+    ];
+
+    const origFetch = globalThis.fetch;
+    try {
+      for (const tc of cases) {
+        globalThis.fetch = async () =>
+          new Response(JSON.stringify({ code: "P0001", message: tc.message }), {
+            status: 400,
+            headers: { "Content-Type": "application/json" }
+          });
+
+        await assert.rejects(
+          () => invokePostgresRpc(rpcEnv, null, {
+            rpcName: tc.rpcName,
+            role: tc.role,
+            uid: "00000000-0000-4000-8000-000000000001",
+            args: {}
+          }),
+          (err) => err && err.httpStatus === tc.expectedStatus && err.statusCode === tc.expectedStatus
+        );
+      }
+    } finally {
+      globalThis.fetch = origFetch;
+    }
   });
 });

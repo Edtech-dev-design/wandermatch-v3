@@ -126,16 +126,27 @@ export async function invokePostgresRpc(env, v4db, { rpcName, args = {}, role = 
     }
 
     if (!res.ok) {
-      const err = new Error(data.message || data.error || `PostgreSQL RPC ${rpcName} failed with status ${res.status}`);
+      const msg = String(data.message || data.error || `PostgreSQL RPC ${rpcName} failed with status ${res.status}`);
+      const err = new Error(msg);
       err.code = data.code || (res.status >= 500 ? "50200" : "P0001");
       if (data.code === "55000" || res.status === 503) err.httpStatus = 503;
       else if (data.code === "28000" || res.status === 401) err.httpStatus = 401;
       else if (data.code === "42501" || res.status === 403) err.httpStatus = 403;
       else if (data.code === "P0002" || res.status === 404) err.httpStatus = 404;
-      else if (data.code === "23505" || res.status === 409) err.httpStatus = 409;
+      else if (msg.startsWith("PAYMENT_REQUIRED:") || msg.startsWith("PAYMENT_RECONCILIATION_FAILED:")) err.httpStatus = 402;
+      else if (msg.startsWith("GONE:")) err.httpStatus = 410;
+      else if (
+        data.code === "23505" ||
+        res.status === 409 ||
+        msg.startsWith("HOLD_CONFLICT:") ||
+        msg.startsWith("INSUFFICIENT_INVENTORY:") ||
+        msg.startsWith("CONFLICT:") ||
+        msg.startsWith("RECONCILIATION_LOCKED:")
+      ) err.httpStatus = 409;
       else if (data.code === "23514" || data.code === "22023" || res.status === 400) err.httpStatus = 400;
       else if (res.status >= 500) err.httpStatus = 502;
       else err.httpStatus = res.status;
+      err.statusCode = err.httpStatus;
       throw err;
     }
     return data;
