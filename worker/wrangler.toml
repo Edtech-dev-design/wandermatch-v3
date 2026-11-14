@@ -1,15 +1,63 @@
-name = "wandermatch-worker"
-main = "src/index.js"
-compatibility_date = "2024-04-01"
+# ==============================================================================
+# Canonical reference to root worker.js for WanderMatch V4.1 (Dev / Staging / Prod)
+# ==============================================================================
+name = "wandermatch-api-staging"
+main = "../src/index.js"
+compatibility_date = "2026-04-01"
+workers_dev = true
+keep_vars = true
+
+[ai]
+binding = "AI"
 
 [vars]
-ENVIRONMENT = "production"
-APP_NAME = "WanderMatch v3.0 API Engine"
-CORS_ALLOW_ORIGIN = "*"
+ENVIRONMENT = "staging"
+APP_NAME = "WanderMatch V4.1 API Engine (Staging)"
+USE_V4_POSTGRES_RPC = "true"
+SUPABASE_URL = "https://hpwtdlffidfircparanl.supabase.co"
+SUPABASE_PROJECT_REF = "hpwtdlffidfircparanl"
+ADMIN_EMAILS = "admin@wandermatch.vn,superadmin.system@wandermatch.vn"
+ALLOWED_ORIGIN = "https://staging.wandermatch.vn,https://wandermatch-v4.vercel.app,https://*.vercel.app,https://edtech-dev-design.github.io,http://localhost:3000,http://127.0.0.1:3000,http://localhost:5500,http://127.0.0.1:5500"
+COMPANY_BANK_ID = "MB"
+COMPANY_ACCOUNT_NO = "0988888888"
+COMPANY_ACCOUNT_NAME = "CONG TY TNHH WANDERMATCH VN (STAGING)"
+
+[env.development]
+name = "wandermatch-api-dev"
+workers_dev = true
+
+[env.development.ai]
+binding = "AI"
+
+[env.development.vars]
+ENVIRONMENT = "development"
+APP_NAME = "WanderMatch V4.1 API Engine (Development)"
+USE_V4_POSTGRES_RPC = "false"
+SUPABASE_URL = "http://127.0.0.1:54321"
+ADMIN_EMAILS = "admin@wandermatch.vn,superadmin.system@wandermatch.vn"
+ALLOWED_ORIGIN = "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5500,http://127.0.0.1:5500,http://localhost:8787,http://127.0.0.1:8787"
+COMPANY_BANK_ID = "MB"
+COMPANY_ACCOUNT_NO = "0988888888"
+COMPANY_ACCOUNT_NAME = "CONG TY TNHH WANDERMATCH VN (DEV)"
+
+[env.staging]
+name = "wandermatch-api-staging"
+workers_dev = true
+
+[env.staging.ai]
+binding = "AI"
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+APP_NAME = "WanderMatch V4.1 API Engine (Staging)"
+USE_V4_POSTGRES_RPC = "true"
+SUPABASE_URL = "https://hpwtdlffidfircparanl.supabase.co"
+SUPABASE_PROJECT_REF = "hpwtdlffidfircparanl"
+ADMIN_EMAILS = "admin@wandermatch.vn,superadmin.system@wandermatch.vn"
+ALLOWED_ORIGIN = "https://staging.wandermatch.vn,https://wandermatch-v4.vercel.app,https://*.vercel.app,https://edtech-dev-design.github.io,http://localhost:3000,http://127.0.0.1:3000,http://localhost:5500,http://127.0.0.1:5500"
+COMPANY_BANK_ID = "MB"
+COMPANY_ACCOUNT_NO = "0988888888"
+COMPANY_ACCOUNT_NAME = "CONG TY TNHH WANDERMATCH VN (STAGING)"
 
 [observability]
 enabled = true
-
-# Cloudflare Workers configuration for WanderMatch 3.0
-# Handles AI Concierge, Napas 247 eKYC, Corporate VietQR,
-# Time-Tiered Conditional Refund, B2B SLA Hard-Commit & Group Split-Bill.

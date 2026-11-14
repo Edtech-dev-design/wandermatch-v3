@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import worker from "../worker.js";
 
 const baseEnv = {
+  ENVIRONMENT: "development",
   SESSION_SECRET: "test-session-secret",
   PAYMENT_WEBHOOK_SECRET: "test-webhook-secret",
   ADMIN_EMAILS: "admin@wandermatch.vn",

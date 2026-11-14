@@ -64,8 +64,11 @@ const SERVICE_ROLE_ONLY_RPCS = new Set([
   "claim_refund_for_processing_v4",
   "finalize_refund_payout_v4",
   "claim_due_outbox_events_v4",
+  "persist_recommendation_session_v4",
   "run_v4_reconciliation_checks",
-  "reconcile_external_settlement_v4"
+  "reconcile_external_settlement_v4",
+  "set_cutover_write_freeze_v4",
+  "export_v4_delta_for_v3_rollback"
 ]);
 
 const VALID_BOOKING_TRANSITIONS = {
@@ -819,7 +822,12 @@ export class V4RelationalDatabase {
    * RPC Dispatcher with Strict Function Privilege Verification (T-02)
    */
   async callRpcAsRole({ role = "authenticated", uid = null, rpcName, args = {}, env = {} }) {
-    if (SERVICE_ROLE_ONLY_RPCS.has(rpcName) && role !== "service_role") {
+    if (
+      (SERVICE_ROLE_ONLY_RPCS.has(rpcName) ||
+        rpcName === "ensure_user_profile_v4" ||
+        rpcName === "ensure_inventory_for_date_v4") &&
+      role !== "service_role"
+    ) {
       throw makeSqlError(`permission denied for function ${rpcName}`, "42501", 403);
     }
     if (role === "anon") {
@@ -853,10 +861,26 @@ export class V4RelationalDatabase {
         return this.rpcFinalizeRefundPayout(args);
       case "claim_due_outbox_events_v4":
         return this.rpcClaimDueOutboxEvents(args);
+      case "persist_recommendation_session_v4":
+        return this.rpcPersistRecommendationSession(args);
+      case "ensure_user_profile_v4":
+        return this.rpcEnsureUserProfile(args);
+      case "ensure_inventory_for_date_v4":
+        return this.rpcEnsureInventoryForDate(args);
+      case "submit_review_v4":
+        return this.rpcSubmitReview(uid, args);
+      case "get_my_notifications_v4":
+        return this.rpcGetMyNotifications(uid, args);
+      case "mark_notification_read_v4":
+        return this.rpcMarkNotificationRead(uid, args);
       case "run_v4_reconciliation_checks":
         return this.rpcRunReconciliationChecks(args.p_v3_snapshot || null);
       case "reconcile_external_settlement_v4":
         return this.rpcReconcileExternalSettlement(args.p_settlement_records || []);
+      case "set_cutover_write_freeze_v4":
+        return this.rpcSetCutoverWriteFreeze(args);
+      case "export_v4_delta_for_v3_rollback":
+        return this.rpcExportV4DeltaForV3Rollback();
       default:
         throw makeSqlError(`function public.${rpcName} does not exist`, "42883", 404);
     }
@@ -984,6 +1008,8 @@ export class V4RelationalDatabase {
    */
   async createRecommendationSessionAndPackages({
     userId,
+    userEmail = null,
+    userName = null,
     originAirport = "SGN",
     budgetPerPersonVnd = 5500000,
     groupSize = 2,
@@ -996,6 +1022,9 @@ export class V4RelationalDatabase {
     if (!userId) throw makeSqlError("UNAUTHORIZED: Authentication required.", "28000", 401);
 
     return this.withTransaction(async (t) => {
+      this._ensureUserProfileInTables(t, { userId, email: userEmail, fullName: userName });
+      this._ensureInventoryForDateInTables(t, departureDate);
+
       const pipelineOut = runFiveStageRecommendationPipeline({
         userId,
         originAirport,
@@ -1112,6 +1141,11 @@ export class V4RelationalDatabase {
     if (!uid) throw makeSqlError("UNAUTHORIZED: Authentication required.", "28000", 401);
 
     return this.withTransaction(async (t) => {
+      const cutoverSetting = t.system_settings.find(s => s.key === "cutover_mode");
+      if (cutoverSetting?.value_jsonb?.write_freeze === true) {
+        throw makeSqlError("WRITE_FREEZE_ACTIVE: System is in cutover write-freeze mode.", "55000", 503);
+      }
+
       const bookingCode = p_booking_code || this.nextBookingCodeV4();
 
       // Idempotent replay check for same user
@@ -1345,6 +1379,40 @@ export class V4RelationalDatabase {
 
       if (!Number.isFinite(amount) || amount <= 0) {
         throw makeSqlError("INVALID_AMOUNT: Transfer amount must be positive.", "22023", 400);
+      }
+
+      const cutoverSetting = t.system_settings.find(s => s.key === "cutover_mode");
+      if (cutoverSetting?.value_jsonb?.write_freeze === true) {
+        let whQueued = t.payment_webhook_events.find(
+          e => e.provider === provider && e.provider_event_id === eventId
+        );
+        if (!whQueued) {
+          whQueued = {
+            id: crypto.randomUUID(),
+            provider,
+            provider_event_id: eventId,
+            matched_booking_id: null,
+            signature_verified: true,
+            raw_payload: structuredClone(p_raw_payload),
+            processing_status: "QUEUED_DURING_CUTOVER",
+            error_message: null,
+            received_at: new Date().toISOString(),
+            processed_at: null
+          };
+          t.payment_webhook_events.push(whQueued);
+        } else {
+          whQueued.raw_payload = structuredClone(p_raw_payload);
+          if (whQueued.processing_status === "RECEIVED") {
+            whQueued.processing_status = "QUEUED_DURING_CUTOVER";
+          }
+        }
+        return {
+          success: true,
+          http_status: 200,
+          queued_during_cutover: true,
+          webhook_event_id: whQueued.id,
+          status: "QUEUED_DURING_CUTOVER"
+        };
       }
 
       // Extract booking code from p_booking_code or p_transfer_content supporting both V4 ^WM[0-9]{8}$ and legacy V3 codes
@@ -1594,6 +1662,11 @@ export class V4RelationalDatabase {
    * RPC #6: replay_queued_webhook_events_v4
    */
   async rpcReplayQueuedWebhookEvents({ p_batch_limit = 200 } = {}) {
+    const cutoverSetting = this.tables.system_settings.find(s => s.key === "cutover_mode");
+    if (cutoverSetting?.value_jsonb?.write_freeze === true) {
+      throw makeSqlError("WRITE_FREEZE_ACTIVE: Cannot replay queued webhooks while write_freeze is active.", "55000", 503);
+    }
+
     const queued = this.tables.payment_webhook_events
       .filter(e => e.processing_status === "QUEUED_DURING_CUTOVER")
       .slice(0, p_batch_limit);
@@ -1607,11 +1680,16 @@ export class V4RelationalDatabase {
       const res = await this.rpcProcessPaymentWebhook({
         p_provider: evt.provider,
         p_provider_event_id: evt.provider_event_id,
-        p_external_tx_id: payload.external_transaction_id || payload.id || evt.provider_event_id,
+        p_external_tx_id:
+          payload.external_transaction_id ||
+          payload.externalTransactionId ||
+          payload.transactionId ||
+          payload.id ||
+          evt.provider_event_id,
         p_booking_code: payload.booking_code || payload.bookingCode || "",
         p_transfer_amount: payload.transfer_amount || payload.transferAmount || payload.amount || 0,
-        p_transfer_content: payload.transfer_content || payload.content || "",
-        p_bank_code: payload.bank_code || "MB",
+        p_transfer_content: payload.transfer_content || payload.content || payload.transferContent || "",
+        p_bank_code: payload.bank_code || payload.bankCode || payload.gateway || "MB",
         p_raw_payload: payload
       });
       replayedCount++;
@@ -2217,6 +2295,195 @@ export class V4RelationalDatabase {
         claimed_count: claimed.length,
         events: claimed
       };
+    });
+  }
+
+  _ensureUserProfileInTables(t, { userId, email = null, fullName = null, role = "USER" } = {}) {
+    if (!userId) return null;
+    const normalizedEmail = email
+      ? String(email).trim().toLowerCase()
+      : `${String(userId).slice(0, 32)}@wandermatch.local`;
+    const safeName = fullName && String(fullName).trim().length >= 2
+      ? String(fullName).trim().slice(0, 120)
+      : "WanderMatch Traveler";
+    let profile = t.profiles.find(p => p.id === userId);
+    if (!profile) {
+      profile = {
+        id: userId,
+        email: normalizedEmail,
+        full_name: safeName,
+        membership_tier: "STANDARD",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      t.profiles.push(profile);
+    } else {
+      if (email) profile.email = normalizedEmail;
+      if (fullName && String(fullName).trim().length >= 2) profile.full_name = safeName;
+      profile.updated_at = new Date().toISOString();
+    }
+    const existingRole = t.user_roles.find(r => r.user_id === userId && r.role === role);
+    if (!existingRole) {
+      t.user_roles.push({
+        id: deterministicUuidV4(`role:${userId}:${role}`),
+        user_id: userId,
+        role,
+        is_active: true,
+        created_at: new Date().toISOString()
+      });
+    }
+    return profile;
+  }
+
+  _ensureInventoryForDateInTables(t, departureDate = "2026-11-15") {
+    const targetDate = String(departureDate || "2026-11-15").slice(0, 10);
+    const existingForDate = t.partner_inventories.filter(
+      inv => inv.inventory_date === targetDate && inv.is_active !== false
+    );
+    if (existingForDate.length >= 12) {
+      return existingForDate;
+    }
+    const baselineDate = "2026-11-15";
+    const baselineRows = t.partner_inventories.filter(
+      inv => inv.inventory_date === baselineDate && inv.is_active !== false
+    );
+    for (const base of baselineRows) {
+      const exists = t.partner_inventories.some(
+        cur =>
+          cur.inventory_date === targetDate &&
+          cur.item_type === base.item_type &&
+          ((base.hotel_id && cur.hotel_id === base.hotel_id) ||
+            (base.flight_id && cur.flight_id === base.flight_id))
+      );
+      if (!exists) {
+        t.partner_inventories.push({
+          ...base,
+          id: deterministicUuidV4(`inv:${base.item_type}:${base.hotel_id || base.flight_id}:${targetDate}`),
+          inventory_date: targetDate,
+          available_slots: Number(base.total_slots || 20),
+          reserved_slots: 0,
+          is_active: true
+        });
+      }
+    }
+    return t.partner_inventories.filter(
+      inv => inv.inventory_date === targetDate && inv.is_active !== false
+    );
+  }
+
+  async ensureInventoryForDate(departureDate = "2026-11-15") {
+    return this.withTransaction(async (t) => {
+      const rows = this._ensureInventoryForDateInTables(t, departureDate);
+      return { departure_date: String(departureDate || "2026-11-15").slice(0, 10), count: rows.length, inventories: rows };
+    });
+  }
+
+  syncRemoteInventoriesForDate(departureDate, remoteRows = []) {
+    if (!Array.isArray(remoteRows) || remoteRows.length === 0) return 0;
+    const targetDate = String(departureDate || "2026-11-15").slice(0, 10);
+    this.tables.partner_inventories = this.tables.partner_inventories.filter(
+      inv => inv.inventory_date !== targetDate
+    );
+    for (const row of remoteRows) {
+      if (!row || !row.id) continue;
+      this.tables.partner_inventories.push({
+        id: row.id,
+        provider_id: row.provider_id,
+        hotel_id: row.hotel_id || null,
+        flight_id: row.flight_id || null,
+        item_type: row.item_type,
+        inventory_date: row.inventory_date || targetDate,
+        total_slots: Number(row.total_slots || 20),
+        available_slots: Number(row.available_slots ?? row.total_slots ?? 20),
+        reserved_slots: Number(row.reserved_slots || 0),
+        retail_price_vnd: Number(row.retail_price_vnd || 0),
+        net_price_vnd: Number(row.net_price_vnd || 0),
+        is_active: row.is_active !== false
+      });
+    }
+    return remoteRows.length;
+  }
+
+  async rpcEnsureUserProfile({ p_user_id, p_email = null, p_full_name = null, p_role = "traveler" } = {}) {
+    if (!p_user_id) throw makeSqlError("INVALID_USER_ID: p_user_id is required.", "22023", 400);
+    return this.withTransaction(async (t) => {
+      const mappedRole = p_role === "admin" || p_role === "super_admin" ? "ADMIN" : "USER";
+      const profile = this._ensureUserProfileInTables(t, {
+        userId: p_user_id,
+        email: p_email,
+        fullName: p_full_name,
+        role: mappedRole
+      });
+      return { ok: true, user_id: profile.id, email: profile.email, role: mappedRole };
+    });
+  }
+
+  async rpcEnsureInventoryForDate({ p_departure_date = "2026-11-15" } = {}) {
+    return this.ensureInventoryForDate(p_departure_date);
+  }
+
+  async rpcSubmitReview(uid, { p_booking_code, p_rating, p_ai_match_rating = 5, p_review_text = "" } = {}) {
+    if (!uid) throw makeSqlError("UNAUTHORIZED", "28000", 401);
+    return this.withTransaction(async (t) => {
+      const bk = t.bookings.find(b => b.booking_code === p_booking_code && b.user_id === uid);
+      if (!bk) throw makeSqlError("BOOKING_NOT_FOUND", "P0002", 404);
+      if (!["REVEALED", "COMPLETED"].includes(bk.status)) {
+        throw makeSqlError("REVIEW_REQUIRES_REVEALED_BOOKING", "P0001", 409);
+      }
+      const review = {
+        id: crypto.randomUUID(),
+        booking_id: bk.id,
+        user_id: uid,
+        rating: Math.max(1, Math.min(5, Number(p_rating || 5))),
+        ai_match_rating: Math.max(1, Math.min(5, Number(p_ai_match_rating || p_rating || 5))),
+        review_text: String(p_review_text || "Wonderful trip!").slice(0, 2000),
+        moderation_status: "APPROVED",
+        created_at: new Date().toISOString()
+      };
+      t.reviews = t.reviews.filter(r => r.booking_id !== bk.id);
+      t.reviews.push(review);
+      return { ok: true, review_id: review.id, booking_code: p_booking_code, rating: review.rating };
+    });
+  }
+
+  async rpcGetMyNotifications(uid, { p_limit = 20 } = {}) {
+    if (!uid) throw makeSqlError("UNAUTHORIZED", "28000", 401);
+    const items = (this.tables.notifications || [])
+      .filter(n => n.user_id === uid)
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, Math.max(1, Math.min(100, Number(p_limit || 20))));
+    return { notifications: items };
+  }
+
+  async rpcMarkNotificationRead(uid, { p_notification_id } = {}) {
+    if (!uid) throw makeSqlError("UNAUTHORIZED", "28000", 401);
+    return this.withTransaction(async (t) => {
+      const item = (t.notifications || []).find(n => n.id === p_notification_id && n.user_id === uid);
+      if (!item) throw makeSqlError("NOTIFICATION_NOT_FOUND", "P0002", 404);
+      item.is_read = true;
+      item.read_at = new Date().toISOString();
+      return { ok: true, id: item.id, read_at: item.read_at };
+    });
+  }
+
+  /**
+   * Service-Role RPC: persist_recommendation_session_v4
+   */
+  async rpcPersistRecommendationSession({ p_session, p_packages = [], p_package_items = [] } = {}) {
+    return this.withTransaction(async (t) => {
+      if (p_session) {
+        const exists = t.recommendation_sessions.some(s => s.id === p_session.id);
+        if (!exists) t.recommendation_sessions.push(p_session);
+      }
+      for (const pkg of (p_packages || [])) {
+        const exists = t.packages.some(p => p.id === pkg.id);
+        if (!exists) t.packages.push(pkg);
+      }
+      for (const it of (p_package_items || [])) {
+        const exists = t.package_items.some(i => i.id === it.id);
+        if (!exists) t.package_items.push(it);
+      }
+      return { success: true };
     });
   }
 
@@ -2831,5 +3098,252 @@ export class V4RelationalDatabase {
       discrepancies
     };
   }
+
+  /**
+   * RPC #15: set_cutover_write_freeze_v4
+   */
+  async rpcSetCutoverWriteFreeze({
+    p_write_freeze = false,
+    p_maintenance_readonly = false
+  } = {}) {
+    return this.withTransaction(async (t) => {
+      const value = {
+        write_freeze: Boolean(p_write_freeze),
+        maintenance_readonly: Boolean(p_maintenance_readonly),
+        v4_active: !p_write_freeze
+      };
+      let row = t.system_settings.find(s => s.key === "cutover_mode");
+      if (!row) {
+        row = {
+          key: "cutover_mode",
+          value_jsonb: value,
+          description: "Cutover control flags",
+          is_public: true,
+          updated_by: null,
+          updated_at: new Date().toISOString()
+        };
+        t.system_settings.push(row);
+      } else {
+        row.value_jsonb = value;
+        row.updated_at = new Date().toISOString();
+      }
+      return {
+        success: true,
+        cutover_mode: structuredClone(row.value_jsonb)
+      };
+    });
+  }
+
+  /**
+   * RPC #16: export_v4_delta_for_v3_rollback
+   */
+  async rpcExportV4DeltaForV3Rollback() {
+    const t = this.tables;
+    const bookings = t.bookings
+      .slice()
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+      .map(b => {
+        const pr = t.profiles.find(p => p.id === b.user_id) || {};
+        return {
+          bookingCode: b.booking_code,
+          isLegacyMigrated: Boolean(b.is_legacy_migrated),
+          email: pr.email || "unknown@wandermatch.vn",
+          fullName: pr.full_name || "WanderMatch Traveler",
+          groupSize: b.group_size,
+          expectedAmount: Number(b.expected_amount_vnd),
+          paidAmount: Number(b.paid_amount_vnd),
+          amountDue: Number(b.amount_due_vnd),
+          overpaidAmount: Number(b.overpaid_amount_vnd),
+          status: b.status,
+          isRevealed: Boolean(b.is_revealed),
+          departureDate: b.departure_date,
+          createdAt: b.created_at,
+          updatedAt: b.updated_at
+        };
+      });
+
+    const payments = t.payment_transactions
+      .filter(tx => tx.direction === "INFLOW")
+      .slice()
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+      .map(tx => {
+        const b = t.bookings.find(bk => bk.id === tx.booking_id);
+        return {
+          transactionId: tx.external_transaction_id,
+          provider: tx.payment_provider,
+          bookingCode: b ? b.booking_code : null,
+          amount: Number(tx.amount_vnd),
+          bankCode: tx.bank_code,
+          transferContent: tx.transfer_content,
+          verifiedAt: tx.created_at
+        };
+      });
+
+    const refunds = t.refunds
+      .slice()
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+      .map(r => {
+        const b = t.bookings.find(bk => bk.id === r.booking_id);
+        return {
+          refundId: r.payout_bank_ref || String(r.id),
+          idempotencyKey: r.idempotency_key,
+          bookingCode: b ? b.booking_code : null,
+          refundAmount: Number(r.refund_amount_vnd),
+          penaltyFee: Number(r.cancellation_fee_vnd),
+          status: r.status,
+          processedAt: r.processed_at || r.created_at
+        };
+      });
+
+    return {
+      exported_at: new Date().toISOString(),
+      bookings,
+      payments,
+      refunds
+    };
+  }
+}
+
+/**
+ * Deterministic V4 -> V3 Rollback Delta Merger (Section G Rollback Rehearsal)
+ * Merges V4 bookings, inflow payment_transactions, and refunds back into a V3
+ * state snapshot without losing any V4-originated payments or duplicating V3 rows.
+ */
+export function mergeV4DeltaIntoV3State(v3Snapshot = {}, v4Delta = {}) {
+  const merged = structuredClone({
+    users: v3Snapshot.users || {},
+    bookings: Array.isArray(v3Snapshot.bookings) ? v3Snapshot.bookings : [],
+    payments: Array.isArray(v3Snapshot.payments) ? v3Snapshot.payments : [],
+    refunds: Array.isArray(v3Snapshot.refunds) ? v3Snapshot.refunds : []
+  });
+
+  const deltaBookings = Array.isArray(v4Delta.bookings) ? v4Delta.bookings : [];
+  const deltaPayments = Array.isArray(v4Delta.payments) ? v4Delta.payments : [];
+  const deltaRefunds = Array.isArray(v4Delta.refunds) ? v4Delta.refunds : [];
+
+  let addedBookings = 0;
+  let updatedBookings = 0;
+  let addedPayments = 0;
+  let skippedDuplicatePayments = 0;
+  let addedRefunds = 0;
+
+  // 1. Merge Payments idempotently by transactionId (ignoring synthetic MIG-OPENING-* rows)
+  const existingTxIds = new Set(merged.payments.map(p => String(p.transactionId)));
+  for (const dp of deltaPayments) {
+    const txId = String(dp.transactionId || "");
+    if (!txId || txId.startsWith("MIG-OPENING-")) continue;
+    if (existingTxIds.has(txId)) {
+      skippedDuplicatePayments++;
+      continue;
+    }
+    existingTxIds.add(txId);
+    merged.payments.push({
+      transactionId: txId,
+      bookingCode: dp.bookingCode,
+      amount: Number(dp.amount || 0),
+      bankCode: dp.bankCode || "MB",
+      transferContent: dp.transferContent || dp.bookingCode,
+      verifiedAt: dp.verifiedAt || new Date().toISOString(),
+      originatedInV4: true
+    });
+    addedPayments++;
+  }
+
+  // 2. Merge Bookings (update existing V3 bookings or append V4-originated bookings)
+  for (const dbk of deltaBookings) {
+    const code = String(dbk.bookingCode || "").toUpperCase();
+    if (!code) continue;
+    const v3Status =
+      dbk.status === "PAID" || dbk.status === "OVERPAID" || dbk.status === "REVEALED" || dbk.status === "COMPLETED"
+        ? "PAID"
+        : dbk.status === "UNDERPAID"
+        ? "UNDERPAID"
+        : dbk.status === "REFUNDED"
+        ? "REFUNDED"
+        : "PENDING_PAYMENT";
+
+    const existingBk = merged.bookings.find(b => String(b.bookingCode || "").toUpperCase() === code);
+    if (existingBk) {
+      if (Number(dbk.paidAmount || 0) > Number(existingBk.paidAmount || 0) || existingBk.status !== v3Status) {
+        existingBk.paidAmount = Math.max(Number(existingBk.paidAmount || 0), Number(dbk.paidAmount || 0));
+        existingBk.expectedAmount = Number(dbk.expectedAmount || existingBk.expectedAmount || 0);
+        existingBk.amountDue = Math.max(0, existingBk.expectedAmount - existingBk.paidAmount);
+        existingBk.status = v3Status;
+        existingBk.isRevealed = Boolean(existingBk.isRevealed || dbk.isRevealed);
+        updatedBookings++;
+      }
+    } else {
+      merged.bookings.push({
+        bookingCode: code,
+        email: dbk.email || "traveler@wandermatch.vn",
+        fullName: dbk.fullName || "WanderMatch Traveler",
+        groupSize: Number(dbk.groupSize || 2),
+        expectedAmount: Number(dbk.expectedAmount || 0),
+        paidAmount: Number(dbk.paidAmount || 0),
+        amountDue: Number(dbk.amountDue ?? Math.max(0, Number(dbk.expectedAmount || 0) - Number(dbk.paidAmount || 0))),
+        status: v3Status,
+        isRevealed: Boolean(dbk.isRevealed),
+        createdAt: dbk.createdAt || new Date().toISOString(),
+        originatedInV4: !dbk.isLegacyMigrated
+      });
+      addedBookings++;
+    }
+  }
+
+  // 3. Merge Refunds idempotently
+  const existingRefundIds = new Set(merged.refunds.map(r => String(r.refundId)));
+  for (const dr of deltaRefunds) {
+    const refId = String(dr.refundId || "");
+    if (!refId || existingRefundIds.has(refId)) continue;
+    existingRefundIds.add(refId);
+    merged.refunds.push({
+      refundId: refId,
+      bookingCode: dr.bookingCode,
+      refundAmount: Number(dr.refundAmount || 0),
+      penaltyFee: Number(dr.penaltyFee || 0),
+      status: dr.status || "SUCCEEDED",
+      processedAt: dr.processedAt || new Date().toISOString(),
+      originatedInV4: true
+    });
+    addedRefunds++;
+  }
+
+  return {
+    mergedState: merged,
+    stats: {
+      addedBookings,
+      updatedBookings,
+      addedPayments,
+      skippedDuplicatePayments,
+      addedRefunds,
+      totalBookingsAfterRollback: merged.bookings.length,
+      totalPaymentsAfterRollback: merged.payments.length,
+      totalPaidVndAfterRollback: merged.bookings.reduce((s, b) => s + Number(b.paidAmount || 0), 0)
+    }
+  };
+}
+
+export function deterministicUuidV4(seed) {
+  const str = String(seed ?? "").trim();
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)) {
+    return str.toLowerCase();
+  }
+  const bytes = new Uint8Array(16);
+  for (let round = 0; round < 4; round++) {
+    let h = (2166136261 ^ (round * 0x9e3779b1)) >>> 0;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    const base = round * 4;
+    bytes[base] = (h >>> 24) & 0xff;
+    bytes[base + 1] = (h >>> 16) & 0xff;
+    bytes[base + 2] = (h >>> 8) & 0xff;
+    bytes[base + 3] = h & 0xff;
+  }
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 

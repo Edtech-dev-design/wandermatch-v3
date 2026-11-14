@@ -4,6 +4,7 @@ import worker from "../worker.js";
 
 function createTestEnv() {
   return {
+    ENVIRONMENT: "development",
     SESSION_SECRET: "unit-test-strong-session-secret-key-2026",
     PAYMENT_WEBHOOK_SECRET: "unit-test-strong-webhook-secret-2026",
     ADMIN_EMAILS: "admin@wandermatch.vn",

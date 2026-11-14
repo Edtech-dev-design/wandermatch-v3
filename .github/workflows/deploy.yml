@@ -1,8 +1,15 @@
-name: Auto Deploy WanderMatch Static Frontend to GitHub Pages
+name: WanderMatch V4.1 CI/CD – Environment Isolation, Staging Worker & Frontend Pipeline
 
 on:
   push:
     branches:
+      - develop
+      - feat/v4-architecture
+      - main
+  pull_request:
+    branches:
+      - develop
+      - feat/v4-architecture
       - main
   workflow_dispatch:
 
@@ -12,11 +19,135 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: "wandermatch-cicd-${{ github.ref }}"
   cancel-in-progress: true
 
 jobs:
+  verify-staging:
+    name: 1. Build, Environment Isolation Audit & V4.1 Test Matrix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Check JavaScript syntax (Frontend & Backend V4.1 Modules)
+        run: npm run build
+
+      - name: Validate Staging vs Production Environment Isolation
+        run: npm run verify:env
+
+      - name: Execute V4.1 Unit, Security & Acceptance Test Matrix
+        run: npm test
+
+  verify-development:
+    name: 2A. Verify Development Branch (develop)
+    needs: verify-staging
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Confirm Development Branch Isolation
+        run: npm run verify:env
+
+  deploy-worker-staging:
+    name: 2B. Deploy Cloudflare Worker Staging & Verify Supabase REST/RPC
+    needs: verify-staging
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/feat/v4-architecture')
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || '251175b21e549e1fd7785ef2f0a49c18' }}
+      STAGING_WORKER_URL: "https://wandermatch-api-staging.vannong20182018.workers.dev"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies (Wrangler CLI)
+        run: npm install --no-audit --no-fund
+
+      - name: Deploy Worker Staging via Non-Interactive API Token
+        id: cf_deploy
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::notice::CLOUDFLARE_API_TOKEN is not yet set in GitHub Actions Secrets. Skipping wrangler deploy step and proceeding to verify live Staging endpoint."
+            echo "deploy_mode=SKIPPED_NO_GITHUB_SECRET" >> $GITHUB_OUTPUT
+          else
+            npx wrangler deploy src/index.js --env staging
+            echo "deploy_mode=DEPLOYED_VIA_GITHUB_ACTIONS" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Sync Optional Worker Staging Secrets (If Provided in GitHub Secrets)
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        env:
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          PAYMENT_WEBHOOK_SECRET: ${{ secrets.PAYMENT_WEBHOOK_SECRET }}
+        run: |
+          if [ -n "$SUPABASE_ANON_KEY" ]; then printf "%s" "$SUPABASE_ANON_KEY" | npx wrangler secret put SUPABASE_ANON_KEY --env staging; fi
+          if [ -n "$SUPABASE_SERVICE_ROLE_KEY" ]; then printf "%s" "$SUPABASE_SERVICE_ROLE_KEY" | npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY --env staging; fi
+          if [ -n "$SESSION_SECRET" ]; then printf "%s" "$SESSION_SECRET" | npx wrangler secret put SESSION_SECRET --env staging; fi
+          if [ -n "$PAYMENT_WEBHOOK_SECRET" ]; then printf "%s" "$PAYMENT_WEBHOOK_SECRET" | npx wrangler secret put PAYMENT_WEBHOOK_SECRET --env staging; fi
+
+      - name: Verify Live Worker Health & Supabase HTTPS REST Connection
+        id: health_verify
+        run: |
+          echo "Probing $STAGING_WORKER_URL/api/health?check=supabase ..."
+          RESPONSE=$(curl -fsS "$STAGING_WORKER_URL/api/health?check=supabase")
+          echo "$RESPONSE" | node -e '
+            const fs = require("fs");
+            const data = JSON.parse(fs.readFileSync(0, "utf8"));
+            console.log("Health Status:", data.status);
+            console.log("Environment:", data.environment);
+            console.log("Supabase Status:", data.supabase);
+            if (data.status !== "HEALTHY") throw new Error("Worker status is not HEALTHY");
+            if (!data.supabase || data.supabase.status !== "CONNECTED" || data.supabase.restConnected !== true) {
+              throw new Error("Worker failed to connect to Supabase HTTPS REST API");
+            }
+            if (data.supabase.projectRef !== "hpwtdlffidfircparanl") {
+              throw new Error("Worker is not connected to Staging project hpwtdlffidfircparanl");
+            }
+            if (data.supabase.rpcMode !== "POSTGRES_REST_RPC") {
+              throw new Error("Worker is not in POSTGRES_REST_RPC mode");
+            }
+          '
+          echo "health_status=PASS" >> $GITHUB_OUTPUT
+
+      - name: Publish CI/CD Deployment & Connectivity Report
+        if: always()
+        run: |
+          {
+            echo "## WanderMatch V4.1 Staging Pipeline Summary"
+            echo "- **Branch:** \`${GITHUB_REF_NAME}\`"
+            echo "- **Commit:** \`${GITHUB_SHA}\`"
+            echo "- **Worker Target:** \`wandermatch-api-staging\`"
+            echo "- **Supabase Staging Project:** \`hpwtdlffidfircparanl\` (\`wandermatch-v4-staging\`)"
+            echo "- **Deploy Mode:** \`${{ steps.cf_deploy.outputs.deploy_mode }}\`"
+            echo "- **Live Health & Supabase REST Check:** \`${{ steps.health_verify.outputs.health_status || 'FAILED' }}\`"
+          } >> $GITHUB_STEP_SUMMARY
+
   deploy:
+    name: 3. Deploy Static Frontend to GitHub Pages (Main Only — Production Worker Gated)
+    needs: verify-staging
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -28,11 +159,7 @@ jobs:
       - name: Stage strictly allowlisted static frontend assets
         run: |
           mkdir -p _site
-          cp index.html _site/
-          cp facebook-auth.html _site/
-          cp styles.css _site/
-          cp app.js _site/
-          cp supabaseClient.js _site/
+          cp -r frontend/* _site/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

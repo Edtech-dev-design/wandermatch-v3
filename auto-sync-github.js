@@ -16,7 +16,7 @@ const { exec } = require('child_process');
 
 const ROOT_DIR = __dirname;
 const WATCH_EXTENSIONS = new Set(['.html', '.css', '.js', '.json', '.sql', '.md', '.yml', '.toml']);
-const IGNORE_DIRS = new Set(['.git', 'node_modules', '.netlify', '.vercel', '.wrangler']);
+const IGNORE_DIRS = new Set(['.git', 'node_modules', '.netlify', '.vercel', '.wrangler', 'scratch', '.temp']);
 
 let syncTimer = null;
 let isSyncing = false;
@@ -79,11 +79,26 @@ async function performGitSync(triggerReason = 'Auto-watch') {
     if (!statusRes.stdout) {
       lastSyncStatus.state = 'UP_TO_DATE';
       lastSyncStatus.lastSyncTime = new Date().toLocaleString('vi-VN');
-      // Thử push nếu còn commit local chưa đẩy
-      const pushCheck = await runGitCommand('git push -u origin main');
-      if (pushCheck.ok) {
-        lastSyncStatus.lastCommitMessage = 'Đã đồng bộ toàn bộ commit lên GitHub thành công';
+      const branchRes = await runGitCommand('git branch --show-current');
+      const currentBranch = branchRes.stdout || 'feat/v4-architecture';
+      if (currentBranch === 'main') {
+        lastSyncStatus.lastCommitMessage = 'Nhánh Production (main) được bảo vệ — không tự động push';
+        isSyncing = false;
+        return lastSyncStatus;
       }
+      const pushCheck = await runGitCommand(`git push -u origin ${currentBranch}`);
+      if (pushCheck.ok) {
+        lastSyncStatus.lastCommitMessage = `Đã đồng bộ toàn bộ commit lên nhánh ${currentBranch} thành công`;
+      }
+      isSyncing = false;
+      return lastSyncStatus;
+    }
+
+    const branchRes = await runGitCommand('git branch --show-current');
+    const currentBranch = branchRes.stdout || 'feat/v4-architecture';
+    if (currentBranch === 'main') {
+      lastSyncStatus.state = 'PRODUCTION_BRANCH_PROTECTED';
+      lastSyncStatus.lastCommitMessage = 'Chặn auto-sync trực tiếp lên nhánh Production (main)';
       isSyncing = false;
       return lastSyncStatus;
     }
@@ -91,12 +106,12 @@ async function performGitSync(triggerReason = 'Auto-watch') {
     const filesList = Array.from(changedFiles).slice(0, 4).join(', ') || 'code files';
     changedFiles.clear();
 
-    await runGitCommand('git add -A');
+    await runGitCommand('git add -u');
     const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
     const commitMsg = `chore(auto-sync): update ${filesList} [${timestamp}] (${triggerReason})`;
     await runGitCommand(`git commit -m "${commitMsg}"`);
 
-    const pushRes = await runGitCommand('git push -u origin main');
+    const pushRes = await runGitCommand(`git push -u origin ${currentBranch}`);
     lastSyncStatus.lastSyncTime = new Date().toLocaleString('vi-VN');
     lastSyncStatus.lastCommitMessage = commitMsg;
 
@@ -149,27 +164,32 @@ function startFileWatcher() {
     console.error('⚠️ Không thể khởi tạo fs.watch:', e.message);
   }
 
-  // Tự động kiểm tra và đẩy các commit chưa push lên GitHub mỗi 15 giây
+  // Tự động kiểm tra và đẩy các commit chưa push lên nhánh phát triển hiện tại (không bao giờ tự động push vào main)
   setInterval(async () => {
     if (lastSyncStatus.state !== 'SYNCED_GITHUB' && !isSyncing) {
-      const pushRes = await runGitCommand('git push -u origin main');
+      const branchRes = await runGitCommand('git branch --show-current');
+      const currentBranch = branchRes.stdout || 'feat/v4-architecture';
+      if (currentBranch === 'main') return;
+      const pushRes = await runGitCommand(`git push -u origin ${currentBranch}`);
       if (pushRes.ok) {
         lastSyncStatus.state = 'SYNCED_GITHUB';
         lastSyncStatus.lastSyncTime = new Date().toLocaleString('vi-VN');
-        lastSyncStatus.lastCommitMessage = 'Đã tự động đẩy toàn bộ mã nguồn lên GitHub thành công!';
-        console.log('🎉 [GitHub Auto-Sync] Đã kết nối và đẩy toàn bộ code lên GitHub thành công!');
+        lastSyncStatus.lastCommitMessage = `Đã tự động đẩy mã nguồn lên nhánh ${currentBranch} thành công!`;
+        console.log(`🎉 [GitHub Auto-Sync] Đã kết nối và đẩy toàn bộ code lên nhánh ${currentBranch} thành công!`);
       }
     }
   }, 15000);
 }
 
-if (require.main === module) {
+const isDirectExecution = Boolean(
+  process.argv[1] && path.resolve(process.argv[1]) === path.resolve(__filename)
+);
+
+if (isDirectExecution) {
   startFileWatcher();
   performGitSync('Startup-Check');
 }
 
-module.exports = {
-  startFileWatcher,
-  performGitSync,
-  getSyncStatus: () => lastSyncStatus
-};
+const getSyncStatus = () => lastSyncStatus;
+export { startFileWatcher, performGitSync, getSyncStatus };
+export default { startFileWatcher, performGitSync, getSyncStatus };

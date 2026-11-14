@@ -1,16 +1,33 @@
 {
   "version": 2,
-  "framework": null,
+  "name": "wandermatch-v4",
+  "public": true,
+  "buildCommand": "echo 'Static frontend assets ready in frontend/'",
   "outputDirectory": "frontend",
+  "git": {
+    "deploymentEnabled": {
+      "main": false,
+      "feat/v4-architecture": true
+    }
+  },
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://hpwtdlffidfircparanl.supabase.co",
+    "VITE_SUPABASE_URL": "https://hpwtdlffidfircparanl.supabase.co",
+    "NEXT_PUBLIC_API_BASE": "https://wandermatch-api-staging.vannong20182018.workers.dev"
+  },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.js" }
+    {
+      "source": "/api/:path*",
+      "destination": "https://wandermatch-api-staging.vannong20182018.workers.dev/api/:path*"
+    }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
     }
   ]

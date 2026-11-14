@@ -44,9 +44,27 @@ window.updatePackingProgress = function() {
 // ============================================================================
 // WANDERMATCH PRODUCTION CONFIG & LIVE BACKEND API ENDPOINT
 // ============================================================================
-window.API_BASE = (typeof window !== "undefined" && (window.location.port === "3000" || window.location.port === "5500"))
-  ? "http://127.0.0.1:8787"
-  : (typeof window !== "undefined" ? window.location.origin : "http://127.0.0.1:8787");
+window.WM_ENV_CONFIG = (function() {
+  const host = (typeof window !== "undefined" && window.location && window.location.hostname) ? window.location.hostname.toLowerCase() : "localhost";
+  const port = (typeof window !== "undefined" && window.location && window.location.port) ? window.location.port : "";
+  const isLocal = host === "localhost" || host === "127.0.0.1";
+  const isProdDomain = host === "wandermatch.vn" || host === "www.wandermatch.vn";
+  return {
+    environment: isLocal ? "development" : (isProdDomain ? "production" : "staging"),
+    apiBase: (typeof window !== "undefined" && window.ENV_API_BASE)
+      ? window.ENV_API_BASE
+      : isLocal
+        ? ((port === "3000" || port === "5500") ? "http://127.0.0.1:8787" : window.location.origin)
+        : isProdDomain
+          ? window.location.origin
+          : "https://wandermatch-api-staging.vannong20182018.workers.dev",
+    supabaseUrl: (typeof window !== "undefined" && window.ENV_SUPABASE_URL)
+      ? window.ENV_SUPABASE_URL
+      : "https://hpwtdlffidfircparanl.supabase.co"
+  };
+})();
+window.CLOUDFLARE_WORKER_API_URL = "https://wandermatch-api-staging.vannong20182018.workers.dev";
+window.API_BASE = window.WM_ENV_CONFIG.apiBase;
 /**
  * WANDERMATCH — PRODUCTION LUXURY BLIND TRAVEL PLATFORM
  * Version 10.0 — Unified One-Step Auth, Live Google & Facebook OAuth Connectors,
@@ -453,6 +471,9 @@ window.sealUnrevealedPackage = function(pkg) {
   delete copy.secret_destination_id;
   delete copy.secret_hotel_id;
   delete copy.secret_flight_id;
+  delete copy.secretRevealPackage;
+  delete copy.secretRevealData;
+  delete copy.secret_package;
   if (copy.reveal && typeof copy.reveal === "object") {
     copy.reveal = {
       ...copy.reveal,
@@ -538,6 +559,9 @@ window.saveStore = function(k, v) {
     localStorage.setItem(k, s);
     if (k === "wm_users_prod" || k === "wm_session_prod") {
       document.cookie = `${k}=${encodeURIComponent(s)}; path=/; max-age=31536000; SameSite=Lax`;
+    }
+    if (k === "wm_session_prod") {
+      window.WM_V4?.syncSessionToken?.(valToSave);
     }
   } catch (e) {}
 };
@@ -1021,6 +1045,7 @@ window.handleAuthFormSubmit = async function() {
   };
   window.saveStore("wm_users_prod", users);
   window.saveStore("wm_session_prod", {
+    id: u.userId || u.id || u.email,
     name: u.name,
     email: u.email,
     provider: "email",
@@ -1921,16 +1946,16 @@ window.selectComboAlternative = function(idx) {
     flightLabel: `Khứ hồi ${chosen.f.airline} (Khởi hành từ ${inp.origin || 'HAN'} ✈️ Sân bay bí mật)`,
     hotelLabel: `Resort ${chosen.h.rating}★ tiêu chuẩn quốc tế (Kèm buffet sáng & xe đưa đón)`,
     reveal: {
-      city: chosen.h.city, 
-      title: chosen.h.title, 
-      sla: chosen.h.sla,
-      room_type: chosen.h.room_type,
+      city: "✦ ĐIỂM ĐẾN NIÊM PHONG SÁP ✦", 
+      title: chosen.h.mysteryTitle || "Kỳ Nghỉ Bí Mật 3N2Đ", 
+      sla: "SLA-SEALED-UNTIL-REVEAL",
+      room_type: "Deluxe Suite View Đẹp (Tiêu Chuẩn SLA)",
       img: chosen.h.img,
       gallery: chosen.h.gallery || [chosen.h.img],
       room_specs: chosen.h.room_specs,
       amenities: chosen.h.amenities,
-      transport: `${chosen.f.id} - ${chosen.f.airline} (${chosen.f.time})`,
-      hotel: chosen.h.name, 
+      transport: `Chuyến bay khứ hồi ${chosen.f.airline} (✈️ Sân bay bí mật)`,
+      hotel: "Resort 4-5★ Tiêu Chuẩn Quốc Tế SLA (Niêm Phong Tên)", 
       paid: totalPaid, 
       retail: totalRetail, 
       savings
@@ -3139,7 +3164,7 @@ window.submitSlaRefundTicket = async function(type, amount) {
   try {
     const response = await fetch(`${window.API_BASE}/api/simulate-refund`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: window.getAuthHeaders({ "Content-Type": "application/json" }),
       body: JSON.stringify({
         scenario: type,
         bookingCode: code,
@@ -3151,6 +3176,7 @@ window.submitSlaRefundTicket = async function(type, amount) {
     if (!response.ok || !refundResult.success || !refundResult.isSimulation) {
       throw new Error(refundResult.error || "Không thể ghi nhận mô phỏng hoàn tiền.");
     }
+    window.WM_V4?.core?.emit?.("refund:requested", { bookingCode: code, scenario: type, amount });
   } catch (error) {
     window.showToast(`Không thể tạo phiếu mô phỏng: ${error.message}`, "error");
     return;
@@ -3269,6 +3295,20 @@ window.initScratchCanvas = function() {
   c.ontouchstart = () => { draw = true; };
   c.ontouchend = () => { draw = false; };
   c.ontouchmove = scratch;
+};
+
+window.wmSubmitReviewV4 = async function(payload = {}) {
+  if (!window.WM_V4?.modules?.reviews) {
+    throw new Error("Reviews module is not initialized.");
+  }
+  return window.WM_V4.modules.reviews.submitReview(payload);
+};
+
+window.wmFetchNotificationsV4 = async function(limit = 20) {
+  if (!window.WM_V4?.modules?.notifications) {
+    return { notifications: [] };
+  }
+  return window.WM_V4.modules.notifications.fetchNotifications(limit);
 };
 
 window.isRevealingInProgress = false;
