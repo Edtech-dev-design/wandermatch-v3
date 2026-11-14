@@ -1222,7 +1222,7 @@ function resolveCors(request, env) {
 
   const corsHeaders = {
     ...(allowOriginHeader ? { "Access-Control-Allow-Origin": allowOriginHeader } : {}),
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization, x-webhook-secret, x-sepay-signature, x-signature, apikey",
     "Vary": "Origin"
   };

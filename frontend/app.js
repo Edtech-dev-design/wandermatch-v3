@@ -1587,10 +1587,12 @@ window.applyServerRecommendationData = function(pkg, data) {
   if (data.session_id || Array.isArray(data.packages)) {
     pkg.recommendationId = data.session_id || pkg.recommendationId;
     const v4Pkgs = Array.isArray(data.packages) ? data.packages : [];
+    window.v4Packages = v4Pkgs;
     const topPkg = v4Pkgs[0] || null;
     if (topPkg) {
-      pkg.v4PackageId = topPkg.id || pkg.v4PackageId;
-      pkg.packageId = topPkg.id || pkg.packageId;
+      const resolvedId = topPkg.package_id || topPkg.id;
+      pkg.v4PackageId = resolvedId || pkg.v4PackageId;
+      pkg.packageId = resolvedId || pkg.packageId;
       pkg.expectedAmount = Number(topPkg.expected_amount_vnd || pkg.expectedAmount || 0);
       pkg.packageCost = pkg.expectedAmount || pkg.packageCost;
       if (topPkg.total_score) pkg.matchScore = Number(topPkg.total_score);
@@ -1599,6 +1601,19 @@ window.applyServerRecommendationData = function(pkg, data) {
       if (pkg.reveal && pkg.expectedAmount) {
         pkg.reveal.paid = pkg.expectedAmount;
       }
+    }
+    if (Array.isArray(pkg.candidates) && v4Pkgs.length) {
+      pkg.candidates = pkg.candidates.map((c, idx) => {
+        const vp = v4Pkgs[idx] || v4Pkgs[0];
+        const vpId = vp ? (vp.package_id || vp.id) : undefined;
+        return vp ? {
+          ...c,
+          v4PackageId: vpId || c.v4PackageId,
+          packageId: vpId || c.packageId,
+          expectedAmount: Number(vp.expected_amount_vnd || c.expectedAmount || 0),
+          unitCost: Number(vp.unit_price_vnd || c.unitCost || 0)
+        } : c;
+      });
     }
     window.currentRecommendationId = pkg.recommendationId || null;
     return window.sealUnrevealedPackage ? window.sealUnrevealedPackage(pkg) : pkg;
@@ -1703,11 +1718,14 @@ window.selectBlindTravelCandidate = function(candidateIdx) {
   });
 
   const isHighestMatch = candidateIdx === 0;
+  const v4Cand = (Array.isArray(window.v4Packages) && (window.v4Packages[candidateIdx] || window.v4Packages[0])) || null;
+  const resolvedV4PkgId = v4Cand ? (v4Cand.package_id || v4Cand.id) : undefined;
 
   const newPkg = {
     code,
     recommendationId: window.currentRecommendationId || undefined,
-    packageId: serverCand ? serverCand.packageId : undefined,
+    v4PackageId: resolvedV4PkgId,
+    packageId: resolvedV4PkgId || (serverCand ? serverCand.packageId : undefined),
     expectedAmount: totalPaid,
     packageCost: totalPaid,
     comboId: chosen.comboId,
@@ -3131,6 +3149,19 @@ window.confirmAndLockBooking = async function() {
           pkg.expectedAmount = Number(v4BookRes.expected_amount_vnd);
           pkg.packageCost = pkg.expectedAmount;
           if (pkg.reveal) pkg.reveal.paid = pkg.expectedAmount;
+        }
+        const unitAmt = Math.round(Number(pkg.expectedAmount || 0) / Math.max(1, Number(tripInputs.groupSize || 2)));
+        if (Array.isArray(pkg.qrs) && pkg.qrs.length) {
+          pkg.qrs = pkg.qrs.map((q, i) => {
+            const memo = `${pkg.code} KH${q.idx || (i + 1)}`;
+            const amt = unitAmt > 0 ? unitAmt : q.amount;
+            return {
+              ...q,
+              amount: amt,
+              memo,
+              url: `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${amt}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent("CONG TY TNHH WANDERMATCH VN")}`
+            };
+          });
         }
       }
     }

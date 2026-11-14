@@ -34,7 +34,7 @@ export function resolveCorsHeaders(request, env) {
 
   const corsHeaders = {
     ...(allowOriginHeader ? { "Access-Control-Allow-Origin": allowOriginHeader } : {}),
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Request-Id, x-webhook-secret, x-sepay-signature, x-signature, apikey",
     "Access-Control-Expose-Headers": "X-Request-Id, X-Environment",
     "Vary": "Origin"
