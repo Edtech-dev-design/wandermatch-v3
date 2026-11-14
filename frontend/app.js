@@ -1559,6 +1559,28 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
 window.serverTop3Curated = [];
 window.currentRecommendationId = null;
 
+window.normalizeItineraryDays = function(daysArray, fallbackDays = []) {
+  const src = Array.isArray(daysArray) && daysArray.length
+    ? daysArray
+    : (Array.isArray(fallbackDays) ? fallbackDays : []);
+  return src.map((item, idx) => {
+    if (!item || typeof item !== "object") {
+      return {
+        d: `Ngày ${idx + 1}: Khám phá hành trình`,
+        m: String(item || "Khởi hành và trải nghiệm buổi sáng."),
+        a: "Khám phá văn hóa và ẩm thực địa phương buổi chiều.",
+        e: "Thư giãn và tận hưởng không gian buổi tối."
+      };
+    }
+    return {
+      d: String(item.d || item.day || item.title || `Ngày ${idx + 1}: Khám phá hành trình`),
+      m: String(item.m || item.morning || "Khởi hành và trải nghiệm buổi sáng."),
+      a: String(item.a || item.afternoon || "Khám phá văn hóa và ẩm thực địa phương buổi chiều."),
+      e: String(item.e || item.evening || "Thư giãn và tận hưởng không gian buổi tối.")
+    };
+  });
+};
+
 window.applyServerRecommendationData = function(pkg, data) {
   if (!pkg || !data || !data.success) return pkg;
   // Support canonical V4 /api/v4/recommendations response shape
@@ -1630,7 +1652,7 @@ window.applyServerRecommendationData = function(pkg, data) {
   pkg.mysteryCuration = data.mysteryCuration;
   if (data.mysteryHint) pkg.hint = data.mysteryHint;
   if (data.packingChecklist) pkg.packing = data.packingChecklist;
-  if (data.itinerary) pkg.days = data.itinerary;
+  if (Array.isArray(data.itinerary) && data.itinerary.length) pkg.days = window.normalizeItineraryDays(data.itinerary, pkg.days);
   if (data.matchScore) pkg.matchScore = data.matchScore;
   if (data.utilityScore) pkg.utilityScore = data.utilityScore;
   return pkg;
@@ -1703,7 +1725,7 @@ window.selectBlindTravelCandidate = function(candidateIdx) {
     hint: (serverCand && serverCand.mysteryHint) || chosen.h.hint,
     packing: (serverCand && serverCand.packingChecklist) || chosen.h.packing,
     food: chosen.h.food,
-    days: (serverCand && serverCand.itinerary) || chosen.h.mysteryDays || chosen.h.days,
+    days: window.normalizeItineraryDays((serverCand && serverCand.itinerary) || chosen.h.mysteryDays || chosen.h.days, chosen.h.days),
     reviews: chosen.h.reviews || [],
     flight: chosen.f,
     hotel: chosen.h,
@@ -2279,6 +2301,7 @@ window.renderPackageUI = function(pkg) {
   if (!pkg) return;
   const resultBox = document.getElementById("recommendationResultBox");
   if (!resultBox) return;
+  pkg.days = window.normalizeItineraryDays(pkg.days);
 
   const gallery = (pkg.reveal && pkg.reveal.gallery) || [pkg.reveal.img];
   const specs = pkg.reveal.room_specs || {
@@ -2806,7 +2829,7 @@ window.renderPackageUI = function(pkg) {
           ${pkg.days.map((d, idx) => `
             <button id="itinDayTab_${idx}" onclick="window.switchItineraryDay(${idx})" class="flex-1 py-2.5 px-3 rounded-xl font-${idx === 0 ? 'extrabold bg-teal-500 text-slate-950 border border-teal-300 shadow-md' : 'semibold bg-slate-900/80 text-slate-400 hover:text-white border border-white/10'} text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
               <span>${idx === 0 ? '🌅' : (idx === 1 ? '🌟' : '🌿')}</span>
-              <span>${d.d.split(':')[0] || 'Ngày ' + (idx + 1)}</span>
+              <span>${((d && (d.d || d.day || d.title)) || ('Ngày ' + (idx + 1))).split(':')[0] || ('Ngày ' + (idx + 1))}</span>
             </button>
           `).join("")}
         </div>
@@ -3796,7 +3819,7 @@ window.revealDestinationNow = window.revealMysteryTrip = async function() {
       pkg.food = rev.antiTouristTrapGuide;
     }
     if (Array.isArray(rev.realItinerary) && rev.realItinerary.length) {
-      pkg.days = rev.realItinerary;
+      pkg.days = window.normalizeItineraryDays(rev.realItinerary, pkg.days);
     }
     window.saveStore("wm_draft_prod", pkg);
 

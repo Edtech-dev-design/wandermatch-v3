@@ -1,7 +1,6 @@
 {
   "version": 2,
-  "name": "wandermatch-v4",
-  "public": true,
+  "framework": null,
   "buildCommand": "echo 'Static frontend assets ready in frontend/'",
   "outputDirectory": "frontend",
   "git": {
@@ -9,11 +8,6 @@
       "main": false,
       "feat/v4-architecture": true
     }
-  },
-  "env": {
-    "NEXT_PUBLIC_SUPABASE_URL": "https://hpwtdlffidfircparanl.supabase.co",
-    "VITE_SUPABASE_URL": "https://hpwtdlffidfircparanl.supabase.co",
-    "NEXT_PUBLIC_API_BASE": "https://wandermatch-api-staging.vannong20182018.workers.dev"
   },
   "rewrites": [
     {
