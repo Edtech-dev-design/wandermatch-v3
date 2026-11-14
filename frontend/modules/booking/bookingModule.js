@@ -26,6 +26,16 @@ export function createBookingModule({ apiClient }) {
         },
         { requireAuth: true }
       );
+    },
+    async getBookingStatus(bookingCode) {
+      const code = String(bookingCode || "").trim().toUpperCase();
+      if (!code) throw new Error("bookingCode is required.");
+      return apiClient.get(`/api/v4/bookings/status?bookingCode=${encodeURIComponent(code)}`, {
+        requireAuth: true
+      });
+    },
+    async listMyBookings() {
+      return apiClient.get("/api/v4/bookings", { requireAuth: true });
     }
   };
 }

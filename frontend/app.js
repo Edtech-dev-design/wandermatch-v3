@@ -933,11 +933,16 @@ window.currentAuthMode = "login";
 window.setAuthMode = function(mode) {
   window.currentAuthMode = mode;
   const nameGroup = document.getElementById("authFieldGroup_Name");
+  const otpGroup = document.getElementById("authFieldGroup_Otp");
+  const passGroup = document.getElementById("authFieldGroup_Pass");
+  const passLabel = document.getElementById("lblUniPass");
+  const forgotLink = document.getElementById("btnAuthForgotLink");
   const confirmGroup = document.getElementById("authFieldGroup_ConfirmPass");
   const submitBtn = document.getElementById("btnAuthSubmit");
   const title = document.getElementById("authModalTitle");
   const subtitle = document.getElementById("authModalSubtitle");
   const toRegBox = document.getElementById("authSwitchToRegisterBox");
+  const toResetBox = document.getElementById("authSwitchToResetBox");
   const toLoginBox = document.getElementById("authSwitchToLoginBox");
   const errBox = document.getElementById("unifiedAuthErrorBox");
   const successBox = document.getElementById("unifiedAuthSuccessBox");
@@ -947,19 +952,53 @@ window.setAuthMode = function(mode) {
 
   if (mode === "register") {
     if (nameGroup) nameGroup.style.display = "block";
+    if (otpGroup) otpGroup.style.display = "none";
+    if (passGroup) passGroup.style.display = "block";
+    if (passLabel) passLabel.innerText = "Mật khẩu (*)";
+    if (forgotLink) forgotLink.style.display = "none";
     if (confirmGroup) confirmGroup.style.display = "block";
     if (title) title.innerText = "Đăng Ký Thành Viên Mới";
     if (subtitle) subtitle.innerText = "Tạo tài khoản nhận ngay Bậc Đồng và mở khóa trải nghiệm du lịch mù.";
     if (submitBtn) submitBtn.innerHTML = "<span>✓</span> Hoàn Tất Đăng Ký Tài Khoản";
     if (toRegBox) toRegBox.style.display = "none";
+    if (toResetBox) toResetBox.style.display = "none";
+    if (toLoginBox) toLoginBox.style.display = "block";
+  } else if (mode === "forgot") {
+    if (nameGroup) nameGroup.style.display = "none";
+    if (otpGroup) otpGroup.style.display = "none";
+    if (passGroup) passGroup.style.display = "none";
+    if (confirmGroup) confirmGroup.style.display = "none";
+    if (title) title.innerText = "Khôi Phục Mật Khẩu";
+    if (subtitle) subtitle.innerText = "Nhập Email đã đăng ký để nhận liên kết/mã khôi phục mật khẩu từ Supabase Auth.";
+    if (submitBtn) submitBtn.innerHTML = "<span>✉</span> Gửi Yêu Cầu Khôi Phục";
+    if (toRegBox) toRegBox.style.display = "none";
+    if (toResetBox) toResetBox.style.display = "block";
+    if (toLoginBox) toLoginBox.style.display = "block";
+  } else if (mode === "reset") {
+    if (nameGroup) nameGroup.style.display = "none";
+    if (otpGroup) otpGroup.style.display = "block";
+    if (passGroup) passGroup.style.display = "block";
+    if (passLabel) passLabel.innerText = "Mật khẩu mới (*)";
+    if (forgotLink) forgotLink.style.display = "none";
+    if (confirmGroup) confirmGroup.style.display = "block";
+    if (title) title.innerText = "Đặt Lại Mật Khẩu Mới";
+    if (subtitle) subtitle.innerText = "Nhập mã OTP hoặc Recovery Token và mật khẩu mới tối thiểu 6 ký tự.";
+    if (submitBtn) submitBtn.innerHTML = "<span>🔒</span> Cập Nhật Mật Khẩu Mới";
+    if (toRegBox) toRegBox.style.display = "none";
+    if (toResetBox) toResetBox.style.display = "none";
     if (toLoginBox) toLoginBox.style.display = "block";
   } else {
     if (nameGroup) nameGroup.style.display = "none";
+    if (otpGroup) otpGroup.style.display = "none";
+    if (passGroup) passGroup.style.display = "block";
+    if (passLabel) passLabel.innerText = "Mật khẩu (*)";
+    if (forgotLink) forgotLink.style.display = "inline";
     if (confirmGroup) confirmGroup.style.display = "none";
     if (title) title.innerText = "Đăng Nhập Tài Khoản";
     if (subtitle) subtitle.innerText = "Đăng nhập để mở khóa giao diện đặt chuyến và quản lý hành trình du lịch mù.";
     if (submitBtn) submitBtn.innerHTML = "<span>✓</span> Đăng Nhập Vào Hệ Thống";
     if (toRegBox) toRegBox.style.display = "block";
+    if (toResetBox) toResetBox.style.display = "none";
     if (toLoginBox) toLoginBox.style.display = "none";
   }
 };
@@ -970,6 +1009,8 @@ window.handleAuthFormSubmit = async function() {
   const pass = document.getElementById("uniPass")?.value || "";
   const errBox = document.getElementById("unifiedAuthErrorBox");
   const successBox = document.getElementById("unifiedAuthSuccessBox");
+  const submitBtn = document.getElementById("btnAuthSubmit");
+  const prevBtnHtml = submitBtn ? submitBtn.innerHTML : "";
 
   const setErr = (msg) => {
     if (successBox) successBox.style.display = "none";
@@ -980,8 +1021,8 @@ window.handleAuthFormSubmit = async function() {
     if (successBox) { successBox.innerText = msg; successBox.style.display = "block"; }
   };
 
-  if (!window.isValidEmail(email)) return setErr("Địa chỉ Email không hợp lệ!");
-  if (!pass || pass.length < 6) return setErr("Mật khẩu phải có tối thiểu 6 ký tự!");
+  if (mode !== "reset" && !window.isValidEmail(email)) return setErr("Địa chỉ Email không hợp lệ!");
+  if (mode !== "forgot" && (!pass || pass.length < 6)) return setErr("Mật khẩu phải có tối thiểu 6 ký tự!");
 
   const call = async (path, body) => {
     const res = await fetch(`${window.API_BASE}${path}`, {
@@ -992,71 +1033,140 @@ window.handleAuthFormSubmit = async function() {
     return { status: res.status, data: await res.json().catch(() => ({})) };
   };
 
-  if (mode === "register") {
-    const name = (document.getElementById("uniName")?.value || "").trim();
-    const passConfirm = document.getElementById("uniPassConfirm")?.value || "";
-    if (!name) return setErr("Vui lòng nhập Họ và tên của bạn!");
-    if (pass !== passConfirm) return setErr("Xác nhận mật khẩu không trùng khớp với mật khẩu đã nhập!");
+  const authMod = window.WM_V4?.modules?.auth;
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = "Đang xử lý..."; }
 
-    try {
-      const regRes = await call("/api/auth/register", { email, password: pass, name });
-      if (!regRes.data.success && regRes.status !== 409) {
-        return setErr(regRes.data.error || "Đăng ký không thành công!");
+  try {
+    if (mode === "forgot") {
+      try {
+        if (authMod?.forgotPassword) {
+          await authMod.forgotPassword({ email });
+        } else {
+          const r = await call("/api/v4/auth/forgot-password", { email });
+          if (!r.data.success) throw new Error(r.data.error || "Không thể gửi yêu cầu khôi phục.");
+        }
+        window.setAuthMode("reset");
+        setSuccess("✓ Yêu cầu khôi phục đã được gửi. Vui lòng kiểm tra email để lấy mã OTP hoặc liên kết khôi phục.");
+      } catch (e) {
+        return setErr(e?.message || "Không thể gửi yêu cầu khôi phục mật khẩu.");
       }
-      if (regRes.status === 409) {
-        return setErr("Email này đã được đăng ký! Vui lòng chuyển sang Đăng Nhập.");
+      return;
+    }
+
+    if (mode === "reset") {
+      const otpOrToken = (document.getElementById("uniRecoveryOtp")?.value || "").trim();
+      const passConfirm = document.getElementById("uniPassConfirm")?.value || "";
+      if (!otpOrToken) return setErr("Vui lòng nhập Mã OTP hoặc Recovery Token.");
+      if (pass !== passConfirm) return setErr("Xác nhận mật khẩu mới không trùng khớp!");
+      const isJwtToken = otpOrToken.split(".").length === 3;
+      try {
+        if (authMod?.resetPassword) {
+          await authMod.resetPassword({
+            email,
+            otp: isJwtToken ? "" : otpOrToken,
+            recoveryToken: isJwtToken ? otpOrToken : "",
+            newPassword: pass
+          });
+        } else {
+          const r = await call("/api/v4/auth/reset-password", {
+            email,
+            otp: isJwtToken ? "" : otpOrToken,
+            recoveryToken: isJwtToken ? otpOrToken : "",
+            newPassword: pass
+          });
+          if (!r.data.success) throw new Error(r.data.error || "Đặt lại mật khẩu thất bại.");
+        }
+        window.setAuthMode("login");
+        setSuccess("✓ Mật khẩu đã được cập nhật! Vui lòng đăng nhập với mật khẩu mới.");
+      } catch (e) {
+        return setErr(e?.message || "Mã OTP hoặc Recovery Token không hợp lệ.");
+      }
+      return;
+    }
+
+    if (mode === "register") {
+      const name = (document.getElementById("uniName")?.value || "").trim();
+      const passConfirm = document.getElementById("uniPassConfirm")?.value || "";
+      if (!name) return setErr("Vui lòng nhập Họ và tên của bạn!");
+      if (pass !== passConfirm) return setErr("Xác nhận mật khẩu không trùng khớp với mật khẩu đã nhập!");
+
+      try {
+        if (authMod?.register) {
+          await authMod.register({ email, password: pass, name });
+        } else {
+          const regRes = await call("/api/v4/auth/register", { email, password: pass, name });
+          if (!regRes.data.success) {
+            const err = new Error(regRes.data.error || "Đăng ký không thành công!");
+            err.status = regRes.status;
+            throw err;
+          }
+        }
+      } catch (e) {
+        if (e?.status === 409) {
+          return setErr("Email này đã được đăng ký! Vui lòng chuyển sang Đăng Nhập.");
+        }
+        return setErr(e?.message || "Không thể kết nối máy chủ xác thực để đăng ký tài khoản. Vui lòng thử lại!");
+      }
+
+      window.setAuthMode("login");
+      setSuccess("✓ Đăng ký tài khoản thành công qua Auth V4! Vui lòng nhập mật khẩu để đăng nhập.");
+      const passInput = document.getElementById("uniPass");
+      if (passInput) {
+        passInput.value = "";
+        passInput.focus();
+      }
+      return;
+    }
+
+    // MODE LOGIN — Authoritative V4 backend authentication via window.WM_V4.modules.auth
+    let loginData;
+    try {
+      if (authMod?.login) {
+        loginData = await authMod.login({ email, password: pass });
+      } else {
+        const res = await call("/api/v4/auth/login", { email, password: pass });
+        if (!res.data.success || !res.data.token) {
+          throw new Error(res.data.error || "Đăng nhập thất bại!");
+        }
+        loginData = res.data;
       }
     } catch (e) {
-      return setErr("Không thể kết nối máy chủ xác thực để đăng ký tài khoản. Vui lòng thử lại!");
+      return setErr(e?.message || "Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu!");
     }
 
-    // ĐĂNG KÝ XONG: TẮT CHỨC NĂNG ĐĂNG KÝ VÀ CHUYỂN LẠI VÀO ĐĂNG NHẬP
-    window.setAuthMode("login");
-    setSuccess("✓ Đăng ký tài khoản thành công! Chức năng đăng ký đã tắt. Vui lòng nhập mật khẩu để đăng nhập.");
-    const passInput = document.getElementById("uniPass");
-    if (passInput) {
-      passInput.value = "";
-      passInput.focus();
+    const u = loginData.user;
+    const users = window.loadStore("wm_users_prod", {});
+    users[u.email] = {
+      ...(users[u.email] || {}),
+      name: u.name,
+      email: u.email,
+      provider: "email",
+      avatar: u.avatar || "",
+      lastLoginAt: new Date().toISOString()
+    };
+    window.saveStore("wm_users_prod", users);
+    const sessionObj = {
+      id: u.userId || u.id || u.email,
+      name: u.name,
+      email: u.email,
+      provider: "email",
+      avatar: u.avatar || "",
+      token: loginData.token,
+      role: u.role || "user"
+    };
+    window.saveStore("wm_session_prod", sessionObj);
+    window.WM_V4?.syncSessionToken?.(sessionObj);
+
+    window.applyUserSession();
+    window.closeUnifiedAuthModal();
+    window.wmRefreshNotificationsV4?.();
+    window.showToast(`Chào mừng ${u.name}! Đã đăng nhập thành công.`);
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      if (submitBtn.innerText === "Đang xử lý...") submitBtn.innerHTML = prevBtnHtml;
     }
-    return;
   }
-
-  // MODE LOGIN — Authoritative backend authentication only (no offline password bypass)
-  let loginRes;
-  try {
-    loginRes = await call("/api/auth/login", { email, password: pass });
-  } catch (e) {
-    return setErr("Không kết nối được máy chủ xác thực. Vui lòng kiểm tra kết nối và thử lại!");
-  }
-
-  if (!loginRes.data.success || !loginRes.data.token) {
-    return setErr(loginRes.data.error || "Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu!");
-  }
-
-  const u = loginRes.data.user;
-  const users = window.loadStore("wm_users_prod", {});
-  users[u.email] = {
-    ...(users[u.email] || {}),
-    name: u.name,
-    email: u.email,
-    provider: "email",
-    avatar: u.avatar || "",
-    lastLoginAt: new Date().toISOString()
-  };
-  window.saveStore("wm_users_prod", users);
-  window.saveStore("wm_session_prod", {
-    id: u.userId || u.id || u.email,
-    name: u.name,
-    email: u.email,
-    provider: "email",
-    avatar: u.avatar || "",
-    token: loginRes.data.token,
-    role: u.role || "b2c"
-  });
-
-  window.applyUserSession();
-  window.closeUnifiedAuthModal();
-  window.showToast(`Chào mừng ${u.name}! Đã đăng nhập thành công.`);
 };
 
 window.verifySessionWithBackend = async function() {
@@ -1067,28 +1177,41 @@ window.verifySessionWithBackend = async function() {
     return;
   }
   try {
-    const res = await fetch(`${window.API_BASE}/api/auth/me`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${session.token}` }
-    });
-    if (res.status === 401) {
+    let data = null;
+    if (window.WM_V4?.modules?.auth?.verifySession) {
+      data = await window.WM_V4.modules.auth.verifySession();
+    } else {
+      const res = await fetch(`${window.API_BASE}/api/v4/auth/me`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${session.token}` }
+      });
+      if (res.status === 401) {
+        const err = new Error("Unauthorized");
+        err.status = 401;
+        throw err;
+      }
+      if (res.ok) data = await res.json().catch(() => ({}));
+    }
+    if (data && data.success && data.user) {
+      const updatedSession = {
+        ...session,
+        id: data.user.id || session.id,
+        name: data.user.name || session.name,
+        email: data.user.email,
+        role: data.user.role || session.role || "user",
+        isAdmin: Boolean(data.user.isAdmin || data.user.role === "admin" || data.user.role === "super_admin")
+      };
+      window.saveStore("wm_session_prod", updatedSession);
+      window.WM_V4?.syncSessionToken?.(updatedSession);
+      window.applyUserSession();
+      window.wmRefreshNotificationsV4?.();
+    }
+  } catch (e) {
+    if (e?.status === 401) {
       window.logoutUser();
       window.showToast("Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại!", "warn");
-      return;
     }
-    if (res.ok) {
-      const data = await res.json().catch(() => ({}));
-      if (data && data.success && data.user) {
-        const updatedSession = {
-          ...session,
-          name: data.user.name || session.name,
-          email: data.user.email,
-          role: data.user.role || "b2c"
-        };
-        window.saveStore("wm_session_prod", updatedSession);
-      }
-    }
-  } catch (e) {}
+  }
 };
 
 // ============================================================================
@@ -1105,6 +1228,10 @@ window.applyUserSession = function() {
     // ĐÃ ĐĂNG NHẬP / ĐĂNG KÝ: MỞ KHÓA THÔNG TIN BÊN TRONG CỦA WEB!
     if (outBox) outBox.style.display = "none";
     if (inBox) inBox.style.display = "flex";
+    const notifBtn = document.getElementById("navNotificationsBtn");
+    const adminBtn = document.getElementById("navAdminBtn");
+    if (notifBtn) notifBtn.style.display = "inline-flex";
+    if (adminBtn) adminBtn.style.display = (session.isAdmin || session.role === "admin" || session.role === "super_admin") ? "inline-flex" : "none";
     if (gatekeeper) gatekeeper.style.display = "none";
     if (b2cTab) b2cTab.style.display = "block";
 
@@ -1145,6 +1272,10 @@ window.applyUserSession = function() {
     // CHƯA ĐĂNG KÝ VÀ ĐĂNG NHẬP: KHÔNG THẤY THÔNG TIN BÊN TRONG CỦA WEB!
     if (outBox) outBox.style.display = "flex";
     if (inBox) inBox.style.display = "none";
+    const notifBtn = document.getElementById("navNotificationsBtn");
+    const adminBtn = document.getElementById("navAdminBtn");
+    if (notifBtn) notifBtn.style.display = "none";
+    if (adminBtn) adminBtn.style.display = "none";
     if (gatekeeper) gatekeeper.style.display = "block";
     if (b2cTab) b2cTab.style.display = "none";
     if (document.getElementById("tab-saved")) document.getElementById("tab-saved").style.display = "none";
@@ -1157,7 +1288,9 @@ window.applyUserSession = function() {
 
 window.logoutUser = function() {
   localStorage.removeItem("wm_session_prod");
+  localStorage.removeItem("wm_supabase_session");
   document.cookie = "wm_session_prod=; path=/; max-age=0";
+  window.WM_V4?.syncSessionToken?.(null);
   if (window.supabaseClient && window.supabaseClient.auth) {
     try { window.supabaseClient.auth.signOut(); } catch (e) {}
   }
@@ -1428,6 +1561,27 @@ window.currentRecommendationId = null;
 
 window.applyServerRecommendationData = function(pkg, data) {
   if (!pkg || !data || !data.success) return pkg;
+  // Support canonical V4 /api/v4/recommendations response shape
+  if (data.session_id || Array.isArray(data.packages)) {
+    pkg.recommendationId = data.session_id || pkg.recommendationId;
+    const v4Pkgs = Array.isArray(data.packages) ? data.packages : [];
+    const topPkg = v4Pkgs[0] || null;
+    if (topPkg) {
+      pkg.v4PackageId = topPkg.id || pkg.v4PackageId;
+      pkg.packageId = topPkg.id || pkg.packageId;
+      pkg.expectedAmount = Number(topPkg.expected_amount_vnd || pkg.expectedAmount || 0);
+      pkg.packageCost = pkg.expectedAmount || pkg.packageCost;
+      if (topPkg.total_score) pkg.matchScore = Number(topPkg.total_score);
+      if (topPkg.climate_zone_label) pkg.weather = `${topPkg.climate_zone_label}${topPkg.temp_range_label ? ` (${topPkg.temp_range_label})` : ""}`;
+      if (topPkg.blind_code_alias) pkg.blindCodeAlias = topPkg.blind_code_alias;
+      if (pkg.reveal && pkg.expectedAmount) {
+        pkg.reveal.paid = pkg.expectedAmount;
+      }
+    }
+    window.currentRecommendationId = pkg.recommendationId || null;
+    return window.sealUnrevealedPackage ? window.sealUnrevealedPackage(pkg) : pkg;
+  }
+
   pkg.recommendationId = data.recommendationId || pkg.recommendationId;
   pkg.packageId = data.packageId || pkg.packageId;
   window.currentRecommendationId = pkg.recommendationId || null;
@@ -1757,11 +1911,25 @@ window.onFormChange = function() {
   window.renderPackageUI(pkg);
   window.updatePersonaUI();
 
-  // 2. Gửi request đồng bộ Dual AI từ Cloudflare Worker trực tiếp (debounce 450ms)
+  // 2. Gửi request đồng bộ Dual AI / V4 Recommendations trực tiếp (debounce 450ms)
   clearTimeout(window.onFormChangeDebounceTimer);
   window.onFormChangeDebounceTimer = setTimeout(async () => {
-    if (window.API_BASE) {
-      try {
+    try {
+      let data = null;
+      if (window.WM_V4?.modules?.ai && window.WM_V4?.session?.getToken?.()) {
+        data = await window.WM_V4.modules.ai.generateRecommendations({
+          originAirport: inp.origin,
+          budgetPerPersonVnd: inp.budget,
+          groupSize: inp.groupSize,
+          healing: inp.vec?.healing ?? 80,
+          nature: inp.vec?.nature ?? 75,
+          solitude: inp.vec?.solitude ?? 70,
+          comfort: inp.vec?.comfort ?? 65,
+          culture: inp.vec?.culture ?? 60,
+          blacklistedSlugs: inp.blacklist || []
+        }).catch(() => null);
+      }
+      if (!data && window.API_BASE) {
         const res = await fetch(`${window.API_BASE}/api/ai-recommend`, {
           method: "POST",
           headers: window.getAuthHeaders({ "Content-Type": "application/json" }),
@@ -1774,17 +1942,15 @@ window.onFormChange = function() {
             blacklistCities: inp.blacklist
           })
         });
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.success) {
-            window.applyServerRecommendationData(pkg, data);
-            window.saveStore("wm_draft_prod", pkg);
-            window.renderPackageUI(pkg);
-            window.updatePersonaUI();
-          }
-        }
-      } catch (e) {}
-    }
+        if (res.ok) data = await res.json();
+      }
+      if (data && data.success) {
+        window.applyServerRecommendationData(pkg, data);
+        window.saveStore("wm_draft_prod", pkg);
+        window.renderPackageUI(pkg);
+        window.updatePersonaUI();
+      }
+    } catch (e) {}
   }, 450);
 
   const session = window.loadStore("wm_session_prod", null);
@@ -1803,12 +1969,26 @@ window.generateNewRecommendation = async function() {
   window.saveStore("wm_draft_prod", pkg);
   window.renderPackageUI(pkg);
   window.updatePersonaUI();
-  window.showToast(`Đang kết nối Dual AI (Cloudflare + Gemini) tính toán hành trình #${pkg.code}...`, "warn");
+  window.showToast(`Đang kết nối Dual AI & V4 Engine tính toán hành trình #${pkg.code}...`, "warn");
 
-  // 2. Gọi Backend Cloudflare Worker trực tiếp để lấy dữ liệu Dual AI
-  if (window.API_BASE) {
-    try {
-      const inp = window.getFormInputs();
+  // 2. Gọi Backend V4 Modules (khi đã đăng nhập) hoặc Dual AI fallback
+  try {
+    const inp = window.getFormInputs();
+    let data = null;
+    if (window.WM_V4?.modules?.ai && window.WM_V4?.session?.getToken?.()) {
+      data = await window.WM_V4.modules.ai.generateRecommendations({
+        originAirport: inp.origin,
+        budgetPerPersonVnd: inp.budget,
+        groupSize: inp.groupSize,
+        healing: inp.vec?.healing ?? 80,
+        nature: inp.vec?.nature ?? 75,
+        solitude: inp.vec?.solitude ?? 70,
+        comfort: inp.vec?.comfort ?? 65,
+        culture: inp.vec?.culture ?? 60,
+        blacklistedSlugs: inp.blacklist || []
+      }).catch(() => null);
+    }
+    if (!data && window.API_BASE) {
       const res = await fetch(`${window.API_BASE}/api/ai-recommend`, {
         method: "POST",
         headers: window.getAuthHeaders({ "Content-Type": "application/json" }),
@@ -1821,20 +2001,18 @@ window.generateNewRecommendation = async function() {
           blacklistCities: inp.blacklist
         })
       });
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.success) {
-          window.applyServerRecommendationData(pkg, data);
-          window.saveStore("wm_draft_prod", pkg);
-          window.renderPackageUI(pkg);
-          window.updatePersonaUI();
-          window.showToast(`✓ Dual AI đã tối ưu trọn vẹn gói #${pkg.code} (Khớp gu ${pkg.matchScore}%)!`);
-          return;
-        }
-      }
-    } catch (e) {
-      console.warn("Backend AI recommend fallback to local engine:", e);
+      if (res.ok) data = await res.json();
     }
+    if (data && data.success) {
+      window.applyServerRecommendationData(pkg, data);
+      window.saveStore("wm_draft_prod", pkg);
+      window.renderPackageUI(pkg);
+      window.updatePersonaUI();
+      window.showToast(`✓ Dual AI V4 đã tối ưu trọn vẹn gói #${pkg.code} (Khớp gu ${pkg.matchScore}%)!`);
+      return;
+    }
+  } catch (e) {
+    console.warn("Backend AI recommend fallback to local engine:", e);
   }
 
   window.showToast(`Đã tính toán hành trình mới #${pkg.code} (Khớp gu ${pkg.matchScore}%)!`);
@@ -2886,62 +3064,111 @@ window.confirmAndLockBooking = async function() {
 
   let pkg = window.loadStore("wm_draft_prod", null) || window.runBlindTravelEngine(true);
   const tripInputs = window.getFormInputs();
+  const hasV4Auth = Boolean(window.WM_V4?.modules?.booking && window.WM_V4?.session?.getToken?.());
   try {
-    if (!pkg.packageId) {
-      const recRes = await fetch(`${window.API_BASE}/api/ai-recommend`, {
+    if (hasV4Auth) {
+      if (!pkg.v4PackageId && window.WM_V4?.modules?.ai) {
+        const recDataV4 = await window.WM_V4.modules.ai.generateRecommendations({
+          originAirport: tripInputs.origin,
+          budgetPerPersonVnd: tripInputs.budget,
+          groupSize: tripInputs.groupSize,
+          healing: tripInputs.vec?.healing ?? 80,
+          nature: tripInputs.vec?.nature ?? 75,
+          solitude: tripInputs.vec?.solitude ?? 70,
+          comfort: tripInputs.vec?.comfort ?? 65,
+          culture: tripInputs.vec?.culture ?? 60,
+          blacklistedSlugs: tripInputs.blacklist || []
+        });
+        window.applyServerRecommendationData(pkg, recDataV4);
+      }
+      if (pkg.v4PackageId) {
+        if (window.WM_V4?.modules?.profile?.upsertSensitivePii) {
+          const cccdVal = (document.getElementById("custCccd")?.value || "079095000001").trim();
+          await window.WM_V4.modules.profile.upsertSensitivePii({
+            cccd: cccdVal,
+            refundBankCode: "MB",
+            refundBankAccount: acc,
+            refundBankHolder: holder
+          }).catch(() => {});
+        }
+        const v4BookRes = await window.WM_V4.modules.booking.createBookingWithHold({
+          packageId: pkg.v4PackageId,
+          departureDate: tripInputs.departureDate || "2026-11-15",
+          durationDays: 3,
+          travelers: [{ fullName: name, email }]
+        });
+        if (!v4BookRes.success) {
+          throw new Error(v4BookRes.error || "Không thể tạo V4 booking.");
+        }
+        pkg.code = v4BookRes.booking_code || pkg.code;
+        pkg.bookingId = v4BookRes.booking_id || pkg.bookingId;
+        pkg.packageId = pkg.v4PackageId;
+        pkg.isV4Booking = true;
+        if (v4BookRes.expected_amount_vnd) {
+          pkg.expectedAmount = Number(v4BookRes.expected_amount_vnd);
+          pkg.packageCost = pkg.expectedAmount;
+          if (pkg.reveal) pkg.reveal.paid = pkg.expectedAmount;
+        }
+      }
+    }
+
+    if (!pkg.isV4Booking) {
+      if (!pkg.packageId) {
+        const recRes = await fetch(`${window.API_BASE}/api/ai-recommend`, {
+          method: "POST",
+          headers: window.getAuthHeaders({ "Content-Type": "application/json" }),
+          body: JSON.stringify({
+            originAirport: tripInputs.origin,
+            budgetVnd: tripInputs.budget,
+            groupSize: tripInputs.groupSize,
+            customPrompt: tripInputs.prompt,
+            userVector: tripInputs.vec,
+            blacklistCities: tripInputs.blacklist
+          })
+        });
+        const recData = await recRes.json();
+        if (!recRes.ok || !recData.success || !recData.packageId) {
+          throw new Error(recData.error || "Không thể khởi tạo phiên đề xuất trên máy chủ.");
+        }
+        window.applyServerRecommendationData(pkg, recData);
+      }
+
+      const response = await fetch(`${window.API_BASE}/api/create-booking`, {
         method: "POST",
         headers: window.getAuthHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({
+          bookingCode: pkg.code,
+          packageId: pkg.packageId,
+          recommendationId: pkg.recommendationId,
+          fullName: name,
+          email,
           originAirport: tripInputs.origin,
           budgetVnd: tripInputs.budget,
           groupSize: tripInputs.groupSize,
-          customPrompt: tripInputs.prompt,
           userVector: tripInputs.vec,
-          blacklistCities: tripInputs.blacklist
+          blacklistCities: tripInputs.blacklist,
+          customPrompt: tripInputs.prompt
         })
       });
-      const recData = await recRes.json();
-      if (!recRes.ok || !recData.success || !recData.packageId) {
-        throw new Error(recData.error || "Không thể khởi tạo phiên đề xuất trên máy chủ.");
+      const booking = await response.json();
+      if (!response.ok || !booking.success) {
+        throw new Error(booking.error || "Máy chủ chưa xác nhận được đơn đặt chỗ.");
       }
-      window.applyServerRecommendationData(pkg, recData);
-    }
-
-    const response = await fetch(`${window.API_BASE}/api/create-booking`, {
-      method: "POST",
-      headers: window.getAuthHeaders({ "Content-Type": "application/json" }),
-      body: JSON.stringify({
-        bookingCode: pkg.code,
-        packageId: pkg.packageId,
-        recommendationId: pkg.recommendationId,
-        fullName: name,
-        email,
-        originAirport: tripInputs.origin,
-        budgetVnd: tripInputs.budget,
-        groupSize: tripInputs.groupSize,
-        userVector: tripInputs.vec,
-        blacklistCities: tripInputs.blacklist,
-        customPrompt: tripInputs.prompt
-      })
-    });
-    const booking = await response.json();
-    if (!response.ok || !booking.success) {
-      throw new Error(booking.error || "Máy chủ chưa xác nhận được đơn đặt chỗ.");
-    }
-    pkg.code = booking.bookingCode || pkg.code;
-    pkg.packageId = booking.packageId || pkg.packageId;
-    if (booking.expectedAmount) {
-      pkg.expectedAmount = booking.expectedAmount;
-      pkg.packageCost = booking.expectedAmount;
-      if (pkg.reveal) pkg.reveal.paid = booking.expectedAmount;
-    }
-    if (Array.isArray(booking.splitQrs) && booking.splitQrs.length) {
-      pkg.qrs = booking.splitQrs.map((sq, i) => ({
-        idx: sq.memberIndex || (i + 1),
-        amount: sq.amountVnd,
-        memo: sq.transferNote,
-        url: sq.qrImageUrl
-      }));
+      pkg.code = booking.bookingCode || pkg.code;
+      pkg.packageId = booking.packageId || pkg.packageId;
+      if (booking.expectedAmount) {
+        pkg.expectedAmount = booking.expectedAmount;
+        pkg.packageCost = booking.expectedAmount;
+        if (pkg.reveal) pkg.reveal.paid = booking.expectedAmount;
+      }
+      if (Array.isArray(booking.splitQrs) && booking.splitQrs.length) {
+        pkg.qrs = booking.splitQrs.map((sq, i) => ({
+          idx: sq.memberIndex || (i + 1),
+          amount: sq.amountVnd,
+          memo: sq.transferNote,
+          url: sq.qrImageUrl
+        }));
+      }
     }
   } catch (error) {
     window.showToast(`Không thể tạo đơn đặt chỗ: ${error.message}`, "error");
@@ -3055,10 +3282,15 @@ window.verifyAndConfirmPayment = async function(silent) {
 
   let st = null;
   try {
-    const res = await fetch(`${window.API_BASE}/api/payment/check-status?bookingCode=${encodeURIComponent(pkg.code)}`, {
-      headers: window.getAuthHeaders()
-    });
-    st = await res.json();
+    if (window.WM_V4?.modules?.payment && window.WM_V4?.session?.getToken?.()) {
+      st = await window.WM_V4.modules.payment.checkPaymentStatus(pkg.code).catch(() => null);
+    }
+    if (!st) {
+      const res = await fetch(`${window.API_BASE}/api/payment/check-status?bookingCode=${encodeURIComponent(pkg.code)}`, {
+        headers: window.getAuthHeaders()
+      });
+      st = await res.json();
+    }
   } catch (e) {
     if (!silent) window.showToast("Không kết nối được máy chủ đối soát.", "error");
   }
@@ -3162,6 +3394,27 @@ window.submitSlaRefundTicket = async function(type, amount) {
 
   let refundResult;
   try {
+    if (pkg?.isV4Booking && window.WM_V4?.modules?.payment && window.WM_V4?.session?.getToken?.()) {
+      refundResult = await window.WM_V4.modules.payment.requestRefund({
+        bookingCode: code,
+        tier: type,
+        reason: `Customer requested SLA refund (${type})`
+      });
+      window.WM_V4?.core?.emit?.("refund:requested", { bookingCode: code, scenario: type, amount });
+      const refundBox = document.getElementById("refundResultBox");
+      if (refundBox) {
+        refundBox.innerHTML = `
+          <div class="bg-emerald-500/20 border border-emerald-500/40 p-4 rounded-xl space-y-1.5 text-emerald-200">
+            <strong class="block font-extrabold text-sm text-emerald-300">✓ Đã gửi yêu cầu hoàn tiền thật lên V4 Escrow Engine</strong>
+            <p class="text-xs">Mã hoàn tiền: <span class="font-mono font-bold text-white">${refundResult.refund_id || refundResult.id || code}</span> (${refundResult.status || "PENDING"})</p>
+            <p class="text-[11px] text-slate-300">Khoản dự kiến: <strong class="text-teal-300">${window.formatVND(refundResult.refund_amount_vnd || amount)}</strong></p>
+          </div>
+        `;
+      }
+      window.showToast(`Đã gửi yêu cầu hoàn tiền cho đơn #${code}!`);
+      return;
+    }
+
     const response = await fetch(`${window.API_BASE}/api/simulate-refund`, {
       method: "POST",
       headers: window.getAuthHeaders({ "Content-Type": "application/json" }),
@@ -3178,7 +3431,7 @@ window.submitSlaRefundTicket = async function(type, amount) {
     }
     window.WM_V4?.core?.emit?.("refund:requested", { bookingCode: code, scenario: type, amount });
   } catch (error) {
-    window.showToast(`Không thể tạo phiếu mô phỏng: ${error.message}`, "error");
+    window.showToast(`Không thể tạo phiếu hoàn tiền: ${error.message}`, "error");
     return;
   }
 
@@ -3311,6 +3564,171 @@ window.wmFetchNotificationsV4 = async function(limit = 20) {
   return window.WM_V4.modules.notifications.fetchNotifications(limit);
 };
 
+window.wmRefreshNotificationsV4 = async function() {
+  const badge = document.getElementById("navNotificationsBadge");
+  if (!window.WM_V4?.modules?.notifications || !window.WM_V4?.session?.getToken?.()) {
+    if (badge) badge.style.display = "none";
+    return [];
+  }
+  try {
+    const res = await window.WM_V4.modules.notifications.fetchNotifications(20);
+    const items = res.notifications || res.items || [];
+    const unread = window.WM_V4.modules.notifications.countUnread(items);
+    if (badge) {
+      badge.innerText = String(unread);
+      badge.style.display = unread > 0 ? "flex" : "none";
+    }
+    return items;
+  } catch (_) {
+    return [];
+  }
+};
+
+window.openNotificationsModal = async function() {
+  const modal = document.getElementById("v4NotificationsModal");
+  const listEl = document.getElementById("v4NotificationsList");
+  if (!modal || !listEl) return;
+  modal.style.display = "flex";
+  listEl.innerHTML = `<div class="p-4 text-center text-slate-400">Đang tải thông báo từ Supabase V4...</div>`;
+  try {
+    const items = await window.wmRefreshNotificationsV4();
+    if (!items.length) {
+      listEl.innerHTML = `<div class="p-4 rounded-2xl bg-slate-950/70 border border-white/10 text-slate-400 text-center">Hiện chưa có thông báo mới.</div>`;
+      return;
+    }
+    listEl.innerHTML = items.map(n => `
+      <div class="p-3.5 rounded-2xl border ${n.is_read ? "bg-slate-950/50 border-white/10 text-slate-400" : "bg-teal-950/30 border-teal-400/40 text-white"} flex items-start justify-between gap-3">
+        <div>
+          <strong class="block text-xs ${n.is_read ? "text-slate-300" : "text-teal-300"}">${n.title || n.event_type || "Thông báo hệ thống"}</strong>
+          <p class="text-[11px] mt-0.5">${n.message || n.body || ""}</p>
+        </div>
+        ${!n.is_read ? `<button type="button" onclick="window.markNotificationReadV4('${n.id}')" class="px-2.5 py-1 rounded-lg bg-teal-500 text-slate-950 font-bold text-[10px] shrink-0 cursor-pointer">Đã đọc</button>` : `<span class="text-[10px] text-emerald-400 shrink-0">✓ Đã xem</span>`}
+      </div>
+    `).join("");
+  } catch (e) {
+    listEl.innerHTML = `<div class="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300">${e?.message || "Không thể tải thông báo."}</div>`;
+  }
+};
+
+window.markNotificationReadV4 = async function(notificationId) {
+  if (!window.WM_V4?.modules?.notifications) return;
+  try {
+    await window.WM_V4.modules.notifications.markAsRead(notificationId);
+    await window.openNotificationsModal();
+  } catch (e) {
+    window.showToast(e?.message || "Không thể đánh dấu đã đọc.", "error");
+  }
+};
+
+window.loadV4ReviewsFeed = async function() {
+  const feedEl = document.getElementById("v4ReviewsFeed");
+  if (!feedEl) return;
+  try {
+    const res = window.WM_V4?.modules?.reviews
+      ? await window.WM_V4.modules.reviews.listApprovedReviews(12)
+      : await fetch(`${window.API_BASE}/api/v4/reviews?limit=12`).then(r => r.json());
+    const items = res.reviews || res.items || [];
+    if (!items.length) {
+      feedEl.innerHTML = `<div class="col-span-full p-4 rounded-2xl bg-slate-900/70 border border-white/10 text-slate-400 text-center">Chưa có đánh giá nào được duyệt. Hãy là người đầu tiên đánh giá sau khi Reveal!</div>`;
+      return;
+    }
+    feedEl.innerHTML = items.map(r => `
+      <div class="p-4 rounded-2xl bg-slate-900/80 border border-white/10 space-y-1.5">
+        <div class="flex justify-between items-center">
+          <span class="text-amber-300 font-extrabold">${"★".repeat(Number(r.rating || 5))}</span>
+          <span class="text-[10px] text-slate-400 font-mono">${r.booking_code || r.moderation_status || "VERIFIED"}</span>
+        </div>
+        <p class="text-xs text-slate-200 leading-relaxed">${r.review_text || r.comment || ""}</p>
+      </div>
+    `).join("");
+  } catch (e) {
+    feedEl.innerHTML = `<div class="col-span-full p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300">${e?.message || "Không tải được danh sách đánh giá."}</div>`;
+  }
+};
+
+window.submitV4ReviewFromForm = async function() {
+  const code = (document.getElementById("revBookingCode")?.value || window.loadStore("wm_draft_prod", null)?.code || "").trim().toUpperCase();
+  const rating = Number(document.getElementById("revRating")?.value || 5);
+  const reviewText = (document.getElementById("revText")?.value || "").trim();
+  const msgEl = document.getElementById("v4ReviewStatusMsg");
+  const showMsg = (txt, ok) => {
+    if (!msgEl) return;
+    msgEl.style.display = "block";
+    msgEl.className = ok
+      ? "p-2.5 rounded-xl text-[11px] font-semibold bg-emerald-500/20 border border-emerald-500/40 text-emerald-300"
+      : "p-2.5 rounded-xl text-[11px] font-semibold bg-rose-500/20 border border-rose-500/40 text-rose-300";
+    msgEl.innerText = txt;
+  };
+  try {
+    await window.wmSubmitReviewV4({ bookingCode: code, rating, aiMatchRating: rating, reviewText });
+    showMsg("✓ Đánh giá của bạn đã được ghi nhận vào Supabase V4!", true);
+    if (document.getElementById("revText")) document.getElementById("revText").value = "";
+    window.loadV4ReviewsFeed();
+  } catch (e) {
+    showMsg(e?.message || "Không thể gửi đánh giá (yêu cầu Booking đã REVEALED).", false);
+  }
+};
+
+window.openAdminDashboardModal = function() {
+  const modal = document.getElementById("v4AdminDashboardModal");
+  const alertBox = document.getElementById("v4AdminAlertBox");
+  if (alertBox) alertBox.style.display = "none";
+  if (modal) modal.style.display = "flex";
+};
+
+window.runAdminReconciliationV4 = async function() {
+  const out = document.getElementById("v4AdminOutputPre");
+  const alertBox = document.getElementById("v4AdminAlertBox");
+  try {
+    const res = await window.WM_V4.modules.admin.runReconciliationChecks();
+    if (out) out.innerText = JSON.stringify(res, null, 2);
+    if (alertBox) {
+      alertBox.style.display = "block";
+      alertBox.className = "p-3 rounded-xl font-semibold bg-emerald-500/20 border border-emerald-500/40 text-emerald-300";
+      alertBox.innerText = "✓ Đối soát sổ cái V4 hoàn tất.";
+    }
+  } catch (e) {
+    if (out) out.innerText = JSON.stringify({ error: e?.message, status: e?.status }, null, 2);
+    if (alertBox) {
+      alertBox.style.display = "block";
+      alertBox.className = "p-3 rounded-xl font-semibold bg-rose-500/20 border border-rose-500/40 text-rose-300";
+      alertBox.innerText = e?.status === 403 ? "⛔ 403 Forbidden: Chỉ tài khoản Admin mới có quyền chạy đối soát." : (e?.message || "Lỗi đối soát.");
+    }
+  }
+};
+
+window.checkAdminHealthV4 = async function() {
+  const out = document.getElementById("v4AdminOutputPre");
+  try {
+    const res = await window.WM_V4.modules.admin.getSystemHealth();
+    if (out) out.innerText = JSON.stringify(res, null, 2);
+  } catch (e) {
+    if (out) out.innerText = JSON.stringify({ error: e?.message, status: e?.status }, null, 2);
+  }
+};
+
+window.approveAdminRefundV4 = async function(decision = "APPROVE") {
+  const out = document.getElementById("v4AdminOutputPre");
+  const refundId = (document.getElementById("adminRefundIdInput")?.value || "").trim();
+  const alertBox = document.getElementById("v4AdminAlertBox");
+  try {
+    const res = await window.WM_V4.modules.admin.approveRefund({ refundId, decision, autoSettleSandbox: true });
+    if (out) out.innerText = JSON.stringify(res, null, 2);
+    if (alertBox) {
+      alertBox.style.display = "block";
+      alertBox.className = "p-3 rounded-xl font-semibold bg-emerald-500/20 border border-emerald-500/40 text-emerald-300";
+      alertBox.innerText = "✓ Đã phê duyệt yêu cầu hoàn tiền.";
+    }
+  } catch (e) {
+    if (out) out.innerText = JSON.stringify({ error: e?.message, status: e?.status }, null, 2);
+    if (alertBox) {
+      alertBox.style.display = "block";
+      alertBox.className = "p-3 rounded-xl font-semibold bg-rose-500/20 border border-rose-500/40 text-rose-300";
+      alertBox.innerText = e?.message || "Không thể phê duyệt hoàn tiền.";
+    }
+  }
+};
+
 window.isRevealingInProgress = false;
 window.revealDestinationNow = window.revealMysteryTrip = async function() {
   if (window.isRevealingInProgress) return;
@@ -3319,23 +3737,46 @@ window.revealDestinationNow = window.revealMysteryTrip = async function() {
 
   window.isRevealingInProgress = true;
   try {
-    const res = await fetch(`${window.API_BASE}/api/bookings/reveal`, {
-      method: "POST",
-      headers: window.getAuthHeaders({ "Content-Type": "application/json" }),
-      body: JSON.stringify({ bookingCode: pkg.code })
-    });
-    const resData = await res.json().catch(() => ({}));
-    if (!res.ok || !resData.success || !resData.revealPackage) {
-      window.scratchStrokeCount = 0;
-      window.initScratchCanvas();
-      window.showToast(
-        resData.error || "Chưa đủ điều kiện mở khóa điểm đến! Đơn đặt chỗ phải được thanh toán đủ (PAID) và thuộc quyền sở hữu của bạn.",
-        "error"
-      );
-      return;
+    let resData = null;
+    if (window.WM_V4?.modules?.blindBooking && window.WM_V4?.session?.getToken?.()) {
+      try {
+        resData = await window.WM_V4.modules.blindBooking.revealBlindBooking(pkg.code);
+      } catch (v4Err) {
+        if (pkg.isV4Booking || v4Err?.status === 402 || v4Err?.status === 403 || v4Err?.status === 409) {
+          window.scratchStrokeCount = 0;
+          window.initScratchCanvas();
+          window.showToast(v4Err?.message || "Chưa đủ điều kiện mở khóa điểm đến!", "error");
+          return;
+        }
+      }
+    }
+    if (!resData) {
+      const res = await fetch(`${window.API_BASE}/api/bookings/reveal`, {
+        method: "POST",
+        headers: window.getAuthHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ bookingCode: pkg.code })
+      });
+      resData = await res.json().catch(() => ({}));
+      if (!res.ok || !resData.success || (!resData.revealPackage && !resData.destination)) {
+        window.scratchStrokeCount = 0;
+        window.initScratchCanvas();
+        window.showToast(
+          resData.error || "Chưa đủ điều kiện mở khóa điểm đến! Đơn đặt chỗ phải được thanh toán đủ (PAID) và thuộc quyền sở hữu của bạn.",
+          "error"
+        );
+        return;
+      }
     }
 
-    const rev = resData.revealPackage;
+    const rev = resData.revealPackage || (resData.destination ? {
+      cityName: resData.destination.city_name,
+      comboTitle: `${resData.destination.city_name} — ${resData.hotel?.hotel_name || "5★ Resort"}`,
+      hotelName: resData.hotel?.hotel_name || "Resort 5★ SLA",
+      slaCode: resData.hotel?.sla_code,
+      transport: resData.flight ? `${resData.flight.flight_code} - ${resData.flight.airline_name} (${resData.flight.exact_departure_time})` : pkg.reveal?.transport,
+      antiTouristTrapGuide: resData.destination.local_dining_guide
+    } : null);
+    if (!rev) return;
     const c = document.getElementById("scratchCanvas");
     if (c) c.style.display = "none";
 
@@ -3551,7 +3992,10 @@ window.switchTab = function(tab) {
     }
   });
 
-  if (tab === "saved") window.renderSavedTab();
+  if (tab === "saved") {
+    window.renderSavedTab();
+    window.loadV4ReviewsFeed?.();
+  }
   if (tab === "b2b") window.renderB2BTab();
 };
 
@@ -3880,6 +4324,9 @@ window.renderB2BTab = function() {
   if (!b2bList) return;
 
   const city = window.currentB2BCityFilter || "ALL";
+  const searchQuery = (document.getElementById("b2bSearchInput")?.value || "").trim().toLowerCase();
+  const maxBudget = Number(document.getElementById("b2bBudgetFilter")?.value || 0);
+
   let filtered = window.HOTELS_DB;
   if (city === "HIGHLAND") {
     filtered = window.HOTELS_DB.filter(h => ["Đà Lạt", "Măng Đen", "Sapa"].includes(h.city));
@@ -3891,10 +4338,28 @@ window.renderB2BTab = function() {
     filtered = window.HOTELS_DB.filter(h => h.city === city);
   }
 
-  b2bList.innerHTML = filtered.map(h => `
+  if (searchQuery || maxBudget > 0) {
+    filtered = filtered.filter(h => {
+      const searchBlob = [h.hint, h.weather, h.room_type, h.sla, h.mysteryZoneLabel, h.mysteryStayLabel, ...(h.amenities || [])].filter(Boolean).join(" ").toLowerCase();
+      if (searchQuery && !searchBlob.includes(searchQuery)) return false;
+      const estimatedPkg = Number(h.night_price || 0) * 2 + 1500000;
+      if (maxBudget > 0 && estimatedPkg > maxBudget) return false;
+      return true;
+    });
+  }
+
+  if (!filtered.length) {
+    b2bList.innerHTML = `<div class="col-span-full p-8 text-center rounded-3xl bg-slate-900/70 border border-white/10 text-slate-400">Không tìm thấy quỹ phòng 5★ ẩn danh phù hợp với bộ lọc hiện tại.</div>`;
+    return;
+  }
+
+  b2bList.innerHTML = filtered.map(h => {
+    const sealedZone = h.mysteryZoneLabel || (["Đà Lạt", "Măng Đen", "Sapa"].includes(h.city) ? "Khu Vực Cao Nguyên Sương Mù Bí Mật" : ["Huế"].includes(h.city) ? "Khu Vực Di Sản & Khoáng Nóng Bí Mật" : "Khu Vực Biển Đảo 5★ Bí Mật");
+    const sealedStay = h.mysteryStayLabel || `Resort ${h.rating || 5}★ Đối Tác SLA (${h.sla})`;
+    return `
     <div class="bg-slate-900/90 rounded-3xl border border-white/10 overflow-hidden hover:border-teal-500/40 transition text-xs shadow-2xl flex flex-col justify-between group">
       <div class="relative h-48 overflow-hidden">
-        <img src="${h.img}" alt="${h.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+        <img src="${h.img}" alt="${sealedStay}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
         <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
         <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-950/85 text-amber-300 font-extrabold backdrop-blur-md border border-amber-400/30 flex items-center gap-1 shadow">
           ★ ${h.rating} (${h.reviews_count} đánh giá)
@@ -3914,8 +4379,8 @@ window.renderB2BTab = function() {
 
       <div class="p-5 space-y-3.5 flex-1 flex flex-col justify-between">
         <div class="space-y-1">
-          <span class="text-teal-400 font-extrabold uppercase text-[10px] tracking-wider block">${h.city}</span>
-          <h4 class="font-extrabold text-white text-sm font-heading leading-snug">${h.name}</h4>
+          <span class="text-teal-400 font-extrabold uppercase text-[10px] tracking-wider block">${sealedZone}</span>
+          <h4 class="font-extrabold text-white text-sm font-heading leading-snug">${sealedStay}</h4>
           <p class="text-slate-400 text-xs mt-0.5">${h.room_type}</p>
           
           <div class="flex flex-wrap gap-1.5 pt-1.5">
@@ -3943,7 +4408,8 @@ window.renderB2BTab = function() {
         </div>
       </div>
     </div>
-  `).join("");
+  `;
+  }).join("");
 };
 
 window.createPackageFromB2B = function(hotelId) {
@@ -3967,7 +4433,7 @@ window.createPackageFromB2B = function(hotelId) {
     url: `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${unitCost}&addInfo=${encodeURIComponent(`${code} KH${i + 1}`)}&accountName=${encodeURIComponent("CONG TY TNHH WANDERMATCH VN")}`
   }));
 
-  const reasoningLog = `[Kích hoạt từ Quỹ phòng B2B Extranet]: Đã ghép nối trực tiếp Resort đối tác SLA ${hotel.rating}★ ${hotel.name} (${hotel.city}) cùng chuyến bay ${flight.airline}. Tối ưu tiết kiệm ${window.formatVND(savings)}.`;
+  const reasoningLog = `[Kích hoạt từ Quỹ phòng B2B Extranet]: Đã ghép nối trực tiếp Resort đối tác SLA ${hotel.rating}★ tiêu chuẩn quốc tế (niêm phong danh tính cho tới khi mở khóa). Tối ưu tiết kiệm ${window.formatVND(savings)}.`;
 
   const newPkg = {
     code,
@@ -3985,13 +4451,11 @@ window.createPackageFromB2B = function(hotelId) {
     food: hotel.food,
     days: hotel.days,
     reviews: hotel.reviews || [],
-    flight: flight,
-    hotel: hotel,
     qrs,
-    flightLabel: `Khứ hồi ${flight.airline} (${flight.time})`,
+    flightLabel: `Chuyến bay khứ hồi giờ đẹp (${flight.time_window || "07:00 - 11:30"})`,
     hotelLabel: `Resort ${hotel.rating}★ tiêu chuẩn quốc tế (Kèm buffet sáng & xe đưa đón)`,
     reveal: {
-      city: hotel.city,
+      city: null,
       title: hotel.title,
       sla: hotel.sla,
       room_type: hotel.room_type,
@@ -3999,21 +4463,22 @@ window.createPackageFromB2B = function(hotelId) {
       gallery: hotel.gallery || [hotel.img],
       room_specs: hotel.room_specs,
       amenities: hotel.amenities,
-      transport: `${flight.id} - ${flight.airline} (${flight.time})`,
-      hotel: hotel.name,
+      transport: null,
+      hotel: null,
       paid: totalPaid,
       retail: totalRetail,
       savings
     }
   };
 
-  window.saveStore("wm_draft_prod", newPkg);
-  window.renderPackageUI(newPkg);
+  const sealedPkg = window.sealUnrevealedPackage(newPkg);
+  window.saveStore("wm_draft_prod", sealedPkg);
+  window.renderPackageUI(sealedPkg);
   window.switchTab("b2c");
   window.goToStep(1);
   const resultBox = document.getElementById("recommendationResultBox");
   if (resultBox) resultBox.scrollIntoView({ behavior: "smooth", block: "start" });
-  window.showToast(`🎉 Đã thiết lập thành công gói du lịch từ Quỹ phòng đối tác: ${hotel.mysteryStayLabel || hotel.name}!`);
+  window.showToast(`🎉 Đã thiết lập thành công gói du lịch từ Quỹ phòng đối tác: ${hotel.mysteryStayLabel || "Resort 5★ Niêm Phong SLA"}!`);
 };
 
 // ============================================================================
@@ -4061,44 +4526,87 @@ window.openUserProfileModal = function() {
   if (actBookings) actBookings.innerText = `${bCount} chuyến`;
   if (wishCount) wishCount.innerText = `${wCount} gói`;
 
-  // Nạp cấu hình sở thích đã lưu của người dùng
   const users = window.loadStore("wm_users_prod", {});
   const userRecord = users[session.email] || {};
   const pref = userRecord.preferences || {};
 
+  const editName = document.getElementById("profEditName");
+  const editPhone = document.getElementById("profEditPhone");
   const defOrigin = document.getElementById("profDefaultOrigin");
   const defBudget = document.getElementById("profDefaultBudget");
   const defBlacklist = document.getElementById("profDefaultBlacklist");
 
+  if (editName) editName.value = session.name || userRecord.name || "";
+  if (editPhone) editPhone.value = userRecord.phone || "";
   if (defOrigin) defOrigin.value = pref.origin || document.getElementById("originInput")?.value || "HAN";
   if (defBudget) defBudget.value = pref.budget || document.getElementById("budgetInput")?.value || 5000000;
   if (defBlacklist) defBlacklist.value = pref.blacklist || document.getElementById("blacklistInput")?.value || "";
 
   modal.style.display = "flex";
+
+  if (window.WM_V4?.modules?.profile && window.WM_V4?.session?.getToken?.()) {
+    window.WM_V4.modules.profile.getProfile().then(res => {
+      const p = res?.profile;
+      if (!p) return;
+      if (profName && p.full_name) profName.innerText = p.full_name;
+      if (editName && p.full_name) editName.value = p.full_name;
+      if (editPhone && p.phone) editPhone.value = p.phone;
+      const locks = p.preferences?.comfort_locks || {};
+      if (defOrigin && locks.origin_airport) defOrigin.value = locks.origin_airport;
+      if (defBudget && locks.budget_per_person_vnd) defBudget.value = locks.budget_per_person_vnd;
+      if (defBlacklist && Array.isArray(p.preferences?.default_blacklisted_slugs) && p.preferences.default_blacklisted_slugs.length) {
+        defBlacklist.value = p.preferences.default_blacklisted_slugs.join(", ");
+      }
+    }).catch(() => {});
+  }
 };
 
-window.saveUserProfilePreferences = function() {
+window.saveUserProfilePreferences = async function() {
   const session = window.loadStore("wm_session_prod", null);
   if (!session || !session.email) return;
 
+  const fullName = (document.getElementById("profEditName")?.value || session.name || "WanderMatch Traveler").trim();
+  const phone = (document.getElementById("profEditPhone")?.value || "").trim();
   const origin = document.getElementById("profDefaultOrigin")?.value || "HAN";
   const budget = parseInt(document.getElementById("profDefaultBudget")?.value || "5000000", 10);
   const blacklist = document.getElementById("profDefaultBlacklist")?.value || "";
 
+  if (fullName.length < 2) {
+    return window.showToast("Họ và tên phải có tối thiểu 2 ký tự!", "error");
+  }
+
+  if (window.WM_V4?.modules?.profile && window.WM_V4?.session?.getToken?.()) {
+    try {
+      await window.WM_V4.modules.profile.updateProfile({
+        fullName,
+        phone,
+        originAirport: origin,
+        budgetPerPersonVnd: budget,
+        blacklistedSlugs: blacklist.split(",").map(s => s.trim()).filter(Boolean)
+      });
+    } catch (e) {
+      return window.showToast(e?.message || "Không thể cập nhật hồ sơ lên Supabase.", "error");
+    }
+  }
+
+  session.name = fullName;
+  window.saveStore("wm_session_prod", session);
   const users = window.loadStore("wm_users_prod", {});
   if (!users[session.email]) {
-    users[session.email] = { name: session.name, email: session.email };
+    users[session.email] = { name: fullName, email: session.email };
   }
+  users[session.email].name = fullName;
+  users[session.email].phone = phone;
   users[session.email].preferences = { origin, budget, blacklist };
   window.saveStore("wm_users_prod", users);
 
-  // Áp dụng trực tiếp vào form Bước 1
   if (document.getElementById("originInput")) document.getElementById("originInput").value = origin;
   if (document.getElementById("budgetInput")) document.getElementById("budgetInput").value = budget;
   if (document.getElementById("blacklistInput")) document.getElementById("blacklistInput").value = blacklist;
 
+  window.applyUserSession();
   window.onFormChange();
-  window.showToast("✓ Đã lưu sở thích mặc định và áp dụng ngay vào bộ lọc chuyến đi!", "success");
+  window.showToast("✓ Đã lưu hồ sơ & thị hiếu mặc định lên Supabase V4!", "success");
 };
 
 window.closeUserProfileModal = function() {
@@ -4121,11 +4629,20 @@ window.initWanderMatchApp = function() {
   // 1. Khởi tạo Google Identity Services GIS
   window.initGoogleIdentity();
 
-  // 2. Kiểm tra callback OAuth từ URL hash hoặc storage
+  // 2. Kiểm tra callback OAuth hoặc Password Recovery từ URL hash
   if (window.location.hash && window.location.hash.includes("access_token")) {
     try {
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const providerToken = hashParams.get("provider_token") || hashParams.get("access_token");
+      const hashType = hashParams.get("type");
+      const accessToken = hashParams.get("access_token");
+      if (hashType === "recovery" && accessToken && window.openUnifiedAuthModal) {
+        window.openUnifiedAuthModal("reset");
+        const otpInput = document.getElementById("uniRecoveryOtp");
+        if (otpInput) otpInput.value = accessToken;
+        history.replaceState(null, "", window.location.pathname);
+        return;
+      }
+      const providerToken = hashParams.get("provider_token") || accessToken;
       if (providerToken && window.supabaseClient && window.supabaseClient.auth) {
         window.supabaseClient.auth.getSession().then(({ data }) => {
           if (data && data.session && data.session.user) {

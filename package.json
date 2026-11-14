@@ -1,6 +1,6 @@
 {
   "name": "wandermatch-fullstack",
-  "version": "4.2.0",
+  "version": "4.3.0",
   "type": "module",
   "private": true,
   "engines": {
@@ -9,9 +9,10 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "build": "node --check app.js && node --check frontend/app.js && node --check frontend/supabaseClient.js && node --check frontend/config/environments.js && node --check frontend/core/appCore.js && node --check frontend/core/bootstrapV4.js && node --check frontend/services/apiClient.js && node --check frontend/modules/ai/aiRecommendationModule.js && node --check frontend/modules/reviews/reviewsModule.js && node --check frontend/modules/notifications/notificationsModule.js && node --check worker.js && node --check src/index.js && node --check src/router/apiRouter.js && node --check src/modules/auth/authController.js && node --check src/modules/reviews/reviewsController.js && node --check src/modules/notifications/notificationsController.js && node --check auto-sync-github.js",
+    "build": "node --check app.js && node --check frontend/app.js && node --check frontend/supabaseClient.js && node --check frontend/config/environments.js && node --check frontend/core/appCore.js && node --check frontend/core/bootstrapV4.js && node --check frontend/services/apiClient.js && node --check frontend/modules/auth/authModule.js && node --check frontend/modules/profile/profileModule.js && node --check frontend/modules/discovery/discoveryModule.js && node --check frontend/modules/ai/aiRecommendationModule.js && node --check frontend/modules/blind-booking/blindBookingModule.js && node --check frontend/modules/booking/bookingModule.js && node --check frontend/modules/payment/paymentModule.js && node --check frontend/modules/reviews/reviewsModule.js && node --check frontend/modules/notifications/notificationsModule.js && node --check frontend/modules/admin/adminModule.js && node --check worker.js && node --check src/index.js && node --check src/router/apiRouter.js && node --check src/modules/auth/authController.js && node --check src/modules/users/usersController.js && node --check src/modules/booking/bookingController.js && node --check src/modules/reviews/reviewsController.js && node --check src/modules/notifications/notificationsController.js && node --check auto-sync-github.js",
     "verify:env": "node -e \"const fs=require('fs'); const w1=fs.readFileSync('wrangler.toml','utf8'); const w2=fs.readFileSync('worker/wrangler.toml','utf8'); const sc=fs.readFileSync('supabase/config.toml','utf8'); if(!w1.includes('hpwtdlffidfircparanl.supabase.co')||!w2.includes('hpwtdlffidfircparanl.supabase.co')) throw new Error('SUPABASE_URL mismatch'); if(w1.includes('iwuehabwpihnpahuhqki')||w2.includes('iwuehabwpihnpahuhqki')) throw new Error('Production ref leaked into Wrangler config'); if(!w1.includes('wandermatch-api-staging')||!w2.includes('wandermatch-api-staging')) throw new Error('Worker staging name mismatch'); if(!w1.includes('src/index.js')||!w2.includes('src/index.js')) throw new Error('Wrangler main entrypoint must point to src/index.js'); if(!sc.includes('wandermatch-v4-staging')) throw new Error('Supabase project_id mismatch'); console.log('Environment configuration verified: Staging targets strictly isolated from Production.');\"",
     "test": "node --test",
+    "test:e2e": "node tests/v4-3-e2e-24-scenarios.mjs",
     "test:staging": "node tests/v4-staging-verification.mjs",
     "db:list": "npx supabase migration list --linked",
     "db:push:staging": "npx supabase db push --remote --yes",
@@ -19,7 +20,7 @@
     "deploy:dev": "wrangler deploy src/index.js --env development",
     "deploy:staging": "wrangler deploy src/index.js --env staging",
     "deploy:worker": "wrangler deploy src/index.js --env staging",
-    "deploy": "wrangler deploy src/index.js --env staging"
+    "deploy": "node -e \"console.error('BLOCKED: Direct deploy is disabled by V4.3 Production Lock. Use npm run deploy:staging explicitly.'); process.exit(1);\""
   },
   "devDependencies": {
     "wrangler": "^3.80.0"

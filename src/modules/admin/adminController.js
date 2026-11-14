@@ -9,6 +9,17 @@ import { deterministicUuidV4 } from "../../services/v4RelationalEngine.js";
 export async function handleApproveRefundV4({ authUser, bearerToken, body, env, v4db }) {
   const admin = requireAdminRole(authUser);
   const adminUid = deterministicUuidV4(admin.userId || admin.email);
+  await invokePostgresRpc(env, v4db, {
+    rpcName: "ensure_user_profile_v4",
+    role: "service_role",
+    uid: null,
+    args: {
+      p_user_id: adminUid,
+      p_email: admin.email || "admin@wandermatch.vn",
+      p_full_name: admin.name || "System Admin",
+      p_role: "admin"
+    }
+  }).catch(() => {});
   const decision = body.decision || body.p_decision || "APPROVE";
   const refundId = body.refundId || body.p_refund_id;
 

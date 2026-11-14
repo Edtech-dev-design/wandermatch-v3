@@ -4,9 +4,9 @@
 
 import { handleCreateRecommendationsV4, handleGetCatalogV4 } from "../modules/discovery/discoveryController.js";
 import { handleGetSealedPackagesV4, handleRevealBlindBookingV4 } from "../modules/blind-booking/blindBookingController.js";
-import { handleCreateBookingWithHoldV4, handleGetBookingStatusV4 } from "../modules/booking/bookingController.js";
+import { handleCreateBookingWithHoldV4, handleGetBookingStatusV4, handleListMyBookingsV4 } from "../modules/booking/bookingController.js";
 import { handlePaymentWebhookV4, handleRequestRefundV4, handleFinalizeRefundV4 } from "../modules/payment/paymentController.js";
-import { handleGetMaskedPiiV4, handleUpsertPiiV4, handleGetProfileV4 } from "../modules/users/usersController.js";
+import { handleGetMaskedPiiV4, handleUpsertPiiV4, handleGetProfileV4, handleUpdateProfileV4 } from "../modules/users/usersController.js";
 import {
   handleApproveRefundV4,
   handleRunReconciliationV4,
@@ -15,7 +15,7 @@ import {
   handleReplayQueuedWebhooksV4,
   handleRollbackRehearsalV4
 } from "../modules/admin/adminController.js";
-import { handleGetAuthMeV4, handleLoginV4, handleRegisterV4 } from "../modules/auth/authController.js";
+import { handleGetAuthMeV4, handleLoginV4, handleRegisterV4, handleForgotPasswordV4, handleResetPasswordV4 } from "../modules/auth/authController.js";
 import { handleSubmitReviewV4, handleGetReviewsV4 } from "../modules/reviews/reviewsController.js";
 import { handleGetNotificationsV4, handleMarkNotificationReadV4 } from "../modules/notifications/notificationsController.js";
 
@@ -39,7 +39,10 @@ export const V42_ROUTE_REGISTRY = Object.freeze({
   "GET /api/v4/auth/me": handleGetAuthMeV4,
   "POST /api/v4/auth/login": handleLoginV4,
   "POST /api/v4/auth/register": handleRegisterV4,
+  "POST /api/v4/auth/forgot-password": handleForgotPasswordV4,
+  "POST /api/v4/auth/reset-password": handleResetPasswordV4,
   "GET /api/v4/discovery/catalog": handleGetCatalogV4,
+  "GET /api/v4/bookings": handleListMyBookingsV4,
   "GET /api/v4/bookings/status": handleGetBookingStatusV4,
   "POST /api/v4/refunds/finalize": handleFinalizeRefundV4,
   "GET /api/v4/reviews": handleGetReviewsV4,
@@ -48,6 +51,8 @@ export const V42_ROUTE_REGISTRY = Object.freeze({
   "POST /api/v4/notifications/read": handleMarkNotificationReadV4,
   "POST /api/v4/pii/upsert": handleUpsertPiiV4,
   "GET /api/v4/users/profile": handleGetProfileV4,
+  "PUT /api/v4/users/profile": handleUpdateProfileV4,
+  "POST /api/v4/users/profile": handleUpdateProfileV4,
   "POST /api/v4/cutover/replay-webhooks": handleReplayQueuedWebhooksV4,
   "POST /api/v4/cutover/rollback-rehearsal": handleRollbackRehearsalV4
 });
@@ -88,7 +93,7 @@ export async function dispatchV4Route(
   request,
   env,
   ctx,
-  { url, v4db, authenticateRequest, verifyWebhookAuthentication, handleAuth, corsHeaders = {}, requestId = null }
+  { url, v4db, storage, hashPassword, verifyToken, authenticateRequest, verifyWebhookAuthentication, handleAuth, corsHeaders = {}, requestId = null }
 ) {
   const path = url.pathname;
   const method = request.method.toUpperCase();
@@ -129,6 +134,26 @@ export async function dispatchV4Route(
       const data = await handleGetAuthMeV4({ authUser });
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
+    if (path === "/api/v4/auth/forgot-password" && method === "POST") {
+      const response = await handleForgotPasswordV4({
+        request,
+        env,
+        storage,
+        corsHeaders
+      });
+      return { matched: true, response };
+    }
+    if (path === "/api/v4/auth/reset-password" && method === "POST") {
+      const response = await handleResetPasswordV4({
+        request,
+        env,
+        storage,
+        hashPassword,
+        verifyToken,
+        corsHeaders
+      });
+      return { matched: true, response };
+    }
 
     // 2. Public Discovery Catalog & Approved Reviews
     if (path === "/api/v4/discovery/catalog" && method === "GET") {
@@ -167,6 +192,10 @@ export async function dispatchV4Route(
     if (path === "/api/v4/packages/sealed" && method === "GET") {
       const sessionId = url.searchParams.get("sessionId");
       const data = await handleGetSealedPackagesV4({ authUser, bearerToken, sessionId, env, v4db });
+      return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
+    }
+    if (path === "/api/v4/bookings" && method === "GET") {
+      const data = await handleListMyBookingsV4({ authUser, env, v4db });
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
     if (path === "/api/v4/bookings" && method === "POST") {
@@ -210,6 +239,11 @@ export async function dispatchV4Route(
     }
     if (path === "/api/v4/users/profile" && method === "GET") {
       const data = await handleGetProfileV4({ authUser, env, v4db });
+      return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
+    }
+    if (path === "/api/v4/users/profile" && (method === "PUT" || method === "POST")) {
+      const body = await request.json();
+      const data = await handleUpdateProfileV4({ authUser, body, env, v4db });
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
     if (path === "/api/v4/reviews" && method === "POST") {

@@ -19,10 +19,18 @@ export function createAiRecommendationModule({ apiClient }) {
       blacklistedSlugs = [],
       comfortLocks = {}
     } = {}) {
+      const budget = Number(budgetPerPersonVnd || 5500000);
+      const size = Number(groupSize || 2);
+      if (!Number.isFinite(budget) || budget <= 0) {
+        throw new Error("VALIDATION_ERROR: budgetPerPersonVnd must be a positive number.");
+      }
+      if (!Number.isInteger(size) || size < 1 || size > 20) {
+        throw new Error("VALIDATION_ERROR: groupSize must be between 1 and 20.");
+      }
       return {
         originAirport: String(originAirport || "SGN").toUpperCase(),
-        budgetPerPersonVnd: Number(budgetPerPersonVnd || 5500000),
-        groupSize: Number(groupSize || 2),
+        budgetPerPersonVnd: budget,
+        groupSize: size,
         departureDate: String(departureDate || "2026-11-15").slice(0, 10),
         durationDays: Number(durationDays || 3),
         userPreferences: {

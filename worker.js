@@ -827,7 +827,7 @@ async function hmac(data, env) {
 }
 
 async function verifyWebhookAuthentication(request, env) {
-  const secret = env && (env.PAYMENT_WEBHOOK_SECRET || env.WEBHOOK_SECRET);
+  const secret = env && String(env.PAYMENT_WEBHOOK_SECRET || env.WEBHOOK_SECRET || "").trim();
   if (!secret) {
     return { ok: false, status: 500, error: "Server webhook secret is unconfigured." };
   }
@@ -2454,6 +2454,8 @@ export {
   hydrate,
   persist,
   STORAGE,
+  hashPassword,
+  verifyToken,
   getV4Db,
   invokeV4RpcWithPostgresRouting
 };

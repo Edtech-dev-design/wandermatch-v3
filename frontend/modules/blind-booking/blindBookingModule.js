@@ -29,9 +29,38 @@ export function verifySealedPackageZeroLeak(pkg) {
   return true;
 }
 
+export function containsForbiddenSecretFields(payload) {
+  if (!payload || typeof payload !== "object") return false;
+  return FORBIDDEN_PRE_REVEAL_KEYS.some(
+    key => key in payload && payload[key] !== null && payload[key] !== undefined
+  );
+}
+
+export function sealClientDraft(pkg) {
+  if (!pkg || typeof pkg !== "object") return pkg;
+  const copy = { ...pkg };
+  for (const key of FORBIDDEN_PRE_REVEAL_KEYS) {
+    if (key in copy) delete copy[key];
+  }
+  if (!copy.is_revealed && copy.reveal && typeof copy.reveal === "object") {
+    copy.reveal = {
+      revealedAt: null,
+      city: null,
+      hotel: null,
+      airline: null,
+      flightCode: null,
+      flightTime: null,
+      foodVibe: null
+    };
+  }
+  return copy;
+}
+
 export function createBlindBookingModule({ apiClient }) {
   return {
     verifySealedPackageZeroLeak,
+    containsForbiddenSecretFields,
+    sealClientDraft,
     async getSealedPackages(sessionId) {
       const res = await apiClient.get(`/api/v4/packages/sealed?sessionId=${encodeURIComponent(sessionId)}`, {
         requireAuth: true

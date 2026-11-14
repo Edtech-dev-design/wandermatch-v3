@@ -14,6 +14,8 @@ import {
   hydrate,
   persist,
   STORAGE,
+  hashPassword,
+  verifyToken,
   getV4Db,
   V4_USER_JWT_RPCS,
   V4_SERVICE_ROLE_RPCS
@@ -143,6 +145,9 @@ export default {
         const routed = await dispatchV4Route(request, env, ctx, {
           url,
           v4db: getV4Db(),
+          storage: STORAGE,
+          hashPassword,
+          verifyToken,
           authenticateRequest,
           verifyWebhookAuthentication,
           handleAuth,

@@ -2298,7 +2298,7 @@ export class V4RelationalDatabase {
     });
   }
 
-  _ensureUserProfileInTables(t, { userId, email = null, fullName = null, role = "USER" } = {}) {
+  _ensureUserProfileInTables(t, { userId, email = null, fullName = null, role = "traveler" } = {}) {
     if (!userId) return null;
     const normalizedEmail = email
       ? String(email).trim().toLowerCase()
@@ -2407,7 +2407,8 @@ export class V4RelationalDatabase {
   async rpcEnsureUserProfile({ p_user_id, p_email = null, p_full_name = null, p_role = "traveler" } = {}) {
     if (!p_user_id) throw makeSqlError("INVALID_USER_ID: p_user_id is required.", "22023", 400);
     return this.withTransaction(async (t) => {
-      const mappedRole = p_role === "admin" || p_role === "super_admin" ? "ADMIN" : "USER";
+      const normalized = String(p_role || "traveler").trim().toLowerCase();
+      const mappedRole = ["admin", "super_admin", "b2b_partner", "traveler"].includes(normalized) ? normalized : "traveler";
       const profile = this._ensureUserProfileInTables(t, {
         userId: p_user_id,
         email: p_email,

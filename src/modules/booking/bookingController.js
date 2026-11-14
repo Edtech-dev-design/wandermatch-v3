@@ -29,6 +29,65 @@ export async function handleCreateBookingWithHoldV4({ authUser, bearerToken, bod
   return { success: true, ...data };
 }
 
+function isPostgresRpcEnabled(env) {
+  return Boolean(
+    env &&
+    env.SUPABASE_URL &&
+    env.SUPABASE_SERVICE_ROLE_KEY &&
+    String(env.USE_V4_POSTGRES_RPC).toLowerCase() === "true"
+  );
+}
+
+function buildSafeBookingProjection(bk) {
+  const expected = Number(bk.expected_amount_vnd || 0);
+  const paid = Number(bk.paid_amount_vnd || 0);
+  return {
+    id: bk.id,
+    booking_code: bk.booking_code,
+    package_id: bk.package_id,
+    group_size: bk.group_size,
+    expected_amount_vnd: expected,
+    paid_amount_vnd: paid,
+    amount_due_vnd: Number(bk.amount_due_vnd ?? Math.max(0, expected - paid)),
+    overpaid_amount_vnd: Number(bk.overpaid_amount_vnd ?? Math.max(0, paid - expected)),
+    status: bk.status,
+    is_revealed: Boolean(bk.is_revealed),
+    revealed_at: bk.is_revealed ? bk.revealed_at : null,
+    departure_date: bk.departure_date,
+    return_date: bk.return_date,
+    hold_expires_at: bk.hold_expires_at,
+    created_at: bk.created_at || null
+  };
+}
+
+export async function handleListMyBookingsV4({ authUser, env, v4db }) {
+  const user = requireAuthenticatedUser(authUser);
+  const resolvedUid = deterministicUuidV4(user.userId || user.email);
+
+  if (isPostgresRpcEnabled(env)) {
+    const rows = await selectPostgresRows(env, {
+      table: "bookings",
+      query: `select=id,booking_code,user_id,package_id,group_size,expected_amount_vnd,paid_amount_vnd,amount_due_vnd,overpaid_amount_vnd,status,is_revealed,revealed_at,departure_date,return_date,hold_expires_at,created_at&user_id=eq.${encodeURIComponent(resolvedUid)}&order=created_at.desc`
+    });
+    return {
+      success: true,
+      source: "supabase_postgres",
+      items: (Array.isArray(rows) ? rows : []).map(buildSafeBookingProjection)
+    };
+  }
+
+  const items = (v4db?.tables?.bookings || [])
+    .filter(b => b.user_id === resolvedUid || b.user_id === user.userId)
+    .sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")))
+    .map(buildSafeBookingProjection);
+
+  return {
+    success: true,
+    source: "relational_memory",
+    items
+  };
+}
+
 export async function handleGetBookingStatusV4({ authUser, bookingCode, env, v4db }) {
   const user = requireAuthenticatedUser(authUser);
   const resolvedUid = deterministicUuidV4(user.userId || user.email);
@@ -39,13 +98,7 @@ export async function handleGetBookingStatusV4({ authUser, bookingCode, env, v4d
     throw err;
   }
 
-  const isPostgresRpc =
-    env &&
-    env.SUPABASE_URL &&
-    env.SUPABASE_SERVICE_ROLE_KEY &&
-    String(env.USE_V4_POSTGRES_RPC).toLowerCase() === "true";
-
-  if (isPostgresRpc) {
+  if (isPostgresRpcEnabled(env)) {
     const rows = await selectPostgresRows(env, {
       table: "bookings",
       query: `select=id,booking_code,user_id,package_id,group_size,expected_amount_vnd,paid_amount_vnd,amount_due_vnd,overpaid_amount_vnd,status,is_revealed,revealed_at,departure_date,return_date,hold_expires_at,created_at&booking_code=eq.${encodeURIComponent(code)}`
@@ -64,22 +117,7 @@ export async function handleGetBookingStatusV4({ authUser, bookingCode, env, v4d
     return {
       success: true,
       source: "supabase_postgres",
-      booking: {
-        id: bk.id,
-        booking_code: bk.booking_code,
-        package_id: bk.package_id,
-        group_size: bk.group_size,
-        expected_amount_vnd: bk.expected_amount_vnd,
-        paid_amount_vnd: bk.paid_amount_vnd,
-        amount_due_vnd: bk.amount_due_vnd,
-        overpaid_amount_vnd: bk.overpaid_amount_vnd,
-        status: bk.status,
-        is_revealed: Boolean(bk.is_revealed),
-        revealed_at: bk.is_revealed ? bk.revealed_at : null,
-        departure_date: bk.departure_date,
-        return_date: bk.return_date,
-        hold_expires_at: bk.hold_expires_at
-      }
+      booking: buildSafeBookingProjection(bk)
     };
   }
 
@@ -99,20 +137,6 @@ export async function handleGetBookingStatusV4({ authUser, bookingCode, env, v4d
   return {
     success: true,
     source: "relational_memory",
-    booking: {
-      id: bk.id,
-      booking_code: bk.booking_code,
-      package_id: bk.package_id,
-      group_size: bk.group_size,
-      expected_amount_vnd: bk.expected_amount_vnd,
-      paid_amount_vnd: bk.paid_amount_vnd,
-      amount_due_vnd: Math.max(0, Number(bk.expected_amount_vnd || 0) - Number(bk.paid_amount_vnd || 0)),
-      status: bk.status,
-      is_revealed: Boolean(bk.is_revealed),
-      revealed_at: bk.is_revealed ? bk.revealed_at : null,
-      departure_date: bk.departure_date,
-      return_date: bk.return_date,
-      hold_expires_at: bk.hold_expires_at
-    }
+    booking: buildSafeBookingProjection(bk)
   };
 }

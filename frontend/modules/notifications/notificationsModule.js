@@ -17,6 +17,14 @@ export function createNotificationsModule({ apiClient }) {
       return apiClient.post("/api/v4/notifications/read", { notificationId }, { requireAuth: true });
     },
 
+    listNotifications(limit = 20) {
+      return this.fetchNotifications(limit);
+    },
+
+    markNotificationRead(notificationId) {
+      return this.markAsRead(notificationId);
+    },
+
     countUnread(notifications = []) {
       if (!Array.isArray(notifications)) return 0;
       return notifications.filter(n => !n?.is_read).length;

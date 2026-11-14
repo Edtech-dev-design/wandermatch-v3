@@ -41,7 +41,13 @@ export function initFrontendAppV4(
   const apiClient = createWorkerApiClient({
     envConfig: core.env,
     getAccessToken: () => readActiveAccessToken(storage),
-    fetchImpl
+    fetchImpl,
+    onUnauthorized: () => {
+      try {
+        storage?.removeItem?.("wm_supabase_session");
+        core.emit("auth:session-expired", {});
+      } catch (_) {}
+    }
   });
 
   const modules = Object.freeze({
@@ -58,11 +64,15 @@ export function initFrontendAppV4(
   });
 
   const wmV4 = {
-    version: "4.2.0",
+    version: "4.3.0",
     environment: core.env.environment || core.env.name,
     core,
     apiClient,
     modules,
+    session: {
+      getToken: () => readActiveAccessToken(storage),
+      getUser: () => modules.auth.getSavedSession()?.user || null
+    },
     syncSessionToken(session) {
       try {
         if (session && session.token && session.token !== "local-token") {

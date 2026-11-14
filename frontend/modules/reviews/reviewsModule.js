@@ -10,6 +10,10 @@ export function createReviewsModule({ apiClient }) {
       return apiClient.get(`/api/v4/reviews?limit=${safeLimit}`, { requireAuth: false });
     },
 
+    listReviews(limit = 20) {
+      return this.listApprovedReviews(limit);
+    },
+
     async submitReview({ bookingCode, rating = 5, aiMatchRating = 5, reviewText = "" } = {}) {
       const cleanCode = String(bookingCode || "").trim().toUpperCase();
       if (!cleanCode) {
