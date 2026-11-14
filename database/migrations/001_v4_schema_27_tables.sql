@@ -12,6 +12,76 @@ REVOKE CREATE ON SCHEMA public FROM PUBLIC, anon, authenticated;
 GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
 
 -- ============================================================================
+-- 1B. NON-DESTRUCTIVE ARCHIVAL OF LEGACY V3 TABLES INTO SCHEMA legacy_v3
+-- Preserves any pre-existing V3 tables without dropping data while preventing
+-- table/index collisions (e.g. public.destinations) during V4 27-table rollout.
+-- ============================================================================
+CREATE SCHEMA IF NOT EXISTS legacy_v3;
+REVOKE ALL ON SCHEMA legacy_v3 FROM PUBLIC, anon, authenticated;
+GRANT USAGE ON SCHEMA legacy_v3 TO service_role;
+
+DO $$
+DECLARE
+  v_tbl TEXT;
+  v_legacy_tables TEXT[] := ARRAY[
+    'users',
+    'linked_bank_accounts',
+    'b2b_partner_profiles',
+    'b2b_inventories',
+    'blind_trips',
+    'b2b_room_commitments',
+    'escrow_payment_ledgers',
+    'cancellation_refund_requests',
+    'destination_pois',
+    'ai_generated_itineraries',
+    'poi_reviews',
+    'group_booking_sessions',
+    'group_booking_members',
+    'b2b_sla_escrow_claims',
+    'anti_tourist_trap_guides',
+    'wm_worker_state'
+  ];
+BEGIN
+  FOREACH v_tbl IN ARRAY v_legacy_tables LOOP
+    IF EXISTS (
+      SELECT 1 FROM information_schema.tables
+      WHERE table_schema = 'public' AND table_name = v_tbl
+    ) AND NOT EXISTS (
+      SELECT 1 FROM information_schema.tables
+      WHERE table_schema = 'legacy_v3' AND table_name = v_tbl
+    ) THEN
+      EXECUTE format('ALTER TABLE public.%I SET SCHEMA legacy_v3', v_tbl);
+    END IF;
+  END LOOP;
+
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'destinations'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'destinations' AND column_name = 'climate_bucket_id'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'legacy_v3' AND table_name = 'destinations'
+  ) THEN
+    EXECUTE 'ALTER TABLE public.destinations SET SCHEMA legacy_v3';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public' AND p.proname = 'update_poi_rating_stats'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'legacy_v3' AND p.proname = 'update_poi_rating_stats'
+  ) THEN
+    EXECUTE 'ALTER FUNCTION public.update_poi_rating_stats() SET SCHEMA legacy_v3';
+  END IF;
+END
+$$;
+
+-- ============================================================================
 -- 2. HELPER FUNCTION FOR IMMUTABLE AUDIT PROTECTION
 -- (All functions strictly use SET search_path = pg_catalog, public)
 -- ============================================================================

@@ -1,7 +1,7 @@
 # ==============================================================================
-# Supabase Configuration for WanderMatch v3.0 Monorepo
+# Supabase Configuration for WanderMatch v4.0 Monorepo (Staging)
 # ==============================================================================
-project_id = "wandermatch-v3"
+project_id = "wandermatch-v4-staging"
 
 [api]
 enabled = true
@@ -13,7 +13,7 @@ max_rows = 1000
 [db]
 port = 54322
 shadow_port = 54320
-major_version = 15
+major_version = 17
 
 [db.pooler]
 enabled = false
@@ -31,6 +31,7 @@ enabled = true
 site_url = "http://localhost:3000"
 additional_redirect_urls = [
   "https://localhost:3000",
+  "https://staging.wandermatch.vn",
   "https://wandermatch.vn",
   "http://localhost:8888"
 ]
@@ -38,7 +39,6 @@ jwt_expiry = 3600
 enable_signup = true
 
 [auth.email]
-enable_signup = true
 double_confirm_changes = true
 enable_confirmations = false
 

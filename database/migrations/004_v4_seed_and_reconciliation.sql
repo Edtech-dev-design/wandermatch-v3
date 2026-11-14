@@ -7,27 +7,27 @@
 -- 1. SEED 9 DESTINATIONS ACROSS 3 CLIMATE BUCKETS (3 PER BUCKET FOR k >= 3)
 -- ============================================================================
 INSERT INTO public.destinations (
-    code_slug, city_name, province_name, region, climate_bucket_id,
+    id, code_slug, city_name, province_name, region, climate_bucket_id,
     climate_zone_label, temp_range_label,
     healing_score, nature_score, solitude_score, comfort_score, culture_score,
     climate_profile_jsonb, approved_mystery_hints_jsonb, generic_packing_jsonb, local_dining_guide_jsonb
 ) VALUES
 -- BUCKET 1: COOL_MIST_HIGHLAND (3 destinations: Đà Lạt, Măng Đen, Sa Pa)
-('da-lat', 'Đà Lạt', 'Lâm Đồng', 'HIGHLANDS', 'COOL_MIST_HIGHLAND',
+('20000000-0000-4000-8000-000000000001', 'da-lat', 'Đà Lạt', 'Lâm Đồng', 'HIGHLANDS', 'COOL_MIST_HIGHLAND',
  'Cao Nguyên Sương Mù & Rừng Thông', '15°C – 22°C', 95, 92, 85, 90, 80,
  '{"default": 92}'::jsonb,
  '["Không gian se lạnh giữa đại ngàn thông xanh, nơi nhịp sống chậm lại bên tách trà ấm.", "Vùng cao nguyên thanh bình đón sương sớm và hương thảo mộc tự nhiên."]'::jsonb,
  '["Áo khoác ấm nhẹ", "Giày đi bộ thoải mái", "Khăn choàng cổ"]'::jsonb,
  '[{"name": "Bánh căn Lệ Yersin", "specialty": "Bánh căn trứng cút nóng hổi"}]'::jsonb),
 
-('mang-den', 'Măng Đen', 'Kon Tum', 'HIGHLANDS', 'COOL_MIST_HIGHLAND',
+('20000000-0000-4000-8000-000000000002', 'mang-den', 'Măng Đen', 'Kon Tum', 'HIGHLANDS', 'COOL_MIST_HIGHLAND',
  'Cao Nguyên Sương Mù & Rừng Thông', '15°C – 22°C', 98, 98, 96, 85, 78,
  '{"default": 90}'::jsonb,
  '["Không gian se lạnh giữa đại ngàn thông xanh, nơi nhịp sống chậm lại bên tách trà ấm.", "Vùng cao nguyên thanh bình đón sương sớm và hương thảo mộc tự nhiên."]'::jsonb,
  '["Áo khoác ấm nhẹ", "Giày đi bộ thoải mái", "Khăn choàng cổ"]'::jsonb,
  '[{"name": "Gà nướng cơm lam Cô Sinh", "specialty": "Gà nướng lá tiêu rừng"}]'::jsonb),
 
-('sa-pa', 'Sa Pa', 'Lào Cai', 'NORTH', 'COOL_MIST_HIGHLAND',
+('20000000-0000-4000-8000-000000000003', 'sa-pa', 'Sa Pa', 'Lào Cai', 'NORTH', 'COOL_MIST_HIGHLAND',
  'Cao Nguyên Sương Mù & Rừng Thông', '15°C – 22°C', 94, 97, 88, 86, 92,
  '{"default": 89}'::jsonb,
  '["Không gian se lạnh giữa đại ngàn thông xanh, nơi nhịp sống chậm lại bên tách trà ấm.", "Vùng cao nguyên thanh bình đón sương sớm và hương thảo mộc tự nhiên."]'::jsonb,
@@ -35,21 +35,21 @@ INSERT INTO public.destinations (
  '[{"name": "Lẩu cá tầm Bản Mây", "specialty": "Cá tầm suối tươi"}]'::jsonb),
 
 -- BUCKET 2: TROPICAL_COAST_SUN (3 destinations: Phú Quốc, Quy Nhơn, Nha Trang)
-('phu-quoc', 'Phú Quốc', 'Kiên Giang', 'ISLAND', 'TROPICAL_COAST_SUN',
+('20000000-0000-4000-8000-000000000004', 'phu-quoc', 'Phú Quốc', 'Kiên Giang', 'ISLAND', 'TROPICAL_COAST_SUN',
  'Vịnh Biển Nắng Ấm & Gió Nhiệt Đới', '25°C – 31°C', 92, 90, 82, 95, 70,
  '{"default": 93}'::jsonb,
  '["Làn nước trong xanh ôm trọn bờ cát mịn dưới ánh hoàng hôn rực rỡ.", "Hơi thở đại dương dịu êm với khu nghỉ dưỡng tách biệt và ẩm thực biển tươi sống."]'::jsonb,
  '["Kính râm & kem chống nắng", "Trang phục đi biển thoáng mát", "Mũ rộng vành"]'::jsonb,
  '[{"name": "Bún quậy Kiến Xây", "specialty": "Bún quậy hải sản tươi"}]'::jsonb),
 
-('quy-nhon', 'Quy Nhơn', 'Bình Định', 'CENTRAL', 'TROPICAL_COAST_SUN',
+('20000000-0000-4000-8000-000000000005', 'quy-nhon', 'Quy Nhơn', 'Bình Định', 'CENTRAL', 'TROPICAL_COAST_SUN',
  'Vịnh Biển Nắng Ấm & Gió Nhiệt Đới', '25°C – 31°C', 90, 91, 88, 88, 84,
  '{"default": 91}'::jsonb,
  '["Làn nước trong xanh ôm trọn bờ cát mịn dưới ánh hoàng hôn rực rỡ.", "Hơi thở đại dương dịu êm với khu nghỉ dưỡng tách biệt và ẩm thực biển tươi sống."]'::jsonb,
  '["Kính râm & kem chống nắng", "Trang phục đi biển thoáng mát", "Mũ rộng vành"]'::jsonb,
  '[{"name": "Hải sản Eo Gió", "specialty": "Ốc biển & nhum nướng mỡ hành"}]'::jsonb),
 
-('nha-trang', 'Nha Trang', 'Khánh Hòa', 'CENTRAL', 'TROPICAL_COAST_SUN',
+('20000000-0000-4000-8000-000000000006', 'nha-trang', 'Nha Trang', 'Khánh Hòa', 'CENTRAL', 'TROPICAL_COAST_SUN',
  'Vịnh Biển Nắng Ấm & Gió Nhiệt Đới', '25°C – 31°C', 89, 88, 80, 94, 78,
  '{"default": 91}'::jsonb,
  '["Làn nước trong xanh ôm trọn bờ cát mịn dưới ánh hoàng hôn rực rỡ.", "Hơi thở đại dương dịu êm với khu nghỉ dưỡng tách biệt và ẩm thực biển tươi sống."]'::jsonb,
@@ -57,27 +57,139 @@ INSERT INTO public.destinations (
  '[{"name": "Bún cá Năm Beo", "specialty": "Bún chả cá sứa tươi"}]'::jsonb),
 
 -- BUCKET 3: HERITAGE_CULTURAL_WARM (3 destinations: Huế, Hội An - Đà Nẵng, Ninh Bình)
-('hue', 'Cố Đô Huế', 'Thừa Thiên Huế', 'CENTRAL', 'HERITAGE_CULTURAL_WARM',
+('20000000-0000-4000-8000-000000000007', 'hue', 'Cố Đô Huế', 'Thừa Thiên Huế', 'CENTRAL', 'HERITAGE_CULTURAL_WARM',
  'Miền Di Sản Trầm Mặc & Khoáng Nóng', '22°C – 28°C', 94, 84, 88, 90, 99,
  '{"default": 88}'::jsonb,
  '["Miền đất lưu giữ chiều sâu văn hóa trăm năm với nhịp sống thư thái và ẩm thực tinh tế.", "Hành trình tìm về sự tĩnh tại giữa kiến trúc cổ kính và thiên nhiên hiền hòa."]'::jsonb,
  '["Trang phục lịch sự tham quan di tích", "Giày bệt êm chân", "Ô gấp gọn"]'::jsonb,
  '[{"name": "Cơm hến Hoa Đông", "specialty": "Cơm hến & bánh bèo nậm lọc"}]'::jsonb),
 
-('hoi-an', 'Đà Nẵng & Hội An', 'Quảng Nam - Đà Nẵng', 'CENTRAL', 'HERITAGE_CULTURAL_WARM',
+('20000000-0000-4000-8000-000000000008', 'hoi-an', 'Đà Nẵng & Hội An', 'Quảng Nam - Đà Nẵng', 'CENTRAL', 'HERITAGE_CULTURAL_WARM',
  'Miền Di Sản Trầm Mặc & Khoáng Nóng', '22°C – 28°C', 91, 86, 82, 94, 96,
  '{"default": 90}'::jsonb,
  '["Miền đất lưu giữ chiều sâu văn hóa trăm năm với nhịp sống thư thái và ẩm thực tinh tế.", "Hành trình tìm về sự tĩnh tại giữa kiến trúc cổ kính và thiên nhiên hiền hòa."]'::jsonb,
  '["Trang phục lịch sự tham quan di tích", "Giày bệt êm chân", "Ô gấp gọn"]'::jsonb,
  '[{"name": "Cao lầu Thanh", "specialty": "Cao lầu phố cổ"}]'::jsonb),
 
-('ninh-binh', 'Tràng An - Ninh Bình', 'Ninh Bình', 'NORTH', 'HERITAGE_CULTURAL_WARM',
+('20000000-0000-4000-8000-000000000009', 'ninh-binh', 'Tràng An - Ninh Bình', 'Ninh Bình', 'NORTH', 'HERITAGE_CULTURAL_WARM',
  'Miền Di Sản Trầm Mặc & Khoáng Nóng', '22°C – 28°C', 93, 95, 89, 88, 95,
  '{"default": 89}'::jsonb,
  '["Miền đất lưu giữ chiều sâu văn hóa trăm năm với nhịp sống thư thái và ẩm thực tinh tế.", "Hành trình tìm về sự tĩnh tại giữa kiến trúc cổ kính và thiên nhiên hiền hòa."]'::jsonb,
  '["Trang phục lịch sự tham quan di tích", "Giày bệt êm chân", "Ô gấp gọn"]'::jsonb,
  '[{"name": "Dê núi Tràng An", "specialty": "Cơm cháy sốt dê núi"}]'::jsonb)
-ON CONFLICT (code_slug) DO NOTHING;
+ON CONFLICT (id) DO NOTHING;
+
+-- SEED B2B PARTNER & PROVIDER
+INSERT INTO auth.users (id, email)
+VALUES ('00000000-0000-4000-8000-000000000001', 'partner.system@wandermatch.vn')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.profiles (id, email, full_name, phone)
+VALUES ('00000000-0000-4000-8000-000000000001', 'partner.system@wandermatch.vn', 'WanderMatch Luxury Partner Network', '0901000111')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.user_roles (user_id, role, is_active)
+VALUES ('00000000-0000-4000-8000-000000000001', 'b2b_partner', true)
+ON CONFLICT (user_id, role) DO NOTHING;
+
+INSERT INTO public.travel_providers (
+    id, owner_user_id, provider_name, provider_type, business_license_no,
+    kyb_status, settlement_bank_code, settlement_bank_account, settlement_bank_holder,
+    sla_deposit_vnd, is_active
+) VALUES (
+    '10000000-0000-4000-8000-000000000001', '00000000-0000-4000-8000-000000000001',
+    'WanderMatch Luxury Partner Network', 'COMBO_OPERATOR', 'BL-WM-2026-001', 'VERIFIED',
+    'MB', '0889421997', 'WANDERMATCH B2B ESCROW', 100000000, true
+) ON CONFLICT (id) DO NOTHING;
+
+-- SEED 9 HOTELS
+INSERT INTO public.hotels (id, destination_id, provider_id, hotel_name, address, sla_code, star_rating, review_score, vibe_tier_alias, secret_hero_image_url) VALUES
+('30000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', 'Ana Mandara Villas Dalat Resort & Spa', 'Đà Lạt, Lâm Đồng', 'SLA-DLI-501', 5, 9.2, 'Boutique Sanctuary & Spa', 'https://cdn.wandermatch.vn/hotels/da-lat.jpg'),
+('30000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001', 'Golden Boutique Sanctuary Măng Đen', 'Măng Đen, Kon Tum', 'SLA-PXU-502', 5, 9.2, 'Boutique Sanctuary & Spa', 'https://cdn.wandermatch.vn/hotels/mang-den.jpg'),
+('30000000-0000-4000-8000-000000000003', '20000000-0000-4000-8000-000000000003', '10000000-0000-4000-8000-000000000001', 'Hotel de la Coupole MGallery', 'Sa Pa, Lào Cai', 'SLA-SPA-503', 5, 9.2, 'Boutique Sanctuary & Spa', 'https://cdn.wandermatch.vn/hotels/sa-pa.jpg'),
+('30000000-0000-4000-8000-000000000004', '20000000-0000-4000-8000-000000000004', '10000000-0000-4000-8000-000000000001', 'Salinda Resort Phu Quoc Island', 'Phú Quốc, Kiên Giang', 'SLA-PQC-504', 5, 9.2, 'Boutique Sanctuary & Spa', 'https://cdn.wandermatch.vn/hotels/phu-quoc.jpg'),
+('30000000-0000-4000-8000-000000000005', '20000000-0000-4000-8000-000000000005', '10000000-0000-4000-8000-000000000001', 'Avani Quy Nhon Resort & Cliff Spa', 'Quy Nhơn, Bình Định', 'SLA-UIH-505', 5, 9.2, 'Boutique Sanctuary & Spa', 'https://cdn.wandermatch.vn/hotels/quy-nhon.jpg'),
+('30000000-0000-4000-8000-000000000006', '20000000-0000-4000-8000-000000000006', '10000000-0000-4000-8000-000000000001', 'Amiana Resort Nha Trang Bay', 'Nha Trang, Khánh Hòa', 'SLA-CXR-506', 5, 9.2, 'Boutique Sanctuary & Spa', 'https://cdn.wandermatch.vn/hotels/nha-trang.jpg'),
+('30000000-0000-4000-8000-000000000007', '20000000-0000-4000-8000-000000000007', '10000000-0000-4000-8000-000000000001', 'Pilgrimage Village Boutique Resort & Spa', 'Huế, Thừa Thiên Huế', 'SLA-HUI-507', 5, 9.2, 'Boutique Sanctuary & Spa', 'https://cdn.wandermatch.vn/hotels/hue.jpg'),
+('30000000-0000-4000-8000-000000000008', '20000000-0000-4000-8000-000000000008', '10000000-0000-4000-8000-000000000001', 'Anantara Hoi An Heritage Resort', 'Hội An, Quảng Nam', 'SLA-DAD-508', 5, 9.2, 'Boutique Sanctuary & Spa', 'https://cdn.wandermatch.vn/hotels/hoi-an.jpg'),
+('30000000-0000-4000-8000-000000000009', '20000000-0000-4000-8000-000000000009', '10000000-0000-4000-8000-000000000001', 'Emeralda Resort Ninh Binh Sanctuary', 'Ninh Bình', 'SLA-NBH-509', 5, 9.2, 'Boutique Sanctuary & Spa', 'https://cdn.wandermatch.vn/hotels/ninh-binh.jpg')
+ON CONFLICT (id) DO NOTHING;
+
+-- SEED 27 FLIGHTS (SGN, HAN, DAD for 9 destinations)
+INSERT INTO public.flights (id, destination_id, provider_id, origin_airport, destination_airport, airline_name, flight_code, exact_departure_time, time_band, baggage_kg) VALUES
+('40000000-0001-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', 'SGN', 'DLI', 'Vietnam Airlines', 'VN1380-SGN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0002-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', 'HAN', 'DLI', 'Vietnam Airlines', 'VN1380-HAN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0003-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', 'DAD', 'DLI', 'Vietnam Airlines', 'VN1380-DAD', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0001-4000-8000-000000000002', '20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001', 'SGN', 'PXU', 'Vietnam Airlines', 'VN1860-SGN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0002-4000-8000-000000000002', '20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001', 'HAN', 'PXU', 'Vietnam Airlines', 'VN1860-HAN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0003-4000-8000-000000000002', '20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001', 'DAD', 'PXU', 'Vietnam Airlines', 'VN1860-DAD', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0001-4000-8000-000000000003', '20000000-0000-4000-8000-000000000003', '10000000-0000-4000-8000-000000000001', 'SGN', 'HAN', 'Vietnam Airlines', 'VN2100-SGN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0002-4000-8000-000000000003', '20000000-0000-4000-8000-000000000003', '10000000-0000-4000-8000-000000000001', 'HAN', 'HAN', 'Vietnam Airlines', 'VN2100-HAN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0003-4000-8000-000000000003', '20000000-0000-4000-8000-000000000003', '10000000-0000-4000-8000-000000000001', 'DAD', 'HAN', 'Vietnam Airlines', 'VN2100-DAD', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0001-4000-8000-000000000004', '20000000-0000-4000-8000-000000000004', '10000000-0000-4000-8000-000000000001', 'SGN', 'PQC', 'Vietnam Airlines', 'VN1820-SGN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0002-4000-8000-000000000004', '20000000-0000-4000-8000-000000000004', '10000000-0000-4000-8000-000000000001', 'HAN', 'PQC', 'Vietnam Airlines', 'VN1820-HAN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0003-4000-8000-000000000004', '20000000-0000-4000-8000-000000000004', '10000000-0000-4000-8000-000000000001', 'DAD', 'PQC', 'Vietnam Airlines', 'VN1820-DAD', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0001-4000-8000-000000000005', '20000000-0000-4000-8000-000000000005', '10000000-0000-4000-8000-000000000001', 'SGN', 'UIH', 'Vietnam Airlines', 'VN1620-SGN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0002-4000-8000-000000000005', '20000000-0000-4000-8000-000000000005', '10000000-0000-4000-8000-000000000001', 'HAN', 'UIH', 'Vietnam Airlines', 'VN1620-HAN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0003-4000-8000-000000000005', '20000000-0000-4000-8000-000000000005', '10000000-0000-4000-8000-000000000001', 'DAD', 'UIH', 'Vietnam Airlines', 'VN1620-DAD', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0001-4000-8000-000000000006', '20000000-0000-4000-8000-000000000006', '10000000-0000-4000-8000-000000000001', 'SGN', 'CXR', 'Vietnam Airlines', 'VN1340-SGN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0002-4000-8000-000000000006', '20000000-0000-4000-8000-000000000006', '10000000-0000-4000-8000-000000000001', 'HAN', 'CXR', 'Vietnam Airlines', 'VN1340-HAN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0003-4000-8000-000000000006', '20000000-0000-4000-8000-000000000006', '10000000-0000-4000-8000-000000000001', 'DAD', 'CXR', 'Vietnam Airlines', 'VN1340-DAD', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0001-4000-8000-000000000007', '20000000-0000-4000-8000-000000000007', '10000000-0000-4000-8000-000000000001', 'SGN', 'HUI', 'Vietnam Airlines', 'VN1540-SGN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0002-4000-8000-000000000007', '20000000-0000-4000-8000-000000000007', '10000000-0000-4000-8000-000000000001', 'HAN', 'HUI', 'Vietnam Airlines', 'VN1540-HAN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0003-4000-8000-000000000007', '20000000-0000-4000-8000-000000000007', '10000000-0000-4000-8000-000000000001', 'DAD', 'HUI', 'Vietnam Airlines', 'VN1540-DAD', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0001-4000-8000-000000000008', '20000000-0000-4000-8000-000000000008', '10000000-0000-4000-8000-000000000001', 'SGN', 'DAD', 'Vietnam Airlines', 'VN1120-SGN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0002-4000-8000-000000000008', '20000000-0000-4000-8000-000000000008', '10000000-0000-4000-8000-000000000001', 'HAN', 'DAD', 'Vietnam Airlines', 'VN1120-HAN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0003-4000-8000-000000000008', '20000000-0000-4000-8000-000000000008', '10000000-0000-4000-8000-000000000001', 'DAD', 'DAD', 'Vietnam Airlines', 'VN1120-DAD', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0001-4000-8000-000000000009', '20000000-0000-4000-8000-000000000009', '10000000-0000-4000-8000-000000000001', 'SGN', 'HAN', 'Vietnam Airlines', 'VN2200-SGN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0002-4000-8000-000000000009', '20000000-0000-4000-8000-000000000009', '10000000-0000-4000-8000-000000000001', 'HAN', 'HAN', 'Vietnam Airlines', 'VN2200-HAN', '08:30 - 10:00', 'MORNING', 20),
+('40000000-0003-4000-8000-000000000009', '20000000-0000-4000-8000-000000000009', '10000000-0000-4000-8000-000000000001', 'DAD', 'HAN', 'Vietnam Airlines', 'VN2200-DAD', '08:30 - 10:00', 'MORNING', 20)
+ON CONFLICT (id) DO NOTHING;
+
+-- SEED 9 HOTEL INVENTORIES
+INSERT INTO public.partner_inventories (id, provider_id, hotel_id, flight_id, item_type, inventory_date, total_slots, available_slots, reserved_slots, retail_price_vnd, net_price_vnd) VALUES
+('50000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000001', NULL, 'HOTEL_ROOM', '2026-11-15', 50, 50, 0, 1800000, 1100000),
+('50000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000002', NULL, 'HOTEL_ROOM', '2026-11-15', 50, 50, 0, 1800000, 1100000),
+('50000000-0000-4000-8000-000000000003', '10000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000003', NULL, 'HOTEL_ROOM', '2026-11-15', 50, 50, 0, 1800000, 1100000),
+('50000000-0000-4000-8000-000000000004', '10000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000004', NULL, 'HOTEL_ROOM', '2026-11-15', 50, 50, 0, 1800000, 1100000),
+('50000000-0000-4000-8000-000000000005', '10000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000005', NULL, 'HOTEL_ROOM', '2026-11-15', 50, 50, 0, 1800000, 1100000),
+('50000000-0000-4000-8000-000000000006', '10000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000006', NULL, 'HOTEL_ROOM', '2026-11-15', 50, 50, 0, 1800000, 1100000),
+('50000000-0000-4000-8000-000000000007', '10000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000007', NULL, 'HOTEL_ROOM', '2026-11-15', 50, 50, 0, 1800000, 1100000),
+('50000000-0000-4000-8000-000000000008', '10000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000008', NULL, 'HOTEL_ROOM', '2026-11-15', 50, 50, 0, 1800000, 1100000),
+('50000000-0000-4000-8000-000000000009', '10000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000009', NULL, 'HOTEL_ROOM', '2026-11-15', 50, 50, 0, 1800000, 1100000)
+ON CONFLICT (id) DO NOTHING;
+
+-- SEED 27 FLIGHT INVENTORIES
+INSERT INTO public.partner_inventories (id, provider_id, hotel_id, flight_id, item_type, inventory_date, total_slots, available_slots, reserved_slots, retail_price_vnd, net_price_vnd) VALUES
+('51000000-0001-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0001-4000-8000-000000000001', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0002-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0002-4000-8000-000000000001', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0003-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0003-4000-8000-000000000001', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0001-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0001-4000-8000-000000000002', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0002-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0002-4000-8000-000000000002', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0003-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0003-4000-8000-000000000002', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0001-4000-8000-000000000003', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0001-4000-8000-000000000003', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0002-4000-8000-000000000003', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0002-4000-8000-000000000003', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0003-4000-8000-000000000003', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0003-4000-8000-000000000003', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0001-4000-8000-000000000004', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0001-4000-8000-000000000004', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0002-4000-8000-000000000004', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0002-4000-8000-000000000004', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0003-4000-8000-000000000004', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0003-4000-8000-000000000004', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0001-4000-8000-000000000005', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0001-4000-8000-000000000005', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0002-4000-8000-000000000005', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0002-4000-8000-000000000005', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0003-4000-8000-000000000005', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0003-4000-8000-000000000005', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0001-4000-8000-000000000006', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0001-4000-8000-000000000006', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0002-4000-8000-000000000006', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0002-4000-8000-000000000006', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0003-4000-8000-000000000006', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0003-4000-8000-000000000006', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0001-4000-8000-000000000007', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0001-4000-8000-000000000007', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0002-4000-8000-000000000007', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0002-4000-8000-000000000007', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0003-4000-8000-000000000007', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0003-4000-8000-000000000007', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0001-4000-8000-000000000008', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0001-4000-8000-000000000008', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0002-4000-8000-000000000008', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0002-4000-8000-000000000008', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0003-4000-8000-000000000008', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0003-4000-8000-000000000008', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0001-4000-8000-000000000009', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0001-4000-8000-000000000009', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0002-4000-8000-000000000009', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0002-4000-8000-000000000009', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000),
+('51000000-0003-4000-8000-000000000009', '10000000-0000-4000-8000-000000000001', NULL, '40000000-0003-4000-8000-000000000009', 'FLIGHT_SEAT', '2026-11-15', 100, 100, 0, 1200000, 850000)
+ON CONFLICT (id) DO NOTHING;
+
 
 -- ============================================================================
 -- 2. SEVEN GATEKEEPER RECONCILIATION QUERIES FUNCTION (Recon #1 - Recon #7)
@@ -276,5 +388,113 @@ $$;
 
 REVOKE ALL ON FUNCTION public.reconcile_external_settlement_v4(JSONB) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.reconcile_external_settlement_v4(JSONB) TO service_role;
+
+-- ============================================================================
+-- 4. CUTOVER WRITE-FREEZE CONTROL & ROLLBACK DELTA EXPORT RPCs
+-- ============================================================================
+CREATE OR REPLACE FUNCTION public.set_cutover_write_freeze_v4(
+    p_write_freeze BOOLEAN,
+    p_maintenance_readonly BOOLEAN DEFAULT FALSE
+) RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog, public
+AS $$
+DECLARE
+    v_val JSONB;
+BEGIN
+    v_val := jsonb_build_object(
+        'write_freeze', COALESCE(p_write_freeze, FALSE),
+        'maintenance_readonly', COALESCE(p_maintenance_readonly, FALSE),
+        'v4_active', NOT COALESCE(p_write_freeze, FALSE),
+        'updated_at', NOW()
+    );
+
+    INSERT INTO public.system_settings (key, value_jsonb, description, is_public, updated_at)
+    VALUES ('cutover_mode', v_val, 'Cutover write-freeze and maintenance control flags', TRUE, NOW())
+    ON CONFLICT (key) DO UPDATE
+        SET value_jsonb = EXCLUDED.value_jsonb,
+            updated_at = NOW();
+
+    RETURN v_val;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.set_cutover_write_freeze_v4(BOOLEAN, BOOLEAN) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.set_cutover_write_freeze_v4(BOOLEAN, BOOLEAN) TO service_role;
+
+CREATE OR REPLACE FUNCTION public.export_v4_delta_for_v3_rollback()
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog, public
+STABLE
+AS $$
+DECLARE
+    v_bookings JSONB;
+    v_payments JSONB;
+    v_refunds JSONB;
+BEGIN
+    SELECT COALESCE(jsonb_agg(jsonb_build_object(
+        'bookingCode', b.booking_code,
+        'userEmail', pr.email,
+        'customerName', pr.full_name,
+        'packageId', b.package_id::TEXT,
+        'groupSize', b.group_size,
+        'expectedAmount', b.expected_amount_vnd,
+        'paidAmount', b.paid_amount_vnd,
+        'amountDue', b.amount_due_vnd,
+        'isOverpaid', (b.overpaid_amount_vnd > 0),
+        'overpaidAmount', b.overpaid_amount_vnd,
+        'status', b.status,
+        'isRevealed', b.is_revealed,
+        'revealedAt', b.revealed_at,
+        'isLegacyMigrated', b.is_legacy_migrated,
+        'departureDate', b.departure_date,
+        'createdAt', b.created_at
+    ) ORDER BY b.created_at ASC), '[]'::jsonb)
+    INTO v_bookings
+    FROM public.bookings b
+    JOIN public.profiles pr ON pr.id = b.user_id;
+
+    SELECT COALESCE(jsonb_agg(jsonb_build_object(
+        'transactionId', tx.external_transaction_id,
+        'provider', tx.payment_provider,
+        'bookingCode', b.booking_code,
+        'amount', tx.amount_vnd,
+        'direction', tx.direction,
+        'gateway', tx.bank_code,
+        'transferContent', tx.transfer_content,
+        'verifiedAt', tx.created_at
+    ) ORDER BY tx.created_at ASC), '[]'::jsonb)
+    INTO v_payments
+    FROM public.payment_transactions tx
+    JOIN public.bookings b ON b.id = tx.booking_id
+    WHERE tx.direction = 'INFLOW';
+
+    SELECT COALESCE(jsonb_agg(jsonb_build_object(
+        'refundId', COALESCE(r.payout_bank_ref, r.id::TEXT),
+        'bookingCode', b.booking_code,
+        'refundAmount', r.refund_amount_vnd,
+        'penaltyFee', r.cancellation_fee_vnd,
+        'status', r.status,
+        'processedAt', COALESCE(r.processed_at, r.updated_at)
+    ) ORDER BY r.created_at ASC), '[]'::jsonb)
+    INTO v_refunds
+    FROM public.refunds r
+    JOIN public.bookings b ON b.id = r.booking_id;
+
+    RETURN jsonb_build_object(
+        'exported_at', NOW(),
+        'bookings', v_bookings,
+        'payments', v_payments,
+        'refunds', v_refunds
+    );
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.export_v4_delta_for_v3_rollback() FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.export_v4_delta_for_v3_rollback() TO service_role;
+
 
 

@@ -106,6 +106,8 @@ GRANT EXECUTE ON FUNCTION public.get_my_sealed_packages_v4(UUID) TO authenticate
 -- Atomically locks package, decrements partner_inventories in deterministic UUID order,
 -- creates booking, inventory_holds, booking_items, payments, travelers, and status history.
 -- ============================================================================
+CREATE SEQUENCE IF NOT EXISTS public.booking_code_v4_seq START 1;
+
 CREATE OR REPLACE FUNCTION public.create_booking_with_hold_v4(
     p_package_id UUID,
     p_booking_code VARCHAR,
@@ -127,15 +129,23 @@ DECLARE
     v_hold_expires TIMESTAMPTZ := NOW() + INTERVAL '30 minutes';
     v_idx SMALLINT := 0;
     v_trav JSONB;
+    v_actual_code VARCHAR(24);
 BEGIN
     IF v_caller_uid IS NULL THEN
         RAISE EXCEPTION 'UNAUTHORIZED: Authentication required.' USING ERRCODE = '28000';
     END IF;
 
-    -- Idempotent replay check if caller retries same package_id or booking_code
+    IF EXISTS (
+        SELECT 1 FROM public.system_settings
+        WHERE key = 'cutover_mode' AND COALESCE((value_jsonb->>'write_freeze')::BOOLEAN, FALSE) = TRUE
+    ) THEN
+        RAISE EXCEPTION 'WRITE_FREEZE_ACTIVE: System is in maintenance write-freeze.' USING ERRCODE = '55000';
+    END IF;
+
+    -- Idempotent replay check if caller retries same package_id or explicit p_booking_code
     SELECT * INTO v_existing_booking
     FROM public.bookings
-    WHERE (package_id = p_package_id OR booking_code = p_booking_code)
+    WHERE (package_id = p_package_id OR (NULLIF(trim(p_booking_code), '') IS NOT NULL AND booking_code = NULLIF(trim(p_booking_code), '')))
       AND user_id = v_caller_uid
     LIMIT 1;
 
@@ -151,6 +161,8 @@ BEGIN
             'idempotent_replay', TRUE
         );
     END IF;
+
+    v_actual_code := COALESCE(NULLIF(trim(p_booking_code), ''), 'WM' || to_char(NOW(), 'YYYY') || lpad(nextval('public.booking_code_v4_seq')::text, 4, '0'));
 
     -- 1. Lock the sealed package row FOR UPDATE
     SELECT * INTO v_pkg
@@ -210,7 +222,7 @@ BEGIN
         expected_amount_vnd, paid_amount_vnd, status,
         is_revealed, departure_date, return_date, hold_expires_at
     ) VALUES (
-        p_booking_code, FALSE, v_caller_uid, v_pkg.id, v_pkg.group_size,
+        v_actual_code, FALSE, v_caller_uid, v_pkg.id, v_pkg.group_size,
         v_pkg.expected_amount_vnd, 0, 'PENDING_PAYMENT',
         FALSE, p_departure_date, p_departure_date + GREATEST(1, p_duration_days), v_hold_expires
     ) RETURNING * INTO v_new_booking;
@@ -374,6 +386,43 @@ BEGIN
         END IF;
     ELSIF COALESCE(array_length(v_code_matches, 1), 0) > 1 THEN
         v_resolved_code := '__AMBIGUOUS__';
+    END IF;
+
+    -- 0. Cutover Write-Freeze Check: Durably queue incoming webhooks without mutating bookings
+    IF EXISTS (
+        SELECT 1 FROM public.system_settings
+        WHERE key = 'cutover_mode' AND COALESCE((value_jsonb->>'write_freeze')::BOOLEAN, FALSE) = TRUE
+    ) THEN
+        INSERT INTO public.payment_webhook_events (
+            provider, provider_event_id, raw_payload, signature_verified, processing_status
+        ) VALUES (
+            v_provider,
+            COALESCE(NULLIF(trim(p_provider_event_id), ''), p_external_tx_id),
+            COALESCE(p_raw_payload, '{}'::jsonb) || jsonb_build_object(
+                'provider', v_provider,
+                'provider_event_id', COALESCE(NULLIF(trim(p_provider_event_id), ''), p_external_tx_id),
+                'external_transaction_id', p_external_tx_id,
+                'booking_code', v_resolved_code,
+                'transfer_amount', p_transfer_amount,
+                'transfer_content', p_transfer_content,
+                'bank_code', p_bank_code
+            ),
+            TRUE,
+            'QUEUED_DURING_CUTOVER'
+        )
+        ON CONFLICT (provider, provider_event_id) DO UPDATE
+            SET raw_payload = EXCLUDED.raw_payload,
+                processing_status = 'QUEUED_DURING_CUTOVER'
+        RETURNING id INTO v_webhook_id;
+
+        RETURN jsonb_build_object(
+            'success', TRUE,
+            'http_status', 200,
+            'queued_during_cutover', TRUE,
+            'webhook_event_id', v_webhook_id,
+            'booking_code', v_resolved_code,
+            'status', 'QUEUED_DURING_CUTOVER'
+        );
     END IF;
 
     -- 1. Check if this provider-scoped bank transaction was already processed
@@ -626,6 +675,13 @@ DECLARE
     v_replayed_count INT := 0;
     v_res JSONB;
 BEGIN
+    IF EXISTS (
+        SELECT 1 FROM public.system_settings
+        WHERE key = 'cutover_mode' AND COALESCE((value_jsonb->>'write_freeze')::BOOLEAN, FALSE) = TRUE
+    ) THEN
+        RAISE EXCEPTION 'WRITE_FREEZE_ACTIVE: Cannot replay queued webhooks while write-freeze is active.' USING ERRCODE = '55000';
+    END IF;
+
     FOR v_evt IN
         SELECT * FROM public.payment_webhook_events
         WHERE processing_status = 'QUEUED_DURING_CUTOVER'
@@ -636,11 +692,27 @@ BEGIN
         v_res := public.process_payment_webhook_v4(
             v_evt.provider,
             v_evt.provider_event_id,
-            COALESCE(v_evt.raw_payload->>'external_transaction_id', v_evt.raw_payload->>'id', v_evt.provider_event_id),
-            v_evt.raw_payload->>'booking_code',
-            COALESCE((v_evt.raw_payload->>'transfer_amount')::BIGINT, (v_evt.raw_payload->>'transferAmount')::BIGINT, 0),
-            COALESCE(v_evt.raw_payload->>'transfer_content', v_evt.raw_payload->>'content', ''),
-            COALESCE(v_evt.raw_payload->>'bank_code', 'MB'),
+            COALESCE(
+                v_evt.raw_payload->>'external_transaction_id',
+                v_evt.raw_payload->>'externalTransactionId',
+                v_evt.raw_payload->>'transactionId',
+                v_evt.raw_payload->>'id',
+                v_evt.provider_event_id
+            ),
+            COALESCE(v_evt.raw_payload->>'booking_code', v_evt.raw_payload->>'bookingCode', ''),
+            COALESCE(
+                (v_evt.raw_payload->>'transfer_amount')::BIGINT,
+                (v_evt.raw_payload->>'transferAmount')::BIGINT,
+                (v_evt.raw_payload->>'amount')::BIGINT,
+                0
+            ),
+            COALESCE(
+                v_evt.raw_payload->>'transfer_content',
+                v_evt.raw_payload->>'content',
+                v_evt.raw_payload->>'transferContent',
+                ''
+            ),
+            COALESCE(v_evt.raw_payload->>'bank_code', v_evt.raw_payload->>'bankCode', v_evt.raw_payload->>'gateway', 'MB'),
             v_evt.raw_payload
         );
         v_replayed_count := v_replayed_count + 1;
@@ -1274,5 +1346,116 @@ $$;
 
 REVOKE ALL ON FUNCTION public.claim_due_outbox_events_v4(VARCHAR, INT, INT) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.claim_due_outbox_events_v4(VARCHAR, INT, INT) TO service_role;
+
+-- ============================================================================
+-- 14. SERVICE-ROLE RPC: persist_recommendation_session_v4
+-- Atomically persists recommendation session, sealed packages, and package_items
+-- into PostgreSQL so subsequent create_booking_with_hold_v4 can lock and reference them.
+-- ============================================================================
+CREATE OR REPLACE FUNCTION public.persist_recommendation_session_v4(
+    p_session JSONB,
+    p_packages JSONB,
+    p_package_items JSONB
+) RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog, public
+AS $$
+DECLARE
+    v_pkg JSONB;
+    v_item JSONB;
+BEGIN
+    INSERT INTO public.recommendation_sessions (
+        id, user_id, origin_airport, budget_per_person_vnd, group_size,
+        departure_date, duration_days, trip_purpose,
+        vec_healing, vec_nature, vec_solitude, vec_comfort, vec_culture,
+        blacklisted_city_slugs, comfort_locks, ai_archetype_label, created_at
+    ) VALUES (
+        (p_session->>'id')::UUID,
+        (p_session->>'user_id')::UUID,
+        COALESCE(p_session->>'origin_airport', 'SGN'),
+        (p_session->>'budget_per_person_vnd')::BIGINT,
+        (p_session->>'group_size')::SMALLINT,
+        (p_session->>'departure_date')::DATE,
+        (p_session->>'duration_days')::SMALLINT,
+        COALESCE(p_session->>'trip_purpose', 'GENERAL_RETREAT'),
+        (p_session->>'vec_healing')::SMALLINT,
+        (p_session->>'vec_nature')::SMALLINT,
+        (p_session->>'vec_solitude')::SMALLINT,
+        (p_session->>'vec_comfort')::SMALLINT,
+        (p_session->>'vec_culture')::SMALLINT,
+        COALESCE(ARRAY(SELECT jsonb_array_elements_text(COALESCE(p_session->'blacklisted_city_slugs', '[]'::jsonb))), '{}'::TEXT[]),
+        COALESCE(p_session->'comfort_locks', '{}'::jsonb),
+        COALESCE(p_session->>'ai_archetype_label', 'Curated Blind Explorer'),
+        COALESCE((p_session->>'created_at')::TIMESTAMPTZ, NOW())
+    ) ON CONFLICT (id) DO NOTHING;
+
+    FOR v_pkg IN SELECT * FROM jsonb_array_elements(p_packages)
+    LOOP
+        INSERT INTO public.packages (
+            id, session_id, user_id, rank_order, is_top_pick,
+            secret_destination_id, secret_hotel_id, secret_flight_id,
+            blind_code_alias, climate_bucket_id, climate_zone_label, temp_range_label,
+            anonymized_hint, packing_checklist, hotel_star_tier, vibe_tier_alias,
+            flight_time_band, mood_illustration_key, display_price_band_vnd,
+            k_anonymity_count, group_size, unit_price_vnd, expected_amount_vnd,
+            retail_value_vnd, net_cost_vnd, similarity_score, total_score,
+            score_breakdown, status, expires_at, created_at
+        ) VALUES (
+            (v_pkg->>'id')::UUID,
+            (v_pkg->>'session_id')::UUID,
+            (v_pkg->>'user_id')::UUID,
+            (v_pkg->>'rank_order')::SMALLINT,
+            COALESCE((v_pkg->>'is_top_pick')::BOOLEAN, FALSE),
+            (v_pkg->>'secret_destination_id')::UUID,
+            (v_pkg->>'secret_hotel_id')::UUID,
+            (v_pkg->>'secret_flight_id')::UUID,
+            v_pkg->>'blind_code_alias',
+            v_pkg->>'climate_bucket_id',
+            v_pkg->>'climate_zone_label',
+            v_pkg->>'temp_range_label',
+            v_pkg->>'anonymized_hint',
+            COALESCE(v_pkg->'packing_checklist', '[]'::jsonb),
+            (v_pkg->>'hotel_star_tier')::SMALLINT,
+            v_pkg->>'vibe_tier_alias',
+            v_pkg->>'flight_time_band',
+            v_pkg->>'mood_illustration_key',
+            v_pkg->>'display_price_band_vnd',
+            (v_pkg->>'k_anonymity_count')::SMALLINT,
+            (v_pkg->>'group_size')::SMALLINT,
+            (v_pkg->>'unit_price_vnd')::BIGINT,
+            (v_pkg->>'expected_amount_vnd')::BIGINT,
+            (v_pkg->>'retail_value_vnd')::BIGINT,
+            (v_pkg->>'net_cost_vnd')::BIGINT,
+            (v_pkg->>'similarity_score')::NUMERIC,
+            (v_pkg->>'total_score')::NUMERIC,
+            COALESCE(v_pkg->'score_breakdown', '{}'::jsonb),
+            COALESCE(v_pkg->>'status', 'SEALED_ACTIVE'),
+            COALESCE((v_pkg->>'expires_at')::TIMESTAMPTZ, NOW() + INTERVAL '30 minutes'),
+            COALESCE((v_pkg->>'created_at')::TIMESTAMPTZ, NOW())
+        ) ON CONFLICT (id) DO NOTHING;
+    END LOOP;
+
+    FOR v_item IN SELECT * FROM jsonb_array_elements(p_package_items)
+    LOOP
+        INSERT INTO public.package_items (
+            id, package_id, inventory_id, item_type, units_required, unit_snapshot_price_vnd
+        ) VALUES (
+            (v_item->>'id')::UUID,
+            (v_item->>'package_id')::UUID,
+            (v_item->>'inventory_id')::UUID,
+            v_item->>'item_type',
+            (v_item->>'units_required')::SMALLINT,
+            (v_item->>'unit_snapshot_price_vnd')::BIGINT
+        ) ON CONFLICT (id) DO NOTHING;
+    END LOOP;
+
+    RETURN jsonb_build_object('success', TRUE);
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.persist_recommendation_session_v4(JSONB, JSONB, JSONB) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.persist_recommendation_session_v4(JSONB, JSONB, JSONB) TO service_role;
+
 
 
