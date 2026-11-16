@@ -136,6 +136,24 @@ export default {
       );
     }
 
+    // 3b. Request payload size limit guard (256 KB max)
+    const contentLength = Number(request.headers.get("content-length") || 0);
+    if (Number.isFinite(contentLength) && contentLength > 262144) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "PAYLOAD_TOO_LARGE",
+          code: "PAYLOAD_TOO_LARGE",
+          message: "Request payload exceeds 256KB limit.",
+          requestId
+        }),
+        {
+          status: 413,
+          headers: { ...corsHeaders, "Content-Type": "application/json", "X-Request-Id": requestId }
+        }
+      );
+    }
+
     // 4. Transactional Storage Lock + Modular V4 Dispatch + Legacy Fallback
     return withStorageLock(async () => {
       await hydrate(env);

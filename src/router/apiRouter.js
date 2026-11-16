@@ -9,6 +9,7 @@ import { handlePaymentWebhookV4, handleRequestRefundV4, handleFinalizeRefundV4 }
 import { handleGetMaskedPiiV4, handleUpsertPiiV4, handleGetProfileV4, handleUpdateProfileV4 } from "../modules/users/usersController.js";
 import {
   handleApproveRefundV4,
+  handleGetAdminSummaryV4,
   handleRunReconciliationV4,
   handleReconcileSettlementV4,
   handleCutoverWriteFreezeV4,
@@ -53,9 +54,37 @@ export const V42_ROUTE_REGISTRY = Object.freeze({
   "GET /api/v4/users/profile": handleGetProfileV4,
   "PUT /api/v4/users/profile": handleUpdateProfileV4,
   "POST /api/v4/users/profile": handleUpdateProfileV4,
+  "GET /api/v4/admin/summary": handleGetAdminSummaryV4,
   "POST /api/v4/cutover/replay-webhooks": handleReplayQueuedWebhooksV4,
   "POST /api/v4/cutover/rollback-rehearsal": handleRollbackRehearsalV4
 });
+
+async function parseJsonBodyStrict(request) {
+  const raw = await request.text();
+  if (!raw || !raw.trim()) return {};
+  if (raw.length > 262144) {
+    const err = new Error("PAYLOAD_TOO_LARGE: Request body exceeds 256KB limit.");
+    err.code = "PAYLOAD_TOO_LARGE";
+    err.statusCode = 413;
+    throw err;
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      const err = new Error("INVALID_JSON: Request body must be a JSON object.");
+      err.code = "INVALID_JSON";
+      err.statusCode = 400;
+      throw err;
+    }
+    return parsed;
+  } catch (e) {
+    if (e.statusCode) throw e;
+    const err = new Error("INVALID_JSON: Malformed JSON request body.");
+    err.code = "INVALID_JSON";
+    err.statusCode = 400;
+    throw err;
+  }
+}
 
 function extractBearerToken(request) {
   const auth = request.headers.get("Authorization") || "";
@@ -76,6 +105,14 @@ function resolveErrorStatus(err) {
   const explicitStatus = err.statusCode ?? err.httpStatus ?? err.status;
   if (typeof explicitStatus === "number" && explicitStatus >= 400) return explicitStatus;
   const msg = String(err.message || "");
+  if (
+    err.code === "INVALID_JSON" ||
+    err.code === "22023" ||
+    err.code === "23514" ||
+    /INVALID_JSON|BAD_REQUEST|INVALID_AMOUNT|MISSING_/i.test(msg)
+  ) {
+    return 400;
+  }
   if (err.code === "28000" || /UNAUTHORIZED/i.test(msg)) return 401;
   if (err.code === "42501" || /FORBIDDEN|CROSS_TENANT|ACCESS_DENIED|ADMIN ROLE/i.test(msg)) return 403;
   if (err.code === "P0002" || /NOT_FOUND/i.test(msg)) return 404;
@@ -175,9 +212,13 @@ export async function dispatchV4Route(
           response: makeJsonResponse({ success: false, error: sigAuth.error }, sigAuth.status || 401, corsHeaders, requestId)
         };
       }
-      const body = await request.json();
+      const body = await parseJsonBodyStrict(request);
       const data = await handlePaymentWebhookV4({ body, env, v4db });
-      return { matched: true, response: makeJsonResponse({ success: true, ...data }, 200, corsHeaders, requestId) };
+      const webhookStatus = Number(data?.http_status) || (data?.success === false ? 400 : 200);
+      return {
+        matched: true,
+        response: makeJsonResponse({ success: data?.success !== false, ...data }, webhookStatus, corsHeaders, requestId)
+      };
     }
 
     // 4. Authenticated User & Admin Routes
@@ -185,7 +226,7 @@ export async function dispatchV4Route(
     const bearerToken = extractBearerToken(request);
 
     if (path === "/api/v4/recommendations" && method === "POST") {
-      const body = await request.json();
+      const body = await parseJsonBodyStrict(request);
       const data = await handleCreateRecommendationsV4({ authUser, body, env, v4db });
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
@@ -199,7 +240,7 @@ export async function dispatchV4Route(
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
     if (path === "/api/v4/bookings" && method === "POST") {
-      const body = await request.json();
+      const body = await parseJsonBodyStrict(request);
       const data = await handleCreateBookingWithHoldV4({ authUser, bearerToken, body, env, v4db });
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
@@ -209,22 +250,22 @@ export async function dispatchV4Route(
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
     if (path === "/api/v4/bookings/reveal" && method === "POST") {
-      const body = await request.json();
+      const body = await parseJsonBodyStrict(request);
       const data = await handleRevealBlindBookingV4({ authUser, bearerToken, body, env, v4db });
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
     if (path === "/api/v4/refunds/request" && method === "POST") {
-      const body = await request.json();
+      const body = await parseJsonBodyStrict(request);
       const data = await handleRequestRefundV4({ authUser, bearerToken, body, env, v4db });
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
     if (path === "/api/v4/refunds/approve" && method === "POST") {
-      const body = await request.json();
+      const body = await parseJsonBodyStrict(request);
       const data = await handleApproveRefundV4({ authUser, bearerToken, body, env, v4db });
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
     if (path === "/api/v4/refunds/finalize" && method === "POST") {
-      const body = await request.json();
+      const body = await parseJsonBodyStrict(request);
       const data = await handleFinalizeRefundV4({ authUser, bearerToken, body, env, v4db });
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
@@ -233,7 +274,7 @@ export async function dispatchV4Route(
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
     if (path === "/api/v4/pii/upsert" && method === "POST") {
-      const body = await request.json();
+      const body = await parseJsonBodyStrict(request);
       const data = await handleUpsertPiiV4({ authUser, body, env, v4db });
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
@@ -242,12 +283,12 @@ export async function dispatchV4Route(
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
     if (path === "/api/v4/users/profile" && (method === "PUT" || method === "POST")) {
-      const body = await request.json();
+      const body = await parseJsonBodyStrict(request);
       const data = await handleUpdateProfileV4({ authUser, body, env, v4db });
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
     if (path === "/api/v4/reviews" && method === "POST") {
-      const body = await request.json();
+      const body = await parseJsonBodyStrict(request);
       const data = await handleSubmitReviewV4({ authUser, bearerToken, body, env, v4db });
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
@@ -257,8 +298,12 @@ export async function dispatchV4Route(
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
     if (path === "/api/v4/notifications/read" && method === "POST") {
-      const body = await request.json();
+      const body = await parseJsonBodyStrict(request);
       const data = await handleMarkNotificationReadV4({ authUser, bearerToken, body, env, v4db });
+      return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
+    }
+    if (path === "/api/v4/admin/summary" && method === "GET") {
+      const data = await handleGetAdminSummaryV4({ authUser, env, v4db });
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
     if (path === "/api/v4/reconciliation" && method === "GET") {
@@ -266,17 +311,17 @@ export async function dispatchV4Route(
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
     if (path === "/api/v4/reconciliation/settlement" && method === "POST") {
-      const body = await request.json();
+      const body = await parseJsonBodyStrict(request);
       const data = await handleReconcileSettlementV4({ authUser, body, env, v4db });
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
     if (path === "/api/v4/cutover/write-freeze" && method === "POST") {
-      const body = await request.json();
+      const body = await parseJsonBodyStrict(request);
       const data = await handleCutoverWriteFreezeV4({ authUser, body, env, v4db });
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }
     if (path === "/api/v4/cutover/replay-webhooks" && method === "POST") {
-      const body = await request.json().catch(() => ({}));
+      const body = await parseJsonBodyStrict(request);
       const data = await handleReplayQueuedWebhooksV4({ authUser, body, env, v4db });
       return { matched: true, response: makeJsonResponse(data, 200, corsHeaders, requestId) };
     }

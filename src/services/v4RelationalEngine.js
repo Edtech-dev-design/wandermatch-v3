@@ -1418,15 +1418,19 @@ export class V4RelationalDatabase {
       // Extract booking code from p_booking_code or p_transfer_content supporting both V4 ^WM[0-9]{8}$ and legacy V3 codes
       let resolvedCode = String(p_booking_code || "").trim().toUpperCase();
       let isAmbiguousMemo = false;
-      if (!resolvedCode && p_transfer_content) {
-        const matches = [...String(p_transfer_content).matchAll(/\b(WM(?:-?[A-Z0-9]{4,16})+)\b/gi)].map(
+      if (p_transfer_content) {
+        const contentMatches = [...String(p_transfer_content).matchAll(/\b(WM(?:-?[A-Z0-9]{4,16})+)\b/gi)].map(
           m => m[1].toUpperCase()
         );
-        const uniqueCodes = [...new Set(matches)];
-        if (uniqueCodes.length === 1) {
-          resolvedCode = uniqueCodes[0];
-        } else if (uniqueCodes.length > 1) {
+        const uniqueContentCodes = [...new Set(contentMatches)];
+        if (uniqueContentCodes.length > 1) {
           isAmbiguousMemo = true;
+        } else if (uniqueContentCodes.length === 1) {
+          if (!resolvedCode) {
+            resolvedCode = uniqueContentCodes[0];
+          } else if (resolvedCode !== uniqueContentCodes[0]) {
+            isAmbiguousMemo = true;
+          }
         }
       }
 

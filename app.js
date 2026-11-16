@@ -462,6 +462,64 @@ window.HOTELS_DB = [
 
 const DEFAULT_SEEDED_USERS = {};
 
+window.maskPreRevealAirline = function(airline = "") {
+  const clean = String(airline || "").replace(/\s*\([^)]*\)/g, "").trim();
+  return clean || "Hãng Hàng Không Chuẩn SLA";
+};
+
+window.scrubPreRevealText = function(text = "") {
+  let out = String(text || "");
+  const secretTerms = [
+    "Ana Mandara Villas Dalat Resort & Spa",
+    "Ana Mandara",
+    "Golden Boutique Sanctuary Măng Đen",
+    "Golden Boutique Hotel Măng Đen",
+    "Hotel de la Coupole MGallery",
+    "MGallery",
+    "Salinda Resort Phu Quoc Island",
+    "Salinda",
+    "Avani Quy Nhon Resort & Cliff Spa",
+    "Avani Quy Nhon Resort",
+    "Avani",
+    "Amiana Resort Nha Trang Bay",
+    "Amiana",
+    "Pilgrimage Village Boutique Resort & Spa",
+    "Pilgrimage",
+    "Anantara Hoi An Heritage Resort",
+    "Anantara",
+    "Emeralda Resort Ninh Binh Sanctuary",
+    "Emeralda",
+    "Đà Lạt",
+    "Liên Khương",
+    "Măng Đen",
+    "Pleiku",
+    "Kon Plông",
+    "Hồ Đăk Ke",
+    "Thác Pa Sỹ",
+    "Kon Pring",
+    "Quy Nhơn",
+    "Phù Cát",
+    "Kỳ Co",
+    "Eo Gió",
+    "Nhơn Lý",
+    "Huế",
+    "Phú Bài",
+    "Phú Quốc",
+    "Nha Trang",
+    "Cam Ranh",
+    "Hội An",
+    "Ninh Bình",
+    "Côn Đảo",
+    "Sapa",
+    "Vasco ATR-72"
+  ];
+  for (const term of secretTerms) {
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    out = out.replace(new RegExp(`(?<!\\p{L})${escaped}(?!\\p{L})`, "giu"), "Điểm Đến Bí Mật SLA");
+  }
+  return out;
+};
+
 window.sealUnrevealedPackage = function(pkg) {
   if (!pkg || typeof pkg !== "object" || pkg.isRevealed) return pkg;
   const copy = { ...pkg };
@@ -474,31 +532,52 @@ window.sealUnrevealedPackage = function(pkg) {
   delete copy.secretRevealPackage;
   delete copy.secretRevealData;
   delete copy.secret_package;
+
+  const baseDays = (copy.hotel && Array.isArray(copy.hotel.mysteryDays) && copy.hotel.mysteryDays.length)
+    ? copy.hotel.mysteryDays
+    : copy.days;
+  if (Array.isArray(baseDays) && typeof window.normalizeItineraryDays === "function") {
+    copy.days = window.normalizeItineraryDays(baseDays).map(d => ({
+      d: window.scrubPreRevealText(d.d),
+      m: window.scrubPreRevealText(d.m),
+      a: window.scrubPreRevealText(d.a),
+      e: window.scrubPreRevealText(d.e)
+    }));
+  }
+  if (copy.flightLabel) {
+    copy.flightLabel = window.scrubPreRevealText(copy.flightLabel);
+  }
+  if (copy.reasoningLog) {
+    copy.reasoningLog = window.scrubPreRevealText(copy.reasoningLog);
+  }
   if (copy.reveal && typeof copy.reveal === "object") {
     copy.reveal = {
       ...copy.reveal,
       city: "✦ ĐIỂM ĐẾN NIÊM PHONG SÁP ✦",
       hotel: "Resort 4-5★ Tiêu Chuẩn Quốc Tế SLA (Niêm Phong Tên)",
-      title: (copy.hotel && copy.hotel.mysteryTitle) || "Kỳ Nghỉ Bí Mật 3N2Đ (Niêm Phong Danh Tính)",
-      transport: copy.flightLabel || "Chuyến bay khứ hồi chuẩn SLA (✈️ Sân bay bí mật)",
-      sla: "SLA-SEALED-UNTIL-REVEAL"
+      title: window.scrubPreRevealText((copy.hotel && copy.hotel.mysteryTitle) || "Kỳ Nghỉ Bí Mật 3N2Đ (Niêm Phong Danh Tính)"),
+      transport: window.scrubPreRevealText(copy.flightLabel || "Chuyến bay khứ hồi chuẩn SLA (✈️ Sân bay bí mật)"),
+      sla: "SLA-SEALED-UNTIL-REVEAL",
+      room_type: "Hạng phòng Deluxe / Suite Tiêu Chuẩn SLA (Niêm phong)"
     };
   }
   if (copy.hotel && typeof copy.hotel === "object") {
     copy.hotel = {
       city: "ĐIỂM ĐẾN BÍ MẬT",
       name: copy.hotel.mysteryStayLabel || "Resort 4-5★ Tiêu Chuẩn Quốc Tế SLA",
-      title: copy.hotel.mysteryTitle || "Kỳ Nghỉ Bí Mật 3N2Đ",
+      title: window.scrubPreRevealText(copy.hotel.mysteryTitle || "Kỳ Nghỉ Bí Mật 3N2Đ"),
       region: copy.hotel.region || "Miền Bí Mật",
       climate: copy.hotel.climate || "Khí hậu dễ chịu",
       temp: copy.hotel.temp || "18°C - 26°C",
-      hint: copy.hotel.hint || "Không gian nghỉ dưỡng tuyển chọn nghiêm ngặt theo tiêu chuẩn SLA.",
+      hint: window.scrubPreRevealText(copy.hotel.hint || "Không gian nghỉ dưỡng tuyển chọn nghiêm ngặt theo tiêu chuẩn SLA."),
       packing: Array.isArray(copy.hotel.packing) ? copy.hotel.packing : [],
-      mysteryTitle: copy.hotel.mysteryTitle || "Kỳ Nghỉ Bí Mật 3N2Đ",
+      mysteryTitle: window.scrubPreRevealText(copy.hotel.mysteryTitle || "Kỳ Nghỉ Bí Mật 3N2Đ"),
+      mysteryTheme: copy.hotel.mysteryTheme || "Nghỉ Dưỡng 5 Sao",
       mysteryStayLabel: copy.hotel.mysteryStayLabel || "Resort 4-5★ Tiêu Chuẩn Quốc Tế SLA",
-      mysteryDays: Array.isArray(copy.hotel.mysteryDays) ? copy.hotel.mysteryDays : [],
-      days: Array.isArray(copy.hotel.mysteryDays) ? copy.hotel.mysteryDays : [],
-      vibe: copy.hotel.vibe ? { ...copy.hotel.vibe } : undefined,
+      mysteryDays: Array.isArray(copy.days) ? copy.days : [],
+      days: Array.isArray(copy.days) ? copy.days : [],
+      vec: copy.hotel.vec ? { ...copy.hotel.vec } : (copy.hotel.vibe ? { ...copy.hotel.vibe } : undefined),
+      vibe: copy.hotel.vibe ? { ...copy.hotel.vibe } : (copy.hotel.vec ? { ...copy.hotel.vec } : undefined),
       rating: copy.hotel.rating || "4.9",
       room_type: "Hạng phòng Deluxe / Suite Tiêu Chuẩn SLA (Niêm phong)",
       room_specs: "Không gian nghỉ dưỡng chuẩn 4-5★, tầm nhìn thiên nhiên khoáng đạt (Chi tiết mở khóa khi Reveal)",
@@ -513,9 +592,14 @@ window.sealUnrevealedPackage = function(pkg) {
     copy.flight = {
       city: "SÂN BAY BÍ MẬT",
       id: "SEALED",
-      airline: "Hãng Hàng Không Chuẩn SLA (Mở khóa khi Reveal)",
+      airline: window.maskPreRevealAirline(copy.flight.airline),
+      aircraft: copy.flight.aircraft || "Airbus A321 Neo",
+      seat_pitch: copy.flight.seat_pitch || "32 inch êm ái",
+      meal: copy.flight.meal || "Suất ăn nhẹ & Nước uống đóng chai",
+      otp: copy.flight.otp || "98.9% Đúng giờ",
+      luggage: copy.flight.luggage || copy.flight.bag || "23kg Ký gửi + 07kg Xách tay",
       time: "Khung giờ bay tiêu chuẩn (Sáng / Trưa)",
-      bag: copy.flight.bag || "23kg Ký gửi + 07kg Xách tay"
+      bag: copy.flight.bag || copy.flight.luggage || "23kg Ký gửi + 07kg Xách tay"
     };
   }
   if (Array.isArray(copy.candidates)) {
@@ -1490,7 +1574,8 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
     url: `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${chosen.unitCost}&addInfo=${encodeURIComponent(`${code} KH${i + 1}`)}&accountName=${encodeURIComponent("CONG TY TNHH WANDERMATCH VN")}`
   }));
 
-  const reasoningLog = `[Thuật toán Knapsack + Cosine Matching]: Đã tối ưu gói ngân sách ${window.formatVND(inp.budget)}/khách ➔ Khớp cặp vé máy bay khứ hồi ${chosen.f.airline} + 2 đêm nghỉ dưỡng tại Resort ${chosen.h.rating}★ chuẩn SLA quốc tế (Đã niêm phong tên đến sân bay). Điểm Utility đạt ${chosen.util}/100, tương thích 5 chiều cảm xúc đạt ${chosen.sim}%. Tiết kiệm ngay ${window.formatVND(savings)} nhờ quỹ phòng ẩn danh OTA Wholesale.`;
+  const maskedChosenAirline = window.maskPreRevealAirline(chosen.f.airline);
+  const reasoningLog = `[Thuật toán Knapsack + Cosine Matching]: Đã tối ưu gói ngân sách ${window.formatVND(inp.budget)}/khách ➔ Khớp cặp vé máy bay khứ hồi ${maskedChosenAirline} + 2 đêm nghỉ dưỡng tại Resort ${chosen.h.rating}★ chuẩn SLA quốc tế (Đã niêm phong tên đến sân bay). Điểm Utility đạt ${chosen.util}/100, tương thích 5 chiều cảm xúc đạt ${chosen.sim}%. Tiết kiệm ngay ${window.formatVND(savings)} nhờ quỹ phòng ẩn danh OTA Wholesale.`;
 
   // Tạo ứng viên cho UI (Gợi ý cao nhất #1 và các ứng viên thay thế)
   const candidates = topCombos.map((tc, idx) => ({
@@ -1503,14 +1588,14 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
     temp: tc.h.temp,
     weather: tc.h.weather,
     mysteryTheme: tc.h.mysteryTheme || "Thiên Nhiên & Nghỉ Dưỡng",
-    airline: tc.f.airline,
+    airline: window.maskPreRevealAirline(tc.f.airline),
     unitCost: tc.unitCost,
     savings: (tc.unitRetail - tc.unitCost) * inp.groupSize
   }));
 
   const isHighestMatch = chosen.comboId === topCombos[0]?.comboId;
 
-  return {
+  return window.sealUnrevealedPackage({
     code, 
     comboId: chosen.comboId, 
     isLocked: false, 
@@ -1534,26 +1619,26 @@ window.runBlindTravelEngine = function(avoidRepeat = true) {
     qrs,
     candidates,
     activeCandidateIndex: topCombos.findIndex(tc => tc.comboId === chosen.comboId),
-    flightLabel: `Khứ hồi ${chosen.f.airline} (Khởi hành từ ${inp.origin || 'HAN'} ✈️ Sân bay bí mật)`,
+    flightLabel: `Khứ hồi ${maskedChosenAirline} (Khởi hành từ ${inp.origin || 'HAN'} ✈️ Sân bay bí mật)`,
     hotelLabel: `Resort ${chosen.h.rating}★ tiêu chuẩn quốc tế (Kèm buffet sáng & xe đưa đón)`,
     expectedAmount: totalPaid,
     packageCost: totalPaid,
     reveal: {
       city: "✦ ĐIỂM ĐẾN NIÊM PHONG SÁP ✦", 
       title: chosen.h.mysteryTitle || "Kỳ Nghỉ Bí Mật 3N2Đ", 
-      sla: chosen.h.sla,
-      room_type: chosen.h.room_type,
+      sla: "SLA-SEALED-UNTIL-REVEAL",
+      room_type: "Hạng phòng Deluxe / Suite Tiêu Chuẩn SLA (Niêm phong)",
       img: chosen.h.img,
       gallery: chosen.h.gallery || [chosen.h.img],
       room_specs: chosen.h.room_specs,
       amenities: chosen.h.amenities,
-      transport: `Chuyến bay khứ hồi ${chosen.f.airline} (✈️ Sân bay bí mật)`,
+      transport: `Chuyến bay khứ hồi ${maskedChosenAirline} (✈️ Sân bay bí mật)`,
       hotel: "Resort 4-5★ Tiêu Chuẩn Quốc Tế SLA (Niêm Phong Tên)", 
       paid: totalPaid, 
       retail: totalRetail, 
       savings
     }
-  };
+  });
 };
 
 window.serverTop3Curated = [];
@@ -1711,7 +1796,7 @@ window.selectBlindTravelCandidate = function(candidateIdx) {
       temp: sc ? sc.weatherTempC : tc.h.temp,
       weather: sc ? sc.weatherDesc : tc.h.weather,
       mysteryTheme: tc.h.mysteryTheme || "Thiên Nhiên & Nghỉ Dưỡng",
-      airline: sc ? sc.airline : tc.f.airline,
+      airline: window.maskPreRevealAirline(sc ? sc.airline : tc.f.airline),
       unitCost: sc ? sc.costPerPerson : tc.unitCost,
       savings: sc ? sc.savingsVnd : (tc.unitRetail - tc.unitCost) * inp.groupSize
     };
@@ -1720,6 +1805,7 @@ window.selectBlindTravelCandidate = function(candidateIdx) {
   const isHighestMatch = candidateIdx === 0;
   const v4Cand = (Array.isArray(window.v4Packages) && (window.v4Packages[candidateIdx] || window.v4Packages[0])) || null;
   const resolvedV4PkgId = v4Cand ? (v4Cand.package_id || v4Cand.id) : undefined;
+  const maskedAirline = window.maskPreRevealAirline(chosen.f.airline);
 
   const newPkg = {
     code,
@@ -1737,31 +1823,31 @@ window.selectBlindTravelCandidate = function(candidateIdx) {
     utilityScore: serverCand ? serverCand.utilityScore : chosen.util,
     knapsackRatio: chosen.knapsackRatio,
     wholesaleSurplus: chosen.wholesaleSurplus,
-    reasoningLog: `[Đã chuyển sang Ứng Viên #${candidateIdx + 1}]: Khớp ${chosen.f.airline} + Resort ${chosen.h.rating}★ SLA. Khớp gu ${serverCand ? serverCand.matchScore : chosen.sim}%.`,
+    reasoningLog: `[Đã chuyển sang Ứng Viên #${candidateIdx + 1}]: Khớp ${maskedAirline} + Resort ${chosen.h.rating}★ SLA. Khớp gu ${serverCand ? serverCand.matchScore : chosen.sim}%.`,
     temp: serverCand ? serverCand.weatherTempC : chosen.h.temp,
     weather: serverCand ? serverCand.weatherDesc : chosen.h.weather,
     hint: (serverCand && serverCand.mysteryHint) || chosen.h.hint,
     packing: (serverCand && serverCand.packingChecklist) || chosen.h.packing,
     food: chosen.h.food,
-    days: window.normalizeItineraryDays((serverCand && serverCand.itinerary) || chosen.h.mysteryDays || chosen.h.days, chosen.h.days),
+    days: window.normalizeItineraryDays((serverCand && serverCand.itinerary) || chosen.h.mysteryDays || chosen.h.days, chosen.h.mysteryDays || chosen.h.days),
     reviews: chosen.h.reviews || [],
     flight: chosen.f,
     hotel: chosen.h,
     qrs,
     candidates,
     activeCandidateIndex: candidateIdx,
-    flightLabel: `Khứ hồi ${chosen.f.airline} (Khởi hành từ ${inp.origin || 'HAN'} ✈️ Sân bay bí mật)`,
+    flightLabel: `Khứ hồi ${maskedAirline} (Khởi hành từ ${inp.origin || 'HAN'} ✈️ Sân bay bí mật)`,
     hotelLabel: `Resort ${chosen.h.rating}★ tiêu chuẩn quốc tế (Kèm buffet sáng & xe đưa đón)`,
     reveal: {
       city: "✦ ĐIỂM ĐẾN NIÊM PHONG SÁP ✦",
       title: chosen.h.mysteryTitle || "Kỳ Nghỉ Bí Mật 3N2Đ",
-      sla: chosen.h.sla,
-      room_type: chosen.h.room_type,
+      sla: "SLA-SEALED-UNTIL-REVEAL",
+      room_type: "Hạng phòng Deluxe / Suite Tiêu Chuẩn SLA (Niêm phong)",
       img: chosen.h.img,
       gallery: chosen.h.gallery || [chosen.h.img],
       room_specs: chosen.h.room_specs,
       amenities: chosen.h.amenities,
-      transport: `Chuyến bay khứ hồi ${chosen.f.airline} (✈️ Sân bay bí mật)`,
+      transport: `Chuyến bay khứ hồi ${maskedAirline} (✈️ Sân bay bí mật)`,
       hotel: "Resort 4-5★ Tiêu Chuẩn Quốc Tế SLA (Niêm Phong Tên)",
       paid: totalPaid,
       retail: totalRetail,
@@ -1769,10 +1855,11 @@ window.selectBlindTravelCandidate = function(candidateIdx) {
     }
   };
 
-  window.saveStore("wm_draft_prod", newPkg);
-  window.renderPackageUI(newPkg);
+  const sealedPkg = window.sealUnrevealedPackage(newPkg);
+  window.saveStore("wm_draft_prod", sealedPkg);
+  window.renderPackageUI(sealedPkg);
   window.updatePersonaUI();
-  window.showToast(`✦ Đã chuyển sang Ứng viên #${candidateIdx + 1}: ${chosen.h.mysteryTheme || 'Kỳ Nghỉ Bí Mật'} (Khớp gu ${newPkg.matchScore}%)`, "success");
+  window.showToast(`✦ Đã chuyển sang Ứng viên #${candidateIdx + 1}: ${chosen.h.mysteryTheme || 'Kỳ Nghỉ Bí Mật'} (Khớp gu ${sealedPkg.matchScore}%)`, "success");
 };
 
 
@@ -2139,50 +2226,58 @@ window.selectComboAlternative = function(idx) {
     url: `https://img.vietqr.io/image/MB-0988888888-compact2.png?amount=${chosen.unitCost}&addInfo=${encodeURIComponent(`${code} KH${i + 1}`)}&accountName=${encodeURIComponent("CONG TY TNHH WANDERMATCH VN")}`
   }));
 
-  const reasoningLog = `[Lựa chọn phương án #${idx + 1}]: Khách hàng đã chuyển sang gói ${chosen.h.mysteryTheme || chosen.h.title}. Độ tương thích ${chosen.sim}%, tối ưu ${chosen.knapsackRatio}% ngân sách. Tiết kiệm ${window.formatVND(savings)}.`;
+  const reasoningLog = `[Lựa chọn phương án #${idx + 1}]: Khách hàng đã chuyển sang gói ${chosen.h.mysteryTheme || "Kỳ Nghỉ Bí Mật"}. Độ tương thích ${chosen.sim}%, tối ưu ${chosen.knapsackRatio}% ngân sách. Tiết kiệm ${window.formatVND(savings)}.`;
+  const v4Cand = (Array.isArray(window.v4Packages) && (window.v4Packages[idx] || window.v4Packages[0])) || null;
+  const resolvedV4PkgId = v4Cand ? (v4Cand.package_id || v4Cand.id) : undefined;
+  const maskedAirline = window.maskPreRevealAirline(chosen.f.airline);
 
   const newPkg = {
-    code, 
-    comboId: chosen.comboId, 
-    isLocked: false, 
+    code,
+    recommendationId: window.currentRecommendationId || undefined,
+    v4PackageId: resolvedV4PkgId,
+    packageId: resolvedV4PkgId || undefined,
+    expectedAmount: totalPaid,
+    packageCost: totalPaid,
+    comboId: chosen.comboId,
+    isLocked: false,
     isRevealed: false,
-    matchScore: chosen.sim, 
+    matchScore: chosen.sim,
     utilityScore: chosen.util,
     knapsackRatio: chosen.knapsackRatio,
     reasoningLog,
-    temp: chosen.h.temp, 
+    temp: chosen.h.temp,
     weather: chosen.h.weather,
-    hint: chosen.h.hint, 
-    packing: chosen.h.packing, 
-    food: chosen.h.food, 
-    days: chosen.h.mysteryDays || chosen.h.days,
-    realDays: chosen.h.days, 
+    hint: chosen.h.hint,
+    packing: chosen.h.packing,
+    food: chosen.h.food,
+    days: window.normalizeItineraryDays(chosen.h.mysteryDays || chosen.h.days),
     reviews: chosen.h.reviews || [],
     flight: chosen.f,
     hotel: chosen.h,
     qrs,
-    flightLabel: `Khứ hồi ${chosen.f.airline} (Khởi hành từ ${inp.origin || 'HAN'} ✈️ Sân bay bí mật)`,
+    flightLabel: `Khứ hồi ${maskedAirline} (Khởi hành từ ${inp.origin || 'HAN'} ✈️ Sân bay bí mật)`,
     hotelLabel: `Resort ${chosen.h.rating}★ tiêu chuẩn quốc tế (Kèm buffet sáng & xe đưa đón)`,
     reveal: {
-      city: "✦ ĐIỂM ĐẾN NIÊM PHONG SÁP ✦", 
-      title: chosen.h.mysteryTitle || "Kỳ Nghỉ Bí Mật 3N2Đ", 
+      city: "✦ ĐIỂM ĐẾN NIÊM PHONG SÁP ✦",
+      title: chosen.h.mysteryTitle || "Kỳ Nghỉ Bí Mật 3N2Đ",
       sla: "SLA-SEALED-UNTIL-REVEAL",
       room_type: "Deluxe Suite View Đẹp (Tiêu Chuẩn SLA)",
       img: chosen.h.img,
       gallery: chosen.h.gallery || [chosen.h.img],
       room_specs: chosen.h.room_specs,
       amenities: chosen.h.amenities,
-      transport: `Chuyến bay khứ hồi ${chosen.f.airline} (✈️ Sân bay bí mật)`,
-      hotel: "Resort 4-5★ Tiêu Chuẩn Quốc Tế SLA (Niêm Phong Tên)", 
-      paid: totalPaid, 
-      retail: totalRetail, 
+      transport: `Chuyến bay khứ hồi ${maskedAirline} (✈️ Sân bay bí mật)`,
+      hotel: "Resort 4-5★ Tiêu Chuẩn Quốc Tế SLA (Niêm Phong Tên)",
+      paid: totalPaid,
+      retail: totalRetail,
       savings
     }
   };
 
-  window.saveStore("wm_draft_prod", newPkg);
-  window.renderPackageUI(newPkg);
-  window.showToast(`Đã chuyển sang phương án #${idx + 1}: ${chosen.h.mysteryTitle || chosen.h.title} (Khớp ${chosen.sim}%)!`);
+  const sealedPkg = window.sealUnrevealedPackage(newPkg);
+  window.saveStore("wm_draft_prod", sealedPkg);
+  window.renderPackageUI(sealedPkg);
+  window.showToast(`Đã chuyển sang phương án #${idx + 1}: ${chosen.h.mysteryTitle || "Kỳ Nghỉ Bí Mật"} (Khớp ${chosen.sim}%)!`);
 };
 
 // ============================================================================
@@ -2739,7 +2834,7 @@ window.renderPackageUI = function(pkg) {
                     <span class="text-amber-300 font-bold font-mono text-[11px]">${tc.sim}% Tương Thích</span>
                   </div>
                   <strong class="text-sm text-white font-heading block line-clamp-1">${tc.h.mysteryTitle || tc.h.title}</strong>
-                  <p class="text-[11px] text-slate-300 mt-0.5 line-clamp-1">✈️ ${tc.f.airline} • 🏨 Resort ${tc.h.rating}★ (${tc.h.temp}°C — ${tc.h.weather})</p>
+                  <p class="text-[11px] text-slate-300 mt-0.5 line-clamp-1">✈️ ${window.maskPreRevealAirline(tc.f.airline)} • 🏨 Resort ${tc.h.rating}★ (${tc.h.temp}°C — ${tc.h.weather})</p>
                 </div>
 
                 <div class="pt-2 border-t border-white/10 flex items-center justify-between">
@@ -4415,12 +4510,14 @@ window.renderB2BTab = function() {
       <div class="relative h-48 overflow-hidden">
         <img src="${h.img}" alt="${sealedStay}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
         <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
-        <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-950/85 text-amber-300 font-extrabold backdrop-blur-md border border-amber-400/30 flex items-center gap-1 shadow">
-          ★ ${h.rating} (${h.reviews_count} đánh giá)
-        </span>
-        <span class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-teal-950/85 text-teal-300 font-mono font-bold backdrop-blur-md border border-teal-400/30 shadow">
-          ${h.sla}
-        </span>
+        <div class="absolute top-3 left-3 right-3 flex flex-wrap items-center justify-between gap-1.5 pointer-events-none">
+          <span class="px-2.5 py-0.5 text-[10px] rounded-full bg-slate-950/85 text-amber-300 font-extrabold backdrop-blur-md border border-amber-400/30 flex items-center gap-1 shadow">
+            ★ ${h.rating} (${h.reviews_count} đánh giá)
+          </span>
+          <span class="px-2.5 py-0.5 text-[10px] rounded-full bg-teal-950/85 text-teal-300 font-mono font-bold backdrop-blur-md border border-teal-400/30 shadow">
+            ${h.sla}
+          </span>
+        </div>
         <div class="absolute bottom-3 left-3 right-3 flex justify-between items-center text-[10px]">
           <span class="px-2.5 py-0.5 rounded-md bg-emerald-500/25 text-emerald-300 font-extrabold backdrop-blur-md border border-emerald-400/30">
             Quỹ phòng: Còn 2-4 phòng trống
@@ -4503,7 +4600,7 @@ window.createPackageFromB2B = function(hotelId) {
     hint: hotel.hint,
     packing: hotel.packing,
     food: hotel.food,
-    days: hotel.days,
+    days: hotel.mysteryDays || hotel.days,
     reviews: hotel.reviews || [],
     qrs,
     flightLabel: `Chuyến bay khứ hồi giờ đẹp (${flight.time_window || "07:00 - 11:30"})`,

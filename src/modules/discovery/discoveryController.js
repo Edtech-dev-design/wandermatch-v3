@@ -9,7 +9,52 @@ import { deterministicUuidV4 } from "../../services/v4RelationalEngine.js";
 export async function handleCreateRecommendationsV4({ authUser, body, env, v4db }) {
   const user = requireAuthenticatedUser(authUser);
   const resolvedUserId = deterministicUuidV4(user.userId || user.email);
-  const departureDate = body.departureDate || "2026-11-15";
+
+  const rawOrigin = body?.originAirport;
+  const originAirport = rawOrigin === undefined || rawOrigin === null || rawOrigin === ""
+    ? "SGN"
+    : String(rawOrigin).trim().toUpperCase();
+  if (!/^[A-Z]{3}$/.test(originAirport)) {
+    const err = new Error("VALIDATION_ERROR: originAirport must be a 3-letter IATA code.");
+    err.code = "VALIDATION_ERROR";
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const rawBudget = body?.budgetPerPersonVnd;
+  const budgetPerPersonVnd = rawBudget === undefined || rawBudget === null || rawBudget === ""
+    ? 5500000
+    : Number(rawBudget);
+  if (!Number.isFinite(budgetPerPersonVnd) || budgetPerPersonVnd < 1000000 || budgetPerPersonVnd > 500000000) {
+    const err = new Error("VALIDATION_ERROR: budgetPerPersonVnd must be between 1,000,000 and 500,000,000 VND.");
+    err.code = "VALIDATION_ERROR";
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const rawGroup = body?.groupSize;
+  const groupSize = rawGroup === undefined || rawGroup === null || rawGroup === ""
+    ? 2
+    : Number(rawGroup);
+  if (!Number.isInteger(groupSize) || groupSize < 1 || groupSize > 20) {
+    const err = new Error("VALIDATION_ERROR: groupSize must be an integer between 1 and 20.");
+    err.code = "VALIDATION_ERROR";
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const rawDuration = body?.durationDays;
+  const durationDays = rawDuration === undefined || rawDuration === null || rawDuration === ""
+    ? 3
+    : Number(rawDuration);
+  if (!Number.isInteger(durationDays) || durationDays < 1 || durationDays > 30) {
+    const err = new Error("VALIDATION_ERROR: durationDays must be an integer between 1 and 30.");
+    err.code = "VALIDATION_ERROR";
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const departureDate = String(body?.departureDate || "2026-11-15").trim();
 
   const isPostgresRpc =
     env &&
@@ -38,11 +83,11 @@ export async function handleCreateRecommendationsV4({ authUser, body, env, v4db 
     userId: resolvedUserId,
     userEmail: user.email || null,
     userName: user.name || user.fullName || null,
-    originAirport: body.originAirport || "SGN",
-    budgetPerPersonVnd: Number(body.budgetPerPersonVnd || 5500000),
-    groupSize: Number(body.groupSize || 2),
+    originAirport,
+    budgetPerPersonVnd,
+    groupSize,
     departureDate,
-    durationDays: Number(body.durationDays || 3),
+    durationDays,
     userPreferences: body.userPreferences || {},
     blacklistedSlugs: body.blacklistedSlugs || [],
     comfortLocks: body.comfortLocks || {}

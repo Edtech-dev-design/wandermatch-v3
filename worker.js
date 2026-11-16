@@ -832,6 +832,20 @@ async function verifyWebhookAuthentication(request, env) {
     return { ok: false, status: 500, error: "Server webhook secret is unconfigured." };
   }
 
+  // Optional replay-window enforcement when caller supplies a timestamp header (max +/- 5 minutes)
+  const tsHeader = (
+    request.headers.get("x-webhook-timestamp") ||
+    request.headers.get("x-sepay-timestamp") ||
+    ""
+  ).trim();
+  if (tsHeader) {
+    const tsNum = Number(tsHeader);
+    const tsMs = tsNum > 1e12 ? tsNum : tsNum * 1000;
+    if (!Number.isFinite(tsNum) || !Number.isFinite(tsMs) || Math.abs(Date.now() - tsMs) > 5 * 60 * 1000) {
+      return { ok: false, status: 401, error: "Unauthorized: Webhook timestamp expired or invalid." };
+    }
+  }
+
   // 1. Check direct secret header (x-webhook-secret or Authorization)
   const authHeader = request.headers.get("Authorization") || "";
   const secretHeader = request.headers.get("x-webhook-secret") || "";
@@ -844,7 +858,7 @@ async function verifyWebhookAuthentication(request, env) {
     return { ok: true };
   }
 
-  // 2. Check HMAC-SHA256 signature header
+  // 2. Check HMAC-SHA256 signature header (rawBody and optional timestamp.rawBody)
   const signature = request.headers.get("x-sepay-signature") ||
                     request.headers.get("x-webhook-signature") ||
                     request.headers.get("x-signature") || "";
@@ -863,6 +877,13 @@ async function verifyWebhookAuthentication(request, env) {
       const expectedHex = Array.from(new Uint8Array(macBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
       if (timingSafeEqualStr(signature.toLowerCase(), expectedHex.toLowerCase())) {
         return { ok: true };
+      }
+      if (tsHeader) {
+        const tsMacBuffer = await crypto.subtle.sign("HMAC", key, enc.encode(`${tsHeader}.${rawBody}`));
+        const expectedTsHex = Array.from(new Uint8Array(tsMacBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+        if (timingSafeEqualStr(signature.toLowerCase(), expectedTsHex.toLowerCase())) {
+          return { ok: true };
+        }
       }
     } catch (_) {
       // Fall through to unauthorized
