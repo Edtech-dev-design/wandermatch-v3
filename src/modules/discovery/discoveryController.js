@@ -4,7 +4,7 @@
 
 import { requireAuthenticatedUser } from "../../middleware/authMiddleware.js";
 import { invokePostgresRpc, selectPostgresRows } from "../../services/supabase/postgresRpcClient.js";
-import { deterministicUuidV4 } from "../../services/v4RelationalEngine.js";
+import { deterministicUuidV4, V4RelationalDatabase } from "../../services/v4RelationalEngine.js";
 
 export async function handleCreateRecommendationsV4({ authUser, body, env, v4db }) {
   const user = requireAuthenticatedUser(authUser);
@@ -62,62 +62,74 @@ export async function handleCreateRecommendationsV4({ authUser, body, env, v4db 
     env.SUPABASE_SERVICE_ROLE_KEY &&
     String(env.USE_V4_POSTGRES_RPC).toLowerCase() === "true";
 
-  if (isPostgresRpc) {
-    try {
-      const invRes = await invokePostgresRpc(env, v4db, {
-        rpcName: "ensure_inventory_for_date_v4",
+  // Isolate request-local recommendation calculation in Postgres RPC mode so concurrent
+  // Cloudflare Worker requests never await a shared cluster.txMutex across I/O contexts.
+  const activeV4Db = isPostgresRpc
+    ? new V4RelationalDatabase(`req_${crypto.randomUUID()}`)
+    : v4db;
+
+  try {
+    if (isPostgresRpc) {
+      try {
+        const invRes = await invokePostgresRpc(env, activeV4Db, {
+          rpcName: "ensure_inventory_for_date_v4",
+          role: "service_role",
+          uid: null,
+          args: { p_departure_date: departureDate }
+        });
+        if (invRes && Array.isArray(invRes.inventories)) {
+          activeV4Db.syncRemoteInventoriesForDate(departureDate, invRes.inventories);
+        }
+      } catch {
+        // Fall back to baseline / local clone if remote ensure fails
+      }
+    }
+
+    // Strictly bind recommendation session to authenticated JWT userId (never body.user_id)
+    const result = await activeV4Db.createRecommendationSessionAndPackages({
+      userId: resolvedUserId,
+      userEmail: user.email || null,
+      userName: user.name || user.fullName || null,
+      originAirport,
+      budgetPerPersonVnd,
+      groupSize,
+      departureDate,
+      durationDays,
+      userPreferences: body.userPreferences || {},
+      blacklistedSlugs: body.blacklistedSlugs || [],
+      comfortLocks: body.comfortLocks || {}
+    });
+
+    if (isPostgresRpc) {
+      const sessionRow = activeV4Db.tables.recommendation_sessions.find(s => s.id === result.session_id);
+      const pkgRows = activeV4Db.tables.packages.filter(p => p.session_id === result.session_id);
+      const pkgIds = new Set(pkgRows.map(p => p.id));
+      const itemRows = activeV4Db.tables.package_items.filter(i => pkgIds.has(i.package_id));
+      const enrichedSession = sessionRow
+        ? {
+            ...sessionRow,
+            user_email: user.email || null,
+            user_name: user.name || user.fullName || null
+          }
+        : sessionRow;
+      await invokePostgresRpc(env, activeV4Db, {
+        rpcName: "persist_recommendation_session_v4",
         role: "service_role",
         uid: null,
-        args: { p_departure_date: departureDate }
+        args: {
+          p_session: enrichedSession,
+          p_packages: pkgRows,
+          p_package_items: itemRows
+        }
       });
-      if (invRes && Array.isArray(invRes.inventories)) {
-        v4db.syncRemoteInventoriesForDate(departureDate, invRes.inventories);
-      }
-    } catch {
-      // Fall back to baseline / local clone if remote ensure fails
+    }
+
+    return { success: true, ...result };
+  } finally {
+    if (isPostgresRpc) {
+      globalThis.__WANDERMATCH_V4_PG_CLUSTERS__?.delete(activeV4Db.clusterName);
     }
   }
-
-  // Strictly bind recommendation session to authenticated JWT userId (never body.user_id)
-  const result = await v4db.createRecommendationSessionAndPackages({
-    userId: resolvedUserId,
-    userEmail: user.email || null,
-    userName: user.name || user.fullName || null,
-    originAirport,
-    budgetPerPersonVnd,
-    groupSize,
-    departureDate,
-    durationDays,
-    userPreferences: body.userPreferences || {},
-    blacklistedSlugs: body.blacklistedSlugs || [],
-    comfortLocks: body.comfortLocks || {}
-  });
-
-  if (isPostgresRpc) {
-    const sessionRow = v4db.tables.recommendation_sessions.find(s => s.id === result.session_id);
-    const pkgRows = v4db.tables.packages.filter(p => p.session_id === result.session_id);
-    const pkgIds = new Set(pkgRows.map(p => p.id));
-    const itemRows = v4db.tables.package_items.filter(i => pkgIds.has(i.package_id));
-    const enrichedSession = sessionRow
-      ? {
-          ...sessionRow,
-          user_email: user.email || null,
-          user_name: user.name || user.fullName || null
-        }
-      : sessionRow;
-    await invokePostgresRpc(env, v4db, {
-      rpcName: "persist_recommendation_session_v4",
-      role: "service_role",
-      uid: null,
-      args: {
-        p_session: enrichedSession,
-        p_packages: pkgRows,
-        p_package_items: itemRows
-      }
-    });
-  }
-
-  return { success: true, ...result };
 }
 
 export async function handleGetCatalogV4({ env, v4db }) {

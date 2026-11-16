@@ -120,7 +120,7 @@ export default {
     }
 
     // 3. Sliding-window rate limit check
-    const rate = checkRateLimit(request);
+    const rate = checkRateLimit(request, env);
     if (!rate.allowed) {
       return new Response(
         JSON.stringify({ success: false, error: "RATE_LIMIT_EXCEEDED", message: "Too many requests.", requestId }),
@@ -154,52 +154,73 @@ export default {
       );
     }
 
-    // 4. Transactional Storage Lock + Modular V4 Dispatch + Legacy Fallback
+    // 4. Request Execution: direct isolated I/O in Postgres RPC mode; serialized storage lock in local/KV mode
+    const isPostgresRpc =
+      Boolean(env?.SUPABASE_URL) &&
+      Boolean(env?.SUPABASE_SERVICE_ROLE_KEY) &&
+      String(env?.USE_V4_POSTGRES_RPC).toLowerCase() === "true";
+
+    const executeRequest = async (persistOnMutation) => {
+      let response;
+      const routed = await dispatchV4Route(request, env, ctx, {
+        url,
+        v4db: getV4Db(),
+        storage: STORAGE,
+        hashPassword,
+        verifyToken,
+        authenticateRequest,
+        verifyWebhookAuthentication,
+        handleAuth,
+        logger,
+        corsHeaders,
+        requestId
+      });
+
+      if (routed && routed.matched) {
+        response = routed.response;
+      } else {
+        response = await legacyHandler.fetch(request, env, ctx);
+      }
+
+      if (persistOnMutation && ["POST", "PUT", "PATCH", "DELETE"].includes(request.method.toUpperCase()) && response.status < 500) {
+        await persist(env);
+      }
+      return attachTracingHeaders(response, requestId, env);
+    };
+
+    const handleWorkerError = (err) => {
+      logger.error("UNHANDLED_WORKER_EXCEPTION", { path: url.pathname, error: err?.message });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: err?.message || "Internal server error",
+          code: err?.code || "INTERNAL_ERROR",
+          requestId
+        }),
+        {
+          status: err?.statusCode || 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json", "X-Request-Id": requestId }
+        }
+      );
+    };
+
+    if (isPostgresRpc) {
+      try {
+        return await executeRequest(false);
+      } catch (err) {
+        return handleWorkerError(err);
+      }
+    }
+
     return withStorageLock(async () => {
       await hydrate(env);
       const preSnapshot = cloneSnapshot(STORAGE);
       try {
-        let response;
-        const routed = await dispatchV4Route(request, env, ctx, {
-          url,
-          v4db: getV4Db(),
-          storage: STORAGE,
-          hashPassword,
-          verifyToken,
-          authenticateRequest,
-          verifyWebhookAuthentication,
-          handleAuth,
-          logger,
-          corsHeaders,
-          requestId
-        });
-
-        if (routed && routed.matched) {
-          response = routed.response;
-        } else {
-          response = await legacyHandler.fetch(request, env, ctx);
-        }
-
-        if (["POST", "PUT", "PATCH", "DELETE"].includes(request.method.toUpperCase()) && response.status < 500) {
-          await persist(env);
-        }
-        return attachTracingHeaders(response, requestId, env);
+        return await executeRequest(true);
       } catch (err) {
         for (const k of Object.keys(STORAGE)) delete STORAGE[k];
         Object.assign(STORAGE, preSnapshot);
-        logger.error("UNHANDLED_WORKER_EXCEPTION", { path: url.pathname, error: err?.message });
-        return new Response(
-          JSON.stringify({
-            success: false,
-            error: err?.message || "Internal server error",
-            code: err?.code || "INTERNAL_ERROR",
-            requestId
-          }),
-          {
-            status: err?.statusCode || 500,
-            headers: { ...corsHeaders, "Content-Type": "application/json", "X-Request-Id": requestId }
-          }
-        );
+        return handleWorkerError(err);
       }
     });
   }
